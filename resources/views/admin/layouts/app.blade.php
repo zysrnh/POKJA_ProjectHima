@@ -95,11 +95,18 @@
             class="fixed lg:static inset-y-0 left-0 z-50 w-64 lg:w-64 bg-gray-900 text-white flex flex-col justify-between -translate-x-full lg:translate-x-0 transition-all duration-200 ease-in-out border-r border-gray-800 shrink-0"
         >
             <div class="w-64">
-                <!-- Brand Header in Sidebar -->
-                <div class="h-16 flex items-center justify-between px-6 bg-gray-950 border-b border-gray-800">
-                    <div class="flex items-center gap-3">
-                        <span class="bg-blue-600 text-white text-[11px] font-bold px-2 py-0.5 uppercase tracking-wider">Admin</span>
-                        <span class="font-bold text-sm uppercase tracking-wider text-white">POKJA HIMA IF</span>
+                <!-- Brand Header in Sidebar with Logo -->
+                <div class="h-16 flex items-center justify-between px-4 bg-gray-950 border-b border-gray-800">
+                    <div class="flex items-center gap-2.5">
+                        <img 
+                            src="{{ asset('logo/logo.png') }}" 
+                            alt="Logo HIMA IF" 
+                            class="w-9 h-9 object-contain rounded-full bg-white p-0.5 border border-gray-700"
+                        >
+                        <div>
+                            <span class="font-bold text-xs uppercase tracking-wider text-white block">POKJA HIMA IF</span>
+                            <span class="text-[10px] text-blue-400 font-semibold uppercase tracking-wider block">Admin Panel</span>
+                        </div>
                     </div>
                     <!-- Close button on mobile -->
                     <button onclick="closeMobileSidebar()" class="lg:hidden text-gray-400 hover:text-white p-1" title="Tutup Menu">

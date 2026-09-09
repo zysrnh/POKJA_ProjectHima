@@ -32,10 +32,17 @@
 <body class="bg-gray-100 text-gray-900 min-h-screen flex items-center justify-center p-3 sm:p-6 antialiased">
 
     <div class="w-full max-w-lg bg-white border border-gray-300 p-5 sm:p-8 shadow-sm">
-        <!-- Header -->
-        <div class="border-b border-gray-200 pb-4 mb-5">
-            <h1 class="text-lg sm:text-xl font-bold text-gray-900 uppercase tracking-wide">Formulir Pendaftaran POKJA</h1>
-            <p class="text-xs text-gray-600 mt-1">Himpunan Mahasiswa Informatika (HIMA IF)</p>
+        <!-- Header with Logo -->
+        <div class="border-b border-gray-200 pb-5 mb-5 flex items-center gap-4">
+            <img 
+                src="{{ asset('logo/logo.png') }}" 
+                alt="Logo HIMA IF" 
+                class="w-14 h-14 sm:w-16 sm:h-16 object-contain rounded-full border border-gray-200 p-1 bg-white shrink-0 shadow-xs"
+            >
+            <div>
+                <h1 class="text-base sm:text-lg font-bold text-gray-900 uppercase tracking-wide">Formulir Pendaftaran POKJA</h1>
+                <p class="text-xs text-gray-600 mt-0.5">Himpunan Mahasiswa Informatika (HIMA IF)</p>
+            </div>
         </div>
 
         <!-- Flash Alert Sukses -->

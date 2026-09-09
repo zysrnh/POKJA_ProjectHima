@@ -32,9 +32,14 @@
 <body class="bg-gray-100 text-gray-900 min-h-screen flex items-center justify-center p-3 sm:p-6 antialiased">
 
     <div class="w-full max-w-md bg-white border border-gray-300 p-6 sm:p-8 shadow-sm">
-        <!-- Header -->
-        <div class="border-b border-gray-200 pb-4 mb-6 text-center">
-            <h1 class="text-xl font-bold uppercase tracking-wide text-gray-900">Panel Administrator</h1>
+        <!-- Header with Logo -->
+        <div class="border-b border-gray-200 pb-5 mb-6 text-center">
+            <img 
+                src="{{ asset('logo/logo.png') }}" 
+                alt="Logo HIMA IF" 
+                class="w-16 h-16 object-contain rounded-full border border-gray-200 p-1 bg-white mx-auto mb-3 shadow-xs"
+            >
+            <h1 class="text-lg font-bold uppercase tracking-wide text-gray-900">Panel Administrator</h1>
             <p class="text-xs text-gray-600 mt-1">POKJA HIMA IF - Silakan masuk untuk mengelola data</p>
         </div>
 
