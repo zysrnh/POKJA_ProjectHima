@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Admin\KelasAdminController;
 use App\Http\Controllers\Admin\PendaftaranAdminController;
+use App\Http\Controllers\Admin\PengaturanAcaraController;
 use App\Http\Controllers\PendaftaranController;
 use Illuminate\Support\Facades\Route;
 
@@ -46,5 +47,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Kelola Akun Admin (CRUD Admin)
         Route::resource('users', AdminUserController::class)->except(['show']);
+
+        // Pengaturan Informasi Acara
+        Route::get('/pengaturan', [PengaturanAcaraController::class, 'index'])->name('pengaturan.index');
+        Route::put('/pengaturan', [PengaturanAcaraController::class, 'update'])->name('pengaturan.update');
     });
 });

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <title>Pendaftaran POKJA - HIMA IF</title>
+    <title>Pendaftaran {{ $pengaturan->nama_acara ?? 'POKJA' }} - HIMA IF</title>
     
     <!-- Google Font: Montserrat -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -48,9 +48,51 @@
                 class="w-14 h-14 sm:w-16 sm:h-16 object-contain rounded-full border border-gray-200 p-1 bg-white shrink-0 shadow-xs"
             >
             <div>
-                <h1 class="text-base sm:text-lg font-bold text-gray-900 uppercase tracking-wide">Formulir Pendaftaran POKJA</h1>
+                <h1 class="text-base sm:text-lg font-bold text-gray-900 uppercase tracking-wide">Formulir Pendaftaran {{ $pengaturan->nama_acara ?? 'POKJA' }}</h1>
                 <p class="text-xs text-gray-600 mt-0.5">Himpunan Mahasiswa Informatika (HIMA IF)</p>
             </div>
+        </div>
+
+        <!-- Banner Informasi Acara (Waktu & Lokasi) -->
+        <div class="mb-6 p-4 bg-gray-50 border border-gray-300">
+            <h2 class="text-xs font-bold uppercase tracking-wider text-[#1A467C] mb-2.5 flex items-center gap-1.5">
+                <svg class="w-4 h-4 text-[#2A82C6]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="square" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>Informasi Pelaksanaan Acara</span>
+            </h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs text-gray-800">
+                <!-- Tanggal & Waktu -->
+                <div class="flex items-start gap-2 bg-white p-2.5 border border-gray-200">
+                    <svg class="w-4 h-4 text-[#2A82C6] shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="square" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <div>
+                        <span class="block text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Tanggal & Waktu</span>
+                        <span class="font-bold text-gray-900">{{ $pengaturan->tanggal_acara ?? '13 Oktober 2026' }}</span>
+                        <span class="block text-[11px] text-gray-600 mt-0.5">{{ $pengaturan->jam_acara ?? '08:00 WIB - Selesai' }}</span>
+                    </div>
+                </div>
+
+                <!-- Lokasi / Ruangan -->
+                <div class="flex items-start gap-2 bg-white p-2.5 border border-gray-200">
+                    <svg class="w-4 h-4 text-[#CA2C2A] shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="square" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path stroke-linecap="square" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <div>
+                        <span class="block text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Lokasi / Tempat</span>
+                        <span class="font-bold text-gray-900">{{ $pengaturan->lokasi_acara ?? 'Ruangan 105' }}</span>
+                        <span class="block text-[11px] text-gray-600 mt-0.5">Kampus Utama</span>
+                    </div>
+                </div>
+            </div>
+
+            @if(!empty($pengaturan->deskripsi_acara))
+                <p class="mt-2.5 text-[11px] text-gray-600 leading-relaxed border-t border-gray-200 pt-2">
+                    <span class="font-semibold text-gray-700">Catatan:</span> {{ $pengaturan->deskripsi_acara }}
+                </p>
+            @endif
         </div>
 
         <!-- Flash Alert Sukses -->

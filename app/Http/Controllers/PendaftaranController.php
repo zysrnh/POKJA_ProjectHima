@@ -4,18 +4,29 @@ namespace App\Http\Controllers;
 
 use App\Models\Kelas;
 use App\Models\Pendaftaran;
+use App\Models\Pengaturan;
 use Illuminate\Http\Request;
 
 class PendaftaranController extends Controller
 {
     /**
-     * Menampilkan halaman form pendaftaran.
+     * Menampilkan halaman form pendaftaran dan info jadwal acara.
      */
     public function index()
     {
         $kelasList = Kelas::where('is_active', true)->orderBy('nama_kelas')->get();
+        $pengaturan = Pengaturan::firstOrCreate(
+            ['id' => 1],
+            [
+                'nama_acara' => 'POKJA HIMA IF',
+                'tanggal_acara' => '13 Oktober 2026',
+                'jam_acara' => '08:00 WIB - Selesai',
+                'lokasi_acara' => 'Ruangan 105',
+                'deskripsi_acara' => 'Pelaksanaan Program Kerja Himpunan Mahasiswa Informatika (HIMA IF)',
+            ]
+        );
 
-        return view('welcome', compact('kelasList'));
+        return view('welcome', compact('kelasList', 'pengaturan'));
     }
 
     /**
