@@ -52,15 +52,71 @@
             box-shadow: 0 1px 3px rgba(0,0,0,0.15);
         }
 
-        /* Modal Smooth Pop-in Animations */
-        @keyframes modalPopIn {
+        /* Smooth Floating Ambient Accents */
+        @keyframes gentleFloat1 {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(2deg); }
+        }
+        @keyframes gentleFloat2 {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(6px) rotate(-3deg); }
+        }
+
+        .anim-float-1 {
+            animation: gentleFloat1 6s ease-in-out infinite;
+        }
+        .anim-float-2 {
+            animation: gentleFloat2 7s ease-in-out infinite;
+        }
+
+        /* Smooth Page Enter Animations */
+        @keyframes slideFadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(18px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .anim-fade-1 {
+            animation: slideFadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .anim-fade-2 {
+            animation: slideFadeUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+        }
+        .anim-fade-3 {
+            animation: slideFadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+        }
+
+        /* Modal Smooth Pop-in with Tactile Spring */
+        @keyframes modalSpringIn {
             0% {
                 opacity: 0;
-                transform: scale(0.88) translateY(16px);
+                transform: scale(0.85) translateY(20px);
+            }
+            70% {
+                transform: scale(1.02) translateY(-2px);
             }
             100% {
                 opacity: 1;
                 transform: scale(1) translateY(0);
+            }
+        }
+
+        @keyframes checkmarkPop {
+            0% {
+                opacity: 0;
+                transform: scale(0.4) rotate(-15deg);
+            }
+            70% {
+                transform: scale(1.15) rotate(5deg);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) rotate(0deg);
             }
         }
 
@@ -69,35 +125,50 @@
             100% { opacity: 1; }
         }
 
-        .modal-pop-in {
-            animation: modalPopIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        .modal-spring-in {
+            animation: modalSpringIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        .checkmark-pop {
+            animation: checkmarkPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both;
         }
 
         .backdrop-fade-in {
             animation: backdropFade 0.25s ease-out forwards;
         }
+
+        /* Smooth Interactive Controls */
+        .btn-smooth {
+            transition: transform 0.18s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.18s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.15s ease;
+        }
+        .btn-smooth:hover {
+            transform: translate(-2px, -2px);
+        }
+        .btn-smooth:active {
+            transform: translate(2px, 2px);
+        }
     </style>
 </head>
 <body class="text-[#000000] min-h-screen flex items-center justify-center p-3.5 sm:p-6 lg:p-10 antialiased selection:bg-[#2A82C6] selection:text-white relative overflow-x-hidden">
 
-    <!-- Floating Geometric Accents with Exact Palette -->
-    <div class="hidden md:block absolute top-8 left-8 w-14 h-14 bg-[#2A82C6]/25 border-2 border-[#1A467C] shadow-[4px_4px_0px_0px_#1A467C] pointer-events-none"></div>
-    <div class="hidden md:block absolute bottom-12 left-12 w-10 h-10 bg-[#CA2C2A]/20 border-2 border-[#901C1A] shadow-[3px_3px_0px_0px_#901C1A] pointer-events-none"></div>
-    <div class="hidden md:block absolute top-16 right-12 w-12 h-12 bg-white border-2 border-[#1A467C] shadow-[4px_4px_0px_0px_#1A467C] pointer-events-none"></div>
-    <div class="hidden md:block absolute bottom-8 right-16 w-16 h-16 bg-[#1A467C]/15 border-2 border-[#000000] shadow-[4px_4px_0px_0px_#000000] pointer-events-none"></div>
+    <!-- Floating Geometric Accents with Gentle Smooth Float -->
+    <div class="hidden md:block absolute top-8 left-8 w-14 h-14 bg-[#2A82C6]/25 border-2 border-[#1A467C] shadow-[4px_4px_0px_0px_#1A467C] pointer-events-none anim-float-1"></div>
+    <div class="hidden md:block absolute bottom-12 left-12 w-10 h-10 bg-[#CA2C2A]/20 border-2 border-[#901C1A] shadow-[3px_3px_0px_0px_#901C1A] pointer-events-none anim-float-2"></div>
+    <div class="hidden md:block absolute top-16 right-12 w-12 h-12 bg-white border-2 border-[#1A467C] shadow-[4px_4px_0px_0px_#1A467C] pointer-events-none anim-float-2"></div>
+    <div class="hidden md:block absolute bottom-8 right-16 w-16 h-16 bg-[#1A467C]/15 border-2 border-[#000000] shadow-[4px_4px_0px_0px_#000000] pointer-events-none anim-float-1"></div>
 
     <!-- Main Wrapper: Separated Sequential Cards (Judul -> Waktu & Tempat -> Form) -->
     <div class="w-full max-w-4xl z-10 my-4 sm:my-8 space-y-5 sm:space-y-6">
 
         <!-- 1. BAGIAN ATAS: CARD JUDUL & LOGO POLAROID -->
-        <div class="bg-white border-2 border-[#1A467C] p-6 sm:p-8 shadow-[8px_8px_0px_0px_#1A467C]">
+        <div class="anim-fade-1 bg-white border-2 border-[#1A467C] p-6 sm:p-8 shadow-[8px_8px_0px_0px_#1A467C] transition-all duration-200">
             <div class="flex flex-col md:flex-row items-center md:items-start gap-6">
                 
                 <!-- Polaroid Logo Badge with Tape Header -->
                 <div class="relative group shrink-0">
                     <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-14 h-5 tape-badge border border-gray-400 z-10"></div>
                     
-                    <div class="bg-white border-2 border-[#1A467C] p-2.5 shadow-[4px_4px_0px_0px_#1A467C] rotate-[-2deg] hover:rotate-0 transition-transform duration-200">
+                    <div class="bg-white border-2 border-[#1A467C] p-2.5 shadow-[4px_4px_0px_0px_#1A467C] rotate-[-2deg] hover:rotate-0 transition-transform duration-300 ease-out cursor-pointer">
                         <img 
                             src="{{ asset('logo/logo.png') }}" 
                             alt="Logo HIMA IF" 
@@ -123,10 +194,10 @@
         </div>
 
         <!-- 2. BAGIAN TENGAH: CARD TANGGAL & TEMPAT (100% MONTSERRAT) -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="anim-fade-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
             
             <!-- Card Tanggal & Waktu -->
-            <div class="bg-white border-2 border-[#1A467C] p-5 shadow-[6px_6px_0px_0px_#1A467C] flex items-start gap-4">
+            <div class="bg-white border-2 border-[#1A467C] p-5 shadow-[6px_6px_0px_0px_#1A467C] flex items-start gap-4 hover:-translate-y-0.5 transition-transform duration-200">
                 <div class="p-2.5 bg-blue-50 border-2 border-[#2A82C6] text-[#2A82C6] shadow-[2px_2px_0px_0px_#1A467C] shrink-0 mt-0.5">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -146,7 +217,7 @@
             </div>
 
             <!-- Card Tempat / Ruangan -->
-            <div class="bg-white border-2 border-[#901C1A] p-5 shadow-[6px_6px_0px_0px_#901C1A] flex items-start gap-4">
+            <div class="bg-white border-2 border-[#901C1A] p-5 shadow-[6px_6px_0px_0px_#901C1A] flex items-start gap-4 hover:-translate-y-0.5 transition-transform duration-200">
                 <div class="p-2.5 bg-red-50 border-2 border-[#CA2C2A] text-[#CA2C2A] shadow-[2px_2px_0px_0px_#901C1A] shrink-0 mt-0.5">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -169,11 +240,11 @@
         </div>
 
         <!-- 3. BAGIAN BAWAH: CARD FORMULIR PENDAFTARAN -->
-        <div class="bg-white border-2 border-[#1A467C] p-6 sm:p-8 shadow-[8px_8px_0px_0px_#1A467C]">
+        <div class="anim-fade-3 bg-white border-2 border-[#1A467C] p-6 sm:p-8 shadow-[8px_8px_0px_0px_#1A467C]">
 
             <!-- Alert Error Global jika ada validasi gagal -->
             @if ($errors->any())
-                <div id="alert-box" class="mb-6 p-4 bg-[#FEE2E2] border-2 border-[#901C1A] text-red-950 text-xs sm:text-sm shadow-[4px_4px_0px_0px_#901C1A]">
+                <div id="alert-box" class="mb-6 p-4 bg-[#FEE2E2] border-2 border-[#901C1A] text-red-950 text-xs sm:text-sm shadow-[4px_4px_0px_0px_#901C1A] animate-pulse">
                     <div class="flex items-center gap-2 mb-1.5">
                         <span class="bg-[#CA2C2A] text-white font-black text-xs px-2 py-0.5 border border-[#901C1A] shrink-0">PERIKSA</span>
                         <span class="font-bold">Terdapat kesalahan input:</span>
@@ -217,7 +288,7 @@
                             placeholder="Masukkan nama lengkap Anda..."
                             maxlength="100"
                             required
-                            class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] px-4 py-3 text-sm font-semibold text-[#000000] focus:bg-white focus:outline-none focus:shadow-[4px_4px_0px_0px_#1A467C] transition-all duration-150 @error('nama') border-[#CA2C2A] bg-red-50 @enderror"
+                            class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] px-4 py-3 text-sm font-semibold text-[#000000] focus:bg-white focus:outline-none focus:shadow-[4px_4px_0px_0px_#1A467C] transition-all duration-200 @error('nama') border-[#CA2C2A] bg-red-50 @enderror"
                         >
                         @error('nama')
                             <p class="mt-1 text-xs font-bold text-[#CA2C2A]">{{ $message }}</p>
@@ -239,7 +310,7 @@
                             value="{{ session('success') ? '' : old('nim') }}"
                             placeholder="Contoh: 250414000"
                             required
-                            class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] px-4 py-3 text-sm font-semibold font-mono text-[#000000] focus:bg-white focus:outline-none focus:shadow-[4px_4px_0px_0px_#1A467C] transition-all duration-150 @error('nim') border-[#CA2C2A] bg-red-50 @enderror"
+                            class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] px-4 py-3 text-sm font-semibold font-mono text-[#000000] focus:bg-white focus:outline-none focus:shadow-[4px_4px_0px_0px_#1A467C] transition-all duration-200 @error('nim') border-[#CA2C2A] bg-red-50 @enderror"
                         >
                         @error('nim')
                             <p class="mt-1 text-xs font-bold text-[#CA2C2A]">{{ $message }}</p>
@@ -256,7 +327,7 @@
                                 id="kelas" 
                                 name="kelas" 
                                 required
-                                class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] px-4 py-3 pr-10 text-sm font-bold font-mono text-[#000000] focus:bg-white focus:outline-none focus:shadow-[4px_4px_0px_0px_#1A467C] transition-all duration-150 cursor-pointer appearance-none @error('kelas') border-[#CA2C2A] bg-red-50 @enderror"
+                                class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] px-4 py-3 pr-10 text-sm font-bold font-mono text-[#000000] focus:bg-white focus:outline-none focus:shadow-[4px_4px_0px_0px_#1A467C] transition-all duration-200 cursor-pointer appearance-none @error('kelas') border-[#CA2C2A] bg-red-50 @enderror"
                             >
                                 <option value="" class="text-gray-400 font-normal">-- PILIH KELAS ANDA --</option>
                                 @foreach ($kelasList as $k)
@@ -292,7 +363,7 @@
                             value="{{ session('success') ? '' : old('no_telp') }}"
                             placeholder="Contoh: 081234567890"
                             required
-                            class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] px-4 py-3 text-sm font-semibold font-mono text-[#000000] focus:bg-white focus:outline-none focus:shadow-[4px_4px_0px_0px_#1A467C] transition-all duration-150 @error('no_telp') border-[#CA2C2A] bg-red-50 @enderror"
+                            class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] px-4 py-3 text-sm font-semibold font-mono text-[#000000] focus:bg-white focus:outline-none focus:shadow-[4px_4px_0px_0px_#1A467C] transition-all duration-200 @error('no_telp') border-[#CA2C2A] bg-red-50 @enderror"
                         >
                         @error('no_telp')
                             <p class="mt-1 text-xs font-bold text-[#CA2C2A]">{{ $message }}</p>
@@ -306,7 +377,7 @@
                     <button 
                         type="submit" 
                         id="btn-submit"
-                        class="w-full bg-[#2A82C6] hover:bg-[#1A467C] active:bg-[#1A467C] text-white text-xs sm:text-sm font-black uppercase tracking-widest py-4 px-6 border-2 border-[#1A467C] shadow-[6px_6px_0px_0px_#1A467C] hover:shadow-[8px_8px_0px_0px_#1A467C] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all duration-150 cursor-pointer flex items-center justify-center gap-2.5"
+                        class="btn-smooth w-full bg-[#2A82C6] hover:bg-[#1A467C] active:bg-[#1A467C] text-white text-xs sm:text-sm font-black uppercase tracking-widest py-4 px-6 border-2 border-[#1A467C] shadow-[6px_6px_0px_0px_#1A467C] hover:shadow-[8px_8px_0px_0px_#1A467C] cursor-pointer flex items-center justify-center gap-2.5"
                     >
                         <span id="btn-text">KIRIM PENDAFTARAN SEKARANG</span>
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -320,7 +391,7 @@
 
     </div>
 
-    <!-- POP-UP MODAL SUKSES (Clean Minimalist Animated Neubrutalism) -->
+    <!-- POP-UP MODAL SUKSES (Clean Minimalist Tactile Animated Neubrutalism) -->
     @if (session('success'))
         @php
             $rawCp = preg_replace('/[^0-9]/', '', $pengaturan->cp_nomor ?? '083861669565');
@@ -334,14 +405,14 @@
         @endphp
 
         <div id="modal-sukses" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs backdrop-fade-in transition-opacity duration-200">
-            <!-- Modal Card Content (Smooth Pop-in Animated) -->
-            <div id="modal-card" class="modal-pop-in w-full max-w-md bg-white border-2 border-[#1A467C] p-6 sm:p-7 shadow-[10px_10px_0px_0px_#1A467C] relative text-center">
+            <!-- Modal Card Content (Smooth Spring Pop-in Animated) -->
+            <div id="modal-card" class="modal-spring-in w-full max-w-md bg-white border-2 border-[#1A467C] p-6 sm:p-7 shadow-[10px_10px_0px_0px_#1A467C] relative text-center">
                 
                 <!-- Close Button (Pojok Kanan Atas) -->
                 <button 
                     type="button" 
                     onclick="tutupModal()" 
-                    class="absolute top-3 right-3 p-1.5 border border-[#1A467C] text-[#1A467C] hover:bg-[#CA2C2A] hover:text-white hover:border-[#901C1A] transition cursor-pointer"
+                    class="btn-smooth absolute top-3 right-3 p-1.5 border border-[#1A467C] text-[#1A467C] hover:bg-[#CA2C2A] hover:text-white hover:border-[#901C1A] cursor-pointer"
                     title="Tutup Modal"
                 >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -349,8 +420,8 @@
                     </svg>
                 </button>
 
-                <!-- Clean Checkmark Icon -->
-                <div class="w-14 h-14 mx-auto mb-4 bg-green-50 border-2 border-green-700 text-green-700 flex items-center justify-center shadow-[3px_3px_0px_0px_#15803d]">
+                <!-- Clean Animated Checkmark Icon -->
+                <div class="checkmark-pop w-14 h-14 mx-auto mb-4 bg-green-50 border-2 border-green-700 text-green-700 flex items-center justify-center shadow-[3px_3px_0px_0px_#15803d]">
                     <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="square" stroke-width="3" d="M5 13l4 4L19 7" />
                     </svg>
@@ -370,7 +441,7 @@
                 <a 
                     href="https://wa.me/{{ $cleanCp }}?text={{ $waMessage }}" 
                     target="_blank"
-                    class="w-full inline-flex items-center justify-center gap-2 bg-[#2A82C6] hover:bg-[#1A467C] text-white font-black text-xs uppercase tracking-wider py-3.5 px-4 border-2 border-[#1A467C] shadow-[4px_4px_0px_0px_#1A467C] hover:shadow-[6px_6px_0px_0px_#1A467C] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition cursor-pointer mb-2.5"
+                    class="btn-smooth w-full inline-flex items-center justify-center gap-2 bg-[#2A82C6] hover:bg-[#1A467C] text-white font-black text-xs uppercase tracking-wider py-3.5 px-4 border-2 border-[#1A467C] shadow-[4px_4px_0px_0px_#1A467C] hover:shadow-[6px_6px_0px_0px_#1A467C] cursor-pointer mb-2.5"
                 >
                     <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
                         <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
@@ -424,12 +495,12 @@
             const modal = document.getElementById('modal-sukses');
             const card = document.getElementById('modal-card');
             if (modal && card) {
-                card.style.transform = 'scale(0.9) translateY(10px)';
+                card.style.transform = 'scale(0.85) translateY(16px)';
                 card.style.opacity = '0';
-                card.style.transition = 'all 0.2s ease-in';
+                card.style.transition = 'all 0.22s cubic-bezier(0.4, 0, 1, 1)';
                 modal.style.opacity = '0';
-                modal.style.transition = 'opacity 0.2s ease-in';
-                setTimeout(() => modal.remove(), 200);
+                modal.style.transition = 'opacity 0.22s ease-in';
+                setTimeout(() => modal.remove(), 220);
             }
         }
 
