@@ -51,6 +51,31 @@
             backdrop-filter: blur(2px);
             box-shadow: 0 1px 3px rgba(0,0,0,0.15);
         }
+
+        /* Modal Smooth Pop-in Animations */
+        @keyframes modalPopIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.88) translateY(16px);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        @keyframes backdropFade {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        .modal-pop-in {
+            animation: modalPopIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .backdrop-fade-in {
+            animation: backdropFade 0.25s ease-out forwards;
+        }
     </style>
 </head>
 <body class="text-[#000000] min-h-screen flex items-center justify-center p-3.5 sm:p-6 lg:p-10 antialiased selection:bg-[#2A82C6] selection:text-white relative overflow-x-hidden">
@@ -295,7 +320,7 @@
 
     </div>
 
-    <!-- POP-UP MODAL SUKSES NEUBRUTALISM (Muncul saat pendaftaran berhasil) -->
+    <!-- POP-UP MODAL SUKSES (Clean Minimalist Animated Neubrutalism) -->
     @if (session('success'))
         @php
             $rawCp = preg_replace('/[^0-9]/', '', $pengaturan->cp_nomor ?? '083861669565');
@@ -308,80 +333,59 @@
             $waMessage = rawurlencode("Halo {$cpNama}, saya sudah mendaftar untuk acara POKJA HIMA IF: {$pengaturan->deskripsi_acara}.");
         @endphp
 
-        <div id="modal-sukses" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs transition-opacity duration-200">
-            <!-- Modal Card Content -->
-            <div class="w-full max-w-lg bg-white border-2 sm:border-[2.5px] border-[#1A467C] p-6 sm:p-8 shadow-[10px_10px_0px_0px_#1A467C] relative animate-in fade-in zoom-in duration-200">
+        <div id="modal-sukses" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs backdrop-fade-in transition-opacity duration-200">
+            <!-- Modal Card Content (Smooth Pop-in Animated) -->
+            <div id="modal-card" class="modal-pop-in w-full max-w-md bg-white border-2 border-[#1A467C] p-6 sm:p-7 shadow-[10px_10px_0px_0px_#1A467C] relative text-center">
                 
-                <!-- Modal Top Badge -->
-                <div class="flex items-center justify-between gap-2 mb-4 pb-3 border-b-2 border-[#1A467C]">
-                    <span class="bg-[#1A467C] text-white border-2 border-[#1A467C] px-3 py-0.5 text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#2A82C6]">
-                        REGISTRASI BERHASIL
-                    </span>
-                    <button 
-                        type="button" 
-                        onclick="tutupModal()" 
-                        class="p-1 border-2 border-[#1A467C] text-[#1A467C] hover:bg-[#CA2C2A] hover:text-white hover:border-[#901C1A] transition cursor-pointer"
-                        title="Tutup Modal"
-                    >
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="square" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
+                <!-- Close Button (Pojok Kanan Atas) -->
+                <button 
+                    type="button" 
+                    onclick="tutupModal()" 
+                    class="absolute top-3 right-3 p-1.5 border border-[#1A467C] text-[#1A467C] hover:bg-[#CA2C2A] hover:text-white hover:border-[#901C1A] transition cursor-pointer"
+                    title="Tutup Modal"
+                >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="square" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+
+                <!-- Clean Checkmark Icon -->
+                <div class="w-14 h-14 mx-auto mb-4 bg-green-50 border-2 border-green-700 text-green-700 flex items-center justify-center shadow-[3px_3px_0px_0px_#15803d]">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="square" stroke-width="3" d="M5 13l4 4L19 7" />
+                    </svg>
                 </div>
 
-                <!-- Success Icon & Message -->
-                <div class="text-center my-4 space-y-3">
-                    <div class="w-16 h-16 mx-auto bg-green-100 border-2 border-[#1A467C] shadow-[4px_4px_0px_0px_#1A467C] flex items-center justify-center text-green-700">
-                        <svg class="w-9 h-9" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="square" stroke-width="3" d="M5 13l4 4L19 7" />
-                        </svg>
-                    </div>
-                    <h3 class="text-xl sm:text-2xl font-black text-[#1A467C] uppercase tracking-tight">
-                        Pendaftaran Anda Sukses!
-                    </h3>
-                    <p class="text-xs sm:text-sm font-semibold text-gray-700 leading-relaxed max-w-sm mx-auto">
-                        Data kehadiran Anda telah berhasil tercatat untuk acara <strong class="text-black">{{ $pengaturan->deskripsi_acara ?? 'POKJA HIMA IF' }}</strong>.
-                    </p>
-                </div>
+                <!-- Headline Title -->
+                <h3 class="text-xl sm:text-2xl font-black text-[#1A467C] uppercase tracking-tight mb-2">
+                    Pendaftaran Berhasil!
+                </h3>
+                
+                <!-- Simple Message -->
+                <p class="text-xs sm:text-sm font-semibold text-gray-700 leading-relaxed max-w-xs mx-auto mb-6">
+                    Data kamu telah berhasil tersimpan di sistem pendaftaran <strong class="text-black">{{ $pengaturan->deskripsi_acara ?? 'POKJA HIMA IF' }}</strong>.
+                </p>
 
-                <!-- Contact Person Box -->
-                <div class="bg-blue-50 border-2 border-[#1A467C] p-4 shadow-[4px_4px_0px_0px_#1A467C] my-5 space-y-2.5">
-                    <div class="flex items-center gap-2 text-[#1A467C]">
-                        <svg class="w-4 h-4 text-[#2A82C6]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="square" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                        </svg>
-                        <span class="text-[11px] font-black uppercase tracking-wider">
-                            Informasi & Konfirmasi (Contact Person):
-                        </span>
-                    </div>
-                    <div class="flex items-center justify-between text-xs font-bold text-gray-800 bg-white p-2.5 border border-[#1A467C]">
-                        <span>{{ $cpNama }}</span>
-                        <span class="font-mono text-[#1A467C]">{{ $pengaturan->cp_nomor ?? '083861669565' }}</span>
-                    </div>
+                <!-- Action Button 1: Single Clean WhatsApp CP Button -->
+                <a 
+                    href="https://wa.me/{{ $cleanCp }}?text={{ $waMessage }}" 
+                    target="_blank"
+                    class="w-full inline-flex items-center justify-center gap-2 bg-[#2A82C6] hover:bg-[#1A467C] text-white font-black text-xs uppercase tracking-wider py-3.5 px-4 border-2 border-[#1A467C] shadow-[4px_4px_0px_0px_#1A467C] hover:shadow-[6px_6px_0px_0px_#1A467C] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition cursor-pointer mb-2.5"
+                >
+                    <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+                    </svg>
+                    <span>Hubungi CP ({{ $cpNama }})</span>
+                </a>
 
-                    <!-- Direct WA Button -->
-                    <a 
-                        href="https://wa.me/{{ $cleanCpPhone ?? $cleanCp }}?text={{ $waMessage }}" 
-                        target="_blank"
-                        class="w-full inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 active:bg-green-800 text-white font-black text-xs uppercase tracking-wider py-3 px-4 border-2 border-black shadow-[3px_3px_0px_0px_#000000] hover:shadow-[5px_5px_0px_0px_#000000] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition cursor-pointer"
-                    >
-                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                            <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
-                        </svg>
-                        <span>Chat WhatsApp Contact Person</span>
-                    </a>
-                </div>
-
-                <!-- Modal Close Button -->
-                <div class="pt-2">
-                    <button 
-                        type="button" 
-                        onclick="tutupModal()" 
-                        class="w-full bg-[#1A467C] hover:bg-[#0F2642] active:bg-[#0F2642] text-white text-xs sm:text-sm font-black uppercase tracking-wider py-3.5 px-4 border-2 border-[#1A467C] shadow-[4px_4px_0px_0px_#1A467C] hover:shadow-[6px_6px_0px_0px_#1A467C] transition cursor-pointer"
-                    >
-                        Tutup / Selesai
-                    </button>
-                </div>
+                <!-- Action Button 2: Simple Close Link -->
+                <button 
+                    type="button" 
+                    onclick="tutupModal()" 
+                    class="w-full text-xs font-bold text-gray-500 hover:text-black py-1.5 transition cursor-pointer"
+                >
+                    Tutup Jendela
+                </button>
 
             </div>
         </div>
@@ -415,11 +419,16 @@
             return true;
         }
 
-        // Close Modal Handler
+        // Close Modal Handler with smooth exit transition
         function tutupModal() {
             const modal = document.getElementById('modal-sukses');
-            if (modal) {
-                modal.classList.add('opacity-0', 'pointer-events-none');
+            const card = document.getElementById('modal-card');
+            if (modal && card) {
+                card.style.transform = 'scale(0.9) translateY(10px)';
+                card.style.opacity = '0';
+                card.style.transition = 'all 0.2s ease-in';
+                modal.style.opacity = '0';
+                modal.style.transition = 'opacity 0.2s ease-in';
                 setTimeout(() => modal.remove(), 200);
             }
         }
