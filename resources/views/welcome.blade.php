@@ -21,12 +21,10 @@
                     },
                     colors: {
                         hima: {
-                            blue: '#2A82C6',
-                            navy: '#1A467C',
-                            red: '#CA2C2A',
-                            maroon: '#901C1A',
-                            bg: '#DFECF8',
-                            dark: '#0F2642',
+                            'blue-light': '#2A82C6',
+                            'blue-dark': '#1A467C',
+                            'red-light': '#CA2C2A',
+                            'red-dark': '#901C1A',
                         }
                     }
                 }
@@ -36,7 +34,7 @@
     <style>
         body {
             font-family: 'Montserrat', sans-serif;
-            background-color: #DCEAF7;
+            background-color: #E8F2FA;
             background-image: radial-gradient(#1A467C 1.2px, transparent 1.2px);
             background-size: 24px 24px;
         }
@@ -49,21 +47,21 @@
 
         /* Tape effect on polaroid badge */
         .tape-badge {
-            background: rgba(255, 255, 255, 0.85);
+            background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(2px);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
         }
     </style>
 </head>
-<body class="text-gray-900 min-h-screen flex items-center justify-center p-3 sm:p-6 lg:p-10 antialiased selection:bg-[#1A467C] selection:text-white relative overflow-x-hidden">
+<body class="text-[#000000] min-h-screen flex items-center justify-center p-3 sm:p-6 lg:p-10 antialiased selection:bg-[#2A82C6] selection:text-white relative overflow-x-hidden">
 
-    <!-- Floating Geometric Accents (Neubrutalism Background Details) -->
-    <div class="hidden md:block absolute top-8 left-8 w-14 h-14 bg-[#2A82C6]/30 border-2 border-[#1A467C] shadow-[4px_4px_0px_0px_#1A467C] pointer-events-none"></div>
-    <div class="hidden md:block absolute bottom-12 left-12 w-10 h-10 bg-[#CA2C2A]/20 border-2 border-[#1A467C] shadow-[3px_3px_0px_0px_#1A467C] pointer-events-none"></div>
+    <!-- Floating Geometric Accents with Exact Palette -->
+    <div class="hidden md:block absolute top-8 left-8 w-14 h-14 bg-[#2A82C6]/25 border-2 border-[#1A467C] shadow-[4px_4px_0px_0px_#1A467C] pointer-events-none"></div>
+    <div class="hidden md:block absolute bottom-12 left-12 w-10 h-10 bg-[#CA2C2A]/20 border-2 border-[#901C1A] shadow-[3px_3px_0px_0px_#901C1A] pointer-events-none"></div>
     <div class="hidden md:block absolute top-16 right-12 w-12 h-12 bg-white border-2 border-[#1A467C] shadow-[4px_4px_0px_0px_#1A467C] pointer-events-none"></div>
-    <div class="hidden md:block absolute bottom-8 right-16 w-16 h-16 bg-[#1A467C]/20 border-2 border-[#1A467C] shadow-[4px_4px_0px_0px_#1A467C] pointer-events-none"></div>
+    <div class="hidden md:block absolute bottom-8 right-16 w-16 h-16 bg-[#1A467C]/15 border-2 border-[#000000] shadow-[4px_4px_0px_0px_#000000] pointer-events-none"></div>
 
-    <!-- Main Container: 2-Column Graphic Design Grid -->
+    <!-- Main Container: 2-Column Grid -->
     <div class="w-full max-w-5xl z-10 my-4 sm:my-8">
 
         <!-- 2-Column Layout Grid -->
@@ -73,7 +71,7 @@
             <div class="lg:col-span-6 flex flex-col gap-5">
                 
                 <!-- Hero Poster Card -->
-                <div class="bg-white border-2 border-[#1A467C] p-6 sm:p-7 shadow-[6px_6px_0px_0px_#1A467C] relative">
+                <div class="bg-white border-2 border-[#1A467C] p-6 sm:p-7 shadow-[8px_8px_0px_0px_#1A467C] relative">
                     
                     <!-- Top Polaroid + Title Layout -->
                     <div class="flex flex-col sm:flex-row items-start gap-5 mb-5">
@@ -101,32 +99,33 @@
                             <h1 class="text-2xl sm:text-3xl lg:text-3xl font-black text-[#1A467C] tracking-tight uppercase leading-tight">
                                 {{ $pengaturan->deskripsi_acara ?? 'INNOVATIVE IDEA TO GREAT PROPOSAL' }}
                             </h1>
-                            <div class="w-20 h-1.5 bg-[#CA2C2A] mt-2.5 mb-1"></div>
+                            <!-- Red Dual Accent Bar (Merah Terang #CA2C2A dengan shadow Merah Gelap #901C1A) -->
+                            <div class="w-20 h-1.5 bg-[#CA2C2A] shadow-[2px_2px_0px_0px_#901C1A] mt-3 mb-1"></div>
                         </div>
                     </div>
 
                     <!-- Event Metadata Cards (Schedule & Venue) -->
                     <div class="dot-card border-2 border-[#1A467C] p-4 shadow-[4px_4px_0px_0px_#1A467C]">
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                            <!-- Tanggal & Waktu -->
-                            <div class="bg-white border-2 border-[#1A467C] p-3 shadow-[2px_2px_0px_0px_#1A467C]">
+                            <!-- Tanggal & Waktu (Biru Terang #2A82C6 & Biru Gelap #1A467C) -->
+                            <div class="bg-white border-2 border-[#1A467C] p-3 shadow-[3px_3px_0px_0px_#1A467C]">
                                 <span class="text-[10px] font-black uppercase tracking-wider text-[#2A82C6] block mb-0.5">
                                     📅 TANGGAL & WAKTU
                                 </span>
-                                <span class="font-extrabold text-sm text-gray-900 block">
+                                <span class="font-extrabold text-sm text-[#000000] block">
                                     {{ $pengaturan->tanggal_acara ?? '13 Oktober 2026' }}
                                 </span>
-                                <span class="font-semibold text-xs text-gray-600 block mt-0.5">
+                                <span class="font-semibold text-xs text-gray-600 block mt-0.5 font-mono">
                                     {{ $pengaturan->jam_acara ?? '08:00 WIB - Selesai' }}
                                 </span>
                             </div>
 
-                            <!-- Lokasi / Ruangan -->
-                            <div class="bg-white border-2 border-[#1A467C] p-3 shadow-[2px_2px_0px_0px_#1A467C]">
+                            <!-- Lokasi / Ruangan (Merah Terang #CA2C2A & Merah Gelap #901C1A) -->
+                            <div class="bg-white border-2 border-[#901C1A] p-3 shadow-[3px_3px_0px_0px_#901C1A]">
                                 <span class="text-[10px] font-black uppercase tracking-wider text-[#CA2C2A] block mb-0.5">
                                     📍 TEMPAT / RUANGAN
                                 </span>
-                                <span class="font-extrabold text-sm text-gray-900 block">
+                                <span class="font-extrabold text-sm text-[#000000] block">
                                     {{ $pengaturan->lokasi_acara ?? 'Ruangan 105' }}
                                 </span>
                                 <span class="font-semibold text-xs text-gray-600 block mt-0.5">
@@ -150,12 +149,12 @@
                         <h2 class="text-lg sm:text-xl font-black text-[#1A467C] uppercase tracking-wide">
                             FORM PENDAFTARAN
                         </h2>
-                        <p class="text-xs font-semibold text-gray-500 mt-0.5">
+                        <p class="text-xs font-semibold text-gray-600 mt-0.5">
                             Lengkapi data diri Anda untuk konfirmasi kehadiran
                         </p>
                     </div>
 
-                    <!-- Flash Alert Sukses (Neubrutalism Style) -->
+                    <!-- Flash Alert Sukses -->
                     @if (session('success'))
                         <div id="alert-box" class="mb-5 p-3.5 bg-[#DCFCE7] border-2 border-[#1A467C] text-green-950 text-xs sm:text-sm shadow-[4px_4px_0px_0px_#1A467C]">
                             <div class="flex items-start gap-2.5">
@@ -165,11 +164,11 @@
                         </div>
                     @endif
 
-                    <!-- Alert Error Global (Neubrutalism Style) -->
+                    <!-- Alert Error Global -->
                     @if ($errors->any())
-                        <div id="alert-box" class="mb-5 p-3.5 bg-[#FEE2E2] border-2 border-[#1A467C] text-red-950 text-xs sm:text-sm shadow-[4px_4px_0px_0px_#1A467C]">
+                        <div id="alert-box" class="mb-5 p-3.5 bg-[#FEE2E2] border-2 border-[#901C1A] text-red-950 text-xs sm:text-sm shadow-[4px_4px_0px_0px_#901C1A]">
                             <div class="flex items-center gap-2 mb-1.5">
-                                <span class="bg-[#CA2C2A] text-white font-black text-xs px-2 py-0.5 border border-black shrink-0">PERIKSA</span>
+                                <span class="bg-[#CA2C2A] text-white font-black text-xs px-2 py-0.5 border border-[#901C1A] shrink-0">PERIKSA</span>
                                 <span class="font-bold">Terdapat kesalahan input:</span>
                             </div>
                             <ul class="list-disc list-inside space-y-0.5 text-xs font-semibold text-red-900">
@@ -208,7 +207,7 @@
                                 placeholder="Masukkan nama lengkap Anda..."
                                 maxlength="100"
                                 required
-                                class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] px-3.5 py-2.5 text-sm font-semibold text-gray-900 focus:bg-white focus:outline-none focus:shadow-[4px_4px_0px_0px_#1A467C] transition-all duration-150 @error('nama') border-red-600 bg-red-50 @enderror"
+                                class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] px-3.5 py-2.5 text-sm font-semibold text-[#000000] focus:bg-white focus:outline-none focus:shadow-[4px_4px_0px_0px_#1A467C] transition-all duration-150 @error('nama') border-[#CA2C2A] bg-red-50 @enderror"
                             >
                             @error('nama')
                                 <p class="mt-1 text-xs font-bold text-[#CA2C2A]">{{ $message }}</p>
@@ -230,7 +229,7 @@
                                 value="{{ session('success') ? '' : old('nim') }}"
                                 placeholder="Contoh: 250414000"
                                 required
-                                class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] px-3.5 py-2.5 text-sm font-semibold font-mono text-gray-900 focus:bg-white focus:outline-none focus:shadow-[4px_4px_0px_0px_#1A467C] transition-all duration-150 @error('nim') border-red-600 bg-red-50 @enderror"
+                                class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] px-3.5 py-2.5 text-sm font-semibold font-mono text-[#000000] focus:bg-white focus:outline-none focus:shadow-[4px_4px_0px_0px_#1A467C] transition-all duration-150 @error('nim') border-[#CA2C2A] bg-red-50 @enderror"
                             >
                             @error('nim')
                                 <p class="mt-1 text-xs font-bold text-[#CA2C2A]">{{ $message }}</p>
@@ -246,7 +245,7 @@
                                 id="kelas" 
                                 name="kelas" 
                                 required
-                                class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] px-3.5 py-2.5 text-sm font-bold font-mono text-gray-900 focus:bg-white focus:outline-none focus:shadow-[4px_4px_0px_0px_#1A467C] transition-all duration-150 cursor-pointer @error('kelas') border-red-600 bg-red-50 @enderror"
+                                class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] px-3.5 py-2.5 text-sm font-bold font-mono text-[#000000] focus:bg-white focus:outline-none focus:shadow-[4px_4px_0px_0px_#1A467C] transition-all duration-150 cursor-pointer @error('kelas') border-[#CA2C2A] bg-red-50 @enderror"
                             >
                                 <option value="">-- PILIH KELAS ANDA --</option>
                                 @foreach ($kelasList as $k)
@@ -275,19 +274,19 @@
                                 value="{{ session('success') ? '' : old('no_telp') }}"
                                 placeholder="Contoh: 081234567890"
                                 required
-                                class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] px-3.5 py-2.5 text-sm font-semibold font-mono text-gray-900 focus:bg-white focus:outline-none focus:shadow-[4px_4px_0px_0px_#1A467C] transition-all duration-150 @error('no_telp') border-red-600 bg-red-50 @enderror"
+                                class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] px-3.5 py-2.5 text-sm font-semibold font-mono text-[#000000] focus:bg-white focus:outline-none focus:shadow-[4px_4px_0px_0px_#1A467C] transition-all duration-150 @error('no_telp') border-[#CA2C2A] bg-red-50 @enderror"
                             >
                             @error('no_telp')
                                 <p class="mt-1 text-xs font-bold text-[#CA2C2A]">{{ $message }}</p>
                             @enderror
                         </div>
 
-                        <!-- Submit Button with Neubrutalism Action Effect -->
+                        <!-- Submit Button: Biru Terang #2A82C6 dengan Bayangan Biru Gelap #1A467C -->
                         <div class="pt-2">
                             <button 
                                 type="submit" 
                                 id="btn-submit"
-                                class="w-full bg-[#1A467C] hover:bg-[#0F2642] active:bg-[#0F2642] text-white text-xs sm:text-sm font-black uppercase tracking-widest py-3.5 px-4 border-2 border-[#0F2642] shadow-[5px_5px_0px_0px_#0F2642] hover:shadow-[7px_7px_0px_0px_#0F2642] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all duration-150 cursor-pointer flex items-center justify-center gap-2"
+                                class="w-full bg-[#2A82C6] hover:bg-[#1A467C] active:bg-[#1A467C] text-white text-xs sm:text-sm font-black uppercase tracking-widest py-3.5 px-4 border-2 border-[#1A467C] shadow-[5px_5px_0px_0px_#1A467C] hover:shadow-[7px_7px_0px_0px_#1A467C] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all duration-150 cursor-pointer flex items-center justify-center gap-2"
                             >
                                 <span id="btn-text">KIRIM PENDAFTARAN SEKARANG</span>
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
