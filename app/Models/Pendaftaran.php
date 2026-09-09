@@ -16,5 +16,6 @@ class Pendaftaran extends Model
         'nim',
         'kelas',
         'no_telp',
+        'status_kehadiran',
     ];
 }

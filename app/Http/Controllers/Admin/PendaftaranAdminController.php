@@ -18,6 +18,7 @@ class PendaftaranAdminController extends Controller
     {
         $search = $request->input('search');
         $kelasFilter = $request->input('kelas');
+        $statusFilter = $request->input('status_kehadiran');
 
         $query = Pendaftaran::query()->latest();
 
@@ -33,10 +34,16 @@ class PendaftaranAdminController extends Controller
             $query->where('kelas', $kelasFilter);
         }
 
+        if (!empty($statusFilter)) {
+            $query->where('status_kehadiran', $statusFilter);
+        }
+
         $pendaftarans = $query->paginate(15)->withQueryString();
 
         // Statistik
         $totalPendaftar = Pendaftaran::count();
+        $totalHadir = Pendaftaran::where('status_kehadiran', 'hadir')->count();
+        $totalBelumHadir = Pendaftaran::where('status_kehadiran', '!=', 'hadir')->count();
         $pendaftarHariIni = Pendaftaran::whereDate('created_at', Carbon::today())->count();
         $totalKelas = Kelas::where('is_active', true)->count();
         
@@ -46,12 +53,47 @@ class PendaftaranAdminController extends Controller
         return view('admin.dashboard', compact(
             'pendaftarans',
             'totalPendaftar',
+            'totalHadir',
+            'totalBelumHadir',
             'pendaftarHariIni',
             'totalKelas',
             'kelasList',
             'search',
-            'kelasFilter'
+            'kelasFilter',
+            'statusFilter'
         ));
+    }
+
+    /**
+     * Quick toggle status kehadiran (AJAX / Normal Form Request).
+     */
+    public function toggleKehadiran(Request $request, $id)
+    {
+        $pendaftaran = Pendaftaran::findOrFail($id);
+
+        if ($request->has('status')) {
+            $targetStatus = in_array($request->input('status'), ['hadir', 'tidak_hadir', 'belum_hadir']) 
+                ? $request->input('status') 
+                : 'belum_hadir';
+            $pendaftaran->status_kehadiran = $targetStatus;
+        } else {
+            // Default toggle logic: hadir <-> belum_hadir
+            $pendaftaran->status_kehadiran = ($pendaftaran->status_kehadiran === 'hadir') ? 'belum_hadir' : 'hadir';
+        }
+
+        $pendaftaran->save();
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'status_kehadiran' => $pendaftaran->status_kehadiran,
+                'is_hadir' => ($pendaftaran->status_kehadiran === 'hadir'),
+                'label' => ($pendaftaran->status_kehadiran === 'hadir') ? 'Hadir' : (($pendaftaran->status_kehadiran === 'tidak_hadir') ? 'Tidak Hadir' : 'Belum Hadir'),
+                'message' => "Status kehadiran {$pendaftaran->nama} diperbarui menjadi " . ($pendaftaran->status_kehadiran === 'hadir' ? 'Hadir' : 'Belum Hadir') . ".",
+            ]);
+        }
+
+        return redirect()->back()->with('success', "Status kehadiran {$pendaftaran->nama} berhasil diubah.");
     }
 
     /**
@@ -78,6 +120,7 @@ class PendaftaranAdminController extends Controller
             'nim' => trim(strip_tags($request->input('nim', ''))),
             'kelas' => trim(strip_tags($request->input('kelas', ''))),
             'no_telp' => trim(strip_tags($request->input('no_telp', ''))),
+            'status_kehadiran' => trim(strip_tags($request->input('status_kehadiran', 'belum_hadir'))),
         ]);
 
         // Normalisasi telepon
@@ -113,6 +156,11 @@ class PendaftaranAdminController extends Controller
                 'string', 
                 'regex:/^08[1-9][0-9]{7,11}$/'
             ],
+            'status_kehadiran' => [
+                'required',
+                'string',
+                'in:hadir,tidak_hadir,belum_hadir',
+            ],
         ], [
             'nama.required' => 'Nama lengkap wajib diisi.',
             'nama.min' => 'Nama lengkap minimal 3 karakter.',
@@ -128,6 +176,9 @@ class PendaftaranAdminController extends Controller
             
             'no_telp.required' => 'No. Telepon / WhatsApp wajib diisi.',
             'no_telp.regex' => 'Format nomor WhatsApp tidak valid. Gunakan nomor Indonesia yang diawali 08 (panjang 10–14 digit).',
+
+            'status_kehadiran.required' => 'Status kehadiran wajib dipilih.',
+            'status_kehadiran.in' => 'Status kehadiran tidak valid.',
         ]);
 
         $pendaftaran->update($validated);
@@ -154,6 +205,7 @@ class PendaftaranAdminController extends Controller
     {
         $search = $request->input('search');
         $kelasFilter = $request->input('kelas');
+        $statusFilter = $request->input('status_kehadiran');
 
         $query = Pendaftaran::query()->latest();
 
@@ -169,6 +221,10 @@ class PendaftaranAdminController extends Controller
             $query->where('kelas', $kelasFilter);
         }
 
+        if (!empty($statusFilter)) {
+            $query->where('status_kehadiran', $statusFilter);
+        }
+
         $data = $query->get();
         $filename = 'data-pendaftar-pokja-' . date('Y-m-d_His') . '.csv';
 
@@ -176,16 +232,23 @@ class PendaftaranAdminController extends Controller
             $handle = fopen('php://output', 'w');
             fputs($handle, "\xEF\xBB\xBF");
 
-            fputcsv($handle, ['No', 'Nama Lengkap', 'NIM', 'Kelas', 'No. Telepon / WA', 'Tanggal Pendaftaran'], ';');
+            fputcsv($handle, ['No', 'Nama Lengkap', 'NIM', 'Kelas', 'No. Telepon / WA', 'Status Kehadiran', 'Tanggal Pendaftaran'], ';');
 
             $no = 1;
             foreach ($data as $item) {
+                $statusText = match ($item->status_kehadiran) {
+                    'hadir' => 'Hadir',
+                    'tidak_hadir' => 'Tidak Hadir',
+                    default => 'Belum Hadir',
+                };
+
                 fputcsv($handle, [
                     $no++,
                     $item->nama,
                     "'" . $item->nim,
                     $item->kelas,
                     "'" . $item->no_telp,
+                    $statusText,
                     $item->created_at ? $item->created_at->timezone('Asia/Jakarta')->format('d-m-Y H:i') . ' WIB' : '-',
                 ], ';');
             }

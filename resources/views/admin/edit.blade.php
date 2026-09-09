@@ -106,6 +106,26 @@
                 @enderror
             </div>
 
+            <!-- Field: Status Kehadiran -->
+            <div>
+                <label for="status_kehadiran" class="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-1">
+                    Status Kehadiran <span class="text-red-600">*</span>
+                </label>
+                <select 
+                    id="status_kehadiran" 
+                    name="status_kehadiran" 
+                    required
+                    class="w-full bg-gray-50 border @error('status_kehadiran') border-red-500 @else border-gray-300 @enderror text-gray-900 text-sm px-3.5 py-2.5 focus:bg-white focus:outline-none focus:border-[#2A82C6] focus:ring-1 focus:ring-[#2A82C6] transition cursor-pointer"
+                >
+                    <option value="belum_hadir" {{ old('status_kehadiran', $pendaftaran->status_kehadiran) == 'belum_hadir' ? 'selected' : '' }}>⚪ Belum Hadir</option>
+                    <option value="hadir" {{ old('status_kehadiran', $pendaftaran->status_kehadiran) == 'hadir' ? 'selected' : '' }}>🟢 Hadir</option>
+                    <option value="tidak_hadir" {{ old('status_kehadiran', $pendaftaran->status_kehadiran) == 'tidak_hadir' ? 'selected' : '' }}>🔴 Tidak Hadir</option>
+                </select>
+                @error('status_kehadiran')
+                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
+
             <!-- Actions -->
             <div class="flex items-center gap-3 pt-3">
                 <button 
