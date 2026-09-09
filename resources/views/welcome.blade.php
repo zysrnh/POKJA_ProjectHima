@@ -432,10 +432,15 @@
                     Pendaftaran Berhasil!
                 </h3>
                 
-                <!-- Simple Message -->
-                <p class="text-xs sm:text-sm font-semibold text-gray-700 leading-relaxed max-w-xs mx-auto mb-6">
-                    Data kamu telah berhasil tersimpan di sistem pendaftaran <strong class="text-black">{{ $pengaturan->deskripsi_acara ?? 'POKJA HIMA IF' }}</strong>.
+                <!-- Confirmation Message -->
+                <p class="text-xs sm:text-sm font-semibold text-gray-800 leading-relaxed max-w-xs mx-auto mb-3">
+                    Data pendaftaran kamu telah berhasil tersimpan di sistem.
                 </p>
+
+                <!-- Note Hubungi CP -->
+                <div class="bg-blue-50/80 border border-[#2A82C6] p-2.5 max-w-sm mx-auto mb-5 text-[11px] sm:text-xs font-semibold text-[#1A467C]">
+                    Jika ada kendala pendaftaran atau butuh info lebih lanjut, silakan hubungi Contact Person di bawah ini:
+                </div>
 
                 <!-- Action Button 1: Single Clean WhatsApp CP Button -->
                 <a 
