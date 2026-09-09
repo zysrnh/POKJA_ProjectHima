@@ -19,7 +19,7 @@ class PengaturanSeeder extends Seeder
                 'tanggal_acara' => '13 Oktober 2026',
                 'jam_acara' => '08:00 WIB - Selesai',
                 'lokasi_acara' => 'Ruangan 105',
-                'deskripsi_acara' => 'Pelaksanaan Program Kerja Himpunan Mahasiswa Informatika (HIMA IF)',
+                'deskripsi_acara' => 'Innovative Idea to Great Proposal',
             ]
         );
     }

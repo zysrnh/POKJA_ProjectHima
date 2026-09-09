@@ -8,7 +8,7 @@
     <!-- Google Font: Montserrat -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,600;1,700;1,800&display=swap" rel="stylesheet">
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -26,6 +26,12 @@
                             red: '#CA2C2A',
                             maroon: '#901C1A',
                         }
+                    },
+                    boxShadow: {
+                        'brutal-sm': '2px 2px 0px 0px #000000',
+                        'brutal': '4px 4px 0px 0px #000000',
+                        'brutal-lg': '6px 6px 0px 0px #000000',
+                        'brutal-navy': '5px 5px 0px 0px #1A467C',
                     }
                 }
             }
@@ -37,81 +43,117 @@
         }
     </style>
 </head>
-<body class="bg-gray-100 text-gray-900 min-h-screen flex items-center justify-center p-3 sm:p-6 antialiased">
+<body class="bg-[#F4F4F0] text-gray-900 min-h-screen flex items-center justify-center p-3.5 sm:p-6 lg:p-8 antialiased selection:bg-[#2A82C6] selection:text-white">
 
-    <div class="w-full max-w-lg bg-white border border-gray-300 p-5 sm:p-8 shadow-sm">
-        <!-- Header with Logo -->
-        <div class="border-b border-gray-200 pb-5 mb-5 flex items-center gap-4">
+    <!-- Main Neubrutalism Card Container -->
+    <div class="w-full max-w-xl bg-white border-2 sm:border-[2.5px] border-black p-5 sm:p-8 shadow-[6px_6px_0px_0px_#000000] sm:shadow-[8px_8px_0px_0px_#1A467C]">
+        
+        <!-- Header Top Badges -->
+        <div class="flex items-center justify-between gap-2 mb-4">
+            <div class="flex items-center gap-2">
+                <span class="bg-[#CA2C2A] text-white border-2 border-black px-2.5 py-0.5 text-[10px] sm:text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000]">
+                    POKJA 2026
+                </span>
+                <span class="bg-[#2A82C6] text-white border-2 border-black px-2.5 py-0.5 text-[10px] sm:text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000]">
+                    HIMA IF
+                </span>
+            </div>
+            <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-gray-600 font-mono">
+                REGISTRATION OPEN
+            </span>
+        </div>
+
+        <!-- Header Title & Logo -->
+        <div class="border-b-2 border-black pb-5 mb-5 flex items-center gap-4">
             <img 
                 src="{{ asset('logo/logo.png') }}" 
                 alt="Logo HIMA IF" 
-                class="w-14 h-14 sm:w-16 sm:h-16 object-contain rounded-full border border-gray-200 p-1 bg-white shrink-0 shadow-xs"
+                class="w-16 h-16 sm:w-20 sm:h-20 object-contain rounded-full border-2 border-black p-1 bg-white shrink-0 shadow-[3px_3px_0px_0px_#000000]"
             >
             <div>
-                <h1 class="text-base sm:text-lg font-bold text-gray-900 uppercase tracking-wide">Formulir Pendaftaran {{ $pengaturan->nama_acara ?? 'POKJA' }}</h1>
-                <p class="text-xs text-gray-600 mt-0.5">Himpunan Mahasiswa Informatika (HIMA IF)</p>
-            </div>
-        </div>
-
-        <!-- Banner Informasi Acara (Waktu & Lokasi) -->
-        <div class="mb-6 p-4 bg-gray-50 border border-gray-300">
-            <h2 class="text-xs font-bold uppercase tracking-wider text-[#1A467C] mb-2.5 flex items-center gap-1.5">
-                <svg class="w-4 h-4 text-[#2A82C6]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="square" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span>Informasi Pelaksanaan Acara</span>
-            </h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs text-gray-800">
-                <!-- Tanggal & Waktu -->
-                <div class="flex items-start gap-2 bg-white p-2.5 border border-gray-200">
-                    <svg class="w-4 h-4 text-[#2A82C6] shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="square" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    <div>
-                        <span class="block text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Tanggal & Waktu</span>
-                        <span class="font-bold text-gray-900">{{ $pengaturan->tanggal_acara ?? '13 Oktober 2026' }}</span>
-                        <span class="block text-[11px] text-gray-600 mt-0.5">{{ $pengaturan->jam_acara ?? '08:00 WIB - Selesai' }}</span>
-                    </div>
-                </div>
-
-                <!-- Lokasi / Ruangan -->
-                <div class="flex items-start gap-2 bg-white p-2.5 border border-gray-200">
-                    <svg class="w-4 h-4 text-[#CA2C2A] shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="square" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path stroke-linecap="square" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                    <div>
-                        <span class="block text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Lokasi / Tempat</span>
-                        <span class="font-bold text-gray-900">{{ $pengaturan->lokasi_acara ?? 'Ruangan 105' }}</span>
-                        <span class="block text-[11px] text-gray-600 mt-0.5">Kampus Utama</span>
-                    </div>
-                </div>
-            </div>
-
-            @if(!empty($pengaturan->deskripsi_acara))
-                <p class="mt-2.5 text-[11px] text-gray-600 leading-relaxed border-t border-gray-200 pt-2">
-                    <span class="font-semibold text-gray-700">Catatan:</span> {{ $pengaturan->deskripsi_acara }}
+                <h1 class="text-lg sm:text-2xl font-black text-black uppercase tracking-tight leading-tight">
+                    FORMULIR PENDAFTARAN
+                </h1>
+                <p class="text-xs sm:text-sm font-semibold text-gray-700 mt-0.5">
+                    Himpunan Mahasiswa Informatika
                 </p>
-            @endif
+            </div>
         </div>
 
-        <!-- Flash Alert Sukses -->
-        @if (session('success'))
-            <div id="alert-box" class="mb-5 p-3.5 bg-green-50 border border-green-600 text-green-800 text-xs sm:text-sm">
-                <div class="flex items-center gap-2">
-                    <svg class="w-4 h-4 text-green-700 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+        <!-- Theme Showcase Box (Neubrutalism Hero Accent) -->
+        <div class="mb-5 bg-[#1A467C] text-white border-2 border-black p-4 shadow-[4px_4px_0px_0px_#000000]">
+            <div class="flex items-center justify-between mb-1.5">
+                <span class="bg-[#CA2C2A] text-white border border-black px-2 py-0.5 text-[9px] sm:text-[10px] font-black uppercase tracking-widest">
+                    TEMA ACARA
+                </span>
+                <span class="text-[10px] font-mono text-blue-200">#SeminarProposal</span>
+            </div>
+            <p class="text-base sm:text-lg font-black tracking-wide text-yellow-300 italic uppercase">
+                "{{ $pengaturan->deskripsi_acara ?? 'Innovative Idea to Great Proposal' }}"
+            </p>
+        </div>
+
+        <!-- Event Details: 3-Card Neubrutalism Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+            <!-- Card 1: Tanggal -->
+            <div class="bg-blue-50 border-2 border-black p-3 shadow-[3px_3px_0px_0px_#000000]">
+                <div class="flex items-center gap-1.5 text-[#1A467C] mb-1">
+                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="square" stroke-width="2.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
-                    <span class="font-semibold">{{ session('success') }}</span>
+                    <span class="text-[10px] font-black uppercase tracking-wider">Tanggal</span>
+                </div>
+                <p class="text-xs sm:text-sm font-bold text-gray-900 leading-tight">
+                    {{ $pengaturan->tanggal_acara ?? '13 Oktober 2026' }}
+                </p>
+            </div>
+
+            <!-- Card 2: Waktu -->
+            <div class="bg-amber-50 border-2 border-black p-3 shadow-[3px_3px_0px_0px_#000000]">
+                <div class="flex items-center gap-1.5 text-amber-900 mb-1">
+                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="square" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span class="text-[10px] font-black uppercase tracking-wider">Waktu</span>
+                </div>
+                <p class="text-xs sm:text-sm font-bold text-gray-900 leading-tight">
+                    {{ $pengaturan->jam_acara ?? '08:00 WIB - Selesai' }}
+                </p>
+            </div>
+
+            <!-- Card 3: Lokasi -->
+            <div class="bg-red-50 border-2 border-black p-3 shadow-[3px_3px_0px_0px_#000000]">
+                <div class="flex items-center gap-1.5 text-[#901C1A] mb-1">
+                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="square" stroke-width="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path stroke-linecap="square" stroke-width="2.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <span class="text-[10px] font-black uppercase tracking-wider">Tempat</span>
+                </div>
+                <p class="text-xs sm:text-sm font-bold text-gray-900 leading-tight">
+                    {{ $pengaturan->lokasi_acara ?? 'Ruangan 105' }}
+                </p>
+            </div>
+        </div>
+
+        <!-- Flash Alert Sukses (Neubrutalism Style) -->
+        @if (session('success'))
+            <div id="alert-box" class="mb-6 p-4 bg-[#DCFCE7] border-2 border-black text-green-950 text-xs sm:text-sm shadow-[4px_4px_0px_0px_#000000]">
+                <div class="flex items-start gap-2.5">
+                    <span class="bg-green-600 text-white font-black text-xs px-2 py-0.5 border border-black">SUKSES</span>
+                    <span class="font-bold">{{ session('success') }}</span>
                 </div>
             </div>
         @endif
 
-        <!-- Alert Error Global jika ada kegagalan validasi -->
+        <!-- Alert Error Global (Neubrutalism Style) -->
         @if ($errors->any())
-            <div id="alert-box" class="mb-5 p-3.5 bg-red-50 border border-red-600 text-red-800 text-xs sm:text-sm">
-                <p class="font-semibold mb-1">Terdapat kesalahan pada input Anda:</p>
-                <ul class="list-disc list-inside space-y-0.5 text-xs text-red-700">
+            <div id="alert-box" class="mb-6 p-4 bg-[#FEE2E2] border-2 border-black text-red-950 text-xs sm:text-sm shadow-[4px_4px_0px_0px_#000000]">
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="bg-[#CA2C2A] text-white font-black text-xs px-2 py-0.5 border border-black">ERROR</span>
+                    <span class="font-bold">Terdapat kesalahan pada input Anda:</span>
+                </div>
+                <ul class="list-disc list-inside space-y-1 text-xs font-semibold text-red-900">
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
                     @endforeach
@@ -119,7 +161,7 @@
             </div>
         @endif
 
-        <!-- Form Pendaftaran -->
+        <!-- Form Pendaftaran (Neubrutalism) -->
         <form 
             id="form-pendaftaran"
             action="{{ route('pendaftaran.store') }}" 
@@ -136,8 +178,8 @@
 
             <!-- Field: Nama -->
             <div>
-                <label for="nama" class="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-1">
-                    Nama Lengkap <span class="text-red-600">*</span>
+                <label for="nama" class="block text-xs font-black uppercase tracking-wider text-black mb-1.5">
+                    Nama Lengkap <span class="text-[#CA2C2A]">*</span>
                 </label>
                 <input 
                     type="text" 
@@ -147,17 +189,17 @@
                     placeholder="Contoh: Fulan bin Fulan"
                     maxlength="100"
                     required
-                    class="w-full bg-gray-50 border @error('nama') border-red-500 bg-red-50/20 @else border-gray-300 @enderror text-gray-900 text-base md:text-sm px-3.5 py-2.5 sm:py-2 focus:bg-white focus:outline-none focus:border-[#2A82C6] focus:ring-1 focus:ring-[#2A82C6] transition"
+                    class="w-full bg-white border-2 border-black px-3.5 py-2.5 text-sm font-semibold text-gray-900 focus:outline-none focus:bg-amber-50/20 focus:shadow-[3px_3px_0px_0px_#000000] transition duration-150 @error('nama') border-red-600 bg-red-50/50 @enderror"
                 >
                 @error('nama')
-                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                    <p class="mt-1 text-xs font-bold text-[#CA2C2A]">{{ $message }}</p>
                 @enderror
             </div>
 
             <!-- Field: NIM -->
             <div>
-                <label for="nim" class="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-1">
-                    NIM (Nomor Induk Mahasiswa) <span class="text-red-600">*</span>
+                <label for="nim" class="block text-xs font-black uppercase tracking-wider text-black mb-1.5">
+                    NIM (Nomor Induk Mahasiswa) <span class="text-[#CA2C2A]">*</span>
                 </label>
                 <input 
                     type="text" 
@@ -169,25 +211,25 @@
                     value="{{ session('success') ? '' : old('nim') }}"
                     placeholder="Contoh: 250414000"
                     required
-                    class="w-full bg-gray-50 border @error('nim') border-red-500 bg-red-50/20 @else border-gray-300 @enderror text-gray-900 text-base md:text-sm px-3.5 py-2.5 sm:py-2 focus:bg-white focus:outline-none focus:border-[#2A82C6] focus:ring-1 focus:ring-[#2A82C6] transition font-mono"
+                    class="w-full bg-white border-2 border-black px-3.5 py-2.5 text-sm font-semibold font-mono text-gray-900 focus:outline-none focus:bg-amber-50/20 focus:shadow-[3px_3px_0px_0px_#000000] transition duration-150 @error('nim') border-red-600 bg-red-50/50 @enderror"
                 >
                 @error('nim')
-                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                    <p class="mt-1 text-xs font-bold text-[#CA2C2A]">{{ $message }}</p>
                 @enderror
             </div>
 
             <!-- Field: Kelas (Dropdown Dinamis) -->
             <div>
-                <label for="kelas" class="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-1">
-                    Kelas <span class="text-red-600">*</span>
+                <label for="kelas" class="block text-xs font-black uppercase tracking-wider text-black mb-1.5">
+                    Kelas <span class="text-[#CA2C2A]">*</span>
                 </label>
                 <select 
                     id="kelas" 
                     name="kelas" 
                     required
-                    class="w-full bg-gray-50 border @error('kelas') border-red-500 bg-red-50/20 @else border-gray-300 @enderror text-gray-900 text-base md:text-sm px-3.5 py-2.5 sm:py-2 focus:bg-white focus:outline-none focus:border-[#2A82C6] focus:ring-1 focus:ring-[#2A82C6] transition cursor-pointer font-mono"
+                    class="w-full bg-white border-2 border-black px-3.5 py-2.5 text-sm font-bold font-mono text-gray-900 focus:outline-none focus:bg-amber-50/20 focus:shadow-[3px_3px_0px_0px_#000000] transition duration-150 cursor-pointer @error('kelas') border-red-600 bg-red-50/50 @enderror"
                 >
-                    <option value="">-- Pilih Kelas Anda --</option>
+                    <option value="">-- PILIH KELAS ANDA --</option>
                     @foreach ($kelasList as $k)
                         <option value="{{ $k->nama_kelas }}" {{ (session('success') ? '' : old('kelas')) == $k->nama_kelas ? 'selected' : '' }}>
                             {{ $k->nama_kelas }}
@@ -195,14 +237,14 @@
                     @endforeach
                 </select>
                 @error('kelas')
-                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                    <p class="mt-1 text-xs font-bold text-[#CA2C2A]">{{ $message }}</p>
                 @enderror
             </div>
 
             <!-- Field: No Telp -->
             <div>
-                <label for="no_telp" class="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-1">
-                    No. Telepon / WhatsApp <span class="text-red-600">*</span>
+                <label for="no_telp" class="block text-xs font-black uppercase tracking-wider text-black mb-1.5">
+                    No. Telepon / WhatsApp <span class="text-[#CA2C2A]">*</span>
                 </label>
                 <input 
                     type="tel" 
@@ -214,33 +256,34 @@
                     value="{{ session('success') ? '' : old('no_telp') }}"
                     placeholder="Contoh: 081234567890"
                     required
-                    class="w-full bg-gray-50 border @error('no_telp') border-red-500 bg-red-50/20 @else border-gray-300 @enderror text-gray-900 text-base md:text-sm px-3.5 py-2.5 sm:py-2 focus:bg-white focus:outline-none focus:border-[#2A82C6] focus:ring-1 focus:ring-[#2A82C6] transition font-mono"
+                    class="w-full bg-white border-2 border-black px-3.5 py-2.5 text-sm font-semibold font-mono text-gray-900 focus:outline-none focus:bg-amber-50/20 focus:shadow-[3px_3px_0px_0px_#000000] transition duration-150 @error('no_telp') border-red-600 bg-red-50/50 @enderror"
                 >
                 @error('no_telp')
-                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                    <p class="mt-1 text-xs font-bold text-[#CA2C2A]">{{ $message }}</p>
                 @enderror
             </div>
 
-            <!-- Submit Button with Anti-Double Submit -->
-            <div class="pt-2">
+            <!-- Submit Button (Neubrutalism Interactive Action) -->
+            <div class="pt-3">
                 <button 
                     type="submit" 
                     id="btn-submit"
-                    class="w-full bg-[#2A82C6] hover:bg-[#1A467C] active:bg-[#1A467C] text-white text-xs sm:text-sm font-semibold uppercase tracking-wider py-3 px-4 transition cursor-pointer flex items-center justify-center gap-2"
+                    class="w-full bg-[#2A82C6] hover:bg-[#1A467C] active:bg-[#1A467C] text-white text-xs sm:text-sm font-black uppercase tracking-wider py-3.5 px-4 border-2 border-black shadow-[4px_4px_0px_0px_#000000] hover:shadow-[6px_6px_0px_0px_#000000] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all duration-150 cursor-pointer flex items-center justify-center gap-2"
                 >
-                    <span id="btn-text">Kirim Pendaftaran</span>
+                    <span id="btn-text">KIRIM PENDAFTARAN</span>
                 </button>
             </div>
         </form>
 
         <!-- Footer Info -->
-        <div class="mt-6 pt-4 border-t border-gray-200 text-center">
-            <p class="text-xs text-gray-500">Pastikan seluruh data yang dimasukkan sudah benar dan valid.</p>
+        <div class="mt-6 pt-4 border-t-2 border-black text-center flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] font-semibold text-gray-600">
+            <span>© {{ date('Y') }} HIMA IF - Pokja Division</span>
+            <span>Pastikan data pendaftaran Anda valid</span>
         </div>
     </div>
 
     <script>
-        // Anti-Double Submit Handler
+        // Anti-Double Submit Handler with Neubrutalism Spinner
         let isSubmitting = false;
 
         function handleSubmit(e) {
@@ -257,11 +300,11 @@
             btn.classList.add('opacity-75', 'cursor-not-allowed');
 
             btnText.innerHTML = `
-                <svg class="animate-spin h-4 w-4 text-white inline-block" fill="none" viewBox="0 0 24 24">
+                <svg class="animate-spin h-4 w-4 text-white inline-block mr-1" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                <span>Sedang Mengirim...</span>
+                <span>SEDANG MENGIRIM...</span>
             `;
 
             return true;
