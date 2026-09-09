@@ -235,64 +235,67 @@ class PendaftaranAdminController extends Controller
             echo '<head>';
             echo '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">';
             echo '<!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Data Pendaftar</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->';
-            echo '<style>';
-            echo 'table { border-collapse: collapse; width: 100%; font-family: "Segoe UI", Arial, sans-serif; font-size: 11pt; }';
-            echo '.title { font-size: 16pt; font-weight: bold; color: #1A467C; text-align: left; height: 35px; }';
-            echo '.subtitle { font-size: 10pt; color: #555555; text-align: left; height: 22px; }';
-            echo '.th-header { background-color: #1A467C; color: #FFFFFF; font-weight: bold; text-align: center; border: 1.5pt solid #0F2A4A; padding: 10px; height: 30px; font-size: 11pt; }';
-            echo '.td-data { border: 0.5pt solid #B0C4DE; padding: 6px 10px; vertical-align: middle; height: 26px; }';
-            echo '.td-center { text-align: center; }';
-            echo '.td-bold { font-weight: bold; }';
-            echo '.text-format { mso-number-format:"\@"; }';
-            echo '.row-even { background-color: #F8FBFE; }';
-            echo '.row-odd { background-color: #FFFFFF; }';
-            echo '.badge-hadir { background-color: #DCFCE7; color: #166534; font-weight: bold; text-align: center; border: 0.5pt solid #86EFAC; }';
-            echo '.badge-belum { background-color: #F3F4F6; color: #4B5563; font-weight: bold; text-align: center; border: 0.5pt solid #D1D5DB; }';
-            echo '.badge-tidak { background-color: #FEE2E2; color: #991B1B; font-weight: bold; text-align: center; border: 0.5pt solid #FCA5A5; }';
-            echo '</style>';
             echo '</head>';
-            echo '<body>';
+            echo '<body style="font-family: Arial, sans-serif; font-size: 11pt;">';
             
-            echo '<table>';
+            echo '<table border="1" style="border-collapse: collapse; border: 1.5pt solid #1A467C; font-family: Arial, sans-serif; width: 100%;">';
+            
+            // Set Kolom Lebar
+            echo '<colgroup>';
+            echo '<col width="50" style="width: 50pt;">';
+            echo '<col width="250" style="width: 200pt;">';
+            echo '<col width="150" style="width: 120pt;">';
+            echo '<col width="100" style="width: 80pt;">';
+            echo '<col width="170" style="width: 130pt;">';
+            echo '<col width="160" style="width: 120pt;">';
+            echo '<col width="200" style="width: 150pt;">';
+            echo '</colgroup>';
+
             // Header Judul Laporan
-            echo '<tr><td colspan="7" class="title">DATA PENDAFTARAN POKJA HIMA IF 2026</td></tr>';
-            echo '<tr><td colspan="7" class="subtitle">Dicetak pada: ' . date('d F Y, H:i') . ' WIB | Total Data: ' . $data->count() . ' (Hadir: ' . $totalHadir . ' | Belum Hadir: ' . $totalBelum . ')</td></tr>';
-            echo '<tr><td colspan="7" style="height: 12px;"></td></tr>';
+            echo '<tr><td colspan="7" style="font-size: 16pt; font-weight: bold; color: #1A467C; border: none; height: 35px; vertical-align: middle;">DATA PENDAFTARAN POKJA HIMA IF 2026</td></tr>';
+            echo '<tr><td colspan="7" style="font-size: 10pt; color: #555555; border: none; height: 22px; vertical-align: middle;">Dicetak pada: ' . date('d F Y, H:i') . ' WIB | Total Data: ' . $data->count() . ' (Hadir: ' . $totalHadir . ' | Belum Hadir: ' . $totalBelum . ')</td></tr>';
+            echo '<tr><td colspan="7" style="border: none; height: 10px;"></td></tr>';
 
             // Baris Header Kolom
-            echo '<tr>';
-            echo '<th class="th-header" style="width: 50px;">NO</th>';
-            echo '<th class="th-header" style="width: 250px;">NAMA LENGKAP</th>';
-            echo '<th class="th-header" style="width: 140px;">NIM</th>';
-            echo '<th class="th-header" style="width: 100px;">KELAS</th>';
-            echo '<th class="th-header" style="width: 170px;">NO. WHATSAPP</th>';
-            echo '<th class="th-header" style="width: 140px;">STATUS KEHADIRAN</th>';
-            echo '<th class="th-header" style="width: 180px;">WAKTU PENDAFTARAN</th>';
+            echo '<tr height="36" style="height: 28pt;">';
+            echo '<th style="background-color: #1A467C; color: #FFFFFF; font-weight: bold; font-size: 11pt; text-align: center; vertical-align: middle; border: 1.5pt solid #0F2A4A; padding: 8px 5px;">NO</th>';
+            echo '<th style="background-color: #1A467C; color: #FFFFFF; font-weight: bold; font-size: 11pt; text-align: center; vertical-align: middle; border: 1.5pt solid #0F2A4A; padding: 8px 10px;">NAMA LENGKAP</th>';
+            echo '<th style="background-color: #1A467C; color: #FFFFFF; font-weight: bold; font-size: 11pt; text-align: center; vertical-align: middle; border: 1.5pt solid #0F2A4A; padding: 8px 10px;">NIM</th>';
+            echo '<th style="background-color: #1A467C; color: #FFFFFF; font-weight: bold; font-size: 11pt; text-align: center; vertical-align: middle; border: 1.5pt solid #0F2A4A; padding: 8px 10px;">KELAS</th>';
+            echo '<th style="background-color: #1A467C; color: #FFFFFF; font-weight: bold; font-size: 11pt; text-align: center; vertical-align: middle; border: 1.5pt solid #0F2A4A; padding: 8px 10px;">NO. WHATSAPP</th>';
+            echo '<th style="background-color: #1A467C; color: #FFFFFF; font-weight: bold; font-size: 11pt; text-align: center; vertical-align: middle; border: 1.5pt solid #0F2A4A; padding: 8px 10px; white-space: nowrap;">STATUS KEHADIRAN</th>';
+            echo '<th style="background-color: #1A467C; color: #FFFFFF; font-weight: bold; font-size: 11pt; text-align: center; vertical-align: middle; border: 1.5pt solid #0F2A4A; padding: 8px 10px; white-space: nowrap;">WAKTU PENDAFTARAN</th>';
             echo '</tr>';
 
             // Loop Baris Data
             $no = 1;
             foreach ($data as $item) {
-                $rowClass = ($no % 2 == 0) ? 'row-even' : 'row-odd';
+                $bgRow = ($no % 2 == 0) ? '#F8FBFE' : '#FFFFFF';
                 $statusText = match ($item->status_kehadiran) {
                     'hadir' => 'HADIR',
                     'tidak_hadir' => 'TIDAK HADIR',
                     default => 'BELUM HADIR',
                 };
-                $badgeClass = match ($item->status_kehadiran) {
-                    'hadir' => 'badge-hadir',
-                    'tidak_hadir' => 'badge-tidak',
-                    default => 'badge-belum',
+                $statusStyle = match ($item->status_kehadiran) {
+                    'hadir' => 'background-color: #DCFCE7; color: #166534; font-weight: bold;',
+                    'tidak_hadir' => 'background-color: #FEE2E2; color: #991B1B; font-weight: bold;',
+                    default => 'background-color: #F3F4F6; color: #4B5563; font-weight: bold;',
                 };
 
-                echo '<tr class="' . $rowClass . '">';
-                echo '<td class="td-data td-center" style="font-weight: bold;">' . $no++ . '</td>';
-                echo '<td class="td-data td-bold" style="color: #111827;">' . htmlspecialchars($item->nama) . '</td>';
-                echo '<td class="td-data td-center td-bold text-format" style="color: #1A467C;">' . htmlspecialchars($item->nim) . '</td>';
-                echo '<td class="td-data td-center td-bold text-format" style="background-color: #EEF6FC;">' . htmlspecialchars($item->kelas) . '</td>';
-                echo '<td class="td-data td-center text-format">' . htmlspecialchars($item->no_telp) . '</td>';
-                echo '<td class="td-data ' . $badgeClass . '">' . $statusText . '</td>';
-                echo '<td class="td-data td-center" style="color: #4B5563;">' . ($item->created_at ? $item->created_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') . ' WIB' : '-') . '</td>';
+                // Pastikan format string nomor whatsapp diawali 0
+                $phone = $item->no_telp;
+                if (!str_starts_with($phone, '0') && !str_starts_with($phone, '+') && !str_starts_with($phone, '62')) {
+                    $phone = '0' . $phone;
+                }
+
+                echo '<tr height="28" style="height: 22pt; background-color: ' . $bgRow . ';">';
+                echo '<td align="center" style="border: 0.5pt solid #B0C4DE; padding: 6px 8px; text-align: center; font-weight: bold; vertical-align: middle;">' . $no++ . '</td>';
+                echo '<td style="border: 0.5pt solid #B0C4DE; padding: 6px 10px; font-weight: bold; color: #111827; vertical-align: middle;">' . htmlspecialchars($item->nama) . '</td>';
+                echo '<td align="center" style="border: 0.5pt solid #B0C4DE; padding: 6px 10px; text-align: center; font-weight: bold; color: #1A467C; mso-number-format:\'\@\'; vertical-align: middle;">' . htmlspecialchars($item->nim) . '</td>';
+                echo '<td align="center" style="border: 0.5pt solid #B0C4DE; padding: 6px 10px; text-align: center; font-weight: bold; background-color: #EEF6FC; mso-number-format:\'\@\'; vertical-align: middle;">' . htmlspecialchars($item->kelas) . '</td>';
+                echo '<td align="center" style="border: 0.5pt solid #B0C4DE; padding: 6px 10px; text-align: center; mso-number-format:\'\@\'; vertical-align: middle;">' . htmlspecialchars($phone) . '</td>';
+                echo '<td align="center" style="border: 0.5pt solid #B0C4DE; padding: 6px 10px; text-align: center; white-space: nowrap; vertical-align: middle; ' . $statusStyle . '">' . $statusText . '</td>';
+                echo '<td align="center" style="border: 0.5pt solid #B0C4DE; padding: 6px 10px; text-align: center; color: #4B5563; white-space: nowrap; vertical-align: middle;">' . ($item->created_at ? $item->created_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') . ' WIB' : '-') . '</td>';
                 echo '</tr>';
             }
 
