@@ -64,24 +64,7 @@
     <div class="hidden md:block absolute bottom-8 right-16 w-16 h-16 bg-[#1A467C]/20 border-2 border-[#1A467C] shadow-[4px_4px_0px_0px_#1A467C] pointer-events-none"></div>
 
     <!-- Main Container: 2-Column Graphic Design Grid -->
-    <div class="w-full max-w-5xl z-10 my-4">
-
-        <!-- Top Header Navigation Bar (Neubrutalism Title & Badges) -->
-        <div class="flex flex-wrap items-center justify-between gap-3 mb-4 sm:mb-6">
-            <div class="flex items-center gap-2.5">
-                <span class="bg-[#1A467C] text-white border-2 border-[#0F2642] px-3 py-1 text-xs font-black uppercase tracking-wider shadow-[3px_3px_0px_0px_#0F2642]">
-                    POKJA HIMA IF
-                </span>
-                <span class="bg-[#CA2C2A] text-white border-2 border-[#0F2642] px-3 py-1 text-xs font-black uppercase tracking-wider shadow-[3px_3px_0px_0px_#0F2642]">
-                    EDISI 2026
-                </span>
-            </div>
-            <div class="flex items-center gap-2">
-                <span class="bg-white text-[#1A467C] border-2 border-[#1A467C] px-3 py-1 text-xs font-black uppercase tracking-widest shadow-[3px_3px_0px_0px_#1A467C] font-mono">
-                    ● REGISTRATION OPEN
-                </span>
-            </div>
-        </div>
+    <div class="w-full max-w-5xl z-10 my-4 sm:my-8">
 
         <!-- 2-Column Layout Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
@@ -113,11 +96,8 @@
                             </div>
                         </div>
 
-                        <!-- Main Big Headline (Without awkward "Tema Acara" labels) -->
+                        <!-- Main Big Headline -->
                         <div class="flex-1">
-                            <span class="inline-block bg-[#2A82C6] text-white border-2 border-[#1A467C] px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider mb-2 shadow-[2px_2px_0px_0px_#1A467C]">
-                                OFFICIAL WORKSHOP & SEMINAR
-                            </span>
                             <h1 class="text-2xl sm:text-3xl lg:text-3xl font-black text-[#1A467C] tracking-tight uppercase leading-tight">
                                 {{ $pengaturan->deskripsi_acara ?? 'INNOVATIVE IDEA TO GREAT PROPOSAL' }}
                             </h1>
