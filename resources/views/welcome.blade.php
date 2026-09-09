@@ -8,7 +8,7 @@
     <!-- Google Font: Montserrat -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,700;1,800;1,900&display=swap" rel="stylesheet">
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -53,7 +53,7 @@
         }
     </style>
 </head>
-<body class="text-[#000000] min-h-screen flex items-center justify-center p-3 sm:p-6 lg:p-10 antialiased selection:bg-[#2A82C6] selection:text-white relative overflow-x-hidden">
+<body class="text-[#000000] min-h-screen flex items-center justify-center p-3.5 sm:p-6 lg:p-10 antialiased selection:bg-[#2A82C6] selection:text-white relative overflow-x-hidden">
 
     <!-- Floating Geometric Accents with Exact Palette -->
     <div class="hidden md:block absolute top-8 left-8 w-14 h-14 bg-[#2A82C6]/25 border-2 border-[#1A467C] shadow-[4px_4px_0px_0px_#1A467C] pointer-events-none"></div>
@@ -61,246 +61,226 @@
     <div class="hidden md:block absolute top-16 right-12 w-12 h-12 bg-white border-2 border-[#1A467C] shadow-[4px_4px_0px_0px_#1A467C] pointer-events-none"></div>
     <div class="hidden md:block absolute bottom-8 right-16 w-16 h-16 bg-[#1A467C]/15 border-2 border-[#000000] shadow-[4px_4px_0px_0px_#000000] pointer-events-none"></div>
 
-    <!-- Main Container: 2-Column Grid -->
-    <div class="w-full max-w-5xl z-10 my-4 sm:my-8">
+    <!-- Unified Single Card Container (Satu Form Utuh Satu Halaman) -->
+    <div class="w-full max-w-4xl z-10 my-4 sm:my-8 bg-white border-2 border-[#1A467C] p-6 sm:p-9 lg:p-10 shadow-[8px_8px_0px_0px_#1A467C] sm:shadow-[10px_10px_0px_0px_#1A467C]">
 
-        <!-- 2-Column Layout Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+        <!-- HERO HEADER: Polaroid + Big Highlighted Title -->
+        <div class="flex flex-col md:flex-row items-center md:items-start gap-6 mb-7 pb-7 border-b-2 border-[#1A467C]">
             
-            <!-- LEFT COLUMN: Event Hero Showcase (Poster Style) -->
-            <div class="lg:col-span-6 flex flex-col gap-5">
+            <!-- Polaroid Logo Badge with Tape Header -->
+            <div class="relative group shrink-0">
+                <!-- Semi-transparent Tape Effect -->
+                <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-14 h-5 tape-badge border border-gray-400 z-10"></div>
                 
-                <!-- Hero Poster Card -->
-                <div class="bg-white border-2 border-[#1A467C] p-6 sm:p-7 shadow-[8px_8px_0px_0px_#1A467C] relative">
-                    
-                    <!-- Top Polaroid + Title Layout -->
-                    <div class="flex flex-col sm:flex-row items-start gap-5 mb-5">
-                        
-                        <!-- Polaroid Logo Badge with Tape Header -->
-                        <div class="relative group shrink-0">
-                            <!-- Semi-transparent Tape Effect -->
-                            <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-14 h-5 tape-badge border border-gray-400 z-10"></div>
-                            
-                            <!-- Polaroid Box -->
-                            <div class="bg-white border-2 border-[#1A467C] p-2.5 shadow-[4px_4px_0px_0px_#1A467C] rotate-[-2deg] hover:rotate-0 transition-transform duration-200">
-                                <img 
-                                    src="{{ asset('logo/logo.png') }}" 
-                                    alt="Logo HIMA IF" 
-                                    class="w-20 h-20 sm:w-24 sm:h-24 object-contain mx-auto bg-gray-50 border border-gray-200 p-1"
-                                >
-                                <p class="text-[10px] font-black font-mono text-center text-[#1A467C] mt-2 uppercase tracking-wider">
-                                    #HIMA_IF
-                                </p>
-                            </div>
-                        </div>
-
-                        <!-- Main Big Headline -->
-                        <div class="flex-1">
-                            <h1 class="text-2xl sm:text-3xl lg:text-3xl font-black text-[#1A467C] tracking-tight uppercase leading-tight">
-                                {{ $pengaturan->deskripsi_acara ?? 'INNOVATIVE IDEA TO GREAT PROPOSAL' }}
-                            </h1>
-                            <!-- Red Dual Accent Bar (Merah Terang #CA2C2A dengan shadow Merah Gelap #901C1A) -->
-                            <div class="w-20 h-1.5 bg-[#CA2C2A] shadow-[2px_2px_0px_0px_#901C1A] mt-3 mb-1"></div>
-                        </div>
-                    </div>
-
-                    <!-- Event Metadata Cards (Schedule & Venue) -->
-                    <div class="dot-card border-2 border-[#1A467C] p-4 shadow-[4px_4px_0px_0px_#1A467C]">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                            <!-- Tanggal & Waktu (Biru Terang #2A82C6 & Biru Gelap #1A467C) -->
-                            <div class="bg-white border-2 border-[#1A467C] p-3 shadow-[3px_3px_0px_0px_#1A467C]">
-                                <span class="text-[10px] font-black uppercase tracking-wider text-[#2A82C6] block mb-0.5">
-                                    📅 TANGGAL & WAKTU
-                                </span>
-                                <span class="font-extrabold text-sm text-[#000000] block">
-                                    {{ $pengaturan->tanggal_acara ?? '13 Oktober 2026' }}
-                                </span>
-                                <span class="font-semibold text-xs text-gray-600 block mt-0.5 font-mono">
-                                    {{ $pengaturan->jam_acara ?? '08:00 WIB - Selesai' }}
-                                </span>
-                            </div>
-
-                            <!-- Lokasi / Ruangan (Merah Terang #CA2C2A & Merah Gelap #901C1A) -->
-                            <div class="bg-white border-2 border-[#901C1A] p-3 shadow-[3px_3px_0px_0px_#901C1A]">
-                                <span class="text-[10px] font-black uppercase tracking-wider text-[#CA2C2A] block mb-0.5">
-                                    📍 TEMPAT / RUANGAN
-                                </span>
-                                <span class="font-extrabold text-sm text-[#000000] block">
-                                    {{ $pengaturan->lokasi_acara ?? 'Ruangan 105' }}
-                                </span>
-                                <span class="font-semibold text-xs text-gray-600 block mt-0.5">
-                                    Kampus Utama
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
-            </div>
-
-            <!-- RIGHT COLUMN: Registration Form Card -->
-            <div class="lg:col-span-6">
-                
-                <div class="bg-white border-2 border-[#1A467C] p-6 sm:p-8 shadow-[8px_8px_0px_0px_#1A467C] relative">
-                    
-                    <!-- Form Title Header -->
-                    <div class="border-b-2 border-[#1A467C] pb-4 mb-5">
-                        <h2 class="text-lg sm:text-xl font-black text-[#1A467C] uppercase tracking-wide">
-                            FORM PENDAFTARAN
-                        </h2>
-                        <p class="text-xs font-semibold text-gray-600 mt-0.5">
-                            Lengkapi data diri Anda untuk konfirmasi kehadiran
-                        </p>
-                    </div>
-
-                    <!-- Flash Alert Sukses -->
-                    @if (session('success'))
-                        <div id="alert-box" class="mb-5 p-3.5 bg-[#DCFCE7] border-2 border-[#1A467C] text-green-950 text-xs sm:text-sm shadow-[4px_4px_0px_0px_#1A467C]">
-                            <div class="flex items-start gap-2.5">
-                                <span class="bg-green-700 text-white font-black text-xs px-2 py-0.5 border border-black shrink-0">BERHASIL</span>
-                                <span class="font-bold pt-0.5">{{ session('success') }}</span>
-                            </div>
-                        </div>
-                    @endif
-
-                    <!-- Alert Error Global -->
-                    @if ($errors->any())
-                        <div id="alert-box" class="mb-5 p-3.5 bg-[#FEE2E2] border-2 border-[#901C1A] text-red-950 text-xs sm:text-sm shadow-[4px_4px_0px_0px_#901C1A]">
-                            <div class="flex items-center gap-2 mb-1.5">
-                                <span class="bg-[#CA2C2A] text-white font-black text-xs px-2 py-0.5 border border-[#901C1A] shrink-0">PERIKSA</span>
-                                <span class="font-bold">Terdapat kesalahan input:</span>
-                            </div>
-                            <ul class="list-disc list-inside space-y-0.5 text-xs font-semibold text-red-900">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
-
-                    <!-- Form Pendaftaran -->
-                    <form 
-                        id="form-pendaftaran"
-                        action="{{ route('pendaftaran.store') }}" 
-                        method="POST" 
-                        class="space-y-4"
-                        onsubmit="handleSubmit(event)"
+                <!-- Polaroid Box -->
+                <div class="bg-white border-2 border-[#1A467C] p-2.5 shadow-[4px_4px_0px_0px_#1A467C] rotate-[-2deg] hover:rotate-0 transition-transform duration-200">
+                    <img 
+                        src="{{ asset('logo/logo.png') }}" 
+                        alt="Logo HIMA IF" 
+                        class="w-20 h-20 sm:w-24 sm:h-24 object-contain mx-auto bg-gray-50 border border-gray-200 p-1"
                     >
-                        @csrf
+                    <p class="text-[10px] font-black font-mono text-center text-[#1A467C] mt-2 uppercase tracking-wider">
+                        #HIMA_IF
+                    </p>
+                </div>
+            </div>
 
-                        <!-- Anti-bot Honeypot Field -->
-                        <div class="hidden" aria-hidden="true">
-                            <input type="text" name="website_url" tabindex="-1" autocomplete="off">
-                        </div>
+            <!-- Big Highlighted Headline Section -->
+            <div class="flex-1 text-center md:text-left">
+                <span class="inline-block bg-[#1A467C] text-white text-[10px] sm:text-xs font-black uppercase px-2.5 py-0.5 tracking-widest mb-2 shadow-[2px_2px_0px_0px_#2A82C6]">
+                    POKJA HIMA IF 2026
+                </span>
+                <h1 class="text-3xl sm:text-4xl lg:text-5xl font-black text-[#1A467C] tracking-tight uppercase leading-none">
+                    {{ $pengaturan->deskripsi_acara ?? 'INNOVATIVE IDEA TO GREAT PROPOSAL' }}
+                </h1>
+                <!-- Red Dual Accent Bar -->
+                <div class="w-24 h-2 bg-[#CA2C2A] shadow-[2px_2px_0px_0px_#901C1A] mt-3 mx-auto md:mx-0"></div>
+            </div>
+        </div>
 
-                        <!-- Field: Nama Lengkap -->
-                        <div>
-                            <label for="nama" class="block text-xs font-black uppercase tracking-wider text-[#1A467C] mb-1">
-                                Nama Lengkap <span class="text-[#CA2C2A]">*</span>
-                            </label>
-                            <input 
-                                type="text" 
-                                id="nama" 
-                                name="nama" 
-                                value="{{ session('success') ? '' : old('nama') }}"
-                                placeholder="Masukkan nama lengkap Anda..."
-                                maxlength="100"
-                                required
-                                class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] px-3.5 py-2.5 text-sm font-semibold text-[#000000] focus:bg-white focus:outline-none focus:shadow-[4px_4px_0px_0px_#1A467C] transition-all duration-150 @error('nama') border-[#CA2C2A] bg-red-50 @enderror"
-                            >
-                            @error('nama')
-                                <p class="mt-1 text-xs font-bold text-[#CA2C2A]">{{ $message }}</p>
-                            @enderror
-                        </div>
+        <!-- Event Details Bar: 2 Blueprint Cards Grid -->
+        <div class="dot-card border-2 border-[#1A467C] p-4 shadow-[4px_4px_0px_0px_#1A467C] mb-8">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-xs">
+                <!-- Tanggal & Waktu -->
+                <div class="bg-white border-2 border-[#1A467C] p-3.5 shadow-[3px_3px_0px_0px_#1A467C] flex items-start gap-3">
+                    <span class="text-2xl mt-0.5">📅</span>
+                    <div>
+                        <span class="text-[10px] font-black uppercase tracking-wider text-[#2A82C6] block">
+                            TANGGAL & WAKTU
+                        </span>
+                        <span class="font-black text-sm sm:text-base text-[#000000] block mt-0.5">
+                            {{ $pengaturan->tanggal_acara ?? '13 Oktober 2026' }}
+                        </span>
+                        <span class="font-bold text-xs text-gray-600 block mt-0.5 font-mono">
+                            {{ $pengaturan->jam_acara ?? '08:00 WIB - Selesai' }}
+                        </span>
+                    </div>
+                </div>
 
-                        <!-- Field: NIM -->
-                        <div>
-                            <label for="nim" class="block text-xs font-black uppercase tracking-wider text-[#1A467C] mb-1">
-                                NIM (Nomor Induk Mahasiswa) <span class="text-[#CA2C2A]">*</span>
-                            </label>
-                            <input 
-                                type="text" 
-                                id="nim" 
-                                name="nim" 
-                                inputmode="numeric"
-                                maxlength="20"
-                                oninput="this.value = this.value.replace(/\s+/g, '')"
-                                value="{{ session('success') ? '' : old('nim') }}"
-                                placeholder="Contoh: 250414000"
-                                required
-                                class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] px-3.5 py-2.5 text-sm font-semibold font-mono text-[#000000] focus:bg-white focus:outline-none focus:shadow-[4px_4px_0px_0px_#1A467C] transition-all duration-150 @error('nim') border-[#CA2C2A] bg-red-50 @enderror"
-                            >
-                            @error('nim')
-                                <p class="mt-1 text-xs font-bold text-[#CA2C2A]">{{ $message }}</p>
-                            @enderror
-                        </div>
+                <!-- Lokasi / Ruangan -->
+                <div class="bg-white border-2 border-[#901C1A] p-3.5 shadow-[3px_3px_0px_0px_#901C1A] flex items-start gap-3">
+                    <span class="text-2xl mt-0.5">📍</span>
+                    <div>
+                        <span class="text-[10px] font-black uppercase tracking-wider text-[#CA2C2A] block">
+                            TEMPAT / RUANGAN
+                        </span>
+                        <span class="font-black text-sm sm:text-base text-[#000000] block mt-0.5">
+                            {{ $pengaturan->lokasi_acara ?? 'Ruangan 105' }}
+                        </span>
+                        <span class="font-bold text-xs text-gray-600 block mt-0.5">
+                            Kampus Utama
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                        <!-- Field: Kelas (Dropdown Dinamis) -->
-                        <div>
-                            <label for="kelas" class="block text-xs font-black uppercase tracking-wider text-[#1A467C] mb-1">
-                                Kelas <span class="text-[#CA2C2A]">*</span>
-                            </label>
-                            <select 
-                                id="kelas" 
-                                name="kelas" 
-                                required
-                                class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] px-3.5 py-2.5 text-sm font-bold font-mono text-[#000000] focus:bg-white focus:outline-none focus:shadow-[4px_4px_0px_0px_#1A467C] transition-all duration-150 cursor-pointer @error('kelas') border-[#CA2C2A] bg-red-50 @enderror"
-                            >
-                                <option value="">-- PILIH KELAS ANDA --</option>
-                                @foreach ($kelasList as $k)
-                                    <option value="{{ $k->nama_kelas }}" {{ (session('success') ? '' : old('kelas')) == $k->nama_kelas ? 'selected' : '' }}>
-                                        {{ $k->nama_kelas }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('kelas')
-                                <p class="mt-1 text-xs font-bold text-[#CA2C2A]">{{ $message }}</p>
-                            @enderror
-                        </div>
+        <!-- Flash Alert Sukses -->
+        @if (session('success'))
+            <div id="alert-box" class="mb-6 p-4 bg-[#DCFCE7] border-2 border-[#1A467C] text-green-950 text-xs sm:text-sm shadow-[4px_4px_0px_0px_#1A467C]">
+                <div class="flex items-start gap-2.5">
+                    <span class="bg-green-700 text-white font-black text-xs px-2 py-0.5 border border-black shrink-0">BERHASIL</span>
+                    <span class="font-bold pt-0.5">{{ session('success') }}</span>
+                </div>
+            </div>
+        @endif
 
-                        <!-- Field: No Telp / WhatsApp -->
-                        <div>
-                            <label for="no_telp" class="block text-xs font-black uppercase tracking-wider text-[#1A467C] mb-1">
-                                No. Telepon / WhatsApp <span class="text-[#CA2C2A]">*</span>
-                            </label>
-                            <input 
-                                type="tel" 
-                                id="no_telp" 
-                                name="no_telp" 
-                                inputmode="tel"
-                                maxlength="15"
-                                oninput="this.value = this.value.replace(/\s+/g, '')"
-                                value="{{ session('success') ? '' : old('no_telp') }}"
-                                placeholder="Contoh: 081234567890"
-                                required
-                                class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] px-3.5 py-2.5 text-sm font-semibold font-mono text-[#000000] focus:bg-white focus:outline-none focus:shadow-[4px_4px_0px_0px_#1A467C] transition-all duration-150 @error('no_telp') border-[#CA2C2A] bg-red-50 @enderror"
-                            >
-                            @error('no_telp')
-                                <p class="mt-1 text-xs font-bold text-[#CA2C2A]">{{ $message }}</p>
-                            @enderror
-                        </div>
+        <!-- Alert Error Global -->
+        @if ($errors->any())
+            <div id="alert-box" class="mb-6 p-4 bg-[#FEE2E2] border-2 border-[#901C1A] text-red-950 text-xs sm:text-sm shadow-[4px_4px_0px_0px_#901C1A]">
+                <div class="flex items-center gap-2 mb-1.5">
+                    <span class="bg-[#CA2C2A] text-white font-black text-xs px-2 py-0.5 border border-[#901C1A] shrink-0">PERIKSA</span>
+                    <span class="font-bold">Terdapat kesalahan input:</span>
+                </div>
+                <ul class="list-disc list-inside space-y-0.5 text-xs font-semibold text-red-900">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
-                        <!-- Submit Button: Biru Terang #2A82C6 dengan Bayangan Biru Gelap #1A467C -->
-                        <div class="pt-2">
-                            <button 
-                                type="submit" 
-                                id="btn-submit"
-                                class="w-full bg-[#2A82C6] hover:bg-[#1A467C] active:bg-[#1A467C] text-white text-xs sm:text-sm font-black uppercase tracking-widest py-3.5 px-4 border-2 border-[#1A467C] shadow-[5px_5px_0px_0px_#1A467C] hover:shadow-[7px_7px_0px_0px_#1A467C] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all duration-150 cursor-pointer flex items-center justify-center gap-2"
-                            >
-                                <span id="btn-text">KIRIM PENDAFTARAN SEKARANG</span>
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="square" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                                </svg>
-                            </button>
-                        </div>
-                    </form>
+        <!-- FORM PENDAFTARAN (Unified 2-Column Grid Layout) -->
+        <form 
+            id="form-pendaftaran"
+            action="{{ route('pendaftaran.store') }}" 
+            method="POST" 
+            class="space-y-5"
+            onsubmit="handleSubmit(event)"
+        >
+            @csrf
 
+            <!-- Anti-bot Honeypot Field -->
+            <div class="hidden" aria-hidden="true">
+                <input type="text" name="website_url" tabindex="-1" autocomplete="off">
+            </div>
+
+            <!-- 2-Column Form Fields Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                
+                <!-- Field: Nama Lengkap -->
+                <div>
+                    <label for="nama" class="block text-xs font-black uppercase tracking-wider text-[#1A467C] mb-1.5">
+                        Nama Lengkap <span class="text-[#CA2C2A]">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="nama" 
+                        name="nama" 
+                        value="{{ session('success') ? '' : old('nama') }}"
+                        placeholder="Masukkan nama lengkap Anda..."
+                        maxlength="100"
+                        required
+                        class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] px-3.5 py-3 text-sm font-semibold text-[#000000] focus:bg-white focus:outline-none focus:shadow-[4px_4px_0px_0px_#1A467C] transition-all duration-150 @error('nama') border-[#CA2C2A] bg-red-50 @enderror"
+                    >
+                    @error('nama')
+                        <p class="mt-1 text-xs font-bold text-[#CA2C2A]">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Field: NIM -->
+                <div>
+                    <label for="nim" class="block text-xs font-black uppercase tracking-wider text-[#1A467C] mb-1.5">
+                        NIM (Nomor Induk Mahasiswa) <span class="text-[#CA2C2A]">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="nim" 
+                        name="nim" 
+                        inputmode="numeric"
+                        maxlength="20"
+                        oninput="this.value = this.value.replace(/\s+/g, '')"
+                        value="{{ session('success') ? '' : old('nim') }}"
+                        placeholder="Contoh: 250414000"
+                        required
+                        class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] px-3.5 py-3 text-sm font-semibold font-mono text-[#000000] focus:bg-white focus:outline-none focus:shadow-[4px_4px_0px_0px_#1A467C] transition-all duration-150 @error('nim') border-[#CA2C2A] bg-red-50 @enderror"
+                    >
+                    @error('nim')
+                        <p class="mt-1 text-xs font-bold text-[#CA2C2A]">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Field: Kelas (Dropdown Dinamis) -->
+                <div>
+                    <label for="kelas" class="block text-xs font-black uppercase tracking-wider text-[#1A467C] mb-1.5">
+                        Kelas <span class="text-[#CA2C2A]">*</span>
+                    </label>
+                    <select 
+                        id="kelas" 
+                        name="kelas" 
+                        required
+                        class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] px-3.5 py-3 text-sm font-bold font-mono text-[#000000] focus:bg-white focus:outline-none focus:shadow-[4px_4px_0px_0px_#1A467C] transition-all duration-150 cursor-pointer @error('kelas') border-[#CA2C2A] bg-red-50 @enderror"
+                    >
+                        <option value="">-- PILIH KELAS ANDA --</option>
+                        @foreach ($kelasList as $k)
+                            <option value="{{ $k->nama_kelas }}" {{ (session('success') ? '' : old('kelas')) == $k->nama_kelas ? 'selected' : '' }}>
+                                {{ $k->nama_kelas }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('kelas')
+                        <p class="mt-1 text-xs font-bold text-[#CA2C2A]">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Field: No Telp / WhatsApp -->
+                <div>
+                    <label for="no_telp" class="block text-xs font-black uppercase tracking-wider text-[#1A467C] mb-1.5">
+                        No. Telepon / WhatsApp <span class="text-[#CA2C2A]">*</span>
+                    </label>
+                    <input 
+                        type="tel" 
+                        id="no_telp" 
+                        name="no_telp" 
+                        inputmode="tel"
+                        maxlength="15"
+                        oninput="this.value = this.value.replace(/\s+/g, '')"
+                        value="{{ session('success') ? '' : old('no_telp') }}"
+                        placeholder="Contoh: 081234567890"
+                        required
+                        class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] px-3.5 py-3 text-sm font-semibold font-mono text-[#000000] focus:bg-white focus:outline-none focus:shadow-[4px_4px_0px_0px_#1A467C] transition-all duration-150 @error('no_telp') border-[#CA2C2A] bg-red-50 @enderror"
+                    >
+                    @error('no_telp')
+                        <p class="mt-1 text-xs font-bold text-[#CA2C2A]">{{ $message }}</p>
+                    @enderror
                 </div>
 
             </div>
 
-        </div>
+            <!-- Submit Button: Full-width Biru Terang #2A82C6 dengan Bayangan Biru Gelap #1A467C -->
+            <div class="pt-3">
+                <button 
+                    type="submit" 
+                    id="btn-submit"
+                    class="w-full bg-[#2A82C6] hover:bg-[#1A467C] active:bg-[#1A467C] text-white text-xs sm:text-sm font-black uppercase tracking-widest py-4 px-6 border-2 border-[#1A467C] shadow-[6px_6px_0px_0px_#1A467C] hover:shadow-[8px_8px_0px_0px_#1A467C] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all duration-150 cursor-pointer flex items-center justify-center gap-2.5"
+                >
+                    <span id="btn-text">KIRIM PENDAFTARAN SEKARANG</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="square" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                </button>
+            </div>
+        </form>
 
     </div>
 
