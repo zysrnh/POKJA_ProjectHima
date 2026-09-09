@@ -81,6 +81,11 @@
         <form action="{{ route('pendaftaran.store') }}" method="POST" class="space-y-4 sm:space-y-5">
             @csrf
 
+            <!-- Anti-bot Honeypot Field (Hidden from real users) -->
+            <div class="hidden" aria-hidden="true">
+                <input type="text" name="website_url" tabindex="-1" autocomplete="off">
+            </div>
+
             <!-- Field: Nama -->
             <div>
                 <label for="nama" class="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-1">
@@ -92,6 +97,7 @@
                     name="nama" 
                     value="{{ old('nama') }}"
                     placeholder="Contoh: Fulan bin Fulan"
+                    maxlength="100"
                     required
                     class="w-full bg-gray-50 border @error('nama') border-red-500 bg-red-50/20 @else border-gray-300 @enderror text-gray-900 text-base md:text-sm px-3.5 py-2.5 sm:py-2 focus:bg-white focus:outline-none focus:border-[#2A82C6] focus:ring-1 focus:ring-[#2A82C6] transition"
                 >
@@ -109,6 +115,8 @@
                     type="text" 
                     id="nim" 
                     name="nim" 
+                    inputmode="numeric"
+                    maxlength="20"
                     value="{{ old('nim') }}"
                     placeholder="Contoh: 250414000"
                     required
@@ -130,12 +138,12 @@
                     required
                     class="w-full bg-gray-50 border @error('kelas') border-red-500 bg-red-50/20 @else border-gray-300 @enderror text-gray-900 text-base md:text-sm px-3.5 py-2.5 sm:py-2 focus:bg-white focus:outline-none focus:border-[#2A82C6] focus:ring-1 focus:ring-[#2A82C6] transition cursor-pointer font-mono"
                 >
-                    <option value="">-- Pilih Kelas Anda --</option>
-                    @foreach ($kelasList as $k)
-                        <option value="{{ $k->nama_kelas }}" {{ old('kelas') == $k->nama_kelas ? 'selected' : '' }}>
-                            {{ $k->nama_kelas }}
-                        </option>
-                    @endforeach
+                <option value="">-- Pilih Kelas Anda --</option>
+                @foreach ($kelasList as $k)
+                    <option value="{{ $k->nama_kelas }}" {{ old('kelas') == $k->nama_kelas ? 'selected' : '' }}>
+                        {{ $k->nama_kelas }}
+                    </option>
+                @endforeach
                 </select>
                 @error('kelas')
                     <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
@@ -151,6 +159,8 @@
                     type="tel" 
                     id="no_telp" 
                     name="no_telp" 
+                    inputmode="tel"
+                    maxlength="15"
                     value="{{ old('no_telp') }}"
                     placeholder="Contoh: 081234567890"
                     required

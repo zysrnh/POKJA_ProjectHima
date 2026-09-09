@@ -72,17 +72,62 @@ class PendaftaranAdminController extends Controller
     {
         $pendaftaran = Pendaftaran::findOrFail($id);
 
+        // Sanitasi
+        $request->merge([
+            'nama' => trim(strip_tags($request->input('nama', ''))),
+            'nim' => trim(strip_tags($request->input('nim', ''))),
+            'kelas' => trim(strip_tags($request->input('kelas', ''))),
+            'no_telp' => trim(strip_tags($request->input('no_telp', ''))),
+        ]);
+
+        // Normalisasi telepon
+        $rawPhone = preg_replace('/[^0-9]/', '', $request->input('no_telp'));
+        if (str_starts_with($rawPhone, '628')) {
+            $rawPhone = '08' . substr($rawPhone, 3);
+        } elseif (str_starts_with($rawPhone, '8')) {
+            $rawPhone = '08' . substr($rawPhone, 1);
+        }
+        $request->merge(['no_telp' => $rawPhone]);
+
         $validated = $request->validate([
-            'nama' => ['required', 'string', 'max:255'],
-            'nim' => ['required', 'string', 'max:50', 'unique:pendaftarans,nim,' . $pendaftaran->id],
-            'kelas' => ['required', 'string', 'max:100'],
-            'no_telp' => ['required', 'string', 'max:30'],
+            'nama' => [
+                'required', 
+                'string', 
+                'min:3', 
+                'max:100', 
+                'regex:/^[a-zA-Z\s\.\',\-]+$/'
+            ],
+            'nim' => [
+                'required', 
+                'numeric', 
+                'digits_between:8,20', 
+                'unique:pendaftarans,nim,' . $pendaftaran->id
+            ],
+            'kelas' => [
+                'required', 
+                'string', 
+                'exists:kelas,nama_kelas'
+            ],
+            'no_telp' => [
+                'required', 
+                'string', 
+                'regex:/^08[1-9][0-9]{7,11}$/'
+            ],
         ], [
             'nama.required' => 'Nama lengkap wajib diisi.',
+            'nama.min' => 'Nama lengkap minimal 3 karakter.',
+            'nama.regex' => 'Nama lengkap hanya boleh berisi huruf, spasi, titik, koma, tanda petik, dan tanda hubung.',
+            
             'nim.required' => 'NIM wajib diisi.',
+            'nim.numeric' => 'NIM hanya boleh berisi angka.',
+            'nim.digits_between' => 'NIM harus berupa angka dengan panjang 8 hingga 20 digit.',
             'nim.unique' => 'NIM ini sudah terdaftar pada data lain.',
+            
             'kelas.required' => 'Silakan pilih kelas.',
+            'kelas.exists' => 'Kelas yang dipilih tidak valid atau belum terdaftar.',
+            
             'no_telp.required' => 'No. Telepon / WhatsApp wajib diisi.',
+            'no_telp.regex' => 'Format nomor WhatsApp tidak valid. Gunakan nomor Indonesia yang diawali 08 (panjang 10–14 digit).',
         ]);
 
         $pendaftaran->update($validated);
