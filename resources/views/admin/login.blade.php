@@ -8,7 +8,7 @@
     <!-- Google Font: Montserrat -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -18,6 +18,14 @@
                 extend: {
                     fontFamily: {
                         sans: ['Montserrat', 'sans-serif'],
+                    },
+                    colors: {
+                        hima: {
+                            'blue-light': '#2A82C6',
+                            'blue-dark': '#1A467C',
+                            'red-light': '#CA2C2A',
+                            'red-dark': '#901C1A',
+                        }
                     }
                 }
             }
@@ -26,34 +34,57 @@
     <style>
         body {
             font-family: 'Montserrat', sans-serif;
+            background-color: #E8F2FA;
+            background-image: radial-gradient(#1A467C 1.2px, transparent 1.2px);
+            background-size: 24px 24px;
+        }
+
+        .btn-smooth {
+            transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.15s ease;
+        }
+        .btn-smooth:hover {
+            transform: translate(-2px, -2px);
+        }
+        .btn-smooth:active {
+            transform: translate(2px, 2px);
         }
     </style>
 </head>
-<body class="bg-gray-100 text-gray-900 min-h-screen flex items-center justify-center p-3 sm:p-6 antialiased">
+<body class="text-[#000000] min-h-screen flex items-center justify-center p-3.5 sm:p-6 antialiased selection:bg-[#2A82C6] selection:text-white relative overflow-x-hidden">
 
-    <div class="w-full max-w-md bg-white border border-gray-300 p-6 sm:p-8 shadow-sm">
+    <!-- Floating Background Decor -->
+    <div class="hidden md:block absolute top-10 left-10 w-12 h-12 bg-[#2A82C6]/20 border-2 border-[#1A467C] shadow-[4px_4px_0px_0px_#1A467C] pointer-events-none"></div>
+    <div class="hidden md:block absolute bottom-12 right-12 w-14 h-14 bg-[#CA2C2A]/15 border-2 border-[#901C1A] shadow-[4px_4px_0px_0px_#901C1A] pointer-events-none"></div>
+
+    <div class="w-full max-w-md bg-white border-2 border-[#1A467C] p-6 sm:p-8 shadow-[8px_8px_0px_0px_#1A467C] z-10 relative">
+        
         <!-- Header with Logo -->
-        <div class="border-b border-gray-200 pb-5 mb-6 text-center">
-            <img 
-                src="{{ asset('logo/logo.png') }}" 
-                alt="Logo HIMA IF" 
-                class="w-16 h-16 object-contain rounded-full border border-gray-200 p-1 bg-white mx-auto mb-3 shadow-xs"
-            >
-            <h1 class="text-lg font-bold uppercase tracking-wide text-gray-900">Panel Administrator</h1>
-            <p class="text-xs text-gray-600 mt-1">POKJA HIMA IF - Silakan masuk untuk mengelola data</p>
+        <div class="border-b-2 border-[#1A467C] pb-5 mb-6 text-center">
+            <div class="inline-block bg-white border-2 border-[#1A467C] p-2 shadow-[3px_3px_0px_0px_#1A467C] mb-3">
+                <img 
+                    src="{{ asset('logo/logo.png') }}" 
+                    alt="Logo HIMA IF" 
+                    class="w-14 h-14 object-contain mx-auto"
+                >
+            </div>
+            <span class="inline-block bg-[#1A467C] text-white text-[10px] font-black uppercase px-2 py-0.5 tracking-widest mb-1.5 shadow-[2px_2px_0px_0px_#2A82C6]">
+                POKJA HIMA IF
+            </span>
+            <h1 class="text-xl font-black uppercase tracking-tight text-[#1A467C]">Panel Administrator</h1>
+            <p class="text-xs font-semibold text-gray-600 mt-1">Silakan masuk untuk mengelola data pendaftaran</p>
         </div>
 
         <!-- Flash Alert Sukses / Info -->
         @if (session('success'))
-            <div class="mb-5 p-3.5 bg-green-50 border border-green-600 text-green-800 text-xs sm:text-sm">
-                <span class="font-medium">{{ session('success') }}</span>
+            <div class="mb-5 p-3.5 bg-green-50 border-2 border-green-700 text-green-900 text-xs sm:text-sm font-semibold shadow-[3px_3px_0px_0px_#15803d]">
+                <span class="font-bold">{{ session('success') }}</span>
             </div>
         @endif
 
         <!-- Flash Alert Error -->
         @if ($errors->any())
-            <div class="mb-5 p-3.5 bg-red-50 border border-red-600 text-red-800 text-xs sm:text-sm">
-                <ul class="list-disc list-inside space-y-0.5 text-xs text-red-700">
+            <div class="mb-5 p-3.5 bg-red-50 border-2 border-[#901C1A] text-red-950 text-xs sm:text-sm font-semibold shadow-[3px_3px_0px_0px_#901C1A]">
+                <ul class="list-disc list-inside space-y-0.5 text-xs text-red-900">
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
                     @endforeach
@@ -61,13 +92,13 @@
             </div>
         @endif
 
-        <!-- Form Login -->
+        <!-- Form Login (Neubrutalism) -->
         <form action="{{ route('admin.login.post') }}" method="POST" class="space-y-4">
             @csrf
 
             <!-- Email -->
             <div>
-                <label for="email" class="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-1">
+                <label for="email" class="block text-xs font-black uppercase tracking-wider text-[#1A467C] mb-1.5">
                     Email Admin
                 </label>
                 <input 
@@ -78,13 +109,13 @@
                     placeholder="admin@pokja.com"
                     required
                     autofocus
-                    class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-base md:text-sm px-3.5 py-2.5 focus:bg-white focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition"
+                    class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] text-gray-950 font-semibold text-sm px-4 py-3 focus:bg-white focus:outline-none focus:shadow-[3px_3px_0px_0px_#1A467C] transition"
                 >
             </div>
 
             <!-- Password -->
             <div>
-                <label for="password" class="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-1">
+                <label for="password" class="block text-xs font-black uppercase tracking-wider text-[#1A467C] mb-1.5">
                     Password
                 </label>
                 <input 
@@ -93,14 +124,14 @@
                     name="password" 
                     placeholder="••••••••"
                     required
-                    class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-base md:text-sm px-3.5 py-2.5 focus:bg-white focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition"
+                    class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] text-gray-950 font-semibold text-sm px-4 py-3 focus:bg-white focus:outline-none focus:shadow-[3px_3px_0px_0px_#1A467C] transition"
                 >
             </div>
 
             <!-- Remember Me -->
             <div class="flex items-center justify-between text-xs pt-1">
-                <label class="flex items-center gap-2 cursor-pointer text-gray-700">
-                    <input type="checkbox" name="remember" class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-0">
+                <label class="flex items-center gap-2 cursor-pointer text-xs font-bold text-[#1A467C]">
+                    <input type="checkbox" name="remember" class="w-4 h-4 text-[#2A82C6] border-2 border-[#1A467C] focus:ring-0">
                     <span>Ingat saya di perangkat ini</span>
                 </label>
             </div>
@@ -109,7 +140,7 @@
             <div class="pt-2">
                 <button 
                     type="submit" 
-                    class="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-xs sm:text-sm font-semibold uppercase tracking-wider py-3 px-4 transition cursor-pointer"
+                    class="btn-smooth w-full bg-[#2A82C6] hover:bg-[#1A467C] active:bg-[#1A467C] text-white text-xs sm:text-sm font-black uppercase tracking-widest py-3.5 px-4 border-2 border-[#1A467C] shadow-[4px_4px_0px_0px_#1A467C] cursor-pointer"
                 >
                     Masuk ke Panel Admin
                 </button>
@@ -117,8 +148,8 @@
         </form>
 
         <!-- Footer / Back to Form -->
-        <div class="mt-6 pt-4 border-t border-gray-200 text-center">
-            <a href="{{ route('pendaftaran.index') }}" class="text-xs font-medium text-blue-600 hover:text-blue-800 hover:underline">
+        <div class="mt-6 pt-4 border-t-2 border-[#1A467C] text-center">
+            <a href="{{ route('pendaftaran.index') }}" class="text-xs font-bold text-[#1A467C] hover:text-[#2A82C6] hover:underline uppercase tracking-wider">
                 &larr; Kembali ke Form Pendaftaran
             </a>
         </div>

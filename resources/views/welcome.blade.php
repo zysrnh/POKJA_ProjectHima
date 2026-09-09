@@ -106,17 +106,14 @@
             }
         }
 
-        @keyframes checkmarkPop {
+        @keyframes modalSpringOut {
             0% {
-                opacity: 0;
-                transform: scale(0.4) rotate(-15deg);
-            }
-            70% {
-                transform: scale(1.15) rotate(5deg);
+                opacity: 1;
+                transform: scale(1) translateY(0);
             }
             100% {
-                opacity: 1;
-                transform: scale(1) rotate(0deg);
+                opacity: 0;
+                transform: scale(0.85) translateY(16px);
             }
         }
 
@@ -125,16 +122,29 @@
             100% { opacity: 1; }
         }
 
+        @keyframes backdropFadeOut {
+            0% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
         .modal-spring-in {
             animation: modalSpringIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
 
-        .checkmark-pop {
-            animation: checkmarkPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both;
+        .modal-spring-out {
+            animation: modalSpringOut 0.22s cubic-bezier(0.4, 0, 1, 1) forwards !important;
         }
 
         .backdrop-fade-in {
             animation: backdropFade 0.25s ease-out forwards;
+        }
+
+        .backdrop-fade-out {
+            animation: backdropFadeOut 0.22s ease-in forwards !important;
+        }
+
+        .checkmark-pop {
+            animation: checkmarkPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both;
         }
 
         /* Smooth Interactive Controls */
@@ -500,12 +510,13 @@
             const modal = document.getElementById('modal-sukses');
             const card = document.getElementById('modal-card');
             if (modal && card) {
-                card.style.transform = 'scale(0.85) translateY(16px)';
-                card.style.opacity = '0';
-                card.style.transition = 'all 0.22s cubic-bezier(0.4, 0, 1, 1)';
-                modal.style.opacity = '0';
-                modal.style.transition = 'opacity 0.22s ease-in';
-                setTimeout(() => modal.remove(), 220);
+                card.classList.remove('modal-spring-in');
+                modal.classList.remove('backdrop-fade-in');
+                card.classList.add('modal-spring-out');
+                modal.classList.add('backdrop-fade-out');
+                setTimeout(() => {
+                    modal.remove();
+                }, 220);
             }
         }
 

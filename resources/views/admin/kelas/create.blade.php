@@ -6,16 +6,19 @@
 @section('content')
 <div class="max-w-xl mx-auto">
 
-    <div class="bg-white border border-gray-300 p-6 sm:p-8 shadow-sm">
-        <div class="border-b border-gray-200 pb-4 mb-6">
-            <h3 class="text-base font-bold uppercase tracking-wide text-gray-900">Formulir Penambahan Kelas</h3>
-            <p class="text-xs text-gray-500 mt-1">Kelas yang ditambahkan akan muncul di form pendaftaran mahasiswa.</p>
+    <div class="bg-white border-2 border-[#1A467C] p-6 sm:p-8 shadow-[6px_6px_0px_0px_#1A467C]">
+        <div class="border-b-2 border-[#1A467C] pb-4 mb-6">
+            <span class="inline-block bg-[#1A467C] text-white text-[10px] font-black uppercase px-2.5 py-0.5 tracking-wider mb-1">
+                KELOLA DATA KELAS
+            </span>
+            <h3 class="text-base font-black uppercase tracking-tight text-[#1A467C]">Formulir Penambahan Kelas</h3>
+            <p class="text-xs font-semibold text-gray-600 mt-1">Kelas yang ditambahkan akan muncul di opsi pilihan form pendaftaran mahasiswa.</p>
         </div>
 
         @if ($errors->any())
-            <div class="mb-5 p-3.5 bg-red-50 border border-red-600 text-red-800 text-xs sm:text-sm">
-                <p class="font-semibold mb-1">Terdapat kesalahan:</p>
-                <ul class="list-disc list-inside space-y-0.5 text-xs text-red-700">
+            <div class="mb-5 p-4 bg-red-50 border-2 border-[#901C1A] text-red-950 text-xs sm:text-sm font-semibold shadow-[3px_3px_0px_0px_#901C1A]">
+                <p class="font-black uppercase mb-1">Terdapat kesalahan:</p>
+                <ul class="list-disc list-inside space-y-0.5 text-xs text-red-900">
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
                     @endforeach
@@ -28,34 +31,34 @@
 
             <!-- Field: Nama Kelas -->
             <div>
-                <label for="nama_kelas" class="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-1">
-                    Nama Kelas <span class="text-red-600">*</span>
+                <label for="nama_kelas" class="block text-xs font-black uppercase tracking-wider text-[#1A467C] mb-1.5">
+                    Nama Kelas <span class="text-[#CA2C2A]">*</span>
                 </label>
                 <input 
                     type="text" 
                     id="nama_kelas" 
                     name="nama_kelas" 
                     value="{{ old('nama_kelas') }}"
-                    placeholder="Contoh: 1IF-01 / 2IF-01 / 3IF-01"
+                    placeholder="Contoh: 1IF-01 / 2IF-01"
                     required
                     autofocus
-                    class="w-full bg-gray-50 border @error('nama_kelas') border-red-500 @else border-gray-300 @enderror text-gray-900 text-sm px-3.5 py-2.5 focus:bg-white focus:outline-none focus:border-[#2A82C6] focus:ring-1 focus:ring-[#2A82C6] transition uppercase font-mono"
+                    class="w-full bg-[#F8FBFE] border-2 @error('nama_kelas') border-[#CA2C2A] bg-red-50 @else border-[#1A467C] @enderror text-gray-950 font-bold font-mono text-sm px-4 py-3 focus:bg-white focus:outline-none focus:shadow-[3px_3px_0px_0px_#1A467C] transition uppercase"
                 >
-                <p class="text-[11px] text-gray-500 mt-1">Otomatis diformat menjadi huruf kapital.</p>
+                <p class="text-[11px] font-semibold text-gray-500 mt-1">Otomatis diformat menjadi huruf kapital.</p>
                 @error('nama_kelas')
-                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                    <p class="mt-1 text-xs font-bold text-[#CA2C2A]">{{ $message }}</p>
                 @enderror
             </div>
 
             <!-- Field: Status Aktif -->
-            <div class="pt-1">
-                <label class="flex items-center gap-2 cursor-pointer text-xs font-medium text-gray-700">
+            <div class="pt-2">
+                <label class="flex items-center gap-2.5 cursor-pointer text-xs font-bold text-[#1A467C]">
                     <input 
                         type="checkbox" 
                         name="is_active" 
                         value="1" 
                         {{ old('is_active', '1') == '1' ? 'checked' : '' }}
-                        class="w-4 h-4 text-[#2A82C6] border-gray-300 focus:ring-0"
+                        class="w-4 h-4 text-[#2A82C6] border-2 border-[#1A467C] focus:ring-0"
                     >
                     <span>Aktifkan dan tampilkan kelas ini di Form Pendaftaran</span>
                 </label>
@@ -65,13 +68,13 @@
             <div class="flex items-center gap-3 pt-3">
                 <button 
                     type="submit" 
-                    class="px-5 py-2.5 bg-[#2A82C6] hover:bg-[#1A467C] active:bg-[#1A467C] text-white text-xs sm:text-sm font-semibold uppercase tracking-wider transition cursor-pointer"
+                    class="btn-smooth px-6 py-3 bg-[#2A82C6] hover:bg-[#1A467C] active:bg-[#1A467C] text-white text-xs sm:text-sm font-black uppercase tracking-wider border-2 border-[#1A467C] shadow-[3px_3px_0px_0px_#1A467C] cursor-pointer"
                 >
                     Simpan Kelas
                 </button>
                 <a 
                     href="{{ route('admin.kelas.index') }}" 
-                    class="px-5 py-2.5 border border-gray-300 hover:bg-gray-100 text-gray-700 text-xs sm:text-sm font-semibold uppercase tracking-wider transition"
+                    class="btn-smooth px-5 py-3 border-2 border-gray-400 bg-white hover:bg-gray-100 text-gray-800 text-xs sm:text-sm font-bold uppercase tracking-wider shadow-[2px_2px_0px_0px_#9ca3af]"
                 >
                     Batal
                 </a>
