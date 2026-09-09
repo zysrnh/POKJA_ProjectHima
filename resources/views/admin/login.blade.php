@@ -60,15 +60,13 @@
         
         <!-- Header with Logo -->
         <div class="border-b-2 border-[#1A467C] pb-5 mb-6 text-center">
-            <div class="inline-block bg-white border-2 border-[#1A467C] p-2.5 shadow-[4px_4px_0px_0px_#1A467C] mb-4">
+            <div class="inline-block bg-white border-2 border-[#1A467C] p-2.5 shadow-[4px_4px_0px_0px_#1A467C]">
                 <img 
                     src="{{ asset('logo/logo.png') }}" 
                     alt="Logo HIMA IF" 
-                    class="w-14 h-14 object-contain mx-auto"
+                    class="w-16 h-16 object-contain mx-auto"
                 >
             </div>
-            <h1 class="text-xl font-black uppercase tracking-tight text-[#1A467C]">Panel Administrator</h1>
-            <p class="text-xs font-semibold text-gray-600 mt-1.5">Silakan masuk untuk mengelola data pendaftaran</p>
         </div>
 
         <!-- Flash Alert Sukses / Info -->
