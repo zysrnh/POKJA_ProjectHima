@@ -199,7 +199,7 @@ class PendaftaranAdminController extends Controller
     }
 
     /**
-     * Export data pendaftar ke file CSV (Kompatibel Excel).
+     * Export data pendaftar ke file Excel (.xls) berformat styling rapi dan profesional.
      */
     public function exportCsv(Request $request)
     {
@@ -226,37 +226,83 @@ class PendaftaranAdminController extends Controller
         }
 
         $data = $query->get();
-        $filename = 'data-pendaftar-pokja-' . date('Y-m-d_His') . '.csv';
+        $totalHadir = $data->where('status_kehadiran', 'hadir')->count();
+        $totalBelum = $data->where('status_kehadiran', '!=', 'hadir')->count();
+        $filename = 'data-pendaftar-pokja-' . date('Y-m-d_His') . '.xls';
 
-        return new StreamedResponse(function () use ($data) {
-            $handle = fopen('php://output', 'w');
-            fputs($handle, "\xEF\xBB\xBF");
+        return response()->stream(function () use ($data, $totalHadir, $totalBelum) {
+            echo '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">';
+            echo '<head>';
+            echo '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">';
+            echo '<!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Data Pendaftar</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->';
+            echo '<style>';
+            echo 'table { border-collapse: collapse; width: 100%; font-family: "Segoe UI", Arial, sans-serif; font-size: 11pt; }';
+            echo '.title { font-size: 16pt; font-weight: bold; color: #1A467C; text-align: left; height: 35px; }';
+            echo '.subtitle { font-size: 10pt; color: #555555; text-align: left; height: 22px; }';
+            echo '.th-header { background-color: #1A467C; color: #FFFFFF; font-weight: bold; text-align: center; border: 1.5pt solid #0F2A4A; padding: 10px; height: 30px; font-size: 11pt; }';
+            echo '.td-data { border: 0.5pt solid #B0C4DE; padding: 6px 10px; vertical-align: middle; height: 26px; }';
+            echo '.td-center { text-align: center; }';
+            echo '.td-bold { font-weight: bold; }';
+            echo '.text-format { mso-number-format:"\@"; }';
+            echo '.row-even { background-color: #F8FBFE; }';
+            echo '.row-odd { background-color: #FFFFFF; }';
+            echo '.badge-hadir { background-color: #DCFCE7; color: #166534; font-weight: bold; text-align: center; border: 0.5pt solid #86EFAC; }';
+            echo '.badge-belum { background-color: #F3F4F6; color: #4B5563; font-weight: bold; text-align: center; border: 0.5pt solid #D1D5DB; }';
+            echo '.badge-tidak { background-color: #FEE2E2; color: #991B1B; font-weight: bold; text-align: center; border: 0.5pt solid #FCA5A5; }';
+            echo '</style>';
+            echo '</head>';
+            echo '<body>';
+            
+            echo '<table>';
+            // Header Judul Laporan
+            echo '<tr><td colspan="7" class="title">DATA PENDAFTARAN POKJA HIMA IF 2026</td></tr>';
+            echo '<tr><td colspan="7" class="subtitle">Dicetak pada: ' . date('d F Y, H:i') . ' WIB | Total Data: ' . $data->count() . ' (Hadir: ' . $totalHadir . ' | Belum Hadir: ' . $totalBelum . ')</td></tr>';
+            echo '<tr><td colspan="7" style="height: 12px;"></td></tr>';
 
-            fputcsv($handle, ['No', 'Nama Lengkap', 'NIM', 'Kelas', 'No. Telepon / WA', 'Status Kehadiran', 'Tanggal Pendaftaran'], ';');
+            // Baris Header Kolom
+            echo '<tr>';
+            echo '<th class="th-header" style="width: 50px;">NO</th>';
+            echo '<th class="th-header" style="width: 250px;">NAMA LENGKAP</th>';
+            echo '<th class="th-header" style="width: 140px;">NIM</th>';
+            echo '<th class="th-header" style="width: 100px;">KELAS</th>';
+            echo '<th class="th-header" style="width: 170px;">NO. WHATSAPP</th>';
+            echo '<th class="th-header" style="width: 140px;">STATUS KEHADIRAN</th>';
+            echo '<th class="th-header" style="width: 180px;">WAKTU PENDAFTARAN</th>';
+            echo '</tr>';
 
+            // Loop Baris Data
             $no = 1;
             foreach ($data as $item) {
+                $rowClass = ($no % 2 == 0) ? 'row-even' : 'row-odd';
                 $statusText = match ($item->status_kehadiran) {
-                    'hadir' => 'Hadir',
-                    'tidak_hadir' => 'Tidak Hadir',
-                    default => 'Belum Hadir',
+                    'hadir' => 'HADIR',
+                    'tidak_hadir' => 'TIDAK HADIR',
+                    default => 'BELUM HADIR',
+                };
+                $badgeClass = match ($item->status_kehadiran) {
+                    'hadir' => 'badge-hadir',
+                    'tidak_hadir' => 'badge-tidak',
+                    default => 'badge-belum',
                 };
 
-                fputcsv($handle, [
-                    $no++,
-                    $item->nama,
-                    "'" . $item->nim,
-                    $item->kelas,
-                    "'" . $item->no_telp,
-                    $statusText,
-                    $item->created_at ? $item->created_at->timezone('Asia/Jakarta')->format('d-m-Y H:i') . ' WIB' : '-',
-                ], ';');
+                echo '<tr class="' . $rowClass . '">';
+                echo '<td class="td-data td-center" style="font-weight: bold;">' . $no++ . '</td>';
+                echo '<td class="td-data td-bold" style="color: #111827;">' . htmlspecialchars($item->nama) . '</td>';
+                echo '<td class="td-data td-center td-bold text-format" style="color: #1A467C;">' . htmlspecialchars($item->nim) . '</td>';
+                echo '<td class="td-data td-center td-bold text-format" style="background-color: #EEF6FC;">' . htmlspecialchars($item->kelas) . '</td>';
+                echo '<td class="td-data td-center text-format">' . htmlspecialchars($item->no_telp) . '</td>';
+                echo '<td class="td-data ' . $badgeClass . '">' . $statusText . '</td>';
+                echo '<td class="td-data td-center" style="color: #4B5563;">' . ($item->created_at ? $item->created_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') . ' WIB' : '-') . '</td>';
+                echo '</tr>';
             }
 
-            fclose($handle);
+            echo '</table>';
+            echo '</body>';
+            echo '</html>';
         }, 200, [
-            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Type' => 'application/vnd.ms-excel; charset=UTF-8',
             'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+            'Cache-Control' => 'max-age=0',
         ]);
     }
 }

@@ -45,14 +45,14 @@
         </div>
     </div>
 
-    <!-- Action Bar: Search, Filter, Export (Neubrutalism) -->
+    <!-- Action Bar: Search, Custom Styled Dropdown Filter, Export Excel (Neubrutalism) -->
     <div class="bg-white border-2 border-[#1A467C] p-4 sm:p-5 shadow-[6px_6px_0px_0px_#1A467C]">
-        <form action="{{ route('admin.dashboard') }}" method="GET" class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
+        <form action="{{ route('admin.dashboard') }}" method="GET" class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3.5">
             
-            <!-- Search & Filter Fields -->
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 flex-1">
+            <!-- Search & Filter Fields Grid -->
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-1 flex-wrap">
                 <!-- Search Input -->
-                <div class="flex-1 min-w-[180px]">
+                <div class="flex-1 min-w-[200px]">
                     <input 
                         type="text" 
                         name="search" 
@@ -62,30 +62,42 @@
                     >
                 </div>
 
-                <!-- Filter Kelas Dropdown -->
-                <div class="sm:w-44">
+                <!-- Custom Styled Filter: Kelas Dropdown -->
+                <div class="w-full sm:w-48 relative">
                     <select 
                         name="kelas" 
-                        class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] text-gray-900 text-xs sm:text-sm font-bold font-mono px-3 py-2.5 focus:bg-white focus:outline-none focus:shadow-[3px_3px_0px_0px_#1A467C] transition cursor-pointer"
+                        class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] text-gray-950 text-xs sm:text-sm font-bold font-mono px-3.5 py-2.5 pr-9 focus:bg-white focus:outline-none focus:shadow-[3px_3px_0px_0px_#1A467C] transition cursor-pointer appearance-none"
                     >
                         <option value="">-- SEMUA KELAS --</option>
                         @foreach ($kelasList as $k)
                             <option value="{{ $k }}" {{ $kelasFilter == $k ? 'selected' : '' }}>{{ $k }}</option>
                         @endforeach
                     </select>
+                    <!-- Custom Chevron Arrow -->
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-[#1A467C]">
+                        <svg class="w-4 h-4 border-l-2 border-[#1A467C] pl-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="square" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
                 </div>
 
-                <!-- Filter Status Kehadiran Dropdown -->
-                <div class="sm:w-44">
+                <!-- Custom Styled Filter: Status Kehadiran Dropdown -->
+                <div class="w-full sm:w-56 relative">
                     <select 
                         name="status_kehadiran" 
-                        class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] text-gray-900 text-xs sm:text-sm font-bold px-3 py-2.5 focus:bg-white focus:outline-none focus:shadow-[3px_3px_0px_0px_#1A467C] transition cursor-pointer"
+                        class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] text-gray-950 text-xs sm:text-sm font-bold px-3.5 py-2.5 pr-9 focus:bg-white focus:outline-none focus:shadow-[3px_3px_0px_0px_#1A467C] transition cursor-pointer appearance-none"
                     >
                         <option value="">-- SEMUA KEHADIRAN --</option>
                         <option value="hadir" {{ $statusFilter == 'hadir' ? 'selected' : '' }}>HADIR</option>
                         <option value="belum_hadir" {{ $statusFilter == 'belum_hadir' ? 'selected' : '' }}>BELUM HADIR</option>
                         <option value="tidak_hadir" {{ $statusFilter == 'tidak_hadir' ? 'selected' : '' }}>TIDAK HADIR</option>
                     </select>
+                    <!-- Custom Chevron Arrow -->
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-[#1A467C]">
+                        <svg class="w-4 h-4 border-l-2 border-[#1A467C] pl-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="square" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
                 </div>
 
                 <!-- Tombol Filter & Reset -->
@@ -107,16 +119,17 @@
                 </div>
             </div>
 
-            <!-- Export CSV Button -->
+            <!-- Export Excel Button -->
             <div>
                 <a 
                     href="{{ route('admin.pendaftar.export', ['search' => $search, 'kelas' => $kelasFilter, 'status_kehadiran' => $statusFilter]) }}" 
-                    class="btn-smooth w-full lg:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-green-700 hover:bg-green-800 text-white text-xs font-black uppercase tracking-wider border-2 border-green-900 shadow-[3px_3px_0px_0px_#14532d] cursor-pointer"
+                    class="btn-smooth w-full lg:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-green-700 hover:bg-green-800 text-white text-xs font-black uppercase tracking-wider border-2 border-green-950 shadow-[3px_3px_0px_0px_#14532d] cursor-pointer"
+                    title="Export data ke file Excel berformat styling rapi"
                 >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="square" stroke-width="2.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
-                    <span>Export Data</span>
+                    <span>Export Excel (.xls)</span>
                 </a>
             </div>
 
@@ -142,7 +155,7 @@
                         <th class="py-3.5 px-3.5">NIM</th>
                         <th class="py-3.5 px-3.5">Kelas</th>
                         <th class="py-3.5 px-3.5">No. Telepon / WA</th>
-                        <th class="py-3.5 px-3.5 text-center min-w-[140px]">Kehadiran</th>
+                        <th class="py-3.5 px-3.5 text-center min-w-[150px]">Kehadiran</th>
                         <th class="py-3.5 px-3.5">Tanggal Daftar</th>
                         <th class="py-3.5 px-3.5 text-center w-28">Aksi</th>
                     </tr>
@@ -185,7 +198,7 @@
                                 </a>
                             </td>
 
-                            <!-- Kolom: Toggle Kehadiran Interaktif (Neubrutalism) -->
+                            <!-- Kolom: Toggle Kehadiran Super Smooth (Neubrutalism) -->
                             <td class="py-3.5 px-3.5 text-center">
                                 <div class="inline-flex items-center gap-2">
                                     <button 
@@ -194,14 +207,14 @@
                                         aria-checked="{{ $isHadir ? 'true' : 'false' }}"
                                         onclick="toggleKehadiran({{ $item->id }}, this)"
                                         id="toggle-btn-{{ $item->id }}"
-                                        class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer border-2 border-[#1A467C] transition-colors duration-150 ease-in-out focus:outline-none {{ $isHadir ? 'bg-green-600' : 'bg-gray-300' }}"
+                                        class="relative inline-flex h-7 w-12 flex-shrink-0 cursor-pointer p-0.5 border-2 border-[#1A467C] transition-colors duration-300 ease-in-out focus:outline-none {{ $isHadir ? 'bg-green-700' : 'bg-gray-300' }}"
                                         title="Klik untuk ubah kehadiran"
                                     >
                                         <span class="sr-only">Toggle Kehadiran</span>
                                         <span 
                                             aria-hidden="true" 
                                             id="toggle-knob-{{ $item->id }}"
-                                            class="pointer-events-none inline-block h-4.5 w-4.5 transform bg-white border border-[#1A467C] transition duration-150 ease-in-out {{ $isHadir ? 'translate-x-5' : 'translate-x-0' }}"
+                                            class="pointer-events-none inline-block h-5 w-5 transform bg-white border border-[#1A467C] shadow-xs transition-transform duration-300 ease-out {{ $isHadir ? 'translate-x-5' : 'translate-x-0' }}"
                                         ></span>
                                     </button>
                                     <span 
@@ -313,7 +326,6 @@
         const statBelum = document.getElementById('stat-total-belum-hadir');
 
         btnElement.disabled = true;
-        btnElement.style.opacity = '0.7';
 
         try {
             const url = `{{ url('/admin/pendaftar') }}/${id}/toggle-kehadiran`;
@@ -332,18 +344,18 @@
             if (response.ok && data.success) {
                 const isHadir = data.is_hadir;
 
-                // Update switch state
+                // Smooth update switch state
                 btnElement.setAttribute('aria-checked', isHadir ? 'true' : 'false');
                 if (isHadir) {
                     btnElement.classList.remove('bg-gray-300');
-                    btnElement.classList.add('bg-green-600');
+                    btnElement.classList.add('bg-green-700');
                     knob.classList.remove('translate-x-0');
                     knob.classList.add('translate-x-5');
                     label.textContent = 'HADIR';
                     label.classList.remove('text-gray-500');
                     label.classList.add('text-green-800');
                 } else {
-                    btnElement.classList.remove('bg-green-600');
+                    btnElement.classList.remove('bg-green-700');
                     btnElement.classList.add('bg-gray-300');
                     knob.classList.remove('translate-x-5');
                     knob.classList.add('translate-x-0');
@@ -378,7 +390,6 @@
             showToast('Terjadi kesalahan jaringan.', false);
         } finally {
             btnElement.disabled = false;
-            btnElement.style.opacity = '1';
         }
     }
 </script>
