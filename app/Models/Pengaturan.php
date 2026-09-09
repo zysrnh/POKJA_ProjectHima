@@ -17,5 +17,7 @@ class Pengaturan extends Model
         'jam_acara',
         'lokasi_acara',
         'deskripsi_acara',
+        'cp_nama',
+        'cp_nomor',
     ];
 }

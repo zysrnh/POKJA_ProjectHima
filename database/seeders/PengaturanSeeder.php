@@ -20,6 +20,8 @@ class PengaturanSeeder extends Seeder
                 'jam_acara' => '08:00 WIB - Selesai',
                 'lokasi_acara' => 'Ruangan 105',
                 'deskripsi_acara' => 'Innovative Idea to Great Proposal',
+                'cp_nama' => 'Admin HIMA IF',
+                'cp_nomor' => '083861669565',
             ]
         );
     }
