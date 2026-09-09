@@ -141,7 +141,7 @@ class PendaftaranAdminController extends Controller
                     "'" . $item->nim,
                     $item->kelas,
                     "'" . $item->no_telp,
-                    $item->created_at ? $item->created_at->format('d-m-Y H:i') : '-',
+                    $item->created_at ? $item->created_at->timezone('Asia/Jakarta')->format('d-m-Y H:i') . ' WIB' : '-',
                 ], ';');
             }
 

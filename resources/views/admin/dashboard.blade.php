@@ -159,7 +159,7 @@
                                 </a>
                             </td>
                             <td class="py-3 px-3.5 text-gray-500 text-xs font-mono">
-                                {{ $item->created_at ? $item->created_at->format('d/m/Y H:i') : '-' }}
+                                {{ $item->created_at ? $item->created_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') . ' WIB' : '-' }}
                             </td>
                             <td class="py-3 px-3.5 text-center">
                                 <div class="flex items-center justify-center gap-1.5">
