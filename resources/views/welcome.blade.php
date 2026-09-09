@@ -106,7 +106,7 @@
                     </div>
 
                     <!-- Event Metadata Cards (Schedule & Venue) -->
-                    <div class="dot-card border-2 border-[#1A467C] p-4 shadow-[4px_4px_0px_0px_#1A467C] mb-4">
+                    <div class="dot-card border-2 border-[#1A467C] p-4 shadow-[4px_4px_0px_0px_#1A467C]">
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                             <!-- Tanggal & Waktu -->
                             <div class="bg-white border-2 border-[#1A467C] p-3 shadow-[2px_2px_0px_0px_#1A467C]">
@@ -136,15 +136,6 @@
                         </div>
                     </div>
 
-                    <!-- Quote Accent Box (Similar to Graphic Design Reference) -->
-                    <div class="bg-[#FCFBF7] border-2 border-[#1A467C] p-3.5 shadow-[3px_3px_0px_0px_#1A467C] relative">
-                        <span class="text-2xl font-serif text-[#1A467C] absolute -top-3 left-3 bg-[#FCFBF7] px-1 font-black leading-none">“</span>
-                        <p class="text-xs font-semibold text-gray-700 italic leading-relaxed pt-1">
-                            Wadah pengasahan ide kreatif dan pematangan proposal ilmiah mahasiswa Teknik Informatika untuk kompetisi dan inovasi masa depan.
-                        </p>
-                        <span class="text-2xl font-serif text-[#1A467C] absolute -bottom-4 right-3 bg-[#FCFBF7] px-1 font-black leading-none">”</span>
-                    </div>
-
                 </div>
 
             </div>
@@ -155,18 +146,13 @@
                 <div class="bg-white border-2 border-[#1A467C] p-6 sm:p-8 shadow-[8px_8px_0px_0px_#1A467C] relative">
                     
                     <!-- Form Title Header -->
-                    <div class="border-b-2 border-[#1A467C] pb-4 mb-5 flex items-center justify-between">
-                        <div>
-                            <h2 class="text-lg sm:text-xl font-black text-[#1A467C] uppercase tracking-wide">
-                                FORM PENDAFTARAN
-                            </h2>
-                            <p class="text-xs font-semibold text-gray-500 mt-0.5">
-                                Lengkapi data diri Anda untuk konfirmasi kehadiran
-                            </p>
-                        </div>
-                        <span class="bg-[#2A82C6] text-white text-xs font-black px-2 py-1 border-2 border-[#1A467C] shadow-[2px_2px_0px_0px_#1A467C]">
-                            STEP 1/1
-                        </span>
+                    <div class="border-b-2 border-[#1A467C] pb-4 mb-5">
+                        <h2 class="text-lg sm:text-xl font-black text-[#1A467C] uppercase tracking-wide">
+                            FORM PENDAFTARAN
+                        </h2>
+                        <p class="text-xs font-semibold text-gray-500 mt-0.5">
+                            Lengkapi data diri Anda untuk konfirmasi kehadiran
+                        </p>
                     </div>
 
                     <!-- Flash Alert Sukses (Neubrutalism Style) -->
@@ -297,7 +283,7 @@
                         </div>
 
                         <!-- Submit Button with Neubrutalism Action Effect -->
-                        <div class="pt-3">
+                        <div class="pt-2">
                             <button 
                                 type="submit" 
                                 id="btn-submit"
@@ -310,12 +296,6 @@
                             </button>
                         </div>
                     </form>
-
-                    <!-- Footer Info -->
-                    <div class="mt-5 pt-3 border-t-2 border-[#1A467C] flex items-center justify-between text-[11px] font-bold text-[#1A467C]">
-                        <span>✓ Sistem Pendaftaran Resmi</span>
-                        <span>HIMA IF © {{ date('Y') }}</span>
-                    </div>
 
                 </div>
 
