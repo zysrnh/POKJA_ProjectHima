@@ -4,10 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>Pendaftaran POKJA - HIMA IF</title>
+    
+    <!-- Google Font: Montserrat -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Montserrat', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+        }
+    </style>
 </head>
-<body class="bg-gray-100 text-gray-900 min-h-screen flex items-center justify-center p-3 sm:p-6">
+<body class="bg-gray-100 text-gray-900 min-h-screen flex items-center justify-center p-3 sm:p-6 antialiased">
 
     <div class="w-full max-w-lg bg-white border border-gray-300 p-5 sm:p-8 shadow-sm">
         <!-- Header -->
