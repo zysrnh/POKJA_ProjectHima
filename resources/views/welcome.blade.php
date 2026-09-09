@@ -327,32 +327,56 @@
                         @enderror
                     </div>
 
-                    <!-- Field: Kelas (Dropdown Dinamis) -->
-                    <div>
-                        <label for="kelas" class="block text-xs font-black uppercase tracking-wider text-[#1A467C] mb-1.5">
+                    <!-- Field: Kelas (Custom Neubrutalism Dropdown Pop-over) -->
+                    <div class="relative" id="custom-select-container">
+                        <label for="input-kelas-value" class="block text-xs font-black uppercase tracking-wider text-[#1A467C] mb-1.5">
                             Kelas <span class="text-[#CA2C2A]">*</span>
                         </label>
-                        <div class="relative">
-                            <select 
-                                id="kelas" 
-                                name="kelas" 
-                                required
-                                class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] px-4 py-3 pr-10 text-sm font-bold font-mono text-[#000000] focus:bg-white focus:outline-none focus:shadow-[4px_4px_0px_0px_#1A467C] transition-all duration-200 cursor-pointer appearance-none @error('kelas') border-[#CA2C2A] bg-red-50 @enderror"
-                            >
-                                <option value="" class="text-gray-400 font-normal">-- PILIH KELAS ANDA --</option>
-                                @foreach ($kelasList as $k)
-                                    <option value="{{ $k->nama_kelas }}" {{ (session('success') ? '' : old('kelas')) == $k->nama_kelas ? 'selected' : '' }} class="text-gray-900 font-bold py-1">
-                                        {{ $k->nama_kelas }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            <!-- Custom Arrow Down SVG -->
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[#1A467C]">
-                                <svg class="w-5 h-5 border-l-2 border-[#1A467C] pl-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2.5" d="M19 9l-7 7-7-7" />
-                                </svg>
-                            </div>
+                        
+                        @php
+                            $selectedKelas = session('success') ? '' : old('kelas');
+                        @endphp
+                        <!-- Hidden input to submit form data -->
+                        <input 
+                            type="hidden" 
+                            id="input-kelas-value" 
+                            name="kelas" 
+                            value="{{ $selectedKelas }}"
+                            required
+                        >
+
+                        <!-- Custom Trigger Button (Works identically across desktop and mobile) -->
+                        <button 
+                            type="button" 
+                            id="dropdown-kelas-trigger"
+                            onclick="toggleKelasDropdown()"
+                            class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] px-4 py-3 text-left flex items-center justify-between text-sm font-bold font-mono focus:bg-white focus:outline-none focus:shadow-[4px_4px_0px_0px_#1A467C] transition-all duration-150 cursor-pointer @error('kelas') border-[#CA2C2A] bg-red-50 @enderror"
+                        >
+                            <span id="dropdown-kelas-label" class="{{ empty($selectedKelas) ? 'text-gray-400 font-normal' : 'text-gray-900 font-bold' }}">
+                                {{ !empty($selectedKelas) ? $selectedKelas : '-- PILIH KELAS ANDA --' }}
+                            </span>
+                            <svg id="dropdown-chevron-icon" class="w-5 h-5 text-[#1A467C] border-l-2 border-[#1A467C] pl-1 transform transition-transform duration-200 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="square" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+
+                        <!-- Dropdown Menu List (Neubrutalism Popover) -->
+                        <div 
+                            id="dropdown-kelas-menu" 
+                            class="hidden absolute z-30 top-full mt-1.5 left-0 right-0 bg-white border-2 border-[#1A467C] shadow-[6px_6px_0px_0px_#1A467C] max-h-56 overflow-y-auto divide-y divide-gray-100"
+                        >
+                            @foreach ($kelasList as $k)
+                                <div 
+                                    onclick="pilihKelas('{{ $k->nama_kelas }}')"
+                                    class="dropdown-kelas-item px-4 py-2.5 text-sm font-bold font-mono text-gray-900 hover:bg-[#2A82C6] hover:text-white cursor-pointer transition-colors flex items-center justify-between {{ $selectedKelas === $k->nama_kelas ? 'bg-blue-50 text-[#1A467C]' : '' }}"
+                                    data-value="{{ $k->nama_kelas }}"
+                                >
+                                    <span>{{ $k->nama_kelas }}</span>
+                                    <span class="item-check {{ $selectedKelas === $k->nama_kelas ? '' : 'hidden' }} text-xs font-black">✓</span>
+                                </div>
+                            @endforeach
                         </div>
+
                         @error('kelas')
                             <p class="mt-1 text-xs font-bold text-[#CA2C2A]">{{ $message }}</p>
                         @enderror
@@ -478,12 +502,83 @@
     @endif
 
     <script>
-        // Anti-Double Submit Handler
+        // Custom Dropdown Kelas Functions
+        function toggleKelasDropdown() {
+            const menu = document.getElementById('dropdown-kelas-menu');
+            const chevron = document.getElementById('dropdown-chevron-icon');
+            if (menu) {
+                const isHidden = menu.classList.contains('hidden');
+                if (isHidden) {
+                    menu.classList.remove('hidden');
+                    if (chevron) chevron.classList.add('rotate-180');
+                } else {
+                    menu.classList.add('hidden');
+                    if (chevron) chevron.classList.remove('rotate-180');
+                }
+            }
+        }
+
+        function pilihKelas(val) {
+            const input = document.getElementById('input-kelas-value');
+            const label = document.getElementById('dropdown-kelas-label');
+            const menu = document.getElementById('dropdown-kelas-menu');
+            const chevron = document.getElementById('dropdown-chevron-icon');
+            const trigger = document.getElementById('dropdown-kelas-trigger');
+
+            if (input) input.value = val;
+            if (label) {
+                label.textContent = val;
+                label.classList.remove('text-gray-400', 'font-normal');
+                label.classList.add('text-gray-900', 'font-bold');
+            }
+
+            // Update item highlight & check icon
+            document.querySelectorAll('.dropdown-kelas-item').forEach(el => {
+                const check = el.querySelector('.item-check');
+                if (el.getAttribute('data-value') === val) {
+                    el.classList.add('bg-blue-50', 'text-[#1A467C]');
+                    if (check) check.classList.remove('hidden');
+                } else {
+                    el.classList.remove('bg-blue-50', 'text-[#1A467C]');
+                    if (check) check.classList.add('hidden');
+                }
+            });
+
+            if (menu) menu.classList.add('hidden');
+            if (chevron) chevron.classList.remove('rotate-180');
+            if (trigger) trigger.classList.remove('border-[#CA2C2A]', 'bg-red-50');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            const container = document.getElementById('custom-select-container');
+            const menu = document.getElementById('dropdown-kelas-menu');
+            const chevron = document.getElementById('dropdown-chevron-icon');
+            if (container && menu && !container.contains(e.target)) {
+                menu.classList.add('hidden');
+                if (chevron) chevron.classList.remove('rotate-180');
+            }
+        });
+
+        // Anti-Double Submit & Client Validation Handler
         let isSubmitting = false;
 
         function handleSubmit(e) {
             if (isSubmitting) {
                 e.preventDefault();
+                return false;
+            }
+
+            // Validate custom dropdown
+            const inputKelas = document.getElementById('input-kelas-value');
+            const triggerKelas = document.getElementById('dropdown-kelas-trigger');
+            if (!inputKelas || !inputKelas.value.trim()) {
+                e.preventDefault();
+                if (triggerKelas) {
+                    triggerKelas.classList.add('border-[#CA2C2A]', 'bg-red-50');
+                    toggleKelasDropdown();
+                    triggerKelas.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
                 return false;
             }
 
@@ -524,6 +619,10 @@
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 tutupModal();
+                const menu = document.getElementById('dropdown-kelas-menu');
+                const chevron = document.getElementById('dropdown-chevron-icon');
+                if (menu) menu.classList.add('hidden');
+                if (chevron) chevron.classList.remove('rotate-180');
             }
         });
     </script>
