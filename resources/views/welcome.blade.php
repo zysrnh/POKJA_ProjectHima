@@ -55,19 +55,19 @@
 
         <!-- Flash Alert Sukses -->
         @if (session('success'))
-            <div class="mb-5 p-3.5 bg-green-50 border border-green-600 text-green-800 text-xs sm:text-sm">
+            <div id="alert-box" class="mb-5 p-3.5 bg-green-50 border border-green-600 text-green-800 text-xs sm:text-sm">
                 <div class="flex items-center gap-2">
                     <svg class="w-4 h-4 text-green-700 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                     </svg>
-                    <span class="font-medium">{{ session('success') }}</span>
+                    <span class="font-semibold">{{ session('success') }}</span>
                 </div>
             </div>
         @endif
 
         <!-- Alert Error Global jika ada kegagalan validasi -->
         @if ($errors->any())
-            <div class="mb-5 p-3.5 bg-red-50 border border-red-600 text-red-800 text-xs sm:text-sm">
+            <div id="alert-box" class="mb-5 p-3.5 bg-red-50 border border-red-600 text-red-800 text-xs sm:text-sm">
                 <p class="font-semibold mb-1">Terdapat kesalahan pada input Anda:</p>
                 <ul class="list-disc list-inside space-y-0.5 text-xs text-red-700">
                     @foreach ($errors->all() as $error)
@@ -78,7 +78,13 @@
         @endif
 
         <!-- Form Pendaftaran -->
-        <form action="{{ route('pendaftaran.store') }}" method="POST" class="space-y-4 sm:space-y-5">
+        <form 
+            id="form-pendaftaran"
+            action="{{ route('pendaftaran.store') }}" 
+            method="POST" 
+            class="space-y-4 sm:space-y-5"
+            onsubmit="handleSubmit(event)"
+        >
             @csrf
 
             <!-- Anti-bot Honeypot Field (Hidden from real users) -->
@@ -95,7 +101,7 @@
                     type="text" 
                     id="nama" 
                     name="nama" 
-                    value="{{ old('nama') }}"
+                    value="{{ session('success') ? '' : old('nama') }}"
                     placeholder="Contoh: Fulan bin Fulan"
                     maxlength="100"
                     required
@@ -117,10 +123,11 @@
                     name="nim" 
                     inputmode="numeric"
                     maxlength="20"
-                    value="{{ old('nim') }}"
+                    oninput="this.value = this.value.replace(/\s+/g, '')"
+                    value="{{ session('success') ? '' : old('nim') }}"
                     placeholder="Contoh: 250414000"
                     required
-                    class="w-full bg-gray-50 border @error('nim') border-red-500 bg-red-50/20 @else border-gray-300 @enderror text-gray-900 text-base md:text-sm px-3.5 py-2.5 sm:py-2 focus:bg-white focus:outline-none focus:border-[#2A82C6] focus:ring-1 focus:ring-[#2A82C6] transition"
+                    class="w-full bg-gray-50 border @error('nim') border-red-500 bg-red-50/20 @else border-gray-300 @enderror text-gray-900 text-base md:text-sm px-3.5 py-2.5 sm:py-2 focus:bg-white focus:outline-none focus:border-[#2A82C6] focus:ring-1 focus:ring-[#2A82C6] transition font-mono"
                 >
                 @error('nim')
                     <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
@@ -138,12 +145,12 @@
                     required
                     class="w-full bg-gray-50 border @error('kelas') border-red-500 bg-red-50/20 @else border-gray-300 @enderror text-gray-900 text-base md:text-sm px-3.5 py-2.5 sm:py-2 focus:bg-white focus:outline-none focus:border-[#2A82C6] focus:ring-1 focus:ring-[#2A82C6] transition cursor-pointer font-mono"
                 >
-                <option value="">-- Pilih Kelas Anda --</option>
-                @foreach ($kelasList as $k)
-                    <option value="{{ $k->nama_kelas }}" {{ old('kelas') == $k->nama_kelas ? 'selected' : '' }}>
-                        {{ $k->nama_kelas }}
-                    </option>
-                @endforeach
+                    <option value="">-- Pilih Kelas Anda --</option>
+                    @foreach ($kelasList as $k)
+                        <option value="{{ $k->nama_kelas }}" {{ (session('success') ? '' : old('kelas')) == $k->nama_kelas ? 'selected' : '' }}>
+                            {{ $k->nama_kelas }}
+                        </option>
+                    @endforeach
                 </select>
                 @error('kelas')
                     <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
@@ -161,23 +168,25 @@
                     name="no_telp" 
                     inputmode="tel"
                     maxlength="15"
-                    value="{{ old('no_telp') }}"
+                    oninput="this.value = this.value.replace(/\s+/g, '')"
+                    value="{{ session('success') ? '' : old('no_telp') }}"
                     placeholder="Contoh: 081234567890"
                     required
-                    class="w-full bg-gray-50 border @error('no_telp') border-red-500 bg-red-50/20 @else border-gray-300 @enderror text-gray-900 text-base md:text-sm px-3.5 py-2.5 sm:py-2 focus:bg-white focus:outline-none focus:border-[#2A82C6] focus:ring-1 focus:ring-[#2A82C6] transition"
+                    class="w-full bg-gray-50 border @error('no_telp') border-red-500 bg-red-50/20 @else border-gray-300 @enderror text-gray-900 text-base md:text-sm px-3.5 py-2.5 sm:py-2 focus:bg-white focus:outline-none focus:border-[#2A82C6] focus:ring-1 focus:ring-[#2A82C6] transition font-mono"
                 >
                 @error('no_telp')
                     <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                 @enderror
             </div>
 
-            <!-- Submit Button -->
+            <!-- Submit Button with Anti-Double Submit -->
             <div class="pt-2">
                 <button 
                     type="submit" 
-                    class="w-full bg-[#2A82C6] hover:bg-[#1A467C] active:bg-[#1A467C] text-white text-xs sm:text-sm font-semibold uppercase tracking-wider py-3 px-4 transition cursor-pointer"
+                    id="btn-submit"
+                    class="w-full bg-[#2A82C6] hover:bg-[#1A467C] active:bg-[#1A467C] text-white text-xs sm:text-sm font-semibold uppercase tracking-wider py-3 px-4 transition cursor-pointer flex items-center justify-center gap-2"
                 >
-                    Kirim Pendaftaran
+                    <span id="btn-text">Kirim Pendaftaran</span>
                 </button>
             </div>
         </form>
@@ -187,6 +196,43 @@
             <p class="text-xs text-gray-500">Pastikan seluruh data yang dimasukkan sudah benar dan valid.</p>
         </div>
     </div>
+
+    <script>
+        // Anti-Double Submit Handler
+        let isSubmitting = false;
+
+        function handleSubmit(e) {
+            if (isSubmitting) {
+                e.preventDefault();
+                return false;
+            }
+
+            const btn = document.getElementById('btn-submit');
+            const btnText = document.getElementById('btn-text');
+
+            isSubmitting = true;
+            btn.disabled = true;
+            btn.classList.add('opacity-75', 'cursor-not-allowed');
+
+            btnText.innerHTML = `
+                <svg class="animate-spin h-4 w-4 text-white inline-block" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>Sedang Mengirim...</span>
+            `;
+
+            return true;
+        }
+
+        // Auto Scroll to Alert if Present
+        document.addEventListener('DOMContentLoaded', () => {
+            const alertBox = document.getElementById('alert-box');
+            if (alertBox) {
+                alertBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        });
+    </script>
 
 </body>
 </html>
