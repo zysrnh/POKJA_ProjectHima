@@ -19,5 +19,6 @@ class Pengaturan extends Model
         'deskripsi_acara',
         'cp_nama',
         'cp_nomor',
+        'link_grup_wa',
     ];
 }

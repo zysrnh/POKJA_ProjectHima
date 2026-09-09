@@ -138,53 +138,34 @@
                 </div>
             </div>
 
-            <!-- Section 2: Contact Person (CP) -->
-            <div class="bg-red-50/50 p-5 border-2 border-[#901C1A] shadow-[3px_3px_0px_0px_#901C1A] space-y-4">
-                <h4 class="text-xs font-black uppercase tracking-wider text-[#901C1A] flex items-center gap-2 border-b border-[#901C1A]/20 pb-2">
-                    <svg class="w-4 h-4 text-[#CA2C2A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="square" stroke-width="2.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+            <!-- Section 2: Link Grup WhatsApp Peserta -->
+            <div class="bg-green-50/50 p-5 border-2 border-green-800 shadow-[3px_3px_0px_0px_#166534] space-y-4">
+                <h4 class="text-xs font-black uppercase tracking-wider text-green-900 flex items-center gap-2 border-b border-green-800/20 pb-2">
+                    <svg class="w-4 h-4 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="square" stroke-width="2.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                     </svg>
-                    <span>2. Contact Person (CP) WhatsApp</span>
+                    <span>2. Link Undangan Grup WhatsApp Peserta</span>
                 </h4>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <!-- Field: Nama CP -->
-                    <div>
-                        <label for="cp_nama" class="block text-xs font-black uppercase tracking-wider text-[#901C1A] mb-1">
-                            Nama Contact Person <span class="text-[#CA2C2A]">*</span>
-                        </label>
-                        <input 
-                            type="text" 
-                            id="cp_nama" 
-                            name="cp_nama" 
-                            value="{{ old('cp_nama', $pengaturan->cp_nama ?? 'Admin HIMA IF') }}"
-                            placeholder="Contoh: Admin HIMA IF"
-                            required
-                            class="w-full bg-white border-2 @error('cp_nama') border-[#CA2C2A] bg-red-50 @else border-[#901C1A] @enderror text-gray-950 font-bold text-sm px-3.5 py-2.5 focus:outline-none focus:shadow-[3px_3px_0px_0px_#901C1A] transition"
-                        >
-                        @error('cp_nama')
-                            <p class="mt-1 text-xs font-bold text-[#CA2C2A]">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <!-- Field: Nomor WA CP -->
-                    <div>
-                        <label for="cp_nomor" class="block text-xs font-black uppercase tracking-wider text-[#901C1A] mb-1">
-                            Nomor WhatsApp CP <span class="text-[#CA2C2A]">*</span>
-                        </label>
-                        <input 
-                            type="tel" 
-                            id="cp_nomor" 
-                            name="cp_nomor" 
-                            value="{{ old('cp_nomor', $pengaturan->cp_nomor ?? '083861669565') }}"
-                            placeholder="Contoh: 083861669565"
-                            required
-                            class="w-full bg-white border-2 @error('cp_nomor') border-[#CA2C2A] bg-red-50 @else border-[#901C1A] @enderror text-gray-950 font-bold font-mono text-sm px-3.5 py-2.5 focus:outline-none focus:shadow-[3px_3px_0px_0px_#901C1A] transition"
-                        >
-                        @error('cp_nomor')
-                            <p class="mt-1 text-xs font-bold text-[#CA2C2A]">{{ $message }}</p>
-                        @enderror
-                    </div>
+                <div>
+                    <label for="link_grup_wa" class="block text-xs font-black uppercase tracking-wider text-green-950 mb-1">
+                        Tautan / Link Undangan Grup WhatsApp <span class="text-[#CA2C2A]">*</span>
+                    </label>
+                    <input 
+                        type="url" 
+                        id="link_grup_wa" 
+                        name="link_grup_wa" 
+                        value="{{ old('link_grup_wa', $pengaturan->link_grup_wa ?? 'https://chat.whatsapp.com/') }}"
+                        placeholder="https://chat.whatsapp.com/KodeGrupWhatsAppAnda"
+                        required
+                        class="w-full bg-white border-2 @error('link_grup_wa') border-[#CA2C2A] bg-red-50 @else border-green-800 @enderror text-gray-950 font-bold font-mono text-sm px-3.5 py-2.5 focus:outline-none focus:shadow-[3px_3px_0px_0px_#166534] transition"
+                    >
+                    <p class="text-[11px] font-semibold text-gray-600 mt-1.5">
+                        Tautan ini akan langsung dibuka saat calon peserta menekan tombol <strong>"GABUNG GRUP WHATSAPP PESERTA"</strong> pada pop-up sukses pendaftaran.
+                    </p>
+                    @error('link_grup_wa')
+                        <p class="mt-1 text-xs font-bold text-[#CA2C2A]">{{ $message }}</p>
+                    @enderror
                 </div>
             </div>
 
