@@ -7,31 +7,74 @@
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
+        function isDesktop() {
+            return window.innerWidth >= 1024;
+        }
+
         function toggleSidebar() {
             const sidebar = document.getElementById('admin-sidebar');
             const overlay = document.getElementById('sidebar-overlay');
-            sidebar.classList.toggle('-translate-x-full');
-            overlay.classList.toggle('hidden');
+            
+            if (isDesktop()) {
+                const isCollapsed = sidebar.classList.contains('lg:w-0');
+                if (isCollapsed) {
+                    sidebar.classList.remove('lg:w-0', 'lg:-translate-x-full', 'lg:overflow-hidden', 'lg:border-r-0');
+                    sidebar.classList.add('lg:w-64', 'lg:translate-x-0');
+                    localStorage.setItem('admin_sidebar_desktop', 'open');
+                } else {
+                    sidebar.classList.remove('lg:w-64', 'lg:translate-x-0');
+                    sidebar.classList.add('lg:w-0', 'lg:-translate-x-full', 'lg:overflow-hidden', 'lg:border-r-0');
+                    localStorage.setItem('admin_sidebar_desktop', 'closed');
+                }
+            } else {
+                const isMobileOpen = !sidebar.classList.contains('-translate-x-full');
+                if (isMobileOpen) {
+                    sidebar.classList.add('-translate-x-full');
+                    overlay.classList.add('hidden');
+                } else {
+                    sidebar.classList.remove('-translate-x-full');
+                    overlay.classList.remove('hidden');
+                }
+            }
         }
+
+        function closeMobileSidebar() {
+            const sidebar = document.getElementById('admin-sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            sidebar.classList.add('-translate-x-full');
+            overlay.classList.add('hidden');
+        }
+
+        // Jalankan saat halaman selesai dimuat untuk membaca preferensi
+        document.addEventListener('DOMContentLoaded', () => {
+            if (isDesktop()) {
+                const savedState = localStorage.getItem('admin_sidebar_desktop');
+                const sidebar = document.getElementById('admin-sidebar');
+                if (savedState === 'closed') {
+                    sidebar.classList.remove('lg:w-64', 'lg:translate-x-0');
+                    sidebar.classList.add('lg:w-0', 'lg:-translate-x-full', 'lg:overflow-hidden', 'lg:border-r-0');
+                }
+            }
+        });
     </script>
 </head>
 <body class="bg-gray-100 text-gray-900 min-h-screen flex flex-col antialiased">
 
-    <div class="flex flex-1 min-h-screen relative">
+    <div class="flex flex-1 min-h-screen relative overflow-x-hidden">
         
-        <!-- Mobile Sidebar Overlay Backdrop -->
+        <!-- Mobile Backdrop Overlay -->
         <div 
             id="sidebar-overlay" 
-            onclick="toggleSidebar()" 
+            onclick="closeMobileSidebar()" 
             class="fixed inset-0 bg-black/50 z-40 lg:hidden hidden transition-opacity"
         ></div>
 
-        <!-- Sidebar Navigation -->
+        <!-- Sidebar Navigation (Desktop & Mobile Collapsible) -->
         <aside 
             id="admin-sidebar" 
-            class="fixed lg:static inset-y-0 left-0 z-50 w-64 bg-gray-900 text-white flex flex-col justify-between transform -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-in-out border-r border-gray-800"
+            class="fixed lg:static inset-y-0 left-0 z-50 w-64 lg:w-64 bg-gray-900 text-white flex flex-col justify-between -translate-x-full lg:translate-x-0 transition-all duration-200 ease-in-out border-r border-gray-800 shrink-0"
         >
-            <div>
+            <div class="w-64">
                 <!-- Brand Header in Sidebar -->
                 <div class="h-16 flex items-center justify-between px-6 bg-gray-950 border-b border-gray-800">
                     <div class="flex items-center gap-3">
@@ -39,7 +82,7 @@
                         <span class="font-bold text-sm uppercase tracking-wider text-white">POKJA HIMA IF</span>
                     </div>
                     <!-- Close button on mobile -->
-                    <button onclick="toggleSidebar()" class="lg:hidden text-gray-400 hover:text-white p-1">
+                    <button onclick="closeMobileSidebar()" class="lg:hidden text-gray-400 hover:text-white p-1" title="Tutup Menu">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="square" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                         </svg>
@@ -73,26 +116,26 @@
             </div>
 
             <!-- Sidebar Footer -->
-            <div class="p-4 border-t border-gray-800 text-[11px] text-gray-400 bg-gray-950">
+            <div class="w-64 p-4 border-t border-gray-800 text-[11px] text-gray-400 bg-gray-950">
                 <p class="font-medium text-gray-300 truncate">{{ Auth::user()->name ?? 'Administrator' }}</p>
                 <p class="truncate text-gray-500">{{ Auth::user()->email ?? 'admin@pokja.com' }}</p>
             </div>
         </aside>
 
         <!-- Main Content Area -->
-        <div class="flex-1 flex flex-col min-w-0">
+        <div class="flex-1 flex flex-col min-w-0 transition-all duration-200">
 
             <!-- Top Header -->
-            <header class="bg-white border-b border-gray-300 h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 sticky top-0 z-30">
-                <!-- Left: Hamburger toggle button for Mobile -->
+            <header class="bg-white border-b border-gray-300 h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 sticky top-0 z-30 shadow-xs">
+                <!-- Left: Universal Sidebar Toggle Button -->
                 <div class="flex items-center gap-3">
                     <button 
                         type="button" 
                         onclick="toggleSidebar()" 
-                        class="lg:hidden p-2 text-gray-700 hover:bg-gray-100 transition"
-                        title="Buka Menu"
+                        class="p-2 border border-gray-300 text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition cursor-pointer"
+                        title="Buka / Tutup Sidebar"
                     >
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="square" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                         </svg>
                     </button>
