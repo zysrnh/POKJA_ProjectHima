@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Kelas;
 use App\Models\Pendaftaran;
 use Illuminate\Http\Request;
 
@@ -12,7 +13,9 @@ class PendaftaranController extends Controller
      */
     public function index()
     {
-        return view('welcome');
+        $kelasList = Kelas::where('is_active', true)->orderBy('nama_kelas')->get();
+
+        return view('welcome', compact('kelasList'));
     }
 
     /**
@@ -29,7 +32,7 @@ class PendaftaranController extends Controller
             'nama.required' => 'Nama lengkap wajib diisi.',
             'nim.required' => 'NIM wajib diisi.',
             'nim.unique' => 'NIM ini sudah terdaftar sebelumnya.',
-            'kelas.required' => 'Kelas wajib diisi.',
+            'kelas.required' => 'Silakan pilih kelas Anda.',
             'no_telp.required' => 'No. Telepon / WhatsApp wajib diisi.',
         ]);
 

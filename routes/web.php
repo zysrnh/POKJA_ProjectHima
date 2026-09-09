@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
+use App\Http\Controllers\Admin\KelasAdminController;
 use App\Http\Controllers\Admin\PendaftaranAdminController;
 use App\Http\Controllers\PendaftaranController;
 use Illuminate\Support\Facades\Route;
@@ -36,6 +37,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/pendaftar/{id}/edit', [PendaftaranAdminController::class, 'edit'])->name('pendaftar.edit');
         Route::put('/pendaftar/{id}', [PendaftaranAdminController::class, 'update'])->name('pendaftar.update');
         Route::delete('/pendaftar/{id}', [PendaftaranAdminController::class, 'destroy'])->name('pendaftar.destroy');
+
+        // Kelola Kelas
+        Route::resource('kelas', KelasAdminController::class)->except(['show']);
 
         // Kelola Akun Admin (CRUD Admin)
         Route::resource('users', AdminUserController::class)->except(['show']);

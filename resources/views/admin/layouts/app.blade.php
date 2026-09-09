@@ -18,6 +18,14 @@
                 extend: {
                     fontFamily: {
                         sans: ['Montserrat', 'sans-serif'],
+                    },
+                    colors: {
+                        hima: {
+                            blue: '#2A82C6',
+                            navy: '#1A467C',
+                            red: '#CA2C2A',
+                            maroon: '#901C1A',
+                        }
                     }
                 }
             }
@@ -105,7 +113,7 @@
                         >
                         <div>
                             <span class="font-bold text-xs uppercase tracking-wider text-white block">POKJA HIMA IF</span>
-                            <span class="text-[10px] text-blue-400 font-semibold uppercase tracking-wider block">Admin Panel</span>
+                            <span class="text-[10px] text-[#2A82C6] font-semibold uppercase tracking-wider block">Admin Panel</span>
                         </div>
                     </div>
                     <!-- Close button on mobile -->
@@ -121,7 +129,7 @@
                     <!-- Menu 1: Data Pendaftar -->
                     <a 
                         href="{{ route('admin.dashboard') }}" 
-                        class="flex items-center gap-3 px-3.5 py-3 transition {{ request()->routeIs('admin.dashboard') || request()->routeIs('admin.pendaftar.*') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' }}"
+                        class="flex items-center gap-3 px-3.5 py-3 transition {{ request()->routeIs('admin.dashboard') || request()->routeIs('admin.pendaftar.*') ? 'bg-[#2A82C6] text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' }}"
                     >
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="square" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
@@ -129,10 +137,21 @@
                         <span>Data Pendaftar</span>
                     </a>
 
-                    <!-- Menu 2: Kelola Admin -->
+                    <!-- Menu 2: Kelola Kelas -->
+                    <a 
+                        href="{{ route('admin.kelas.index') }}" 
+                        class="flex items-center gap-3 px-3.5 py-3 transition {{ request()->routeIs('admin.kelas.*') ? 'bg-[#2A82C6] text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' }}"
+                    >
+                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="square" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                        </svg>
+                        <span>Kelola Kelas</span>
+                    </a>
+
+                    <!-- Menu 3: Kelola Admin -->
                     <a 
                         href="{{ route('admin.users.index') }}" 
-                        class="flex items-center gap-3 px-3.5 py-3 transition {{ request()->routeIs('admin.users.*') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' }}"
+                        class="flex items-center gap-3 px-3.5 py-3 transition {{ request()->routeIs('admin.users.*') ? 'bg-[#2A82C6] text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' }}"
                     >
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="square" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
@@ -188,7 +207,7 @@
                         @csrf
                         <button 
                             type="submit" 
-                            class="px-3.5 py-1.5 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white text-xs font-semibold uppercase tracking-wider transition cursor-pointer"
+                            class="px-3.5 py-1.5 bg-[#CA2C2A] hover:bg-[#901C1A] active:bg-[#901C1A] text-white text-xs font-semibold uppercase tracking-wider transition cursor-pointer"
                         >
                             Keluar
                         </button>

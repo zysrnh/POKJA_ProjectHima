@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Kelas;
 use App\Models\Pendaftaran;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -37,8 +38,10 @@ class PendaftaranAdminController extends Controller
         // Statistik
         $totalPendaftar = Pendaftaran::count();
         $pendaftarHariIni = Pendaftaran::whereDate('created_at', Carbon::today())->count();
-        $totalKelas = Pendaftaran::distinct('kelas')->count('kelas');
-        $kelasList = Pendaftaran::distinct()->pluck('kelas')->filter()->values();
+        $totalKelas = Kelas::where('is_active', true)->count();
+        
+        // Pilihan kelas untuk filter
+        $kelasList = Kelas::orderBy('nama_kelas')->pluck('nama_kelas');
 
         return view('admin.dashboard', compact(
             'pendaftarans',
@@ -57,8 +60,9 @@ class PendaftaranAdminController extends Controller
     public function edit($id)
     {
         $pendaftaran = Pendaftaran::findOrFail($id);
+        $kelasList = Kelas::orderBy('nama_kelas')->get();
 
-        return view('admin.edit', compact('pendaftaran'));
+        return view('admin.edit', compact('pendaftaran', 'kelasList'));
     }
 
     /**
@@ -77,7 +81,7 @@ class PendaftaranAdminController extends Controller
             'nama.required' => 'Nama lengkap wajib diisi.',
             'nim.required' => 'NIM wajib diisi.',
             'nim.unique' => 'NIM ini sudah terdaftar pada data lain.',
-            'kelas.required' => 'Kelas wajib diisi.',
+            'kelas.required' => 'Silakan pilih kelas.',
             'no_telp.required' => 'No. Telepon / WhatsApp wajib diisi.',
         ]);
 
@@ -125,10 +129,8 @@ class PendaftaranAdminController extends Controller
 
         return new StreamedResponse(function () use ($data) {
             $handle = fopen('php://output', 'w');
-            // Menambahkan UTF-8 BOM agar terbaca rapi di Microsoft Excel
             fputs($handle, "\xEF\xBB\xBF");
 
-            // Header kolom
             fputcsv($handle, ['No', 'Nama Lengkap', 'NIM', 'Kelas', 'No. Telepon / WA', 'Tanggal Pendaftaran'], ';');
 
             $no = 1;
@@ -136,7 +138,7 @@ class PendaftaranAdminController extends Controller
                 fputcsv($handle, [
                     $no++,
                     $item->nama,
-                    "'" . $item->nim, // Tambahkan tanda kutip agar angka NIM tidak diformat scientific di Excel
+                    "'" . $item->nim,
                     $item->kelas,
                     "'" . $item->no_telp,
                     $item->created_at ? $item->created_at->format('d-m-Y H:i') : '-',

@@ -18,6 +18,14 @@
                 extend: {
                     fontFamily: {
                         sans: ['Montserrat', 'sans-serif'],
+                    },
+                    colors: {
+                        hima: {
+                            blue: '#2A82C6',
+                            navy: '#1A467C',
+                            red: '#CA2C2A',
+                            maroon: '#901C1A',
+                        }
                     }
                 }
             }
@@ -85,7 +93,7 @@
                     value="{{ old('nama') }}"
                     placeholder="Contoh: Fulan bin Fulan"
                     required
-                    class="w-full bg-gray-50 border @error('nama') border-red-500 bg-red-50/20 @else border-gray-300 @enderror text-gray-900 text-base md:text-sm px-3.5 py-2.5 sm:py-2 focus:bg-white focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition"
+                    class="w-full bg-gray-50 border @error('nama') border-red-500 bg-red-50/20 @else border-gray-300 @enderror text-gray-900 text-base md:text-sm px-3.5 py-2.5 sm:py-2 focus:bg-white focus:outline-none focus:border-[#2A82C6] focus:ring-1 focus:ring-[#2A82C6] transition"
                 >
                 @error('nama')
                     <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
@@ -102,29 +110,33 @@
                     id="nim" 
                     name="nim" 
                     value="{{ old('nim') }}"
-                    placeholder="Contoh: 2111521001"
+                    placeholder="Contoh: 250414000"
                     required
-                    class="w-full bg-gray-50 border @error('nim') border-red-500 bg-red-50/20 @else border-gray-300 @enderror text-gray-900 text-base md:text-sm px-3.5 py-2.5 sm:py-2 focus:bg-white focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition"
+                    class="w-full bg-gray-50 border @error('nim') border-red-500 bg-red-50/20 @else border-gray-300 @enderror text-gray-900 text-base md:text-sm px-3.5 py-2.5 sm:py-2 focus:bg-white focus:outline-none focus:border-[#2A82C6] focus:ring-1 focus:ring-[#2A82C6] transition"
                 >
                 @error('nim')
                     <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                 @enderror
             </div>
 
-            <!-- Field: Kelas -->
+            <!-- Field: Kelas (Dropdown Dinamis) -->
             <div>
                 <label for="kelas" class="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-1">
                     Kelas <span class="text-red-600">*</span>
                 </label>
-                <input 
-                    type="text" 
+                <select 
                     id="kelas" 
                     name="kelas" 
-                    value="{{ old('kelas') }}"
-                    placeholder="Contoh: IF-A / IF 2024"
                     required
-                    class="w-full bg-gray-50 border @error('kelas') border-red-500 bg-red-50/20 @else border-gray-300 @enderror text-gray-900 text-base md:text-sm px-3.5 py-2.5 sm:py-2 focus:bg-white focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition"
+                    class="w-full bg-gray-50 border @error('kelas') border-red-500 bg-red-50/20 @else border-gray-300 @enderror text-gray-900 text-base md:text-sm px-3.5 py-2.5 sm:py-2 focus:bg-white focus:outline-none focus:border-[#2A82C6] focus:ring-1 focus:ring-[#2A82C6] transition cursor-pointer font-mono"
                 >
+                    <option value="">-- Pilih Kelas Anda --</option>
+                    @foreach ($kelasList as $k)
+                        <option value="{{ $k->nama_kelas }}" {{ old('kelas') == $k->nama_kelas ? 'selected' : '' }}>
+                            {{ $k->nama_kelas }}
+                        </option>
+                    @endforeach
+                </select>
                 @error('kelas')
                     <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                 @enderror
@@ -142,7 +154,7 @@
                     value="{{ old('no_telp') }}"
                     placeholder="Contoh: 081234567890"
                     required
-                    class="w-full bg-gray-50 border @error('no_telp') border-red-500 bg-red-50/20 @else border-gray-300 @enderror text-gray-900 text-base md:text-sm px-3.5 py-2.5 sm:py-2 focus:bg-white focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition"
+                    class="w-full bg-gray-50 border @error('no_telp') border-red-500 bg-red-50/20 @else border-gray-300 @enderror text-gray-900 text-base md:text-sm px-3.5 py-2.5 sm:py-2 focus:bg-white focus:outline-none focus:border-[#2A82C6] focus:ring-1 focus:ring-[#2A82C6] transition"
                 >
                 @error('no_telp')
                     <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
@@ -153,7 +165,7 @@
             <div class="pt-2">
                 <button 
                     type="submit" 
-                    class="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-xs sm:text-sm font-semibold uppercase tracking-wider py-3 px-4 transition cursor-pointer"
+                    class="w-full bg-[#2A82C6] hover:bg-[#1A467C] active:bg-[#1A467C] text-white text-xs sm:text-sm font-semibold uppercase tracking-wider py-3 px-4 transition cursor-pointer"
                 >
                     Kirim Pendaftaran
                 </button>
