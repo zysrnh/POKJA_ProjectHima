@@ -166,7 +166,7 @@
         }
     </style>
 </head>
-<body class="text-[#000000] min-h-screen flex items-center justify-center p-3.5 sm:p-6 lg:p-10 antialiased selection:bg-[#2A82C6] selection:text-white relative overflow-x-hidden">
+<body class="text-[#000000] min-h-screen flex items-center justify-center p-2.5 sm:p-6 lg:p-10 antialiased selection:bg-[#2A82C6] selection:text-white relative overflow-x-hidden">
 
     <!-- Floating Geometric Accents with Gentle Smooth Float -->
     <div class="hidden md:block absolute top-8 left-8 w-14 h-14 bg-[#2A82C6]/25 border-2 border-[#1A467C] shadow-[4px_4px_0px_0px_#1A467C] pointer-events-none anim-float-1"></div>
@@ -175,91 +175,91 @@
     <div class="hidden md:block absolute bottom-8 right-16 w-16 h-16 bg-[#1A467C]/15 border-2 border-[#000000] shadow-[4px_4px_0px_0px_#000000] pointer-events-none anim-float-1"></div>
 
     <!-- Main Wrapper: Separated Sequential Cards (Judul -> Waktu & Tempat -> Form) -->
-    <div class="w-full max-w-4xl z-10 my-4 sm:my-8 space-y-5 sm:space-y-6">
+    <div class="w-full max-w-4xl z-10 my-1 sm:my-8 space-y-2 sm:space-y-6">
 
         <!-- 1. BAGIAN ATAS: CARD JUDUL & LOGO POLAROID -->
-        <div class="anim-fade-1 bg-white border-2 border-[#1A467C] p-6 sm:p-8 shadow-[8px_8px_0px_0px_#1A467C] transition-all duration-200">
-            <div class="flex flex-col md:flex-row items-center md:items-start gap-6">
+        <div class="anim-fade-1 bg-white border-2 border-[#1A467C] p-3 sm:p-8 shadow-[4px_4px_0px_0px_#1A467C] sm:shadow-[8px_8px_0px_0px_#1A467C] transition-all duration-200">
+            <div class="flex flex-row items-center gap-3 sm:gap-6">
                 
                 <!-- Polaroid Logo Badge with Tape Header -->
                 <div class="relative group shrink-0">
-                    <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-14 h-5 tape-badge border border-gray-400 z-10"></div>
+                    <div class="hidden sm:block absolute -top-3 left-1/2 -translate-x-1/2 w-14 h-5 tape-badge border border-gray-400 z-10"></div>
                     
-                    <div class="bg-white border-2 border-[#1A467C] p-2.5 shadow-[4px_4px_0px_0px_#1A467C] rotate-[-2deg] hover:rotate-0 transition-transform duration-300 ease-out cursor-pointer">
+                    <div class="bg-white border-2 border-[#1A467C] p-1.5 sm:p-2.5 shadow-[2px_2px_0px_0px_#1A467C] sm:shadow-[4px_4px_0px_0px_#1A467C] rotate-[-2deg] hover:rotate-0 transition-transform duration-300 ease-out cursor-pointer">
                         <img 
                             src="{{ asset('logo/logo.png') }}" 
                             alt="Logo HIMA IF" 
-                            class="w-20 h-20 sm:w-24 sm:h-24 object-contain mx-auto bg-gray-50 border border-gray-200 p-1"
+                            class="w-12 h-12 sm:w-24 sm:h-24 object-contain mx-auto bg-gray-50 border border-gray-200 p-0.5 sm:p-1"
                         >
-                        <p class="text-[10px] font-black font-mono text-center text-[#1A467C] mt-2 uppercase tracking-wider">
+                        <p class="hidden sm:block text-[10px] font-black font-mono text-center text-[#1A467C] mt-2 uppercase tracking-wider">
                             #HIMA_IF
                         </p>
                     </div>
                 </div>
 
                 <!-- Big Headline Section -->
-                <div class="flex-1 text-center md:text-left">
-                    <span class="inline-block bg-[#1A467C] text-white text-[10px] sm:text-xs font-black uppercase px-2.5 py-0.5 tracking-widest mb-2 shadow-[2px_2px_0px_0px_#2A82C6]">
+                <div class="flex-1 text-left min-w-0">
+                    <span class="inline-block bg-[#1A467C] text-white text-[9px] sm:text-xs font-black uppercase px-2 py-0.5 tracking-widest mb-1 sm:mb-2 shadow-[1px_1px_0px_0px_#2A82C6] sm:shadow-[2px_2px_0px_0px_#2A82C6]">
                         POKJA HIMA IF 2026
                     </span>
-                    <h1 class="text-2xl sm:text-4xl lg:text-5xl font-black text-[#1A467C] tracking-tight uppercase leading-tight">
+                    <h1 class="text-xs sm:text-4xl lg:text-5xl font-black text-[#1A467C] tracking-tight uppercase leading-snug sm:leading-tight">
                         {{ $pengaturan->deskripsi_acara ?? 'INNOVATIVE IDEA TO GREAT PROPOSAL' }}
                     </h1>
-                    <div class="w-24 h-2 bg-[#CA2C2A] shadow-[2px_2px_0px_0px_#901C1A] mt-3 mx-auto md:mx-0"></div>
+                    <div class="w-12 sm:w-24 h-1 sm:h-2 bg-[#CA2C2A] shadow-[1px_1px_0px_0px_#901C1A] sm:shadow-[2px_2px_0px_0px_#901C1A] mt-1 sm:mt-3"></div>
                 </div>
             </div>
         </div>
 
         <!-- 2. BAGIAN TENGAH: CARD TANGGAL, WAKTU & TEMPAT (100% MONTSERRAT) -->
-        <div class="anim-fade-2 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="anim-fade-2 grid grid-cols-3 gap-2 sm:gap-4">
             
             <!-- Card 1: Tanggal Pelaksanaan -->
-            <div class="bg-white border-2 border-[#1A467C] p-4 sm:p-5 shadow-[6px_6px_0px_0px_#1A467C] flex items-start gap-3.5 hover:-translate-y-0.5 transition-transform duration-200">
-                <div class="p-2 bg-blue-50 border-2 border-[#2A82C6] text-[#2A82C6] shadow-[2px_2px_0px_0px_#1A467C] shrink-0 mt-0.5">
-                    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="bg-white border-2 border-[#1A467C] p-2 sm:p-5 shadow-[3px_3px_0px_0px_#1A467C] sm:shadow-[6px_6px_0px_0px_#1A467C] flex flex-col sm:flex-row items-start gap-1.5 sm:gap-3.5 hover:-translate-y-0.5 transition-transform duration-200">
+                <div class="p-1 sm:p-2 bg-blue-50 border sm:border-2 border-[#2A82C6] text-[#2A82C6] shadow-[1px_1px_0px_0px_#1A467C] sm:shadow-[2px_2px_0px_0px_#1A467C] shrink-0">
+                    <svg class="w-3.5 h-3.5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                 </div>
-                <div class="flex-1 min-w-0">
-                    <span class="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-[#2A82C6] block mb-1">
-                        TANGGAL ACARA
+                <div class="flex-1 min-w-0 w-full">
+                    <span class="text-[8px] sm:text-[11px] font-black uppercase tracking-wider text-[#2A82C6] block leading-tight mb-0.5">
+                        TANGGAL
                     </span>
-                    <span class="font-extrabold text-sm sm:text-base text-gray-900 block leading-snug">
+                    <span class="font-black text-[10px] sm:text-base text-gray-900 block leading-tight truncate w-full" title="{{ $pengaturan->tanggal_acara ?? '13 Oktober 2026' }}">
                         {{ $pengaturan->tanggal_acara ?? '13 Oktober 2026' }}
                     </span>
                 </div>
             </div>
 
             <!-- Card 2: Waktu Pelaksanaan -->
-            <div class="bg-white border-2 border-[#1A467C] p-4 sm:p-5 shadow-[6px_6px_0px_0px_#1A467C] flex items-start gap-3.5 hover:-translate-y-0.5 transition-transform duration-200">
-                <div class="p-2 bg-blue-50 border-2 border-[#1A467C] text-[#1A467C] shadow-[2px_2px_0px_0px_#1A467C] shrink-0 mt-0.5">
-                    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="bg-white border-2 border-[#1A467C] p-2 sm:p-5 shadow-[3px_3px_0px_0px_#1A467C] sm:shadow-[6px_6px_0px_0px_#1A467C] flex flex-col sm:flex-row items-start gap-1.5 sm:gap-3.5 hover:-translate-y-0.5 transition-transform duration-200">
+                <div class="p-1 sm:p-2 bg-blue-50 border sm:border-2 border-[#1A467C] text-[#1A467C] shadow-[1px_1px_0px_0px_#1A467C] sm:shadow-[2px_2px_0px_0px_#1A467C] shrink-0">
+                    <svg class="w-3.5 h-3.5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                 </div>
-                <div class="flex-1 min-w-0">
-                    <span class="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-[#1A467C] block mb-1">
-                        WAKTU PELAKSANAAN
+                <div class="flex-1 min-w-0 w-full">
+                    <span class="text-[8px] sm:text-[11px] font-black uppercase tracking-wider text-[#1A467C] block leading-tight mb-0.5">
+                        WAKTU
                     </span>
-                    <span class="font-extrabold text-sm sm:text-base text-gray-900 block leading-snug">
+                    <span class="font-black text-[10px] sm:text-base text-gray-900 block leading-tight truncate w-full" title="{{ $pengaturan->jam_acara ?? '08:00 WIB - Selesai' }}">
                         {{ $pengaturan->jam_acara ?? '08:00 WIB - Selesai' }}
                     </span>
                 </div>
             </div>
 
             <!-- Card 3: Tempat / Ruangan -->
-            <div class="bg-white border-2 border-[#901C1A] p-4 sm:p-5 shadow-[6px_6px_0px_0px_#901C1A] flex items-start gap-3.5 hover:-translate-y-0.5 transition-transform duration-200">
-                <div class="p-2 bg-red-50 border-2 border-[#CA2C2A] text-[#CA2C2A] shadow-[2px_2px_0px_0px_#901C1A] shrink-0 mt-0.5">
-                    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="bg-white border-2 border-[#901C1A] p-2 sm:p-5 shadow-[3px_3px_0px_0px_#901C1A] sm:shadow-[6px_6px_0px_0px_#901C1A] flex flex-col sm:flex-row items-start gap-1.5 sm:gap-3.5 hover:-translate-y-0.5 transition-transform duration-200">
+                <div class="p-1 sm:p-2 bg-red-50 border sm:border-2 border-[#CA2C2A] text-[#CA2C2A] shadow-[1px_1px_0px_0px_#901C1A] sm:shadow-[2px_2px_0px_0px_#901C1A] shrink-0">
+                    <svg class="w-3.5 h-3.5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                         <path stroke-linecap="square" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                 </div>
-                <div class="flex-1 min-w-0">
-                    <span class="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-[#CA2C2A] block mb-1">
-                        LOKASI & RUANGAN
+                <div class="flex-1 min-w-0 w-full">
+                    <span class="text-[8px] sm:text-[11px] font-black uppercase tracking-wider text-[#CA2C2A] block leading-tight mb-0.5">
+                        LOKASI
                     </span>
-                    <span class="font-extrabold text-sm sm:text-base text-gray-900 block leading-snug">
+                    <span class="font-black text-[10px] sm:text-base text-gray-900 block leading-tight truncate w-full" title="{{ $pengaturan->lokasi_acara ?? 'Ruangan 105' }}">
                         {{ $pengaturan->lokasi_acara ?? 'Ruangan 105' }}
                     </span>
                 </div>
@@ -268,16 +268,16 @@
         </div>
 
         <!-- 3. BAGIAN BAWAH: CARD FORMULIR PENDAFTARAN -->
-        <div class="anim-fade-3 bg-white border-2 border-[#1A467C] p-6 sm:p-8 shadow-[8px_8px_0px_0px_#1A467C]">
+        <div class="anim-fade-3 bg-white border-2 border-[#1A467C] p-3 sm:p-8 shadow-[4px_4px_0px_0px_#1A467C] sm:shadow-[8px_8px_0px_0px_#1A467C]">
 
             <!-- Alert Error Global jika ada validasi gagal -->
             @if ($errors->any())
-                <div id="alert-box" class="mb-6 p-4 bg-[#FEE2E2] border-2 border-[#901C1A] text-red-950 text-xs sm:text-sm shadow-[4px_4px_0px_0px_#901C1A] animate-pulse">
-                    <div class="flex items-center gap-2 mb-1.5">
-                        <span class="bg-[#CA2C2A] text-white font-black text-xs px-2 py-0.5 border border-[#901C1A] shrink-0">PERIKSA</span>
-                        <span class="font-bold">Terdapat kesalahan input:</span>
+                <div id="alert-box" class="mb-3 sm:mb-6 p-2.5 sm:p-4 bg-[#FEE2E2] border-2 border-[#901C1A] text-red-950 text-xs sm:text-sm shadow-[3px_3px_0px_0px_#901C1A] sm:shadow-[4px_4px_0px_0px_#901C1A] animate-pulse">
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="bg-[#CA2C2A] text-white font-black text-[10px] sm:text-xs px-1.5 py-0.5 border border-[#901C1A] shrink-0">PERIKSA</span>
+                        <span class="font-bold text-[11px] sm:text-xs">Terdapat kesalahan input:</span>
                     </div>
-                    <ul class="list-disc list-inside space-y-0.5 text-xs font-semibold text-red-900">
+                    <ul class="list-disc list-inside space-y-0.5 text-[10px] sm:text-xs font-semibold text-red-900">
                         @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>
                         @endforeach
@@ -290,7 +290,7 @@
                 id="form-pendaftaran"
                 action="{{ route('pendaftaran.store') }}" 
                 method="POST" 
-                class="space-y-5"
+                class="space-y-2 sm:space-y-5"
                 onsubmit="handleSubmit(event)"
             >
                 @csrf
@@ -301,11 +301,11 @@
                 </div>
 
                 <!-- 2-Column Fields Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div class="grid grid-cols-2 gap-2 sm:gap-5">
                     
                     <!-- Field: Nama Lengkap -->
                     <div>
-                        <label for="nama" class="block text-xs font-black uppercase tracking-wider text-[#1A467C] mb-1.5">
+                        <label for="nama" class="block text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#1A467C] mb-1">
                             Nama Lengkap <span class="text-[#CA2C2A]">*</span>
                         </label>
                         <input 
@@ -313,20 +313,20 @@
                             id="nama" 
                             name="nama" 
                             value="{{ session('success') ? '' : old('nama') }}"
-                            placeholder="Masukkan nama lengkap Anda..."
+                            placeholder="Nama lengkap..."
                             maxlength="100"
                             required
-                            class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] px-4 py-3 text-sm font-semibold text-[#000000] focus:bg-white focus:outline-none focus:shadow-[4px_4px_0px_0px_#1A467C] transition-all duration-200 @error('nama') border-[#CA2C2A] bg-red-50 @enderror"
+                            class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] px-2.5 py-1.5 sm:px-4 sm:py-3 text-xs sm:text-sm font-semibold text-[#000000] focus:bg-white focus:outline-none focus:shadow-[3px_3px_0px_0px_#1A467C] sm:focus:shadow-[4px_4px_0px_0px_#1A467C] transition-all duration-200 @error('nama') border-[#CA2C2A] bg-red-50 @enderror"
                         >
                         @error('nama')
-                            <p class="mt-1 text-xs font-bold text-[#CA2C2A]">{{ $message }}</p>
+                            <p class="mt-0.5 text-[10px] sm:text-xs font-bold text-[#CA2C2A]">{{ $message }}</p>
                         @enderror
                     </div>
 
                     <!-- Field: NIM -->
                     <div>
-                        <label for="nim" class="block text-xs font-black uppercase tracking-wider text-[#1A467C] mb-1.5">
-                            NIM (Nomor Induk Mahasiswa) <span class="text-[#CA2C2A]">*</span>
+                        <label for="nim" class="block text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#1A467C] mb-1">
+                            NIM <span class="text-[#CA2C2A]">*</span>
                         </label>
                         <input 
                             type="text" 
@@ -338,16 +338,16 @@
                             value="{{ session('success') ? '' : old('nim') }}"
                             placeholder="Contoh: 250414000"
                             required
-                            class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] px-4 py-3 text-sm font-semibold font-mono text-[#000000] focus:bg-white focus:outline-none focus:shadow-[4px_4px_0px_0px_#1A467C] transition-all duration-200 @error('nim') border-[#CA2C2A] bg-red-50 @enderror"
+                            class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] px-2.5 py-1.5 sm:px-4 sm:py-3 text-xs sm:text-sm font-semibold font-mono text-[#000000] focus:bg-white focus:outline-none focus:shadow-[3px_3px_0px_0px_#1A467C] sm:focus:shadow-[4px_4px_0px_0px_#1A467C] transition-all duration-200 @error('nim') border-[#CA2C2A] bg-red-50 @enderror"
                         >
                         @error('nim')
-                            <p class="mt-1 text-xs font-bold text-[#CA2C2A]">{{ $message }}</p>
+                            <p class="mt-0.5 text-[10px] sm:text-xs font-bold text-[#CA2C2A]">{{ $message }}</p>
                         @enderror
                     </div>
 
                     <!-- Field: Kelas (Custom Neubrutalism Dropdown Pop-over) -->
                     <div class="relative" id="custom-select-container">
-                        <label for="input-kelas-value" class="block text-xs font-black uppercase tracking-wider text-[#1A467C] mb-1.5">
+                        <label for="input-kelas-value" class="block text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#1A467C] mb-1">
                             Kelas <span class="text-[#CA2C2A]">*</span>
                         </label>
                         
@@ -368,12 +368,12 @@
                             type="button" 
                             id="dropdown-kelas-trigger"
                             onclick="toggleKelasDropdown()"
-                            class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] px-4 py-3 text-left flex items-center justify-between text-sm font-bold font-mono focus:bg-white focus:outline-none focus:shadow-[4px_4px_0px_0px_#1A467C] transition-all duration-150 cursor-pointer @error('kelas') border-[#CA2C2A] bg-red-50 @enderror"
+                            class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] px-2.5 py-1.5 sm:px-4 sm:py-3 text-left flex items-center justify-between text-xs sm:text-sm font-bold font-mono focus:bg-white focus:outline-none focus:shadow-[3px_3px_0px_0px_#1A467C] sm:focus:shadow-[4px_4px_0px_0px_#1A467C] transition-all duration-150 cursor-pointer @error('kelas') border-[#CA2C2A] bg-red-50 @enderror"
                         >
-                            <span id="dropdown-kelas-label" class="{{ empty($selectedKelas) ? 'text-gray-400 font-normal' : 'text-gray-900 font-bold' }}">
-                                {{ !empty($selectedKelas) ? $selectedKelas : '-- PILIH KELAS ANDA --' }}
+                            <span id="dropdown-kelas-label" class="truncate {{ empty($selectedKelas) ? 'text-gray-400 font-normal' : 'text-gray-900 font-bold' }}">
+                                {{ !empty($selectedKelas) ? $selectedKelas : '-- KELAS --' }}
                             </span>
-                            <svg id="dropdown-chevron-icon" class="w-5 h-5 text-[#1A467C] border-l-2 border-[#1A467C] pl-1 transform transition-transform duration-200 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg id="dropdown-chevron-icon" class="w-4 h-4 sm:w-5 sm:h-5 text-[#1A467C] border-l sm:border-l-2 border-[#1A467C] pl-1 transform transition-transform duration-200 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="square" stroke-width="2.5" d="M19 9l-7 7-7-7" />
                             </svg>
                         </button>
@@ -381,12 +381,12 @@
                         <!-- Dropdown Menu List (Neubrutalism Popover) -->
                         <div 
                             id="dropdown-kelas-menu" 
-                            class="hidden absolute z-30 top-full mt-1.5 left-0 right-0 bg-white border-2 border-[#1A467C] shadow-[6px_6px_0px_0px_#1A467C] max-h-56 overflow-y-auto divide-y divide-gray-100"
+                            class="hidden absolute z-30 bottom-full mb-1.5 sm:bottom-auto sm:top-full sm:mt-1.5 left-0 right-0 bg-white border-2 border-[#1A467C] shadow-[4px_4px_0px_0px_#1A467C] sm:shadow-[6px_6px_0px_0px_#1A467C] max-h-48 sm:max-h-56 overflow-y-auto divide-y divide-gray-100"
                         >
                             @foreach ($kelasList as $k)
                                 <div 
                                     onclick="pilihKelas('{{ $k->nama_kelas }}')"
-                                    class="dropdown-kelas-item px-4 py-2.5 text-sm font-bold font-mono text-gray-900 hover:bg-[#2A82C6] hover:text-white cursor-pointer transition-colors flex items-center justify-between {{ $selectedKelas === $k->nama_kelas ? 'bg-blue-50 text-[#1A467C]' : '' }}"
+                                    class="dropdown-kelas-item px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-bold font-mono text-gray-900 hover:bg-[#2A82C6] hover:text-white cursor-pointer transition-colors flex items-center justify-between {{ $selectedKelas === $k->nama_kelas ? 'bg-blue-50 text-[#1A467C]' : '' }}"
                                     data-value="{{ $k->nama_kelas }}"
                                 >
                                     <span>{{ $k->nama_kelas }}</span>
@@ -396,14 +396,14 @@
                         </div>
 
                         @error('kelas')
-                            <p class="mt-1 text-xs font-bold text-[#CA2C2A]">{{ $message }}</p>
+                            <p class="mt-0.5 text-[10px] sm:text-xs font-bold text-[#CA2C2A]">{{ $message }}</p>
                         @enderror
                     </div>
 
                     <!-- Field: No Telp / WhatsApp -->
                     <div>
-                        <label for="no_telp" class="block text-xs font-black uppercase tracking-wider text-[#1A467C] mb-1.5">
-                            No. Telepon / WhatsApp <span class="text-[#CA2C2A]">*</span>
+                        <label for="no_telp" class="block text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#1A467C] mb-1">
+                            No. WhatsApp <span class="text-[#CA2C2A]">*</span>
                         </label>
                         <input 
                             type="tel" 
@@ -413,26 +413,26 @@
                             maxlength="15"
                             oninput="this.value = this.value.replace(/\s+/g, '')"
                             value="{{ session('success') ? '' : old('no_telp') }}"
-                            placeholder="Contoh: 081234567890"
+                            placeholder="081234567890"
                             required
-                            class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] px-4 py-3 text-sm font-semibold font-mono text-[#000000] focus:bg-white focus:outline-none focus:shadow-[4px_4px_0px_0px_#1A467C] transition-all duration-200 @error('no_telp') border-[#CA2C2A] bg-red-50 @enderror"
+                            class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] px-2.5 py-1.5 sm:px-4 sm:py-3 text-xs sm:text-sm font-semibold font-mono text-[#000000] focus:bg-white focus:outline-none focus:shadow-[3px_3px_0px_0px_#1A467C] sm:focus:shadow-[4px_4px_0px_0px_#1A467C] transition-all duration-200 @error('no_telp') border-[#CA2C2A] bg-red-50 @enderror"
                         >
                         @error('no_telp')
-                            <p class="mt-1 text-xs font-bold text-[#CA2C2A]">{{ $message }}</p>
+                            <p class="mt-0.5 text-[10px] sm:text-xs font-bold text-[#CA2C2A]">{{ $message }}</p>
                         @enderror
                     </div>
 
                 </div>
 
                 <!-- Submit Button -->
-                <div class="pt-3">
+                <div class="pt-1 sm:pt-3">
                     <button 
                         type="submit" 
                         id="btn-submit"
-                        class="btn-smooth w-full bg-[#2A82C6] hover:bg-[#1A467C] active:bg-[#1A467C] text-white text-xs sm:text-sm font-black uppercase tracking-widest py-4 px-6 border-2 border-[#1A467C] shadow-[6px_6px_0px_0px_#1A467C] hover:shadow-[8px_8px_0px_0px_#1A467C] cursor-pointer flex items-center justify-center gap-2.5"
+                        class="btn-smooth w-full bg-[#2A82C6] hover:bg-[#1A467C] active:bg-[#1A467C] text-white text-xs sm:text-sm font-black uppercase tracking-widest py-2.5 sm:py-4 px-4 sm:px-6 border-2 border-[#1A467C] shadow-[4px_4px_0px_0px_#1A467C] sm:shadow-[6px_6px_0px_0px_#1A467C] hover:shadow-[6px_6px_0px_0px_#1A467C] sm:hover:shadow-[8px_8px_0px_0px_#1A467C] cursor-pointer flex items-center justify-center gap-2"
                     >
                         <span id="btn-text">KIRIM PENDAFTARAN SEKARANG</span>
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="square" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                         </svg>
                     </button>
