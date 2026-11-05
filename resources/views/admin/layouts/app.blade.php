@@ -81,9 +81,95 @@
         .btn-smooth:active {
             transform: translate(2px, 2px);
         }
+
+        /* Solid Spring Slam Toast Animation (ZERO Opacity Fade) */
+        @keyframes toastSlamIn {
+            0% {
+                transform: translateY(-140%) scale(0.92);
+            }
+            65% {
+                transform: translateY(10px) scale(1.02);
+            }
+            85% {
+                transform: translateY(-4px) scale(0.99);
+            }
+            100% {
+                transform: translateY(0) scale(1);
+            }
+        }
+        @keyframes toastSlamOut {
+            0% {
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                transform: translateY(-160%) scale(0.88);
+            }
+        }
     </style>
 </head>
 <body class="text-[#000000] min-h-screen flex flex-col antialiased selection:bg-[#2A82C6] selection:text-white">
+
+    <!-- ============================================================== -->
+    <!-- FLOATING NEUBRUTALISM TOAST NOTIFICATION (Solid Spring Slam)   -->
+    <!-- ============================================================== -->
+    @if (session('success') || session('error'))
+        <div 
+            id="toast-notification"
+            role="alert"
+            class="fixed top-4 right-4 sm:top-6 sm:right-6 z-[100] w-[calc(100%-2rem)] sm:w-96 bg-white border-[3px] border-[#000000] shadow-[6px_6px_0px_0px_#000000] p-4 text-[#000000]"
+            style="animation: toastSlamIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;"
+        >
+            <div class="flex items-start justify-between gap-3">
+                <div class="flex items-start gap-2.5 min-w-0">
+                    @if (session('success'))
+                        <div class="shrink-0 w-8 h-8 bg-[#15803d] border-2 border-[#000000] flex items-center justify-center text-white font-black text-sm shadow-[2px_2px_0px_0px_#000000]">
+                            ✓
+                        </div>
+                        <div class="min-w-0">
+                            <span class="inline-block bg-[#15803d] text-white text-[10px] font-black px-1.5 py-0.5 uppercase tracking-wider border border-[#000000]">SUKSES</span>
+                            <p class="font-bold text-xs sm:text-sm text-gray-900 mt-1 leading-snug break-words">
+                                {{ session('success') }}
+                            </p>
+                        </div>
+                    @else
+                        <div class="shrink-0 w-8 h-8 bg-[#CA2C2A] border-2 border-[#000000] flex items-center justify-center text-white font-black text-sm shadow-[2px_2px_0px_0px_#000000]">
+                            ✕
+                        </div>
+                        <div class="min-w-0">
+                            <span class="inline-block bg-[#CA2C2A] text-white text-[10px] font-black px-1.5 py-0.5 uppercase tracking-wider border border-[#000000]">ERROR</span>
+                            <p class="font-bold text-xs sm:text-sm text-gray-900 mt-1 leading-snug break-words">
+                                {{ session('error') }}
+                            </p>
+                        </div>
+                    @endif
+                </div>
+
+                <!-- Close Button -->
+                <button 
+                    type="button" 
+                    onclick="dismissToast()" 
+                    class="shrink-0 w-7 h-7 bg-white hover:bg-gray-100 border-2 border-[#000000] flex items-center justify-center text-xs font-black shadow-[2px_2px_0px_0px_#000000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer"
+                    title="Tutup Notifikasi"
+                >
+                    ✕
+                </button>
+            </div>
+        </div>
+
+        <script>
+            function dismissToast() {
+                const toast = document.getElementById('toast-notification');
+                if (!toast) return;
+                toast.style.animation = 'toastSlamOut 0.25s cubic-bezier(0.6, -0.28, 0.735, 0.045) forwards';
+                setTimeout(() => toast.remove(), 260);
+            }
+
+            // Otomatis tutup setelah 4.5 detik
+            setTimeout(() => {
+                dismissToast();
+            }, 4500);
+        </script>
+    @endif
 
     <div class="flex flex-1 min-h-screen relative overflow-x-hidden">
 
@@ -230,25 +316,6 @@
 
             <!-- Page Body Content (Added pb-28 for mobile so bottom toolbar never blocks content) -->
             <main class="flex-1 p-3 sm:p-6 lg:p-8 space-y-4 sm:space-y-6 pb-28 lg:pb-8">
-                <!-- Flash Messages -->
-                @if (session('success'))
-                    <div class="p-3.5 bg-green-50 border-2 border-green-700 text-green-900 text-xs sm:text-sm font-semibold shadow-[4px_4px_0px_0px_#15803d]">
-                        <div class="flex items-center gap-2">
-                            <span class="bg-green-700 text-white font-black text-[10px] px-1.5 py-0.5 uppercase">SUKSES</span>
-                            <span>{{ session('success') }}</span>
-                        </div>
-                    </div>
-                @endif
-
-                @if (session('error'))
-                    <div class="p-3.5 bg-red-50 border-2 border-[#901C1A] text-red-950 text-xs sm:text-sm font-semibold shadow-[4px_4px_0px_0px_#901C1A]">
-                        <div class="flex items-center gap-2">
-                            <span class="bg-[#CA2C2A] text-white font-black text-[10px] px-1.5 py-0.5 uppercase">ERROR</span>
-                            <span>{{ session('error') }}</span>
-                        </div>
-                    </div>
-                @endif
-
                 @yield('content')
             </main>
 
