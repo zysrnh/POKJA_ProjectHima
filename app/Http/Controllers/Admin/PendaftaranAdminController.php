@@ -155,6 +155,7 @@ class PendaftaranAdminController extends Controller
                 'string',
                 'email',
                 'max:150',
+                'ends_with:@fellow.lpkia.ac.id',
                 'unique:pendaftarans,email,' . $pendaftaran->id
             ],
             'kelas' => [
@@ -184,6 +185,7 @@ class PendaftaranAdminController extends Controller
 
             'email.required' => 'Email wajib diisi.',
             'email.email' => 'Format email tidak valid.',
+            'email.ends_with' => 'Email harus menggunakan domain resmi kampus (@fellow.lpkia.ac.id).',
             'email.max' => 'Email maksimal 150 karakter.',
             'email.unique' => 'Email ini sudah terdaftar pada data lain.',
             

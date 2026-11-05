@@ -444,7 +444,7 @@
                     <div>
                         <label for="email" class="block text-xs font-black uppercase tracking-wider text-[#1A467C] mb-1 sm:mb-1.5 flex items-center justify-between">
                             <span>Email <span class="text-[#CA2C2A]">*</span></span>
-                            <span id="hint-email" class="text-[10px] font-mono text-gray-400">email aktif</span>
+                            <span id="hint-email" class="text-[10px] font-mono text-gray-400">@fellow.lpkia.ac.id</span>
                         </label>
                         <div class="relative">
                             <input 
@@ -454,7 +454,7 @@
                                 maxlength="150"
                                 oninput="validateLive('email')"
                                 value="{{ session('success') ? '' : old('email') }}"
-                                placeholder="Contoh: mahasiswa@gmail.com"
+                                placeholder="Contoh: 250414000@fellow.lpkia.ac.id"
                                 required
                                 class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] pl-3.5 pr-8 py-2 sm:pl-4 sm:pr-9 sm:py-3 text-xs sm:text-sm font-semibold text-[#000000] focus:bg-white focus:outline-none focus:shadow-[4px_4px_0px_0px_#1A467C] transition-all duration-200 @error('email') border-[#CA2C2A] bg-red-50 @enderror"
                             >
@@ -850,10 +850,10 @@
                     }
                 }
             } else if (type === 'email') {
-                const val = document.getElementById('email')?.value.trim() || '';
+                const val = document.getElementById('email')?.value.trim().toLowerCase() || '';
                 const check = document.getElementById('check-email');
                 if (check) {
-                    if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) {
+                    if (/^[^\s@]+@fellow\.lpkia\.ac\.id$/.test(val)) {
                         check.classList.remove('hidden');
                     } else {
                         check.classList.add('hidden');

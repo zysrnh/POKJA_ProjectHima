@@ -74,8 +74,9 @@
 
             <!-- Field: Email -->
             <div>
-                <label for="email" class="block text-xs font-black uppercase tracking-wider text-[#1A467C] mb-1.5">
-                    Alamat Email <span class="text-[#CA2C2A]">*</span>
+                <label for="email" class="block text-xs font-black uppercase tracking-wider text-[#1A467C] mb-1.5 flex items-center justify-between">
+                    <span>Alamat Email <span class="text-[#CA2C2A]">*</span></span>
+                    <span class="text-[10px] font-mono text-gray-400">@fellow.lpkia.ac.id</span>
                 </label>
                 <input 
                     type="email" 
@@ -84,7 +85,7 @@
                     value="{{ old('email', $pendaftaran->email) }}"
                     required
                     maxlength="150"
-                    placeholder="nama@gmail.com"
+                    placeholder="Contoh: 250414000@fellow.lpkia.ac.id"
                     class="w-full bg-[#F8FBFE] border-2 @error('email') border-[#CA2C2A] bg-red-50 @else border-[#1A467C] @enderror text-gray-950 font-bold text-sm px-4 py-3 focus:bg-white focus:outline-none focus:shadow-[3px_3px_0px_0px_#1A467C] transition"
                 >
                 @error('email')
