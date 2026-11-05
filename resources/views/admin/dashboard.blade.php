@@ -85,7 +85,7 @@
     <!-- ============================================================== -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
         <!-- Card 1: Total Pendaftar -->
-        <div class="card-interactive bg-white border-2 border-[#000000] p-3 sm:p-5 shadow-[4px_4px_0px_0px_#000000] flex flex-col justify-between cursor-default">
+        <div class="snap-in-1 card-interactive bg-white border-2 border-[#000000] p-3 sm:p-5 shadow-[4px_4px_0px_0px_#000000] flex flex-col justify-between cursor-default">
             <div class="flex items-center justify-between gap-1">
                 <span class="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#1A467C]">Total Pendaftar</span>
                 <div class="w-6 h-6 sm:w-7 sm:h-7 bg-[#2A82C6] border-2 border-[#000000] flex items-center justify-center text-white shadow-[1px_1px_0px_0px_#000000]">
@@ -102,7 +102,7 @@
         </div>
 
         <!-- Card 2: Total Hadir -->
-        <div class="card-interactive bg-white border-2 border-[#000000] p-3 sm:p-5 shadow-[4px_4px_0px_0px_#000000] flex flex-col justify-between cursor-default">
+        <div class="snap-in-2 card-interactive bg-white border-2 border-[#000000] p-3 sm:p-5 shadow-[4px_4px_0px_0px_#000000] flex flex-col justify-between cursor-default">
             <div class="flex items-center justify-between gap-1">
                 <span class="text-[10px] sm:text-xs font-black uppercase tracking-wider text-green-800">Sudah Hadir</span>
                 <div class="w-6 h-6 sm:w-7 sm:h-7 bg-[#15803d] border-2 border-[#000000] flex items-center justify-center text-white shadow-[1px_1px_0px_0px_#000000]">
@@ -119,7 +119,7 @@
         </div>
 
         <!-- Card 3: Belum Hadir -->
-        <div class="card-interactive bg-white border-2 border-[#000000] p-3 sm:p-5 shadow-[4px_4px_0px_0px_#000000] flex flex-col justify-between cursor-default">
+        <div class="snap-in-3 card-interactive bg-white border-2 border-[#000000] p-3 sm:p-5 shadow-[4px_4px_0px_0px_#000000] flex flex-col justify-between cursor-default">
             <div class="flex items-center justify-between gap-1">
                 <span class="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#CA2C2A]">Belum Hadir</span>
                 <div class="w-6 h-6 sm:w-7 sm:h-7 bg-[#CA2C2A] border-2 border-[#000000] flex items-center justify-center text-white shadow-[1px_1px_0px_0px_#000000]">
@@ -136,7 +136,7 @@
         </div>
 
         <!-- Card 4: Pendaftar Hari Ini -->
-        <div class="card-interactive bg-white border-2 border-[#000000] p-3 sm:p-5 shadow-[4px_4px_0px_0px_#000000] flex flex-col justify-between cursor-default">
+        <div class="snap-in-4 card-interactive bg-white border-2 border-[#000000] p-3 sm:p-5 shadow-[4px_4px_0px_0px_#000000] flex flex-col justify-between cursor-default">
             <div class="flex items-center justify-between gap-1">
                 <span class="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#1A467C]">Daftar Hari Ini</span>
                 <div class="w-6 h-6 sm:w-7 sm:h-7 bg-[#F59E0B] border-2 border-[#000000] flex items-center justify-center text-black shadow-[1px_1px_0px_0px_#000000]">
@@ -156,7 +156,7 @@
     <!-- ============================================================== -->
     <!-- ACTION & FILTER BAR (Clean, Non-overflowing Neubrutalism)      -->
     <!-- ============================================================== -->
-    <div class="bg-white border-2 border-[#000000] p-3 sm:p-4 shadow-[4px_4px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000]">
+    <div class="snap-in-5 bg-white border-2 border-[#000000] p-3 sm:p-4 shadow-[4px_4px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000]">
         <form action="{{ route('admin.dashboard') }}" method="GET" class="space-y-3">
             
             <!-- Row 1: Search Input & Filter Fields -->
@@ -302,7 +302,7 @@
     <!-- ============================================================== -->
     <!-- MOBILE VIEW: NATIVE APP CARDS (Static, Fit Width, No Overflow)-->
     <!-- ============================================================== -->
-    <div class="block lg:hidden space-y-3">
+    <div class="snap-in-6 block lg:hidden space-y-3">
         <div class="flex items-center justify-between px-1">
             <span class="text-xs font-black uppercase tracking-wider text-[#1A467C]">
                 Daftar Mahasiswa ({{ $pendaftarans->total() }})
@@ -425,7 +425,7 @@
     <!-- ============================================================== -->
     <!-- DESKTOP VIEW: CLEAN NEUBRUTALISM TABLE (Large Screens Only)    -->
     <!-- ============================================================== -->
-    <div class="hidden lg:block bg-white border-2 border-[#000000] shadow-[6px_6px_0px_0px_#000000] overflow-hidden">
+    <div class="snap-in-6 hidden lg:block bg-white border-2 border-[#000000] shadow-[6px_6px_0px_0px_#000000] overflow-hidden">
         <div class="px-5 py-3 border-b-2 border-[#000000] bg-blue-50/70 flex items-center justify-between">
             <h3 class="text-xs font-black uppercase tracking-wider text-[#1A467C]">Daftar Mahasiswa Pendaftar</h3>
             <span class="text-xs font-bold text-[#1A467C] bg-white border-2 border-[#000000] px-2.5 py-0.5 shadow-[1px_1px_0px_0px_#000000]">

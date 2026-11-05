@@ -7,7 +7,7 @@
 <div class="space-y-6">
 
     <!-- Action Bar (Neubrutalism) -->
-    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white border-2 border-[#1A467C] p-5 sm:p-6 shadow-[6px_6px_0px_0px_#1A467C]">
+    <div class="snap-in-1 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white border-2 border-[#1A467C] p-5 sm:p-6 shadow-[6px_6px_0px_0px_#1A467C]">
         <div>
             <h3 class="text-sm font-black uppercase tracking-wider text-[#1A467C]">Daftar Pilihan Kelas Mahasiswa</h3>
             <p class="text-xs font-semibold text-gray-600 mt-1">Kelas yang aktif di bawah ini akan otomatis muncul pada opsi dropdown di Form Pendaftaran.</p>
@@ -25,7 +25,7 @@
     </div>
 
     <!-- Tabel Kelas (Neubrutalism) -->
-    <div class="bg-white border-2 border-[#1A467C] shadow-[6px_6px_0px_0px_#1A467C] overflow-hidden">
+    <div class="snap-in-2 bg-white border-2 border-[#1A467C] shadow-[6px_6px_0px_0px_#1A467C] overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse text-xs sm:text-sm">
                 <thead>

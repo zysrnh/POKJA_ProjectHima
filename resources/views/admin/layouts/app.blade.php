@@ -106,24 +106,28 @@
             }
         }
 
-        /* Solid Spring Page Entrance Animation (ZERO Opacity Fade) */
-        @keyframes pageSlamIn {
+        /* Staggered Solid Spring Tactile Slam (ZERO Opacity Fade) */
+        @keyframes tactileSnapDown {
             0% {
-                transform: translateY(-24px) scale(0.98);
+                transform: translateY(-28px) scale(0.96);
             }
             60% {
-                transform: translateY(5px) scale(1.008);
+                transform: translateY(6px) scale(1.012);
             }
             85% {
-                transform: translateY(-2px) scale(0.997);
+                transform: translateY(-2px) scale(0.998);
             }
             100% {
                 transform: translateY(0) scale(1);
             }
         }
-        .anim-page-slam {
-            animation: pageSlamIn 0.32s cubic-bezier(0.18, 0.89, 0.32, 1.28) both;
-        }
+        .snap-in-1 { animation: tactileSnapDown 0.35s cubic-bezier(0.18, 0.89, 0.32, 1.28) 0.03s both; }
+        .snap-in-2 { animation: tactileSnapDown 0.35s cubic-bezier(0.18, 0.89, 0.32, 1.28) 0.09s both; }
+        .snap-in-3 { animation: tactileSnapDown 0.35s cubic-bezier(0.18, 0.89, 0.32, 1.28) 0.15s both; }
+        .snap-in-4 { animation: tactileSnapDown 0.35s cubic-bezier(0.18, 0.89, 0.32, 1.28) 0.21s both; }
+        .snap-in-5 { animation: tactileSnapDown 0.35s cubic-bezier(0.18, 0.89, 0.32, 1.28) 0.27s both; }
+        .snap-in-6 { animation: tactileSnapDown 0.35s cubic-bezier(0.18, 0.89, 0.32, 1.28) 0.33s both; }
+        .snap-in-7 { animation: tactileSnapDown 0.35s cubic-bezier(0.18, 0.89, 0.32, 1.28) 0.39s both; }
     </style>
 </head>
 <body class="text-[#000000] min-h-screen flex flex-col antialiased selection:bg-[#2A82C6] selection:text-white">
@@ -334,7 +338,7 @@
             </header>
 
             <!-- Page Body Content (Added pb-28 for mobile so bottom toolbar never blocks content) -->
-            <main class="flex-1 p-3 sm:p-6 lg:p-8 space-y-4 sm:space-y-6 pb-28 lg:pb-8 anim-page-slam">
+            <main class="flex-1 p-3 sm:p-6 lg:p-8 space-y-4 sm:space-y-6 pb-28 lg:pb-8">
                 @yield('content')
             </main>
 
