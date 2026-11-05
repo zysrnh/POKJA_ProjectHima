@@ -99,78 +99,13 @@
             animation: shapePopSpin 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both !important;
         }
 
-        /* Interactive 3D Perspective Card Container */
-        .card-perspective {
-            perspective: 1000px;
-        }
-        .tilt-card {
-            transform-style: preserve-3d;
-            transition: transform 0.15s ease-out, box-shadow 0.15s ease-out;
-            will-change: transform;
-        }
-
         /* Live Validation Pop-in Checkmark */
         @keyframes fieldCheckPop {
-            0% { opacity: 0; transform: scale(0.4) rotate(-20deg); }
-            70% { transform: scale(1.2) rotate(5deg); }
-            100% { opacity: 1; transform: scale(1) rotate(0deg); }
+            0% { transform: scale(0.7); }
+            100% { transform: scale(1); }
         }
         .field-valid-badge {
-            animation: fieldCheckPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-        }
-
-        /* Smooth Page Enter Animations */
-        @keyframes slideFadeUp {
-            from {
-                opacity: 0;
-                transform: translateY(18px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Smooth Floating Card Keyframes */
-        @keyframes floatCard1 {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-4px); }
-        }
-        @keyframes floatCard2 {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(3.5px); }
-        }
-        @keyframes floatCard3 {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-3.5px); }
-        }
-
-        .anim-fade-1 {
-            animation: slideFadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards, floatCard1 5.5s ease-in-out 0.5s infinite;
-            transition: transform 0.25s ease, box-shadow 0.25s ease;
-        }
-        .anim-fade-1:hover {
-            animation-play-state: paused;
-            transform: translateY(-6px);
-        }
-
-        .anim-fade-2 {
-            animation: slideFadeUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both, floatCard2 6.2s ease-in-out 0.65s infinite;
-            transition: transform 0.25s ease, box-shadow 0.25s ease;
-        }
-        .anim-fade-2:hover {
-            animation-play-state: paused;
-            transform: translateY(-5px);
-        }
-
-        .anim-fade-3 {
-            animation: slideFadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both, floatCard3 7s ease-in-out 0.8s infinite;
-            transition: transform 0.25s ease, box-shadow 0.25s ease;
-        }
-        .anim-fade-3:focus-within,
-        .anim-fade-3:hover {
-            animation-play-state: paused;
-            transform: translateY(-3px);
+            animation: fieldCheckPop 0.15s ease-out forwards;
         }
 
         /* Modal Smooth Pop-in with Tactile Spring */
@@ -241,7 +176,7 @@
         }
     </style>
 </head>
-<body class="text-[#000000] min-h-screen flex items-center justify-center p-3 sm:p-6 lg:p-10 antialiased selection:bg-[#2A82C6] selection:text-white relative overflow-x-hidden">
+<body class="text-[#000000] min-h-screen flex flex-col items-center justify-start p-3 sm:p-6 lg:p-10 antialiased selection:bg-[#2A82C6] selection:text-white relative">
 
     <!-- Floating Interactive Geometric Accents (Click/Tap for fun tactile pop) -->
     <div onclick="popShape(this)" title="Klik aku!" class="cursor-pointer select-none absolute top-6 sm:top-8 left-4 sm:left-8 w-10 h-10 sm:w-14 sm:h-14 bg-[#2A82C6]/30 border-2 border-[#1A467C] shadow-[3px_3px_0px_0px_#1A467C] sm:shadow-[4px_4px_0px_0px_#1A467C] hover:scale-110 active:scale-90 transition-transform anim-float-1 z-0"></div>
@@ -250,10 +185,10 @@
     <div onclick="popShape(this)" title="Klik aku!" class="cursor-pointer select-none absolute bottom-6 sm:bottom-8 right-4 sm:right-16 w-11 h-11 sm:w-16 sm:h-16 bg-[#1A467C]/20 border-2 border-[#000000] shadow-[3px_3px_0px_0px_#000000] sm:shadow-[4px_4px_0px_0px_#000000] hover:scale-110 active:scale-90 transition-transform anim-float-1 z-0"></div>
 
     <!-- Main Wrapper: Separated Sequential Cards (Judul -> Waktu & Tempat -> Form) -->
-    <div class="card-perspective w-full max-w-4xl z-10 my-2 sm:my-8 space-y-3.5 sm:space-y-6">
+    <div class="w-full max-w-4xl z-10 my-2 sm:my-8 space-y-3.5 sm:space-y-6">
 
         <!-- 1. BAGIAN ATAS: CARD JUDUL & LOGO POLAROID -->
-        <div class="anim-fade-1 tilt-card bg-white border-2 border-[#1A467C] p-4 sm:p-8 shadow-[5px_5px_0px_0px_#1A467C] sm:shadow-[8px_8px_0px_0px_#1A467C] transition-all duration-200">
+        <div class="bg-white border-2 border-[#1A467C] p-4 sm:p-8 shadow-[5px_5px_0px_0px_#1A467C] sm:shadow-[8px_8px_0px_0px_#1A467C]">
             <div class="flex flex-col md:flex-row items-center md:items-start gap-4 sm:gap-6 text-center md:text-left">
                 
                 <!-- Polaroid Logo Badge with Tape Header (Click to Wobble) -->
@@ -291,7 +226,7 @@
         </div>
 
         <!-- 2. BAGIAN TENGAH: CARD INFO ACARA (3 SEKAT ELEGAN) -->
-        <div class="anim-fade-2 tilt-card bg-white border-2 border-[#1A467C] shadow-[5px_5px_0px_0px_#1A467C] sm:shadow-[6px_6px_0px_0px_#1A467C] grid grid-cols-3 divide-x-2 divide-[#1A467C]/20 p-2 sm:p-3">
+        <div class="bg-white border-2 border-[#1A467C] shadow-[5px_5px_0px_0px_#1A467C] sm:shadow-[6px_6px_0px_0px_#1A467C] grid grid-cols-3 divide-x-2 divide-[#1A467C]/20 p-2 sm:p-3">
             
             <!-- Sekat 1: Tanggal Pelaksanaan -->
             <div class="px-1.5 sm:px-4 py-1 flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-1 sm:gap-3">
@@ -348,7 +283,7 @@
         </div>
 
         <!-- 3. BAGIAN BAWAH: CARD FORMULIR PENDAFTARAN -->
-        <div class="anim-fade-3 tilt-card bg-white border-2 border-[#1A467C] p-4 sm:p-8 shadow-[5px_5px_0px_0px_#1A467C] sm:shadow-[8px_8px_0px_0px_#1A467C]">
+        <div class="bg-white border-2 border-[#1A467C] p-4 sm:p-8 shadow-[5px_5px_0px_0px_#1A467C] sm:shadow-[8px_8px_0px_0px_#1A467C]">
 
             <!-- Alert Error Global jika ada validasi gagal -->
             @if ($errors->any())
@@ -444,7 +379,7 @@
                     <div>
                         <label for="email" class="block text-xs font-black uppercase tracking-wider text-[#1A467C] mb-1 sm:mb-1.5 flex items-center justify-between">
                             <span>Email <span class="text-[#CA2C2A]">*</span></span>
-                            <span id="hint-email" class="text-[10px] font-mono text-gray-400">@fellow.lpkia.ac.id</span>
+                            <span id="hint-email" class="text-[10px] font-mono text-gray-400">email aktif</span>
                         </label>
                         <div class="relative">
                             <input 
@@ -454,7 +389,7 @@
                                 maxlength="150"
                                 oninput="validateLive('email')"
                                 value="{{ session('success') ? '' : old('email') }}"
-                                placeholder="Contoh: 250414000@fellow.lpkia.ac.id"
+                                placeholder="Contoh: nama@gmail.com atau @fellow.lpkia.ac.id"
                                 required
                                 class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] pl-3.5 pr-8 py-2 sm:pl-4 sm:pr-9 sm:py-3 text-xs sm:text-sm font-semibold text-[#000000] focus:bg-white focus:outline-none focus:shadow-[4px_4px_0px_0px_#1A467C] transition-all duration-200 @error('email') border-[#CA2C2A] bg-red-50 @enderror"
                             >
@@ -806,28 +741,7 @@
             }, { once: true });
         }
 
-        // 3. Tactile 3D Tilt Card Parallax (Smooth Neubrutalism Angle)
-        function initTiltCards() {
-            const cards = document.querySelectorAll('.tilt-card');
-            cards.forEach(card => {
-                card.addEventListener('mousemove', (e) => {
-                    if (window.innerWidth < 768) return;
-                    const rect = card.getBoundingClientRect();
-                    const x = e.clientX - rect.left;
-                    const y = e.clientY - rect.top;
-                    const centerX = rect.width / 2;
-                    const centerY = rect.height / 2;
-                    const rotateX = ((y - centerY) / centerY) * -2.5;
-                    const rotateY = ((x - centerX) / centerX) * 2.5;
-                    card.style.transform = `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateY(-2px)`;
-                });
-                card.addEventListener('mouseleave', () => {
-                    card.style.transform = '';
-                });
-            });
-        }
-
-        // 4. Live Form Input Validation Indicators
+        // Live Form Input Validation Indicators
         function validateLive(type) {
             if (type === 'nama') {
                 const val = document.getElementById('nama')?.value.trim() || '';
@@ -853,7 +767,7 @@
                 const val = document.getElementById('email')?.value.trim().toLowerCase() || '';
                 const check = document.getElementById('check-email');
                 if (check) {
-                    if (/^[^\s@]+@fellow\.lpkia\.ac\.id$/.test(val)) {
+                    if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) {
                         check.classList.remove('hidden');
                     } else {
                         check.classList.add('hidden');
@@ -874,7 +788,6 @@
 
         // Initialize On Load
         document.addEventListener('DOMContentLoaded', () => {
-            initTiltCards();
             validateLive('nama');
             validateLive('nim');
             validateLive('email');
