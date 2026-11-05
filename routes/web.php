@@ -35,6 +35,10 @@ Route::post('/absen/scan', [PresensiMahasiswaController::class, 'submitScan'])
 Route::prefix('mahasiswa')->name('mahasiswa.')->group(function () {
     Route::get('/login', [MahasiswaController::class, 'showLogin'])->name('login');
     Route::post('/login', [MahasiswaController::class, 'login'])->name('login.post');
+    Route::get('/aktivasi', [MahasiswaController::class, 'aktivasiDirect'])->name('aktivasi');
+    Route::post('/verifikasi-qr', [MahasiswaController::class, 'verifikasiQr'])->name('verifikasiQr');
+    Route::get('/set-password', [MahasiswaController::class, 'showSetPassword'])->name('setPassword');
+    Route::post('/set-password', [MahasiswaController::class, 'savePassword'])->name('savePassword');
     Route::get('/dashboard', [MahasiswaController::class, 'dashboard'])->name('dashboard');
     Route::post('/logout', [MahasiswaController::class, 'logout'])->name('logout');
 });

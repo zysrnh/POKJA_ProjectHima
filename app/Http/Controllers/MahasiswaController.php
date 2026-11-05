@@ -5,11 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Pendaftaran;
 use App\Models\Pengaturan;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class MahasiswaController extends Controller
 {
     /**
-     * Menampilkan halaman login untuk mahasiswa (menggunakan NIM terdaftar).
+     * Menampilkan halaman login untuk mahasiswa.
      */
     public function showLogin()
     {
@@ -23,28 +24,47 @@ class MahasiswaController extends Controller
     }
 
     /**
-     * Memproses login mahasiswa berdasarkan NIM 9 digit terdaftar.
+     * Memproses login mahasiswa biasa (Email / NIM + Password).
      */
     public function login(Request $request)
     {
         $request->merge([
-            'nim' => trim(strip_tags($request->input('nim', ''))),
+            'identifier' => trim(strip_tags($request->input('identifier', ''))),
         ]);
 
         $request->validate([
-            'nim' => ['required', 'numeric', 'digits:9'],
+            'identifier' => ['required', 'string'],
+            'password' => ['required', 'string'],
         ], [
-            'nim.required' => 'NIM wajib diisi.',
-            'nim.numeric' => 'NIM harus berupa angka.',
-            'nim.digits' => 'NIM harus tepat 9 digit angka kampus.',
+            'identifier.required' => 'Email kampus atau NIM wajib diisi.',
+            'password.required' => 'Password akun wajib diisi.',
         ]);
 
-        $mahasiswa = Pendaftaran::where('nim', $request->nim)->first();
+        $identifier = $request->identifier;
+
+        // Cari berdasarkan Email atau NIM
+        $mahasiswa = Pendaftaran::where('email', $identifier)
+            ->orWhere('nim', $identifier)
+            ->first();
 
         if (!$mahasiswa) {
             return back()
-                ->withInput()
-                ->with('error', 'NIM ' . $request->nim . ' belum terdaftar sebagai peserta POKJA. Silakan daftar melalui formulir terlebih dahulu.');
+                ->withInput(['identifier' => $identifier])
+                ->with('error', 'Akun tidak ditemukan. Pastikan Anda telah terdaftar sebagai peserta POKJA.');
+        }
+
+        // Cek jika akun belum pernah setting password
+        if (empty($mahasiswa->password)) {
+            return back()
+                ->withInput(['identifier' => $identifier])
+                ->with('error', 'Akun Anda belum memiliki password. Silakan gunakan tab "Aktivasi QR Tiket" untuk membuat password pertama kali.');
+        }
+
+        // Verifikasi password
+        if (!Hash::check($request->password, $mahasiswa->password)) {
+            return back()
+                ->withInput(['identifier' => $identifier])
+                ->with('error', 'Password yang Anda masukkan salah. Silakan coba lagi.');
         }
 
         // Simpan sesi autentikasi mahasiswa
@@ -54,7 +74,132 @@ class MahasiswaController extends Controller
             'mahasiswa_nama' => $mahasiswa->nama,
         ]);
 
-        return redirect()->route('mahasiswa.dashboard')->with('success', 'Selamat datang, ' . $mahasiswa->nama . '!');
+        return redirect()->route('mahasiswa.dashboard')->with('success', 'Selamat datang kembali, ' . $mahasiswa->nama . '!');
+    }
+
+    /**
+     * Memproses verifikasi QR Code pendaftaran untuk aktivasi akun pertama kali.
+     */
+    public function verifikasiQr(Request $request)
+    {
+        $rawToken = trim($request->input('token', ''));
+
+        if (empty($rawToken)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Kode atau QR tiket tidak boleh kosong.',
+            ], 422);
+        }
+
+        // Jika input berupa URL penuh (misal hasil scan QR kamera), ekstrak parameter 'token'
+        if (str_contains($rawToken, 'token=')) {
+            parse_str(parse_url($rawToken, PHP_URL_QUERY) ?? '', $queryParams);
+            if (!empty($queryParams['token'])) {
+                $rawToken = $queryParams['token'];
+            }
+        }
+
+        // Cari berdasarkan qr_token atau NIM
+        $mahasiswa = Pendaftaran::where('qr_token', $rawToken)
+            ->orWhere('nim', $rawToken)
+            ->first();
+
+        if (!$mahasiswa) {
+            return response()->json([
+                'success' => false,
+                'message' => 'QR Tiket pendaftaran tidak valid atau tidak terdaftar di sistem.',
+            ], 404);
+        }
+
+        // Simpan sesi aktivasi sementara
+        session(['aktivasi_mahasiswa_id' => $mahasiswa->id]);
+
+        return response()->json([
+            'success' => true,
+            'nama' => $mahasiswa->nama,
+            'nim' => $mahasiswa->nim,
+            'redirect' => route('mahasiswa.setPassword'),
+        ]);
+    }
+
+    /**
+     * Handler langsung jika mahasiswa membuka tautan aktivasi dari QR Code / Email.
+     */
+    public function aktivasiDirect(Request $request)
+    {
+        $token = trim($request->query('token', ''));
+
+        if (!empty($token)) {
+            $mahasiswa = Pendaftaran::where('qr_token', $token)
+                ->orWhere('nim', $token)
+                ->first();
+
+            if ($mahasiswa) {
+                session(['aktivasi_mahasiswa_id' => $mahasiswa->id]);
+                return redirect()->route('mahasiswa.setPassword');
+            }
+        }
+
+        return redirect()->route('mahasiswa.login')->with('error', 'Tautan aktivasi tidak valid.');
+    }
+
+    /**
+     * Menampilkan formulir buat password untuk mahasiswa baru.
+     */
+    public function showSetPassword()
+    {
+        if (!session()->has('aktivasi_mahasiswa_id')) {
+            return redirect()->route('mahasiswa.login')->with('error', 'Sesi aktivasi telah berakhir. Silakan scan/upload QR tiket Anda kembali.');
+        }
+
+        $mahasiswa = Pendaftaran::find(session('aktivasi_mahasiswa_id'));
+
+        if (!$mahasiswa) {
+            session()->forget('aktivasi_mahasiswa_id');
+            return redirect()->route('mahasiswa.login')->with('error', 'Data mahasiswa tidak ditemukan.');
+        }
+
+        return view('mahasiswa.set_password', compact('mahasiswa'));
+    }
+
+    /**
+     * Menyimpan password baru mahasiswa dan langsung login ke dashboard.
+     */
+    public function savePassword(Request $request)
+    {
+        if (!session()->has('aktivasi_mahasiswa_id')) {
+            return redirect()->route('mahasiswa.login')->with('error', 'Sesi aktivasi telah berakhir.');
+        }
+
+        $mahasiswa = Pendaftaran::find(session('aktivasi_mahasiswa_id'));
+
+        if (!$mahasiswa) {
+            session()->forget('aktivasi_mahasiswa_id');
+            return redirect()->route('mahasiswa.login')->with('error', 'Data mahasiswa tidak ditemukan.');
+        }
+
+        $request->validate([
+            'password' => ['required', 'string', 'min:6', 'confirmed'],
+        ], [
+            'password.required' => 'Password baru wajib diisi.',
+            'password.min' => 'Password minimal terdiri dari 6 karakter.',
+            'password.confirmed' => 'Konfirmasi password tidak cocok dengan password baru.',
+        ]);
+
+        $mahasiswa->password = Hash::make($request->password);
+        $mahasiswa->save();
+
+        // Hapus sesi aktivasi sementara
+        session()->forget('aktivasi_mahasiswa_id');
+
+        // Login otomatis ke dashboard
+        session([
+            'mahasiswa_id' => $mahasiswa->id,
+            'mahasiswa_nim' => $mahasiswa->nim,
+            'mahasiswa_nama' => $mahasiswa->nama,
+        ]);
+
+        return redirect()->route('mahasiswa.dashboard')->with('success', 'Password berhasil dibuat! Akun Anda kini telah aktif.');
     }
 
     /**
@@ -63,7 +208,7 @@ class MahasiswaController extends Controller
     public function dashboard()
     {
         if (!session()->has('mahasiswa_id')) {
-            return redirect()->route('mahasiswa.login')->with('error', 'Silakan masuk dengan NIM Anda terlebih dahulu.');
+            return redirect()->route('mahasiswa.login')->with('error', 'Silakan masuk ke akun Anda terlebih dahulu.');
         }
 
         $mahasiswa = Pendaftaran::with('presensis')->find(session('mahasiswa_id'));
@@ -88,6 +233,6 @@ class MahasiswaController extends Controller
     {
         session()->forget(['mahasiswa_id', 'mahasiswa_nim', 'mahasiswa_nama']);
 
-        return redirect()->route('mahasiswa.login')->with('success', 'Anda telah berhasil keluar.');
+        return redirect()->route('mahasiswa.login')->with('success', 'Anda telah berhasil keluar dari akun mahasiswa.');
     }
 }

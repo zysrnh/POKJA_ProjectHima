@@ -27,10 +27,10 @@ class TiketPendaftaranMail extends Mailable
         $this->pendaftaran = $pendaftaran;
         $this->pengaturan = $pengaturan;
 
-        // Ambil binary image QR Code agar bisa disematkan langsung (Inline CID)
-        // Keuntungan: Gmail / Outlook TIDAK AKAN memblokir gambar
+        // Ambil binary image QR Code pendaftaran (berisi token aktivasi login mahasiswa)
         try {
-            $response = Http::timeout(5)->get('https://api.qrserver.com/v1/create-qr-code/?size=250x250&margin=4&data=' . urlencode($pendaftaran->nim));
+            $qrData = route('mahasiswa.aktivasi', ['token' => $pendaftaran->qr_token]);
+            $response = Http::timeout(5)->get('https://api.qrserver.com/v1/create-qr-code/?size=250x250&margin=4&data=' . urlencode($qrData));
             $this->qrBinary = $response->successful() ? $response->body() : null;
         } catch (\Throwable $e) {
             $this->qrBinary = null;
