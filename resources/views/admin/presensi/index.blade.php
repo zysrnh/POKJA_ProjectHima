@@ -84,19 +84,22 @@
     </div>
 
     <!-- ============================================================== -->
-    <!-- CARD 2: KONTROL SESI PERTEMUAN AKTIF                           -->
+    <!-- CARD 2: KONTROL SESI PERTEMUAN AKTIF (1-Klik Tactile Switch)   -->
     <!-- ============================================================== -->
-    <div class="snap-in-2 bg-white border-2 border-[#000000] p-4 sm:p-5 shadow-[4px_4px_0px_0px_#000000]">
-        <form action="{{ route('admin.presensi.sesi') }}" method="POST" class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-            @csrf
+    <div class="snap-in-2 bg-white border-2 border-[#000000] p-3.5 sm:p-5 shadow-[4px_4px_0px_0px_#000000]">
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
             
-            <div class="flex flex-wrap items-center gap-2">
-                <span class="text-xs font-black uppercase tracking-wider text-gray-800">
-                    Pilih Pertemuan Aktif:
+            <!-- Left: Pertemuan Aktif Selector (Auto Submit on Change) -->
+            <form action="{{ route('admin.presensi.sesi') }}" method="POST" class="flex items-center gap-2.5">
+                @csrf
+                <span class="text-xs font-black uppercase tracking-wider text-gray-800 shrink-0">
+                    Sesi Pertemuan:
                 </span>
                 <select 
                     name="pertemuan_aktif" 
-                    class="bg-[#F8FBFE] border-2 border-black font-black text-xs sm:text-sm px-3 py-1.5 focus:outline-none focus:shadow-[2px_2px_0px_0px_#000000]"
+                    onchange="this.form.submit()"
+                    class="bg-[#F8FBFE] border-2 border-black font-black text-xs sm:text-sm px-3 py-1.5 focus:bg-white focus:outline-none focus:shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
+                    title="Ganti Pertemuan Aktif"
                 >
                     @for ($p = 1; $p <= 7; $p++)
                         <option value="{{ $p }}" {{ (int) $pengaturan->pertemuan_aktif === $p ? 'selected' : '' }}>
@@ -104,23 +107,47 @@
                         </option>
                     @endfor
                 </select>
+            </form>
 
-                <select 
-                    name="is_scan_aktif" 
-                    class="bg-[#F8FBFE] border-2 border-black font-black text-xs sm:text-sm px-3 py-1.5 focus:outline-none focus:shadow-[2px_2px_0px_0px_#000000]"
-                >
-                    <option value="1" {{ $pengaturan->is_scan_aktif ? 'selected' : '' }}>BUKA SCAN (Aktif)</option>
-                    <option value="0" {{ !$pengaturan->is_scan_aktif ? 'selected' : '' }}>TUTUP SCAN (Nonaktif)</option>
-                </select>
+            <!-- Right: Status Badge & 1-Click Toggle Button -->
+            <div class="flex items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-gray-200">
+                <div class="flex items-center gap-1.5">
+                    <span class="w-2.5 h-2.5 {{ $pengaturan->is_scan_aktif ? 'bg-green-500 animate-pulse' : 'bg-red-500' }} border border-black inline-block"></span>
+                    <span class="text-xs font-black uppercase tracking-wider {{ $pengaturan->is_scan_aktif ? 'text-green-800' : 'text-red-700' }}">
+                        {{ $pengaturan->is_scan_aktif ? 'SCAN DIBUKA' : 'SCAN DITUTUP' }}
+                    </span>
+                </div>
+
+                <form action="{{ route('admin.presensi.sesi') }}" method="POST" class="inline">
+                    @csrf
+                    <input type="hidden" name="toggle_scan" value="1">
+                    @if ($pengaturan->is_scan_aktif)
+                        <button 
+                            type="submit" 
+                            class="btn-smooth px-3 py-1.5 sm:px-4 sm:py-2 bg-[#CA2C2A] hover:bg-[#901C1A] text-white text-xs font-black uppercase tracking-wider border-2 border-black shadow-[2px_2px_0px_0px_#000000] flex items-center gap-1.5 cursor-pointer"
+                            title="Tutup sesi scan untuk mencegah absensi"
+                        >
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="square" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                            <span>TUTUP SESI SCAN</span>
+                        </button>
+                    @else
+                        <button 
+                            type="submit" 
+                            class="btn-smooth px-3 py-1.5 sm:px-4 sm:py-2 bg-[#15803d] hover:bg-[#166534] text-white text-xs font-black uppercase tracking-wider border-2 border-black shadow-[2px_2px_0px_0px_#000000] flex items-center gap-1.5 cursor-pointer"
+                            title="Buka sesi scan agar mahasiswa bisa scan di kelas"
+                        >
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="square" stroke-width="3" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span>BUKA SESI SCAN</span>
+                        </button>
+                    @endif
+                </form>
             </div>
 
-            <button 
-                type="submit" 
-                class="btn-smooth px-4 py-2 bg-[#1A467C] hover:bg-[#0F2A4A] text-white text-xs font-black uppercase tracking-wider border-2 border-black shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
-            >
-                Simpan Status Sesi
-            </button>
-        </form>
+        </div>
     </div>
 
     <!-- ============================================================== -->
@@ -373,3 +400,4 @@
 
 </div>
 @endsection
+

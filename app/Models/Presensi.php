@@ -27,3 +27,4 @@ class Presensi extends Model
         return $this->belongsTo(Pendaftaran::class, 'pendaftaran_id');
     }
 }
+

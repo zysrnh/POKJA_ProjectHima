@@ -170,14 +170,21 @@ class PresensiAdminController extends Controller
      */
     public function updateSesi(Request $request)
     {
-        $request->validate([
-            'pertemuan_aktif' => 'required|integer|min:1|max:7',
-            'is_scan_aktif' => 'required|boolean',
-        ]);
-
         $pengaturan = Pengaturan::firstOrCreate([]);
-        $pengaturan->pertemuan_aktif = $request->input('pertemuan_aktif');
-        $pengaturan->is_scan_aktif = $request->boolean('is_scan_aktif');
+
+        if ($request->has('pertemuan_aktif')) {
+            $p = (int) $request->input('pertemuan_aktif');
+            if ($p >= 1 && $p <= 7) {
+                $pengaturan->pertemuan_aktif = $p;
+            }
+        }
+
+        if ($request->has('toggle_scan')) {
+            $pengaturan->is_scan_aktif = !$pengaturan->is_scan_aktif;
+        } elseif ($request->has('is_scan_aktif')) {
+            $pengaturan->is_scan_aktif = $request->boolean('is_scan_aktif');
+        }
+
         $pengaturan->save();
 
         $statusText = $pengaturan->is_scan_aktif ? 'DIBUKA' : 'DITUTUP';
@@ -376,3 +383,4 @@ class PresensiAdminController extends Controller
         exit;
     }
 }
+
