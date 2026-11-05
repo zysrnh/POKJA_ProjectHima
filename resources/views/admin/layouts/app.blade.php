@@ -105,6 +105,25 @@
                 transform: translateY(-160%) scale(0.88);
             }
         }
+
+        /* Solid Spring Page Entrance Animation (ZERO Opacity Fade) */
+        @keyframes pageSlamIn {
+            0% {
+                transform: translateY(-24px) scale(0.98);
+            }
+            60% {
+                transform: translateY(5px) scale(1.008);
+            }
+            85% {
+                transform: translateY(-2px) scale(0.997);
+            }
+            100% {
+                transform: translateY(0) scale(1);
+            }
+        }
+        .anim-page-slam {
+            animation: pageSlamIn 0.32s cubic-bezier(0.18, 0.89, 0.32, 1.28) both;
+        }
     </style>
 </head>
 <body class="text-[#000000] min-h-screen flex flex-col antialiased selection:bg-[#2A82C6] selection:text-white">
@@ -315,7 +334,7 @@
             </header>
 
             <!-- Page Body Content (Added pb-28 for mobile so bottom toolbar never blocks content) -->
-            <main class="flex-1 p-3 sm:p-6 lg:p-8 space-y-4 sm:space-y-6 pb-28 lg:pb-8">
+            <main class="flex-1 p-3 sm:p-6 lg:p-8 space-y-4 sm:space-y-6 pb-28 lg:pb-8 anim-page-slam">
                 @yield('content')
             </main>
 
