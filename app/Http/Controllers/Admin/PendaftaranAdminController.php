@@ -169,7 +169,7 @@ class PendaftaranAdminController extends Controller
                 'regex:/^08[1-9][0-9]{7,11}$/'
             ],
             'status_kehadiran' => [
-                'required',
+                'nullable',
                 'string',
                 'in:hadir,tidak_hadir,belum_hadir',
             ],

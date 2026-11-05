@@ -81,74 +81,38 @@
 <div class="space-y-4 sm:space-y-6">
 
     <!-- ============================================================== -->
-    <!-- 4 STAT CARDS (Neubrutalism Responsive Native App Style)       -->
+    <!-- 2 STAT CARDS (Neubrutalism Responsive Minimalist Style)        -->
     <!-- ============================================================== -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         <!-- Card 1: Total Pendaftar -->
-        <div class="snap-in-1 card-interactive bg-white border-2 border-[#000000] p-3 sm:p-5 shadow-[4px_4px_0px_0px_#000000] flex flex-col justify-between cursor-default">
+        <div class="snap-in-1 card-interactive bg-white border-2 border-[#000000] p-4 sm:p-5 shadow-[4px_4px_0px_0px_#000000] flex flex-col justify-between cursor-default">
             <div class="flex items-center justify-between gap-1">
-                <span class="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#1A467C]">Total Pendaftar</span>
-                <div class="w-6 h-6 sm:w-7 sm:h-7 bg-[#2A82C6] border-2 border-[#000000] flex items-center justify-center text-white shadow-[1px_1px_0px_0px_#000000]">
-                    <!-- Clean SVG Users Icon -->
-                    <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <span class="text-xs font-black uppercase tracking-wider text-[#1A467C]">Total Pendaftar</span>
+                <div class="w-7 h-7 sm:w-8 sm:h-8 bg-[#2A82C6] border-2 border-[#000000] flex items-center justify-center text-white shadow-[1px_1px_0px_0px_#000000]">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="square" stroke-width="2.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                     </svg>
                 </div>
             </div>
-            <div class="mt-2 sm:mt-3 flex items-baseline justify-between">
+            <div class="mt-3 flex items-baseline justify-between">
                 <span class="text-2xl sm:text-3xl font-black text-gray-950 font-mono" id="stat-total-pendaftar">{{ number_format($totalPendaftar) }}</span>
-                <span class="text-[9px] sm:text-[10px] font-black text-[#1A467C] bg-blue-50 border border-[#2A82C6] px-1.5 py-0.2 uppercase">Mhs</span>
+                <span class="text-[10px] font-black text-[#1A467C] bg-blue-50 border border-[#2A82C6] px-2 py-0.5 uppercase">Mahasiswa</span>
             </div>
         </div>
 
-        <!-- Card 2: Total Hadir -->
-        <div class="snap-in-2 card-interactive bg-white border-2 border-[#000000] p-3 sm:p-5 shadow-[4px_4px_0px_0px_#000000] flex flex-col justify-between cursor-default">
+        <!-- Card 2: Pendaftar Hari Ini -->
+        <div class="snap-in-2 card-interactive bg-white border-2 border-[#000000] p-4 sm:p-5 shadow-[4px_4px_0px_0px_#000000] flex flex-col justify-between cursor-default">
             <div class="flex items-center justify-between gap-1">
-                <span class="text-[10px] sm:text-xs font-black uppercase tracking-wider text-green-800">Sudah Hadir</span>
-                <div class="w-6 h-6 sm:w-7 sm:h-7 bg-[#15803d] border-2 border-[#000000] flex items-center justify-center text-white shadow-[1px_1px_0px_0px_#000000]">
-                    <!-- Clean SVG Check Icon -->
-                    <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="square" stroke-width="3" d="M5 13l4 4L19 7" />
-                    </svg>
-                </div>
-            </div>
-            <div class="mt-2 sm:mt-3 flex items-baseline justify-between">
-                <span class="text-2xl sm:text-3xl font-black text-[#15803d] font-mono" id="stat-total-hadir">{{ number_format($totalHadir) }}</span>
-                <span class="text-[9px] sm:text-[10px] font-black text-green-900 bg-green-50 border border-green-700 px-1.5 py-0.2 uppercase">Hadir</span>
-            </div>
-        </div>
-
-        <!-- Card 3: Belum Hadir -->
-        <div class="snap-in-3 card-interactive bg-white border-2 border-[#000000] p-3 sm:p-5 shadow-[4px_4px_0px_0px_#000000] flex flex-col justify-between cursor-default">
-            <div class="flex items-center justify-between gap-1">
-                <span class="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#CA2C2A]">Belum Hadir</span>
-                <div class="w-6 h-6 sm:w-7 sm:h-7 bg-[#CA2C2A] border-2 border-[#000000] flex items-center justify-center text-white shadow-[1px_1px_0px_0px_#000000]">
-                    <!-- Clean SVG Cross Icon -->
-                    <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="square" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </div>
-            </div>
-            <div class="mt-2 sm:mt-3 flex items-baseline justify-between">
-                <span class="text-2xl sm:text-3xl font-black text-[#CA2C2A] font-mono" id="stat-total-belum-hadir">{{ number_format($totalBelumHadir) }}</span>
-                <span class="text-[9px] sm:text-[10px] font-black text-[#901C1A] bg-red-50 border border-[#CA2C2A] px-1.5 py-0.2 uppercase">Belum</span>
-            </div>
-        </div>
-
-        <!-- Card 4: Pendaftar Hari Ini -->
-        <div class="snap-in-4 card-interactive bg-white border-2 border-[#000000] p-3 sm:p-5 shadow-[4px_4px_0px_0px_#000000] flex flex-col justify-between cursor-default">
-            <div class="flex items-center justify-between gap-1">
-                <span class="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#1A467C]">Daftar Hari Ini</span>
-                <div class="w-6 h-6 sm:w-7 sm:h-7 bg-[#F59E0B] border-2 border-[#000000] flex items-center justify-center text-black shadow-[1px_1px_0px_0px_#000000]">
-                    <!-- Clean SVG Calendar Clock Icon -->
-                    <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <span class="text-xs font-black uppercase tracking-wider text-[#1A467C]">Daftar Hari Ini</span>
+                <div class="w-7 h-7 sm:w-8 sm:h-8 bg-[#F59E0B] border-2 border-[#000000] flex items-center justify-center text-black shadow-[1px_1px_0px_0px_#000000]">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="square" stroke-width="2.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                 </div>
             </div>
-            <div class="mt-2 sm:mt-3 flex items-baseline justify-between">
+            <div class="mt-3 flex items-baseline justify-between">
                 <span class="text-2xl sm:text-3xl font-black text-gray-950 font-mono">{{ number_format($pendaftarHariIni) }}</span>
-                <span class="text-[9px] sm:text-[10px] font-black text-[#B45309] bg-amber-50 border border-[#F59E0B] px-1.5 py-0.2 uppercase">Hari Ini</span>
+                <span class="text-[10px] font-black text-[#B45309] bg-amber-50 border border-[#F59E0B] px-2 py-0.5 uppercase">Hari Ini</span>
             </div>
         </div>
     </div>
@@ -175,54 +139,33 @@
                     </svg>
                 </div>
 
-                <!-- Filters Grid in Mobile -->
-                <div class="grid grid-cols-2 md:flex md:items-center gap-2">
-                    <!-- Filter: Kelas -->
-                    <div class="relative">
-                        <select 
-                            name="kelas" 
-                            class="w-full md:w-44 bg-[#F8FBFE] border-2 border-[#000000] text-gray-950 text-xs font-bold font-mono px-2.5 py-2 sm:py-2.5 pr-7 focus:bg-white focus:outline-none focus:shadow-[2px_2px_0px_0px_#000000] transition cursor-pointer appearance-none"
-                        >
-                            <option value="">-- SEMUA KELAS --</option>
-                            @foreach ($kelasList as $k)
-                                <option value="{{ $k }}" {{ $kelasFilter == $k ? 'selected' : '' }}>{{ $k }}</option>
-                            @endforeach
-                        </select>
-                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-[#000000]">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="square" stroke-width="2.5" d="M19 9l-7 7-7-7" />
-                            </svg>
-                        </div>
-                    </div>
-
-                    <!-- Filter: Kehadiran -->
-                    <div class="relative">
-                        <select 
-                            name="status_kehadiran" 
-                            class="w-full md:w-44 bg-[#F8FBFE] border-2 border-[#000000] text-gray-950 text-xs font-bold px-2.5 py-2 sm:py-2.5 pr-7 focus:bg-white focus:outline-none focus:shadow-[2px_2px_0px_0px_#000000] transition cursor-pointer appearance-none"
-                        >
-                            <option value="">-- KEHADIRAN --</option>
-                            <option value="hadir" {{ $statusFilter == 'hadir' ? 'selected' : '' }}>HADIR</option>
-                            <option value="belum_hadir" {{ $statusFilter == 'belum_hadir' ? 'selected' : '' }}>BELUM HADIR</option>
-                            <option value="tidak_hadir" {{ $statusFilter == 'tidak_hadir' ? 'selected' : '' }}>TIDAK HADIR</option>
-                        </select>
-                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-[#000000]">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="square" stroke-width="2.5" d="M19 9l-7 7-7-7" />
-                            </svg>
-                        </div>
+                <!-- Filter: Kelas (Neubrutalism Custom Chevron) -->
+                <div class="relative w-full sm:w-56">
+                    <select 
+                        name="kelas" 
+                        class="w-full bg-[#F8FBFE] border-2 border-[#000000] text-gray-950 text-xs font-bold font-mono px-3 py-2 sm:py-2.5 pr-8 focus:bg-white focus:outline-none focus:shadow-[2px_2px_0px_0px_#000000] transition cursor-pointer appearance-none"
+                    >
+                        <option value="">-- SEMUA KELAS --</option>
+                        @foreach ($kelasList as $k)
+                            <option value="{{ $k }}" {{ $kelasFilter == $k ? 'selected' : '' }}>{{ $k }}</option>
+                        @endforeach
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-[#000000]">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="square" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+                        </svg>
                     </div>
                 </div>
 
                 <!-- Submit Filter & Reset -->
-                <div class="flex items-center gap-1.5">
+                <div class="flex items-center gap-1.5 shrink-0">
                     <button 
                         type="submit" 
-                        class="btn-smooth flex-1 md:flex-none px-4 py-2 sm:py-2.5 bg-[#1A467C] hover:bg-[#0F2A4A] text-white text-xs font-black uppercase tracking-wider border-2 border-[#000000] shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
+                        class="btn-smooth px-4 py-2 sm:py-2.5 bg-[#1A467C] hover:bg-[#0F2A4A] text-white text-xs font-black uppercase tracking-wider border-2 border-[#000000] shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
                     >
                         Filter
                     </button>
-                    @if ($search || $kelasFilter || $statusFilter)
+                    @if ($search || $kelasFilter)
                         <a 
                             href="{{ route('admin.dashboard') }}" 
                             class="btn-smooth px-3 py-2 sm:py-2.5 border-2 border-gray-400 bg-white text-gray-700 hover:bg-gray-100 text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] text-center"
@@ -367,25 +310,11 @@
                     </div>
                 </div>
 
-                <!-- Card Footer: Kehadiran Button (No labels) & Action Buttons -->
+                <!-- Card Footer: Action Buttons (Icon Only Neubrutalism) -->
                 <div class="flex items-center justify-between gap-2 pt-2 border-t border-gray-200">
-                    <!-- Clean Tactile Toggle Button (SVG Icon + Text) -->
-                    <button 
-                        type="button"
-                        onclick="toggleKehadiran({{ $item->id }}, this)"
-                        id="toggle-btn-m-{{ $item->id }}"
-                        class="btn-smooth px-3 py-1.5 text-xs font-black uppercase border-2 border-[#000000] shadow-[2px_2px_0px_0px_#000000] flex items-center gap-1.5 cursor-pointer {{ $isHadir ? 'bg-[#15803d] text-white hover:bg-green-800' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' }}"
-                        title="Klik untuk ubah kehadiran"
-                    >
-                        <span id="btn-icon-m-{{ $item->id }}">
-                            @if ($isHadir)
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
-                            @else
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-width="3" d="M6 18L18 6M6 6l12 12" /></svg>
-                            @endif
-                        </span>
-                        <span id="label-status-m-{{ $item->id }}">{{ $isHadir ? 'HADIR' : 'BELUM' }}</span>
-                    </button>
+                    <span class="text-[11px] font-mono text-gray-500">
+                        {{ $item->created_at ? $item->created_at->timezone('Asia/Jakarta')->format('d/m/y H:i') : '-' }}
+                    </span>
 
                     <!-- Edit & Delete Buttons (Icon Only Neubrutalism) -->
                     <div class="flex items-center gap-1.5">
@@ -456,7 +385,6 @@
                         <th class="py-3.5 px-3.5">Email Kampus</th>
                         <th class="py-3.5 px-3 text-center">Kelas</th>
                         <th class="py-3.5 px-3">No. WhatsApp</th>
-                        <th class="py-3.5 px-3 text-center w-28">Kehadiran</th>
                         <th class="py-3.5 px-3 text-center">Tgl Daftar</th>
                         <th class="py-3.5 px-3 text-center w-28">Aksi</th>
                     </tr>
@@ -468,7 +396,6 @@
                             if (str_starts_with($cleanPhone, '0')) {
                                 $cleanPhone = '62' . substr($cleanPhone, 1);
                             }
-                            $isHadir = ($item->status_kehadiran === 'hadir');
                         @endphp
                         <tr class="hover:bg-blue-100/60 transition-colors" id="row-pendaftar-{{ $item->id }}">
                             <td class="py-3 px-3 text-center">
@@ -505,26 +432,6 @@
                                 >
                                     <span>{{ $item->no_telp }}</span>
                                 </a>
-                            </td>
-
-                            <!-- Clean Tactile Presence Button with SVG Icons -->
-                            <td class="py-3 px-3 text-center">
-                                <button 
-                                    type="button" 
-                                    onclick="toggleKehadiran({{ $item->id }}, this)"
-                                    id="toggle-btn-d-{{ $item->id }}"
-                                    class="btn-smooth inline-flex items-center justify-center gap-1.5 px-3 py-1 text-xs font-black uppercase border-2 border-[#000000] shadow-[2px_2px_0px_0px_#000000] cursor-pointer transition-colors {{ $isHadir ? 'bg-[#15803d] text-white hover:bg-green-800' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' }}"
-                                    title="Klik untuk ubah status kehadiran"
-                                >
-                                    <span id="btn-icon-d-{{ $item->id }}">
-                                        @if ($isHadir)
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
-                                        @else
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-width="3" d="M6 18L18 6M6 6l12 12" /></svg>
-                                        @endif
-                                    </span>
-                                    <span id="label-status-d-{{ $item->id }}">{{ $isHadir ? 'HADIR' : 'BELUM' }}</span>
-                                </button>
                             </td>
 
                             <td class="py-3 px-3 text-center text-gray-600 text-xs font-mono">

@@ -130,7 +130,7 @@
         .snap-in-7 { animation: tactileSnapDown 0.35s cubic-bezier(0.18, 0.89, 0.32, 1.28) 0.39s both; }
     </style>
 </head>
-<body class="text-[#000000] min-h-screen flex flex-col antialiased selection:bg-[#2A82C6] selection:text-white">
+<body class="text-[#000000] h-screen overflow-hidden flex flex-col antialiased selection:bg-[#2A82C6] selection:text-white">
 
     <!-- ============================================================== -->
     <!-- FLOATING NEUBRUTALISM TOAST NOTIFICATION (Solid Spring Slam)   -->
@@ -194,12 +194,12 @@
         </script>
     @endif
 
-    <div class="flex flex-1 min-h-screen relative overflow-x-hidden">
+    <div class="flex flex-1 h-screen overflow-hidden relative">
 
-        <!-- Sidebar Navigation (Desktop Sticky Collapsible Neubrutalism, Hidden on Mobile) -->
+        <!-- Sidebar Navigation (Desktop Fixed Pinned Neubrutalism, Hidden on Mobile) -->
         <aside 
             id="admin-sidebar" 
-            class="hidden lg:flex flex-col justify-between sticky top-0 h-screen z-40 w-64 bg-[#1A467C] text-white transition-all duration-200 ease-in-out border-r-2 border-[#000000] shrink-0"
+            class="hidden lg:flex flex-col justify-between h-screen z-40 w-64 bg-[#1A467C] text-white transition-all duration-200 ease-in-out border-r-2 border-[#000000] shrink-0"
         >
             <div class="flex flex-col flex-1 min-h-0 overflow-y-auto w-64">
                 <!-- Brand Header in Sidebar with Logo -->
@@ -283,11 +283,11 @@
             </div>
         </aside>
 
-        <!-- Main Content Area -->
-        <div class="flex-1 flex flex-col min-w-0 transition-all duration-200">
+        <!-- Main Content Area (Scrolls Independently, Keeps Sidebar & Header Locked) -->
+        <div class="flex-1 flex flex-col h-screen overflow-y-auto min-w-0 transition-all duration-200">
 
-            <!-- Top Header -->
-            <header class="bg-white border-b-2 border-[#1A467C] h-16 flex items-center justify-between px-3 sm:px-6 lg:px-8 sticky top-0 z-30 shadow-[0_2px_0px_0px_#1A467C]">
+            <!-- Top Header (Always Sticky at Top) -->
+            <header class="bg-white border-b-2 border-[#1A467C] h-16 flex items-center justify-between px-3 sm:px-6 lg:px-8 sticky top-0 z-30 shadow-[0_2px_0px_0px_#1A467C] shrink-0">
                 <!-- Left: Desktop Toggle / Mobile Brand -->
                 <div class="flex items-center gap-2 sm:gap-3 min-w-0">
                     <!-- Desktop Sidebar Toggle Button -->

@@ -6,21 +6,21 @@
 @section('content')
 <div class="space-y-6">
 
-    <!-- Top Action Bar (Neubrutalism) -->
-    <div class="snap-in-1 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white border-2 border-[#1A467C] p-5 sm:p-6 shadow-[6px_6px_0px_0px_#1A467C]">
+    <!-- Top Action Bar (Neubrutalism Minimalist) -->
+    <div class="snap-in-1 flex items-center justify-between gap-4 bg-white border-2 border-[#000000] p-4 sm:p-5 shadow-[5px_5px_0px_0px_#000000]">
         <div>
-            <h3 class="text-sm font-black uppercase tracking-wider text-[#1A467C]">Daftar Administrator Sistem</h3>
-            <p class="text-xs font-semibold text-gray-600 mt-1">Seluruh akun yang memiliki hak akses login ke panel admin POKJA.</p>
+            <h3 class="text-sm sm:text-base font-black uppercase tracking-tight text-[#1A467C]">Daftar Administrator Sistem</h3>
+            <p class="text-xs font-semibold text-gray-600 mt-0.5">Seluruh akun yang memiliki hak akses login ke panel admin POKJA.</p>
         </div>
 
         <a 
             href="{{ route('admin.users.create') }}" 
-            class="btn-smooth inline-flex items-center gap-2 px-5 py-3 bg-[#2A82C6] hover:bg-[#1A467C] text-white text-xs font-black uppercase tracking-wider border-2 border-[#1A467C] shadow-[3px_3px_0px_0px_#1A467C] cursor-pointer"
+            class="btn-smooth w-10 h-10 sm:w-11 sm:h-11 bg-[#2A82C6] hover:bg-[#1A467C] text-white border-2 border-black flex items-center justify-center shadow-[2px_2px_0px_0px_#000000] cursor-pointer shrink-0"
+            title="Tambah Admin Baru"
         >
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="square" stroke-width="2.5" d="M12 4v16m8-8H4" />
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="square" stroke-width="2.8" d="M12 4v16m8-8H4" />
             </svg>
-            <span>Tambah Admin Baru</span>
         </a>
     </div>
 

@@ -4,7 +4,7 @@
 @section('header_title', 'Edit Data Pendaftar')
 
 @section('content')
-<div class="max-w-2xl mx-auto">
+<div class="max-w-4xl mx-auto space-y-4">
 
     <div class="bg-white border-2 border-[#1A467C] p-6 sm:p-8 shadow-[6px_6px_0px_0px_#1A467C]">
         <div class="border-b-2 border-[#1A467C] pb-4 mb-6">
@@ -130,26 +130,6 @@
                     class="w-full bg-[#F8FBFE] border-2 @error('no_telp') border-[#CA2C2A] bg-red-50 @else border-[#1A467C] @enderror text-gray-950 font-bold font-mono text-sm px-4 py-3 focus:bg-white focus:outline-none focus:shadow-[3px_3px_0px_0px_#1A467C] transition"
                 >
                 @error('no_telp')
-                    <p class="mt-1 text-xs font-bold text-[#CA2C2A]">{{ $message }}</p>
-                @enderror
-            </div>
-
-            <!-- Field: Status Kehadiran -->
-            <div>
-                <label for="status_kehadiran" class="block text-xs font-black uppercase tracking-wider text-[#1A467C] mb-1.5">
-                    Status Kehadiran <span class="text-[#CA2C2A]">*</span>
-                </label>
-                <select 
-                    id="status_kehadiran" 
-                    name="status_kehadiran" 
-                    required
-                    class="w-full bg-[#F8FBFE] border-2 @error('status_kehadiran') border-[#CA2C2A] bg-red-50 @else border-[#1A467C] @enderror text-gray-950 font-bold text-sm px-4 py-3 focus:bg-white focus:outline-none focus:shadow-[3px_3px_0px_0px_#1A467C] transition cursor-pointer"
-                >
-                    <option value="belum_hadir" {{ old('status_kehadiran', $pendaftaran->status_kehadiran) == 'belum_hadir' ? 'selected' : '' }}>BELUM HADIR</option>
-                    <option value="hadir" {{ old('status_kehadiran', $pendaftaran->status_kehadiran) == 'hadir' ? 'selected' : '' }}>HADIR</option>
-                    <option value="tidak_hadir" {{ old('status_kehadiran', $pendaftaran->status_kehadiran) == 'tidak_hadir' ? 'selected' : '' }}>TIDAK HADIR</option>
-                </select>
-                @error('status_kehadiran')
                     <p class="mt-1 text-xs font-bold text-[#CA2C2A]">{{ $message }}</p>
                 @enderror
             </div>
