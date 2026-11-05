@@ -210,42 +210,56 @@
             </div>
         </div>
 
-        <!-- 2. BAGIAN TENGAH: CARD TANGGAL & TEMPAT (100% MONTSERRAT) -->
-        <div class="anim-fade-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <!-- 2. BAGIAN TENGAH: CARD TANGGAL, WAKTU & TEMPAT (100% MONTSERRAT) -->
+        <div class="anim-fade-2 grid grid-cols-1 md:grid-cols-3 gap-4">
             
-            <!-- Card Tanggal & Waktu -->
-            <div class="bg-white border-2 border-[#1A467C] p-5 shadow-[6px_6px_0px_0px_#1A467C] flex items-start gap-4 hover:-translate-y-0.5 transition-transform duration-200">
-                <div class="p-2.5 bg-blue-50 border-2 border-[#2A82C6] text-[#2A82C6] shadow-[2px_2px_0px_0px_#1A467C] shrink-0 mt-0.5">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <!-- Card 1: Tanggal Pelaksanaan -->
+            <div class="bg-white border-2 border-[#1A467C] p-4 sm:p-5 shadow-[6px_6px_0px_0px_#1A467C] flex items-start gap-3.5 hover:-translate-y-0.5 transition-transform duration-200">
+                <div class="p-2 bg-blue-50 border-2 border-[#2A82C6] text-[#2A82C6] shadow-[2px_2px_0px_0px_#1A467C] shrink-0 mt-0.5">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                 </div>
-                <div class="flex-1">
-                    <span class="text-[11px] font-bold uppercase tracking-wider text-[#2A82C6] block mb-1">
-                        TANGGAL & WAKTU PELAKSANAAN
+                <div class="flex-1 min-w-0">
+                    <span class="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-[#2A82C6] block mb-1">
+                        TANGGAL ACARA
                     </span>
-                    <span class="font-extrabold text-base sm:text-lg text-gray-900 block leading-snug">
+                    <span class="font-extrabold text-sm sm:text-base text-gray-900 block leading-snug">
                         {{ $pengaturan->tanggal_acara ?? '13 Oktober 2026' }}
                     </span>
-                    <span class="font-semibold text-xs text-gray-600 block mt-1">
+                </div>
+            </div>
+
+            <!-- Card 2: Waktu Pelaksanaan -->
+            <div class="bg-white border-2 border-[#1A467C] p-4 sm:p-5 shadow-[6px_6px_0px_0px_#1A467C] flex items-start gap-3.5 hover:-translate-y-0.5 transition-transform duration-200">
+                <div class="p-2 bg-blue-50 border-2 border-[#1A467C] text-[#1A467C] shadow-[2px_2px_0px_0px_#1A467C] shrink-0 mt-0.5">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <span class="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-[#1A467C] block mb-1">
+                        WAKTU PELAKSANAAN
+                    </span>
+                    <span class="font-extrabold text-sm sm:text-base text-gray-900 block leading-snug">
                         {{ $pengaturan->jam_acara ?? '08:00 WIB - Selesai' }}
                     </span>
                 </div>
             </div>
 
-            <!-- Card Tempat / Ruangan -->
-            <div class="bg-white border-2 border-[#901C1A] p-5 shadow-[6px_6px_0px_0px_#901C1A] flex items-start gap-4 hover:-translate-y-0.5 transition-transform duration-200">
-                <div class="p-2.5 bg-red-50 border-2 border-[#CA2C2A] text-[#CA2C2A] shadow-[2px_2px_0px_0px_#901C1A] shrink-0 mt-0.5">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <!-- Card 3: Tempat / Ruangan -->
+            <div class="bg-white border-2 border-[#901C1A] p-4 sm:p-5 shadow-[6px_6px_0px_0px_#901C1A] flex items-start gap-3.5 hover:-translate-y-0.5 transition-transform duration-200">
+                <div class="p-2 bg-red-50 border-2 border-[#CA2C2A] text-[#CA2C2A] shadow-[2px_2px_0px_0px_#901C1A] shrink-0 mt-0.5">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                         <path stroke-linecap="square" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                 </div>
-                <div class="flex-1">
-                    <span class="text-[11px] font-bold uppercase tracking-wider text-[#CA2C2A] block mb-1">
-                        LOKASI & RUANGAN ACARA
+                <div class="flex-1 min-w-0">
+                    <span class="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-[#CA2C2A] block mb-1">
+                        LOKASI & RUANGAN
                     </span>
-                    <span class="font-extrabold text-base sm:text-lg text-gray-900 block leading-snug">
+                    <span class="font-extrabold text-sm sm:text-base text-gray-900 block leading-snug">
                         {{ $pengaturan->lokasi_acara ?? 'Ruangan 105' }}
                     </span>
                 </div>
