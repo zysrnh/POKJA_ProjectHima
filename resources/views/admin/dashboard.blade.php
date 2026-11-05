@@ -119,11 +119,28 @@
                 </div>
             </div>
 
-            <!-- Export Excel Button -->
-            <div>
+            <!-- Action Buttons: Sync Spreadsheet & Export Excel -->
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                <!-- Sync Google Sheet Button -->
+                <form action="{{ route('admin.pendaftar.sync') }}" method="POST" class="inline">
+                    @csrf
+                    <button 
+                        type="submit" 
+                        onclick="return confirm('Sinkronkan seluruh data di database ke Google Spreadsheet?')"
+                        class="btn-smooth w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 bg-[#2A82C6] hover:bg-[#1A467C] text-white text-xs font-black uppercase tracking-wider border-2 border-[#1A467C] shadow-[3px_3px_0px_0px_#1A467C] cursor-pointer"
+                        title="Sinkronkan seluruh data pendaftar ke Google Spreadsheet"
+                    >
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="square" stroke-width="2.2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                        <span>Sinkron Spreadsheet</span>
+                    </button>
+                </form>
+
+                <!-- Export Excel Button -->
                 <a 
                     href="{{ route('admin.pendaftar.export', ['search' => $search, 'kelas' => $kelasFilter, 'status_kehadiran' => $statusFilter]) }}" 
-                    class="btn-smooth w-full lg:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-green-700 hover:bg-green-800 text-white text-xs font-black uppercase tracking-wider border-2 border-green-950 shadow-[3px_3px_0px_0px_#14532d] cursor-pointer"
+                    class="btn-smooth w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-green-700 hover:bg-green-800 text-white text-xs font-black uppercase tracking-wider border-2 border-green-950 shadow-[3px_3px_0px_0px_#14532d] cursor-pointer"
                     title="Export data ke file Excel berformat styling rapi"
                 >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

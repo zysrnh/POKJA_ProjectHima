@@ -7,6 +7,8 @@ use App\Models\Kelas;
 use App\Models\Pendaftaran;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class PendaftaranAdminController extends Controller
@@ -183,11 +185,14 @@ class PendaftaranAdminController extends Controller
 
         $pendaftaran->update($validated);
 
-        return redirect()->route('admin.dashboard')->with('success', 'Data pendaftar berhasil diperbarui.');
+        // Sinkronisasi otomatis ke Google Sheets setelah update
+        self::syncAllToGoogleSheets();
+
+        return redirect()->route('admin.dashboard')->with('success', 'Data pendaftar berhasil diperbarui dan disinkronkan ke Google Sheets.');
     }
 
     /**
-     * Menghapus data pendaftar.
+     * Menghapus data pendaftar dan otomatis sinkronkan ke Google Sheets.
      */
     public function destroy($id)
     {
@@ -195,7 +200,60 @@ class PendaftaranAdminController extends Controller
         $nama = $pendaftaran->nama;
         $pendaftaran->delete();
 
-        return redirect()->route('admin.dashboard')->with('success', "Data pendaftar atas nama '{$nama}' berhasil dihapus.");
+        // Sinkronisasi ulang ke Google Sheets agar baris yang dihapus lenyap & nomor urut rapi kembali
+        self::syncAllToGoogleSheets();
+
+        return redirect()->route('admin.dashboard')->with('success', "Data pendaftar atas nama '{$nama}' berhasil dihapus dan diperbarui di Google Sheets.");
+    }
+
+    /**
+     * Manual Trigger Sync Semua Data Pendaftar ke Google Sheets.
+     */
+    public function syncSpreadsheet()
+    {
+        $success = self::syncAllToGoogleSheets();
+
+        if ($success) {
+            return redirect()->route('admin.dashboard')->with('success', 'Seluruh data pendaftar berhasil disinkronkan ke Google Sheets.');
+        }
+
+        return redirect()->route('admin.dashboard')->with('error', 'Gagal menyinkronkan data ke Google Sheets. Periksa URL Webhook di .env.');
+    }
+
+    /**
+     * Helper Sinkronisasi Menyeluruh (Atomic Mirroring) ke Google Sheets Webhook.
+     */
+    public static function syncAllToGoogleSheets()
+    {
+        $webhookUrl = env('GOOGLE_SHEET_WEBHOOK_URL');
+        if (empty($webhookUrl)) {
+            return false;
+        }
+
+        try {
+            $pendaftarans = Pendaftaran::orderBy('created_at', 'asc')->get();
+            $payloadData = [];
+
+            foreach ($pendaftarans as $p) {
+                $payloadData[] = [
+                    'nama' => $p->nama,
+                    'nim' => $p->nim,
+                    'kelas' => $p->kelas,
+                    'no_telp' => $p->no_telp,
+                    'created_at' => $p->created_at ? $p->created_at->timezone('Asia/Jakarta')->format('d/m/Y H:i:s') : '-',
+                ];
+            }
+
+            $response = Http::timeout(10)->post($webhookUrl, [
+                'action' => 'sync_all',
+                'data' => $payloadData,
+            ]);
+
+            return $response->successful();
+        } catch (\Throwable $e) {
+            Log::warning('Sinkronisasi Google Sheet Gagal: ' . $e->getMessage());
+            return false;
+        }
     }
 
     /**
