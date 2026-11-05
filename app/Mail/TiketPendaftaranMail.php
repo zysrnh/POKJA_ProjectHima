@@ -59,3 +59,4 @@ class TiketPendaftaranMail extends Mailable
         return [];
     }
 }
+
