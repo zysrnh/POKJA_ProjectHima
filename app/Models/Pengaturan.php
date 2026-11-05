@@ -20,5 +20,13 @@ class Pengaturan extends Model
         'cp_nama',
         'cp_nomor',
         'link_grup_wa',
+        'pertemuan_aktif',
+        'is_scan_aktif',
+        'token_salt',
+    ];
+
+    protected $casts = [
+        'is_scan_aktif' => 'boolean',
+        'pertemuan_aktif' => 'integer',
     ];
 }

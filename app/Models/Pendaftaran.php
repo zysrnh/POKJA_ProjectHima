@@ -19,4 +19,9 @@ class Pendaftaran extends Model
         'no_telp',
         'status_kehadiran',
     ];
+
+    public function presensis()
+    {
+        return $this->hasMany(Presensi::class, 'pendaftaran_id');
+    }
 }

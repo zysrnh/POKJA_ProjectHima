@@ -5,18 +5,26 @@ use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Admin\KelasAdminController;
 use App\Http\Controllers\Admin\PendaftaranAdminController;
 use App\Http\Controllers\Admin\PengaturanAcaraController;
+use App\Http\Controllers\Admin\PresensiAdminController;
 use App\Http\Controllers\PendaftaranController;
+use App\Http\Controllers\PresensiMahasiswaController;
 use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| Public Routes (Pendaftaran Mahasiswa)
+| Public Routes (Pendaftaran Mahasiswa & Scanner Absensi HP)
 |--------------------------------------------------------------------------
 */
 Route::get('/', [PendaftaranController::class, 'index'])->name('pendaftaran.index');
 Route::post('/daftar', [PendaftaranController::class, 'store'])
     ->middleware('throttle:10,1')
     ->name('pendaftaran.store');
+
+// Scanner Absensi Mahasiswa di HP
+Route::get('/absen', [PresensiMahasiswaController::class, 'showAbsen'])->name('presensi.absen');
+Route::post('/absen/scan', [PresensiMahasiswaController::class, 'submitScan'])
+    ->middleware('throttle:60,1')
+    ->name('presensi.scan');
 
 /*
 |--------------------------------------------------------------------------
@@ -43,6 +51,16 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::put('/pendaftar/{id}', [PendaftaranAdminController::class, 'update'])->name('pendaftar.update');
         Route::patch('/pendaftar/{id}/toggle-kehadiran', [PendaftaranAdminController::class, 'toggleKehadiran'])->name('pendaftar.toggleKehadiran');
         Route::delete('/pendaftar/{id}', [PendaftaranAdminController::class, 'destroy'])->name('pendaftar.destroy');
+
+        // Presensi 7 Pertemuan & Layar Proyektor Kelas
+        Route::get('/presensi', [PresensiAdminController::class, 'index'])->name('presensi.index');
+        Route::get('/presensi/layar', [PresensiAdminController::class, 'layarProyektor'])->name('presensi.layar');
+        Route::get('/presensi/token', [PresensiAdminController::class, 'getProyektorToken'])->name('presensi.token');
+        Route::get('/presensi/recent-scans', [PresensiAdminController::class, 'getRecentScans'])->name('presensi.recent-scans');
+        Route::post('/presensi/sesi', [PresensiAdminController::class, 'updateSesi'])->name('presensi.sesi');
+        Route::patch('/presensi/{id}/toggle', [PresensiAdminController::class, 'toggleManual'])->name('presensi.toggle');
+        Route::post('/presensi/sync-spreadsheet', [PresensiAdminController::class, 'syncSpreadsheet'])->name('presensi.sync');
+        Route::get('/presensi/export', [PresensiAdminController::class, 'exportExcel'])->name('presensi.export');
 
         // Kelola Kelas
         Route::resource('kelas', KelasAdminController::class)->except(['show']);
