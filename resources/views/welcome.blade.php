@@ -76,6 +76,49 @@
             animation: gentleFloat2 7s ease-in-out infinite;
         }
 
+        /* Polaroid Playful Wobble on Click */
+        @keyframes polaroidWobble {
+            0% { transform: rotate(-2deg) scale(1); }
+            20% { transform: rotate(12deg) scale(1.12); }
+            40% { transform: rotate(-10deg) scale(1.08); }
+            60% { transform: rotate(6deg) scale(1.04); }
+            80% { transform: rotate(-4deg) scale(1.01); }
+            100% { transform: rotate(-2deg) scale(1); }
+        }
+        .wobble-active {
+            animation: polaroidWobble 0.65s cubic-bezier(0.36, 0.07, 0.19, 0.97) both !important;
+        }
+
+        /* Interactive Shape Bounce & Spin */
+        @keyframes shapePopSpin {
+            0% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.35) rotate(180deg); }
+            100% { transform: scale(1) rotate(360deg); }
+        }
+        .shape-popping {
+            animation: shapePopSpin 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both !important;
+        }
+
+        /* Interactive 3D Perspective Card Container */
+        .card-perspective {
+            perspective: 1000px;
+        }
+        .tilt-card {
+            transform-style: preserve-3d;
+            transition: transform 0.15s ease-out, box-shadow 0.15s ease-out;
+            will-change: transform;
+        }
+
+        /* Live Validation Pop-in Checkmark */
+        @keyframes fieldCheckPop {
+            0% { opacity: 0; transform: scale(0.4) rotate(-20deg); }
+            70% { transform: scale(1.2) rotate(5deg); }
+            100% { opacity: 1; transform: scale(1) rotate(0deg); }
+        }
+        .field-valid-badge {
+            animation: fieldCheckPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
         /* Smooth Page Enter Animations */
         @keyframes slideFadeUp {
             from {
@@ -200,28 +243,33 @@
 </head>
 <body class="text-[#000000] min-h-screen flex items-center justify-center p-3 sm:p-6 lg:p-10 antialiased selection:bg-[#2A82C6] selection:text-white relative overflow-x-hidden">
 
-    <!-- Floating Geometric Accents with Gentle Smooth Float -->
-    <div class="hidden md:block absolute top-8 left-8 w-14 h-14 bg-[#2A82C6]/25 border-2 border-[#1A467C] shadow-[4px_4px_0px_0px_#1A467C] pointer-events-none anim-float-1"></div>
-    <div class="hidden md:block absolute bottom-12 left-12 w-10 h-10 bg-[#CA2C2A]/20 border-2 border-[#901C1A] shadow-[3px_3px_0px_0px_#901C1A] pointer-events-none anim-float-2"></div>
-    <div class="hidden md:block absolute top-16 right-12 w-12 h-12 bg-white border-2 border-[#1A467C] shadow-[4px_4px_0px_0px_#1A467C] pointer-events-none anim-float-2"></div>
-    <div class="hidden md:block absolute bottom-8 right-16 w-16 h-16 bg-[#1A467C]/15 border-2 border-[#000000] shadow-[4px_4px_0px_0px_#000000] pointer-events-none anim-float-1"></div>
+    <!-- Floating Interactive Geometric Accents (Click/Tap for fun tactile pop) -->
+    <div onclick="popShape(this)" title="Klik aku!" class="cursor-pointer select-none absolute top-6 sm:top-8 left-4 sm:left-8 w-10 h-10 sm:w-14 sm:h-14 bg-[#2A82C6]/30 border-2 border-[#1A467C] shadow-[3px_3px_0px_0px_#1A467C] sm:shadow-[4px_4px_0px_0px_#1A467C] hover:scale-110 active:scale-90 transition-transform anim-float-1 z-0"></div>
+    <div onclick="popShape(this)" title="Klik aku!" class="cursor-pointer select-none absolute bottom-8 sm:bottom-12 left-4 sm:left-12 w-8 h-8 sm:w-10 sm:h-10 bg-[#CA2C2A]/25 border-2 border-[#901C1A] shadow-[2px_2px_0px_0px_#901C1A] sm:shadow-[3px_3px_0px_0px_#901C1A] hover:scale-110 active:scale-90 transition-transform anim-float-2 z-0"></div>
+    <div onclick="popShape(this)" title="Klik aku!" class="cursor-pointer select-none absolute top-12 sm:top-16 right-4 sm:right-12 w-9 h-9 sm:w-12 sm:h-12 bg-white/90 border-2 border-[#1A467C] shadow-[3px_3px_0px_0px_#1A467C] sm:shadow-[4px_4px_0px_0px_#1A467C] hover:scale-110 active:scale-90 transition-transform anim-float-2 z-0"></div>
+    <div onclick="popShape(this)" title="Klik aku!" class="cursor-pointer select-none absolute bottom-6 sm:bottom-8 right-4 sm:right-16 w-11 h-11 sm:w-16 sm:h-16 bg-[#1A467C]/20 border-2 border-[#000000] shadow-[3px_3px_0px_0px_#000000] sm:shadow-[4px_4px_0px_0px_#000000] hover:scale-110 active:scale-90 transition-transform anim-float-1 z-0"></div>
 
     <!-- Main Wrapper: Separated Sequential Cards (Judul -> Waktu & Tempat -> Form) -->
-    <div class="w-full max-w-4xl z-10 my-2 sm:my-8 space-y-3.5 sm:space-y-6">
+    <div class="card-perspective w-full max-w-4xl z-10 my-2 sm:my-8 space-y-3.5 sm:space-y-6">
 
         <!-- 1. BAGIAN ATAS: CARD JUDUL & LOGO POLAROID -->
-        <div class="anim-fade-1 bg-white border-2 border-[#1A467C] p-4 sm:p-8 shadow-[5px_5px_0px_0px_#1A467C] sm:shadow-[8px_8px_0px_0px_#1A467C] transition-all duration-200">
+        <div class="anim-fade-1 tilt-card bg-white border-2 border-[#1A467C] p-4 sm:p-8 shadow-[5px_5px_0px_0px_#1A467C] sm:shadow-[8px_8px_0px_0px_#1A467C] transition-all duration-200">
             <div class="flex flex-col md:flex-row items-center md:items-start gap-4 sm:gap-6 text-center md:text-left">
                 
-                <!-- Polaroid Logo Badge with Tape Header -->
+                <!-- Polaroid Logo Badge with Tape Header (Click to Wobble) -->
                 <div class="relative group shrink-0">
                     <div class="absolute -top-2.5 left-1/2 -translate-x-1/2 w-12 sm:w-14 h-4 sm:h-5 tape-badge border border-gray-400 z-10"></div>
                     
-                    <div class="bg-white border-2 border-[#1A467C] p-2 sm:p-2.5 shadow-[3px_3px_0px_0px_#1A467C] sm:shadow-[4px_4px_0px_0px_#1A467C] rotate-[-2deg] hover:rotate-0 transition-transform duration-300 ease-out cursor-pointer">
+                    <div 
+                        id="polaroid-badge"
+                        onclick="wobblePolaroid(this)"
+                        title="Klik untuk efek goyang!"
+                        class="bg-white border-2 border-[#1A467C] p-2 sm:p-2.5 shadow-[3px_3px_0px_0px_#1A467C] sm:shadow-[4px_4px_0px_0px_#1A467C] rotate-[-2deg] hover:rotate-0 transition-transform duration-300 ease-out cursor-pointer active:scale-95 select-none"
+                    >
                         <img 
                             src="{{ asset('logo/logo.png') }}" 
                             alt="Logo HIMA IF" 
-                            class="w-14 h-14 sm:w-24 sm:h-24 object-contain mx-auto bg-gray-50 border border-gray-200 p-0.5 sm:p-1"
+                            class="w-14 h-14 sm:w-24 sm:h-24 object-contain mx-auto bg-gray-50 border border-gray-200 p-0.5 sm:p-1 pointer-events-none"
                         >
                         <p class="text-[9px] sm:text-[10px] font-black font-mono text-center text-[#1A467C] mt-1 sm:mt-2 uppercase tracking-wider">
                             #HIMA_IF
@@ -243,9 +291,9 @@
         </div>
 
         <!-- 2. BAGIAN TENGAH: CARD INFO ACARA (3 SEKAT ELEGAN) -->
-        <div class="anim-fade-2 bg-white border-2 border-[#1A467C] shadow-[5px_5px_0px_0px_#1A467C] sm:shadow-[6px_6px_0px_0px_#1A467C] grid grid-cols-3 divide-x-2 divide-[#1A467C]/20 p-2 sm:p-3">
+        <div class="anim-fade-2 tilt-card bg-white border-2 border-[#1A467C] shadow-[5px_5px_0px_0px_#1A467C] sm:shadow-[6px_6px_0px_0px_#1A467C] grid grid-cols-3 divide-x-2 divide-[#1A467C]/20 p-2 sm:p-3">
             
-            <!-- Sekat 1: Tanggal Pelaksanaan -->
+            <!-- Sekat 1: Tanggal Pelaksanaan & Live Countdown Badge -->
             <div class="px-1.5 sm:px-4 py-1 flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-1 sm:gap-3">
                 <div class="p-1 sm:p-2 bg-blue-50 border sm:border-2 border-[#2A82C6] text-[#2A82C6] shadow-[1px_1px_0px_0px_#1A467C] sm:shadow-[2px_2px_0px_0px_#1A467C] shrink-0">
                     <svg class="w-3.5 h-3.5 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -253,10 +301,14 @@
                     </svg>
                 </div>
                 <div class="min-w-0 w-full">
-                    <span class="text-[8px] sm:text-[10px] font-black uppercase tracking-wider text-[#2A82C6] block leading-tight">
-                        TANGGAL
-                    </span>
-                    <span class="font-extrabold text-[11px] sm:text-sm text-gray-900 block leading-tight truncate mt-0.5" title="{{ $pengaturan->tanggal_acara ?? '13 Oktober 2026' }}">
+                    <div class="flex items-center justify-center sm:justify-start gap-1">
+                        <span class="text-[8px] sm:text-[10px] font-black uppercase tracking-wider text-[#2A82C6] block leading-tight">
+                            TANGGAL
+                        </span>
+                        <!-- Live Countdown Dynamic Badge -->
+                        <span id="countdown-badge" class="hidden text-[8px] font-black uppercase bg-[#2A82C6] text-white px-1 py-0.2 border border-[#1A467C] shadow-[1px_1px_0px_0px_#1A467C]"></span>
+                    </div>
+                    <span id="event-date-text" class="font-extrabold text-[11px] sm:text-sm text-gray-900 block leading-tight truncate mt-0.5" title="{{ $pengaturan->tanggal_acara ?? '13 Oktober 2026' }}">
                         {{ $pengaturan->tanggal_acara ?? '13 Oktober 2026' }}
                     </span>
                 </div>
@@ -300,7 +352,7 @@
         </div>
 
         <!-- 3. BAGIAN BAWAH: CARD FORMULIR PENDAFTARAN -->
-        <div class="anim-fade-3 bg-white border-2 border-[#1A467C] p-4 sm:p-8 shadow-[5px_5px_0px_0px_#1A467C] sm:shadow-[8px_8px_0px_0px_#1A467C]">
+        <div class="anim-fade-3 tilt-card bg-white border-2 border-[#1A467C] p-4 sm:p-8 shadow-[5px_5px_0px_0px_#1A467C] sm:shadow-[8px_8px_0px_0px_#1A467C]">
 
             <!-- Alert Error Global jika ada validasi gagal -->
             @if ($errors->any())
@@ -337,19 +389,27 @@
                     
                     <!-- Field: Nama Lengkap -->
                     <div>
-                        <label for="nama" class="block text-xs font-black uppercase tracking-wider text-[#1A467C] mb-1 sm:mb-1.5">
-                            Nama Lengkap <span class="text-[#CA2C2A]">*</span>
+                        <label for="nama" class="block text-xs font-black uppercase tracking-wider text-[#1A467C] mb-1 sm:mb-1.5 flex items-center justify-between">
+                            <span>Nama Lengkap <span class="text-[#CA2C2A]">*</span></span>
+                            <span id="hint-nama" class="text-[10px] font-mono text-gray-400">min. 3 huruf</span>
                         </label>
-                        <input 
-                            type="text" 
-                            id="nama" 
-                            name="nama" 
-                            value="{{ session('success') ? '' : old('nama') }}"
-                            placeholder="Masukkan nama lengkap Anda..."
-                            maxlength="100"
-                            required
-                            class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] px-3.5 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm font-semibold text-[#000000] focus:bg-white focus:outline-none focus:shadow-[4px_4px_0px_0px_#1A467C] transition-all duration-200 @error('nama') border-[#CA2C2A] bg-red-50 @enderror"
-                        >
+                        <div class="relative">
+                            <input 
+                                type="text" 
+                                id="nama" 
+                                name="nama" 
+                                value="{{ session('success') ? '' : old('nama') }}"
+                                placeholder="Masukkan nama lengkap Anda..."
+                                maxlength="100"
+                                required
+                                oninput="validateLive('nama')"
+                                class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] pl-3.5 pr-8 py-2 sm:pl-4 sm:pr-9 sm:py-3 text-xs sm:text-sm font-semibold text-[#000000] focus:bg-white focus:outline-none focus:shadow-[4px_4px_0px_0px_#1A467C] transition-all duration-200 @error('nama') border-[#CA2C2A] bg-red-50 @enderror"
+                            >
+                            <!-- Live Checkmark Badge -->
+                            <div id="check-nama" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 bg-green-600 text-white border border-[#1A467C] text-[9px] sm:text-[11px] font-black flex items-center justify-center shadow-[1px_1px_0px_0px_#1A467C] field-valid-badge">
+                                ✓
+                            </div>
+                        </div>
                         @error('nama')
                             <p class="mt-1 text-xs font-bold text-[#CA2C2A]">{{ $message }}</p>
                         @enderror
@@ -357,21 +417,28 @@
 
                     <!-- Field: NIM -->
                     <div>
-                        <label for="nim" class="block text-xs font-black uppercase tracking-wider text-[#1A467C] mb-1 sm:mb-1.5">
-                            NIM (Nomor Induk Mahasiswa) <span class="text-[#CA2C2A]">*</span>
+                        <label for="nim" class="block text-xs font-black uppercase tracking-wider text-[#1A467C] mb-1 sm:mb-1.5 flex items-center justify-between">
+                            <span>NIM <span class="text-[#CA2C2A]">*</span></span>
+                            <span id="hint-nim" class="text-[10px] font-mono text-gray-400">angka</span>
                         </label>
-                        <input 
-                            type="text" 
-                            id="nim" 
-                            name="nim" 
-                            inputmode="numeric"
-                            maxlength="20"
-                            oninput="this.value = this.value.replace(/\s+/g, '')"
-                            value="{{ session('success') ? '' : old('nim') }}"
-                            placeholder="Contoh: 250414000"
-                            required
-                            class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] px-3.5 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm font-semibold font-mono text-[#000000] focus:bg-white focus:outline-none focus:shadow-[4px_4px_0px_0px_#1A467C] transition-all duration-200 @error('nim') border-[#CA2C2A] bg-red-50 @enderror"
-                        >
+                        <div class="relative">
+                            <input 
+                                type="text" 
+                                id="nim" 
+                                name="nim" 
+                                inputmode="numeric"
+                                maxlength="20"
+                                oninput="this.value = this.value.replace(/\s+/g, ''); validateLive('nim')"
+                                value="{{ session('success') ? '' : old('nim') }}"
+                                placeholder="Contoh: 250414000"
+                                required
+                                class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] pl-3.5 pr-8 py-2 sm:pl-4 sm:pr-9 sm:py-3 text-xs sm:text-sm font-semibold font-mono text-[#000000] focus:bg-white focus:outline-none focus:shadow-[4px_4px_0px_0px_#1A467C] transition-all duration-200 @error('nim') border-[#CA2C2A] bg-red-50 @enderror"
+                            >
+                            <!-- Live Checkmark Badge -->
+                            <div id="check-nim" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 bg-green-600 text-white border border-[#1A467C] text-[9px] sm:text-[11px] font-black flex items-center justify-center shadow-[1px_1px_0px_0px_#1A467C] field-valid-badge">
+                                ✓
+                            </div>
+                        </div>
                         @error('nim')
                             <p class="mt-1 text-xs font-bold text-[#CA2C2A]">{{ $message }}</p>
                         @enderror
@@ -379,8 +446,9 @@
 
                     <!-- Field: Kelas (Custom Neubrutalism Dropdown Pop-over) -->
                     <div class="relative" id="custom-select-container">
-                        <label for="input-kelas-value" class="block text-xs font-black uppercase tracking-wider text-[#1A467C] mb-1 sm:mb-1.5">
-                            Kelas <span class="text-[#CA2C2A]">*</span>
+                        <label for="input-kelas-value" class="block text-xs font-black uppercase tracking-wider text-[#1A467C] mb-1 sm:mb-1.5 flex items-center justify-between">
+                            <span>Kelas <span class="text-[#CA2C2A]">*</span></span>
+                            <span id="check-kelas" class="hidden text-green-700 font-bold text-xs">✓ Terpilih</span>
                         </label>
                         
                         @php
@@ -434,21 +502,28 @@
 
                     <!-- Field: No Telp / WhatsApp -->
                     <div>
-                        <label for="no_telp" class="block text-xs font-black uppercase tracking-wider text-[#1A467C] mb-1 sm:mb-1.5">
-                            No. Telepon / WhatsApp <span class="text-[#CA2C2A]">*</span>
+                        <label for="no_telp" class="block text-xs font-black uppercase tracking-wider text-[#1A467C] mb-1 sm:mb-1.5 flex items-center justify-between">
+                            <span>No. WhatsApp <span class="text-[#CA2C2A]">*</span></span>
+                            <span id="hint-wa" class="text-[10px] font-mono text-gray-400">08xx / 62xx</span>
                         </label>
-                        <input 
-                            type="tel" 
-                            id="no_telp" 
-                            name="no_telp" 
-                            inputmode="tel"
-                            maxlength="15"
-                            oninput="this.value = this.value.replace(/\s+/g, '')"
-                            value="{{ session('success') ? '' : old('no_telp') }}"
-                            placeholder="Contoh: 081234567890"
-                            required
-                            class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] px-3.5 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm font-semibold font-mono text-[#000000] focus:bg-white focus:outline-none focus:shadow-[4px_4px_0px_0px_#1A467C] transition-all duration-200 @error('no_telp') border-[#CA2C2A] bg-red-50 @enderror"
-                        >
+                        <div class="relative">
+                            <input 
+                                type="tel" 
+                                id="no_telp" 
+                                name="no_telp" 
+                                inputmode="tel"
+                                maxlength="15"
+                                oninput="this.value = this.value.replace(/\s+/g, ''); validateLive('no_telp')"
+                                value="{{ session('success') ? '' : old('no_telp') }}"
+                                placeholder="Contoh: 081234567890"
+                                required
+                                class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] pl-3.5 pr-8 py-2 sm:pl-4 sm:pr-9 sm:py-3 text-xs sm:text-sm font-semibold font-mono text-[#000000] focus:bg-white focus:outline-none focus:shadow-[4px_4px_0px_0px_#1A467C] transition-all duration-200 @error('no_telp') border-[#CA2C2A] bg-red-50 @enderror"
+                            >
+                            <!-- Live Checkmark Badge -->
+                            <div id="check-no_telp" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 bg-green-600 text-white border border-[#1A467C] text-[9px] sm:text-[11px] font-black flex items-center justify-center shadow-[1px_1px_0px_0px_#1A467C] field-valid-badge">
+                                ✓
+                            </div>
+                        </div>
                         @error('no_telp')
                             <p class="mt-1 text-xs font-bold text-[#CA2C2A]">{{ $message }}</p>
                         @enderror
@@ -603,6 +678,9 @@
             if (menu) menu.classList.add('hidden');
             if (chevron) chevron.classList.remove('rotate-180');
             if (trigger) trigger.classList.remove('border-[#CA2C2A]', 'bg-red-50');
+
+            const checkKelas = document.getElementById('check-kelas');
+            if (checkKelas) checkKelas.classList.remove('hidden');
         }
 
         // Close dropdown when clicking outside
@@ -679,6 +757,146 @@
                 const chevron = document.getElementById('dropdown-chevron-icon');
                 if (menu) menu.classList.add('hidden');
                 if (chevron) chevron.classList.remove('rotate-180');
+            }
+        });
+
+        // 1. Polaroid Wobble Click Animation
+        function wobblePolaroid(el) {
+            if (!el) return;
+            el.classList.remove('wobble-active');
+            void el.offsetWidth;
+            el.classList.add('wobble-active');
+            el.addEventListener('animationend', () => {
+                el.classList.remove('wobble-active');
+            }, { once: true });
+        }
+
+        // 2. Interactive Floating Background Shapes (Pop & Spin)
+        function popShape(el) {
+            if (!el) return;
+            el.classList.remove('shape-popping');
+            void el.offsetWidth;
+            el.classList.add('shape-popping');
+            el.addEventListener('animationend', () => {
+                el.classList.remove('shape-popping');
+            }, { once: true });
+        }
+
+        // 3. Tactile 3D Tilt Card Parallax (Smooth Neubrutalism Angle)
+        function initTiltCards() {
+            const cards = document.querySelectorAll('.tilt-card');
+            cards.forEach(card => {
+                card.addEventListener('mousemove', (e) => {
+                    if (window.innerWidth < 768) return;
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    const rotateX = ((y - centerY) / centerY) * -2.5;
+                    const rotateY = ((x - centerX) / centerX) * 2.5;
+                    card.style.transform = `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateY(-2px)`;
+                });
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = '';
+                });
+            });
+        }
+
+        // 4. Live Form Input Validation Indicators
+        function validateLive(type) {
+            if (type === 'nama') {
+                const val = document.getElementById('nama')?.value.trim() || '';
+                const check = document.getElementById('check-nama');
+                if (check) {
+                    if (val.length >= 3) {
+                        check.classList.remove('hidden');
+                    } else {
+                        check.classList.add('hidden');
+                    }
+                }
+            } else if (type === 'nim') {
+                const val = document.getElementById('nim')?.value.trim() || '';
+                const check = document.getElementById('check-nim');
+                if (check) {
+                    if (/^\d{6,20}$/.test(val)) {
+                        check.classList.remove('hidden');
+                    } else {
+                        check.classList.add('hidden');
+                    }
+                }
+            } else if (type === 'no_telp') {
+                const val = document.getElementById('no_telp')?.value.trim() || '';
+                const check = document.getElementById('check-no_telp');
+                if (check) {
+                    if (/^(08|62|\+62)\d{8,13}$/.test(val)) {
+                        check.classList.remove('hidden');
+                    } else {
+                        check.classList.add('hidden');
+                    }
+                }
+            }
+        }
+
+        // 5. Dynamic Event Live Countdown Badge
+        function initCountdown() {
+            const dateEl = document.getElementById('event-date-text');
+            const badge = document.getElementById('countdown-badge');
+            if (!dateEl || !badge) return;
+
+            const dateStr = dateEl.innerText.trim();
+            const months = {
+                'januari': 0, 'februari': 1, 'maret': 2, 'april': 3, 'mei': 4, 'juni': 5,
+                'juli': 6, 'agustus': 7, 'september': 8, 'oktober': 9, 'november': 10, 'desember': 11
+            };
+
+            // Parse pattern like "13 Oktober 2026"
+            const match = dateStr.match(/(\d{1,2})\s+([a-zA-Z]+)\s+(\d{4})/);
+            if (match) {
+                const day = parseInt(match[1], 10);
+                const monthName = match[2].toLowerCase();
+                const year = parseInt(match[3], 10);
+
+                if (months[monthName] !== undefined) {
+                    const targetDate = new Date(year, months[monthName], day);
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+
+                    const diffTime = targetDate.getTime() - today.getTime();
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                    if (diffDays > 1) {
+                        badge.textContent = `${diffDays} HARI LAGI`;
+                        badge.classList.remove('hidden');
+                    } else if (diffDays === 1) {
+                        badge.textContent = 'BESOK!';
+                        badge.classList.remove('hidden');
+                        badge.classList.add('bg-[#CA2C2A]');
+                    } else if (diffDays === 0) {
+                        badge.textContent = 'HARI H!';
+                        badge.classList.remove('hidden');
+                        badge.classList.add('bg-green-600');
+                    } else {
+                        badge.textContent = 'SELESAI';
+                        badge.classList.remove('hidden');
+                        badge.classList.add('bg-gray-600');
+                    }
+                }
+            }
+        }
+
+        // Initialize On Load
+        document.addEventListener('DOMContentLoaded', () => {
+            initTiltCards();
+            initCountdown();
+            validateLive('nama');
+            validateLive('nim');
+            validateLive('no_telp');
+
+            const kelasVal = document.getElementById('input-kelas-value')?.value.trim();
+            if (kelasVal) {
+                const checkKelas = document.getElementById('check-kelas');
+                if (checkKelas) checkKelas.classList.remove('hidden');
             }
         });
     </script>
