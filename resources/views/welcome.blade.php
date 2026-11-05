@@ -293,7 +293,7 @@
         <!-- 2. BAGIAN TENGAH: CARD INFO ACARA (3 SEKAT ELEGAN) -->
         <div class="anim-fade-2 tilt-card bg-white border-2 border-[#1A467C] shadow-[5px_5px_0px_0px_#1A467C] sm:shadow-[6px_6px_0px_0px_#1A467C] grid grid-cols-3 divide-x-2 divide-[#1A467C]/20 p-2 sm:p-3">
             
-            <!-- Sekat 1: Tanggal Pelaksanaan & Live Countdown Badge -->
+            <!-- Sekat 1: Tanggal Pelaksanaan -->
             <div class="px-1.5 sm:px-4 py-1 flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-1 sm:gap-3">
                 <div class="p-1 sm:p-2 bg-blue-50 border sm:border-2 border-[#2A82C6] text-[#2A82C6] shadow-[1px_1px_0px_0px_#1A467C] sm:shadow-[2px_2px_0px_0px_#1A467C] shrink-0">
                     <svg class="w-3.5 h-3.5 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -301,14 +301,10 @@
                     </svg>
                 </div>
                 <div class="min-w-0 w-full">
-                    <div class="flex items-center justify-center sm:justify-start gap-1">
-                        <span class="text-[8px] sm:text-[10px] font-black uppercase tracking-wider text-[#2A82C6] block leading-tight">
-                            TANGGAL
-                        </span>
-                        <!-- Live Countdown Dynamic Badge -->
-                        <span id="countdown-badge" class="hidden text-[8px] font-black uppercase bg-[#2A82C6] text-white px-1 py-0.2 border border-[#1A467C] shadow-[1px_1px_0px_0px_#1A467C]"></span>
-                    </div>
-                    <span id="event-date-text" class="font-extrabold text-[11px] sm:text-sm text-gray-900 block leading-tight truncate mt-0.5" title="{{ $pengaturan->tanggal_acara ?? '13 Oktober 2026' }}">
+                    <span class="text-[8px] sm:text-[10px] font-black uppercase tracking-wider text-[#2A82C6] block leading-tight">
+                        TANGGAL
+                    </span>
+                    <span class="font-extrabold text-[11px] sm:text-sm text-gray-900 block leading-tight truncate mt-0.5" title="{{ $pengaturan->tanggal_acara ?? '13 Oktober 2026' }}">
                         {{ $pengaturan->tanggal_acara ?? '13 Oktober 2026' }}
                     </span>
                 </div>
@@ -838,57 +834,9 @@
             }
         }
 
-        // 5. Dynamic Event Live Countdown Badge
-        function initCountdown() {
-            const dateEl = document.getElementById('event-date-text');
-            const badge = document.getElementById('countdown-badge');
-            if (!dateEl || !badge) return;
-
-            const dateStr = dateEl.innerText.trim();
-            const months = {
-                'januari': 0, 'februari': 1, 'maret': 2, 'april': 3, 'mei': 4, 'juni': 5,
-                'juli': 6, 'agustus': 7, 'september': 8, 'oktober': 9, 'november': 10, 'desember': 11
-            };
-
-            // Parse pattern like "13 Oktober 2026"
-            const match = dateStr.match(/(\d{1,2})\s+([a-zA-Z]+)\s+(\d{4})/);
-            if (match) {
-                const day = parseInt(match[1], 10);
-                const monthName = match[2].toLowerCase();
-                const year = parseInt(match[3], 10);
-
-                if (months[monthName] !== undefined) {
-                    const targetDate = new Date(year, months[monthName], day);
-                    const today = new Date();
-                    today.setHours(0, 0, 0, 0);
-
-                    const diffTime = targetDate.getTime() - today.getTime();
-                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-                    if (diffDays > 1) {
-                        badge.textContent = `${diffDays} HARI LAGI`;
-                        badge.classList.remove('hidden');
-                    } else if (diffDays === 1) {
-                        badge.textContent = 'BESOK!';
-                        badge.classList.remove('hidden');
-                        badge.classList.add('bg-[#CA2C2A]');
-                    } else if (diffDays === 0) {
-                        badge.textContent = 'HARI H!';
-                        badge.classList.remove('hidden');
-                        badge.classList.add('bg-green-600');
-                    } else {
-                        badge.textContent = 'SELESAI';
-                        badge.classList.remove('hidden');
-                        badge.classList.add('bg-gray-600');
-                    }
-                }
-            }
-        }
-
         // Initialize On Load
         document.addEventListener('DOMContentLoaded', () => {
             initTiltCards();
-            initCountdown();
             validateLive('nama');
             validateLive('nim');
             validateLive('no_telp');
