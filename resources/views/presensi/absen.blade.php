@@ -45,7 +45,6 @@
             box-shadow: 1px 1px 0px 0px #000000 !important;
         }
 
-        /* Solid Spring Modal Slam Animation */
         @keyframes modalSlam {
             0% {
                 transform: translateY(-40px) scale(0.92);
@@ -76,13 +75,13 @@
             >
             <div>
                 <span class="font-black text-xs uppercase tracking-wider text-[#1A467C] block leading-none">POKJA HIMA IF</span>
-                <span class="text-[10px] font-bold text-gray-500 uppercase tracking-tight block mt-0.5">PRESENSI KELAS</span>
+                <span class="text-[10px] font-bold text-gray-500 uppercase tracking-tight block mt-0.5">Presensi Kehadiran</span>
             </div>
         </div>
 
-        <div class="bg-[#2A82C6] border border-black px-2.5 py-1 text-white shadow-[1px_1px_0px_0px_#000000]">
+        <div class="bg-[#1A467C] border border-black px-2.5 py-1 text-white shadow-[1px_1px_0px_0px_#000000]">
             <span class="text-[10px] font-black uppercase tracking-wider">
-                SESI P{{ $pengaturan->pertemuan_aktif ?? 1 }}
+                Sesi Pertemuan {{ $pengaturan->pertemuan_aktif ?? 1 }}
             </span>
         </div>
     </header>
@@ -92,39 +91,64 @@
     <!-- ============================================================== -->
     <main class="w-full max-w-md mx-auto my-4 space-y-4">
 
-        <!-- Card Input NIM Mahasiswa -->
+        <!-- Card Identitas Mahasiswa -->
         <div class="bg-white border-2 border-black p-4 sm:p-5 shadow-[4px_4px_0px_0px_#000000] space-y-3">
             <div class="flex items-center justify-between border-b-2 border-black pb-2">
                 <span class="text-xs font-black uppercase tracking-wider text-[#1A467C]">
                     1. Identitas Mahasiswa
                 </span>
-                <span id="nim-badge-saved" class="hidden text-[9px] font-black uppercase tracking-wider bg-green-100 text-green-900 border border-green-800 px-1.5 py-0.2">
-                    NIM TERSIMPAN
-                </span>
+                @if ($mahasiswaLogin)
+                    <span class="text-[9px] font-black uppercase tracking-wider bg-green-100 text-green-900 border border-green-800 px-2 py-0.5 shadow-[1px_1px_0px_0px_#000000]">
+                        ✓ AKUN TERHUBUNG
+                    </span>
+                @else
+                    <span id="nim-badge-saved" class="hidden text-[9px] font-black uppercase tracking-wider bg-green-100 text-green-900 border border-green-800 px-1.5 py-0.5">
+                        NIM VALID
+                    </span>
+                @endif
             </div>
 
-            <div>
-                <label for="input-nim" class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1">
-                    Nomor Induk Mahasiswa (NIM) <span class="text-[#CA2C2A]">*</span>
-                </label>
-                <div class="relative">
-                    <input 
-                        type="text" 
-                        id="input-nim" 
-                        inputmode="numeric"
-                        pattern="[0-9]*"
-                        maxlength="9" 
-                        placeholder="Contoh: 250414010" 
-                        class="w-full bg-[#F8FBFE] border-2 border-black text-gray-950 font-mono font-black text-base px-3.5 py-2.5 focus:bg-white focus:outline-none focus:shadow-[3px_3px_0px_0px_#000000] transition tracking-widest"
-                    >
-                    <span id="nim-check" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-green-700 font-black text-lg">
-                        ✓
-                    </span>
+            @if ($mahasiswaLogin)
+                <!-- Identitas Terkunci dari Login Mahasiswa -->
+                <div class="pt-1">
+                    <input type="hidden" id="input-nim" value="{{ $mahasiswaLogin->nim }}">
+                    <h3 class="text-base font-black text-gray-950 uppercase">
+                        {{ $mahasiswaLogin->nama }}
+                    </h3>
+                    <div class="flex items-center gap-2 mt-1">
+                        <span class="font-mono font-bold text-xs text-[#1A467C] bg-blue-50 border border-black px-2 py-0.5">
+                            NIM: {{ $mahasiswaLogin->nim }}
+                        </span>
+                        <span class="font-bold text-xs text-gray-800 bg-gray-100 border border-black px-2 py-0.5">
+                            Kelas: {{ $mahasiswaLogin->kelas }}
+                        </span>
+                    </div>
                 </div>
-                <p class="text-[11px] font-semibold text-gray-500 mt-1">
-                    Pastikan NIM sesuai dengan pendaftaran (9 digit angka).
-                </p>
-            </div>
+            @else
+                <!-- Input Manual NIM untuk Publik non-login -->
+                <div>
+                    <label for="input-nim" class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1">
+                        Nomor Induk Mahasiswa (NIM) <span class="text-[#CA2C2A]">*</span>
+                    </label>
+                    <div class="relative">
+                        <input 
+                            type="text" 
+                            id="input-nim" 
+                            inputmode="numeric"
+                            pattern="[0-9]*"
+                            maxlength="9" 
+                            placeholder="Contoh: 250414010" 
+                            class="w-full bg-[#F8FBFE] border-2 border-black text-gray-950 font-mono font-black text-base px-3.5 py-2.5 focus:bg-white focus:outline-none focus:shadow-[3px_3px_0px_0px_#000000] transition tracking-widest"
+                        >
+                        <span id="nim-check" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-green-700 font-black text-lg">
+                            ✓
+                        </span>
+                    </div>
+                    <p id="nim-feedback" class="text-[11px] font-semibold text-gray-500 mt-1">
+                        Masukkan 9 digit NIM resmi Anda yang terdaftar di POKJA.
+                    </p>
+                </div>
+            @endif
         </div>
 
         <!-- Card Kamera Scanner QR Proyektor -->
@@ -133,7 +157,7 @@
                 <span class="text-xs font-black uppercase tracking-wider text-[#1A467C]">
                     2. Scan QR di Layar Proyektor
                 </span>
-                <span class="text-[10px] font-mono font-bold text-gray-500">HTML5 CAMERA</span>
+                <span class="text-[10px] font-mono font-bold text-gray-500">LIVE SCANNER</span>
             </div>
 
             <!-- Tombol Buka Kamera -->
@@ -142,13 +166,13 @@
                     type="button" 
                     id="btn-start-camera"
                     onclick="startCameraScanner()"
-                    class="btn-smooth w-full py-3 bg-[#2A82C6] hover:bg-[#1A467C] active:bg-[#1A467C] text-white text-xs sm:text-sm font-black uppercase tracking-wider border-2 border-black shadow-[3px_3px_0px_0px_#000000] flex items-center justify-center gap-2 cursor-pointer"
+                    class="btn-smooth w-full py-3.5 bg-[#2A82C6] hover:bg-[#1A467C] active:bg-[#1A467C] text-white text-xs sm:text-sm font-black uppercase tracking-wider border-2 border-black shadow-[4px_4px_0px_0px_#000000] flex items-center justify-center gap-2 cursor-pointer"
                 >
                     <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="square" stroke-width="2.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                         <path stroke-linecap="square" stroke-width="2.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
-                    <span>BUKA KAMERA & SCAN QR</span>
+                    <span>Buka Kamera & Scan QR</span>
                 </button>
             </div>
 
@@ -163,21 +187,26 @@
                     onclick="stopCameraScanner()"
                     class="btn-smooth w-full py-2 bg-gray-200 hover:bg-gray-300 text-gray-900 border-2 border-black text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
                 >
-                    TUTUP KAMERA
+                    Tutup Kamera
                 </button>
             </div>
 
-            <!-- Tips & Peringatan QR 5 Detik -->
-            <div class="p-3 bg-amber-50 border-2 border-black text-[11px] font-bold text-amber-950 shadow-[2px_2px_0px_0px_#000000] space-y-1">
-                <p class="font-black uppercase flex items-center gap-1.5 text-amber-900">
-                    <svg class="w-3.5 h-3.5 text-amber-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="square" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                    </svg>
-                    <span>PENTING (ANTI-TITIP ABSEN):</span>
-                </p>
-                <p>QR Code di proyektor berganti otomatis tiap 5 detik. Pastikan scan langsung ke layar proyektor di kelas, bukan dari kiriman foto chat.</p>
-            </div>
+            <!-- Keterangan Minimalis Refresh 5 Detik -->
+            <p class="text-center text-xs font-semibold text-gray-500 pt-1">
+                QR di proyektor refresh otomatis tiap 5 detik.
+            </p>
         </div>
+
+        @if ($mahasiswaLogin)
+            <div class="text-center">
+                <a 
+                    href="{{ route('mahasiswa.dashboard') }}" 
+                    class="btn-smooth inline-flex items-center gap-1.5 px-4 py-2 bg-white text-gray-900 border-2 border-black text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000]"
+                >
+                    ← Kembali ke Dashboard Mahasiswa
+                </a>
+            </div>
+        @endif
 
     </main>
 
@@ -240,39 +269,91 @@
     <!-- JAVASCRIPT: HTML5 QR Scanner & AJAX Submission                 -->
     <!-- ============================================================== -->
     <script>
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
         let html5QrCode = null;
         let isProcessing = false;
+        let isNimValid = {{ $mahasiswaLogin ? 'true' : 'false' }};
 
-        // Cek LocalStorage untuk NIM tersimpan
         document.addEventListener('DOMContentLoaded', () => {
-            const savedNIM = localStorage.getItem('pokja_mhs_nim');
             const inputNIM = document.getElementById('input-nim');
 
-            if (savedNIM && savedNIM.length === 9) {
-                inputNIM.value = savedNIM;
-                document.getElementById('nim-badge-saved').classList.remove('hidden');
-                document.getElementById('nim-check').classList.remove('hidden');
-            }
-
-            inputNIM.addEventListener('input', (e) => {
-                const val = e.target.value.replace(/[^0-9]/g, '');
-                e.target.value = val;
-
-                if (val.length === 9) {
-                    localStorage.setItem('pokja_mhs_nim', val);
-                    document.getElementById('nim-check').classList.remove('hidden');
-                } else {
-                    document.getElementById('nim-check').classList.add('hidden');
+            @if (!$mahasiswaLogin)
+                // Cek LocalStorage untuk NIM tersimpan
+                const savedNIM = localStorage.getItem('pokja_mhs_nim');
+                if (savedNIM && savedNIM.length === 9) {
+                    inputNIM.value = savedNIM;
+                    verifikasiNimServer(savedNIM);
                 }
-            });
+
+                inputNIM.addEventListener('input', (e) => {
+                    const val = e.target.value.replace(/[^0-9]/g, '');
+                    e.target.value = val;
+
+                    if (val.length === 9) {
+                        verifikasiNimServer(val);
+                    } else {
+                        isNimValid = false;
+                        document.getElementById('nim-check').classList.add('hidden');
+                        const fb = document.getElementById('nim-feedback');
+                        fb.className = "text-[11px] font-semibold text-gray-500 mt-1";
+                        fb.innerText = "Masukkan 9 digit NIM resmi Anda yang terdaftar di POKJA.";
+                    }
+                });
+            @endif
         });
 
-        // Buka Kamera Scanner
+        // Verifikasi ke server apakah NIM benar-benar terdaftar
+        async function verifikasiNimServer(nim) {
+            const checkEl = document.getElementById('nim-check');
+            const fb = document.getElementById('nim-feedback');
+            fb.className = "text-[11px] font-semibold text-blue-700 mt-1";
+            fb.innerText = "Memeriksa NIM ke database...";
+
+            try {
+                const res = await fetch("{{ route('presensi.cekNim') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ nim: nim })
+                });
+
+                const data = await res.json();
+
+                if (res.ok && data.valid) {
+                    isNimValid = true;
+                    localStorage.setItem('pokja_mhs_nim', nim);
+                    checkEl.classList.remove('hidden');
+                    fb.className = "text-[11px] font-bold text-green-700 mt-1";
+                    fb.innerText = `✓ Terdaftar: ${data.nama} (${data.kelas})`;
+                } else {
+                    isNimValid = false;
+                    checkEl.classList.add('hidden');
+                    fb.className = "text-[11px] font-bold text-red-600 mt-1";
+                    fb.innerText = `✗ ${data.message || 'NIM tidak terdaftar di sistem POKJA'}`;
+                }
+            } catch (err) {
+                isNimValid = false;
+                checkEl.classList.add('hidden');
+                fb.className = "text-[11px] font-semibold text-red-600 mt-1";
+                fb.innerText = "Gagal memverifikasi NIM. Periksa koneksi internet.";
+            }
+        }
+
+        // Buka Kamera Scanner dengan Fallback Kompatibilitas Tinggi
         async function startCameraScanner() {
             const nim = document.getElementById('input-nim').value.trim();
-            if (nim.length !== 9) {
-                alert("Harap masukkan 9 digit NIM Anda terlebih dahulu!");
-                document.getElementById('input-nim').focus();
+
+            if (!nim || nim.length !== 9) {
+                alert("Harap masukkan 9 digit NIM terdaftar Anda terlebih dahulu!");
+                document.getElementById('input-nim')?.focus();
+                return;
+            }
+
+            if (!isNimValid) {
+                alert("NIM Anda tidak valid atau tidak terdaftar di sistem. Harap periksa kembali.");
                 return;
             }
 
@@ -289,16 +370,27 @@
                 aspectRatio: 1.0
             };
 
+            // 1. Coba kamera belakang (environment)
             try {
                 await html5QrCode.start(
                     { facingMode: "environment" },
                     config,
                     onScanSuccess,
-                    onScanFailure
+                    (err) => { /* abaikan error frame scanner */ }
                 );
-            } catch (err) {
-                alert(`Gagal mengakses kamera: ${err.message || 'Izin kamera ditolak'}`);
-                stopCameraScanner();
+            } catch (envErr) {
+                // 2. Fallback jika device tidak mendukung facingMode environment (misal laptop webcam)
+                try {
+                    await html5QrCode.start(
+                        { facingMode: "user" },
+                        config,
+                        onScanSuccess,
+                        (err) => { /* abaikan */ }
+                    );
+                } catch (userErr) {
+                    alert("Tidak dapat mengakses kamera. Pastikan Anda telah memberikan izin akses kamera di browser.");
+                    stopCameraScanner();
+                }
             }
         }
 
@@ -316,32 +408,26 @@
         }
 
         // Callback saat QR Berhasil Terbaca Kamera
-        async function onScanSuccess(decodedText, decodedResult) {
+        async function onScanSuccess(decodedText) {
             if (isProcessing) return;
             isProcessing = true;
 
             const nim = document.getElementById('input-nim').value.trim();
-            if (nim.length !== 9) {
-                alert("NIM belum diisi dengan benar!");
-                isProcessing = false;
-                return;
-            }
 
-            // Getar HP jika browser mendukung
+            // Getar HP jika didukung
             if (navigator.vibrate) {
                 navigator.vibrate([100, 50, 100]);
             }
 
-            // Hentikan kamera sementara
             await stopCameraScanner();
 
-            // Submit ke Backend via AJAX
+            // Submit ke Backend
             try {
                 const response = await fetch("{{ route('presensi.scan') }}", {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'X-CSRF-TOKEN': csrfToken,
                         'Accept': 'application/json'
                     },
                     body: JSON.stringify({
@@ -363,11 +449,7 @@
             }
         }
 
-        function onScanFailure(error) {
-            // Abaikan frame kamera yang belum menemukan QR
-        }
-
-        // Tampilkan Modal Hasil Absen
+        // Tampilkan Modal Hasil Presensi
         function showResultModal(data, isHttpOk) {
             const modal = document.getElementById('result-modal');
             const iconWrapper = document.getElementById('modal-icon-wrapper');
@@ -376,52 +458,42 @@
             const desc = document.getElementById('modal-desc');
             const studentBox = document.getElementById('modal-student-box');
 
-            modal.classList.remove('hidden');
+            iconWrapper.className = "w-14 h-14 mx-auto border-2 border-black flex items-center justify-center font-black text-2xl shadow-[3px_3px_0px_0px_#000000]";
+            badge.className = "inline-block text-[10px] font-black uppercase px-2 py-0.5 border border-black shadow-[1px_1px_0px_0px_#000000] mb-1";
 
-            if (data.success && !data.already) {
-                // SUKSES HADIR PERTAMA KALI
-                iconWrapper.className = "w-14 h-14 mx-auto border-2 border-black flex items-center justify-center font-black text-2xl shadow-[3px_3px_0px_0px_#000000] bg-green-500 text-white";
-                iconWrapper.innerText = "✓";
-                badge.className = "inline-block text-[10px] font-black uppercase px-2 py-0.5 border border-black shadow-[1px_1px_0px_0px_#000000] mb-1 bg-green-100 text-green-900";
-                badge.innerText = "BERHASIL HADIR";
-                title.innerText = `PERTEMUAN ${data.pertemuan}`;
-                desc.innerText = "Presensi Anda telah berhasil dicatat dan masuk ke layar proyektor!";
+            if (isHttpOk && data.success) {
+                iconWrapper.classList.add('bg-green-400', 'text-black');
+                iconWrapper.innerHTML = '✓';
+                badge.classList.add('bg-green-100', 'text-green-900');
+                badge.innerText = 'BERHASIL HADIR';
+                title.innerText = 'PRESENSI BERHASIL!';
+                desc.innerText = data.message || 'Kehadiran Anda pada sesi ini telah berhasil dicatat.';
 
-                studentBox.classList.remove('hidden');
-                document.getElementById('detail-nama').innerText = data.nama;
-                document.getElementById('detail-nim-kelas').innerText = `${data.nim} • ${data.kelas}`;
-                document.getElementById('detail-waktu').innerText = `${data.waktu} WIB`;
-
-            } else if (data.success && data.already) {
-                // SUDAH PERNAH HADIR
-                iconWrapper.className = "w-14 h-14 mx-auto border-2 border-black flex items-center justify-center font-black text-2xl shadow-[3px_3px_0px_0px_#000000] bg-amber-400 text-black";
-                iconWrapper.innerText = "ℹ";
-                badge.className = "inline-block text-[10px] font-black uppercase px-2 py-0.5 border border-black shadow-[1px_1px_0px_0px_#000000] mb-1 bg-amber-100 text-amber-900";
-                badge.innerText = "SUDAH TERCATAT";
-                title.innerText = `SUDAH ABSEN (P${data.pertemuan})`;
-                desc.innerText = data.message;
-
-                studentBox.classList.remove('hidden');
-                document.getElementById('detail-nama').innerText = data.nama;
-                document.getElementById('detail-nim-kelas').innerText = `${data.nim} • ${data.kelas}`;
-                document.getElementById('detail-waktu').innerText = `${data.waktu} WIB`;
-
+                if (data.data) {
+                    document.getElementById('detail-nama').innerText = data.data.nama || '-';
+                    document.getElementById('detail-nim-kelas').innerText = `${data.data.nim || '-'} (${data.data.kelas || '-'})`;
+                    document.getElementById('detail-waktu').innerText = data.data.waktu || 'Baru Saja';
+                    studentBox.classList.remove('hidden');
+                } else {
+                    studentBox.classList.add('hidden');
+                }
             } else {
-                // ERROR (KEDALUWARSA / NIM SALAH / SESI TUTUP)
-                iconWrapper.className = "w-14 h-14 mx-auto border-2 border-black flex items-center justify-center font-black text-2xl shadow-[3px_3px_0px_0px_#000000] bg-red-600 text-white";
-                iconWrapper.innerText = "✕";
-                badge.className = "inline-block text-[10px] font-black uppercase px-2 py-0.5 border border-black shadow-[1px_1px_0px_0px_#000000] mb-1 bg-red-100 text-red-900";
-                badge.innerText = "PRESENSI GAGAL";
-                title.innerText = "TIDAK VALID";
-                desc.innerText = data.message || "Gagal memproses presensi.";
+                iconWrapper.classList.add('bg-red-400', 'text-black');
+                iconWrapper.innerHTML = '✕';
+                badge.classList.add('bg-red-100', 'text-red-900');
+                badge.innerText = 'PRESENSI GAGAL';
+                title.innerText = 'Gagal Melakukan Presensi';
+                desc.innerText = data.message || 'Terjadi kesalahan sistem saat memproses presensi.';
                 studentBox.classList.add('hidden');
             }
+
+            modal.classList.remove('hidden');
         }
 
         function closeResultModal() {
             document.getElementById('result-modal').classList.add('hidden');
         }
     </script>
+
 </body>
 </html>
-

@@ -26,6 +26,7 @@ Route::get('/absen', [PresensiMahasiswaController::class, 'showAbsen'])->name('p
 Route::post('/absen/scan', [PresensiMahasiswaController::class, 'submitScan'])
     ->middleware('throttle:60,1')
     ->name('presensi.scan');
+Route::post('/absen/cek-nim', [PresensiMahasiswaController::class, 'cekNim'])->name('presensi.cekNim');
 
 /*
 |--------------------------------------------------------------------------

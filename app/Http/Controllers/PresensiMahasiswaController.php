@@ -17,7 +17,43 @@ class PresensiMahasiswaController extends Controller
     public function showAbsen()
     {
         $pengaturan = Pengaturan::first();
-        return view('presensi.absen', compact('pengaturan'));
+        $mahasiswaLogin = null;
+
+        if (session()->has('mahasiswa_id')) {
+            $mahasiswaLogin = Pendaftaran::find(session('mahasiswa_id'));
+        }
+
+        return view('presensi.absen', compact('pengaturan', 'mahasiswaLogin'));
+    }
+
+    /**
+     * Verifikasi keberadaan NIM terdaftar di database via AJAX.
+     */
+    public function cekNim(Request $request)
+    {
+        $nim = trim($request->input('nim', ''));
+
+        if (strlen($nim) !== 9 || !ctype_digit($nim)) {
+            return response()->json([
+                'valid' => false,
+                'message' => 'NIM harus tepat 9 digit angka.',
+            ], 422);
+        }
+
+        $mahasiswa = Pendaftaran::where('nim', $nim)->first();
+
+        if (!$mahasiswa) {
+            return response()->json([
+                'valid' => false,
+                'message' => 'NIM tidak terdaftar sebagai peserta POKJA HIMA IF.',
+            ], 404);
+        }
+
+        return response()->json([
+            'valid' => true,
+            'nama' => $mahasiswa->nama,
+            'kelas' => $mahasiswa->kelas,
+        ]);
     }
 
     /**

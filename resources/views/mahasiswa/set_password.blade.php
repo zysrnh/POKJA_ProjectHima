@@ -72,9 +72,6 @@
                     class="w-14 h-14 mx-auto object-contain bg-white p-1.5 border-2 border-black shadow-[3px_3px_0px_0px_#000000]"
                 >
                 <div>
-                    <span class="inline-block bg-[#15803d] text-white text-[10px] font-black uppercase px-2 py-0.5 tracking-wider border border-black mb-1">
-                        QR TERVERIFIKASI
-                    </span>
                     <h1 class="text-lg sm:text-xl font-black uppercase tracking-tight text-[#1A467C]">
                         Buat Password Akun
                     </h1>
