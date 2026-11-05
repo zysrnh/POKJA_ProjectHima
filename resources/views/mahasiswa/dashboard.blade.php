@@ -37,15 +37,24 @@
             background-size: 24px 24px;
         }
 
-        .btn-smooth {
-            transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.15s ease;
+        /* Tactile Neubrutalism Button & Card Transitions */
+        .btn-tactile {
+            transition: transform 0.12s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.12s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.12s ease;
         }
-        .btn-smooth:hover {
+        .btn-tactile:hover {
             transform: translate(-2px, -2px);
         }
-        .btn-smooth:active {
+        .btn-tactile:active {
             transform: translate(2px, 2px);
             box-shadow: 1px 1px 0px 0px #000000 !important;
+        }
+
+        .card-tactile {
+            transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.15s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .card-tactile:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px 0px #000000 !important;
         }
 
         .nav-item-active {
@@ -57,6 +66,7 @@
         .bottom-nav-active {
             color: #1A467C !important;
             font-weight: 800 !important;
+            transform: scale(1.05);
         }
         .bottom-nav-active .bottom-nav-icon {
             background-color: #1A467C !important;
@@ -64,22 +74,32 @@
             box-shadow: 2px 2px 0px 0px #000000 !important;
         }
 
-        @keyframes modalSlam {
-            0% { transform: translateY(-30px) scale(0.95); }
-            65% { transform: translateY(6px) scale(1.02); }
+        /* Spring Slam Modal Animation (Without Opacity Transitions) */
+        @keyframes modalSpringSlam {
+            0% { transform: translateY(-30px) scale(0.92); }
+            70% { transform: translateY(4px) scale(1.02); }
             100% { transform: translateY(0) scale(1); }
         }
-        .modal-slam {
-            animation: modalSlam 0.28s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+        .modal-spring-slam {
+            animation: modalSpringSlam 0.28s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+        }
+
+        /* Tactile Tab Snap Pop Animation (No Opacity) */
+        @keyframes tabSnapIn {
+            0% { transform: translateY(6px) scale(0.99); }
+            100% { transform: translateY(0) scale(1); }
+        }
+        .tab-snap-in {
+            animation: tabSnapIn 0.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
         }
     </style>
 </head>
-<body class="min-h-screen text-[#000000] flex flex-col md:flex-row antialiased selection:bg-[#2A82C6] selection:text-white">
+<body class="min-h-screen text-[#000000] flex flex-col md:flex-row antialiased selection:bg-[#2A82C6] selection:text-white overflow-x-hidden">
 
     <!-- ============================================================== -->
     <!-- DESKTOP SIDEBAR (Visible on md: and up)                         -->
     <!-- ============================================================== -->
-    <aside class="hidden md:flex md:w-64 lg:w-72 bg-white border-r-[3px] border-black flex-col justify-between shrink-0 min-h-screen sticky top-0 z-30 shadow-[4px_0px_0px_0px_#000000]">
+    <aside class="hidden md:flex md:w-64 lg:w-72 bg-white border-r-[3px] border-black flex-col justify-between shrink-0 h-screen sticky top-0 z-30 shadow-[4px_0px_0px_0px_#000000]">
         
         <div class="p-5 space-y-6">
             <!-- Brand & Logo -->
@@ -102,7 +122,7 @@
                         {{ strtoupper(substr($mahasiswa->nama, 0, 2)) }}
                     </div>
                     <div class="min-w-0">
-                        <span class="text-[9px] font-black uppercase tracking-wider text-[#1A467C] block">Peserta Terdaftar</span>
+                        <span class="text-[9px] font-black uppercase tracking-wider text-[#1A467C] block">MAHASISWA</span>
                         <h4 class="text-xs font-black text-gray-950 truncate uppercase leading-tight mt-0.5" title="{{ $mahasiswa->nama }}">
                             {{ $mahasiswa->nama }}
                         </h4>
@@ -120,7 +140,7 @@
                     type="button" 
                     id="side-nav-beranda"
                     onclick="switchTab('beranda')" 
-                    class="nav-item-active btn-smooth w-full text-left px-3.5 py-2.5 border-2 border-black font-black text-xs uppercase tracking-wider flex items-center gap-2.5 cursor-pointer"
+                    class="nav-item-active btn-tactile w-full text-left px-3.5 py-2.5 border-2 border-black font-black text-xs uppercase tracking-wider flex items-center gap-2.5 cursor-pointer"
                 >
                     <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="square" stroke-width="2.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
@@ -132,7 +152,7 @@
                     type="button" 
                     id="side-nav-scan"
                     onclick="switchTab('scan')" 
-                    class="btn-smooth w-full text-left px-3.5 py-2.5 bg-white hover:bg-gray-100 text-gray-900 border-2 border-black font-black text-xs uppercase tracking-wider flex items-center gap-2.5 shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
+                    class="btn-tactile w-full text-left px-3.5 py-2.5 bg-white hover:bg-gray-100 text-gray-900 border-2 border-black font-black text-xs uppercase tracking-wider flex items-center gap-2.5 shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
                 >
                     <svg class="w-4 h-4 text-[#15803d] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="square" stroke-width="2.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
@@ -145,12 +165,12 @@
                     type="button" 
                     id="side-nav-tiket"
                     onclick="switchTab('tiket')" 
-                    class="btn-smooth w-full text-left px-3.5 py-2.5 bg-white hover:bg-gray-100 text-gray-900 border-2 border-black font-black text-xs uppercase tracking-wider flex items-center gap-2.5 shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
+                    class="btn-tactile w-full text-left px-3.5 py-2.5 bg-white hover:bg-gray-100 text-gray-900 border-2 border-black font-black text-xs uppercase tracking-wider flex items-center gap-2.5 shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
                 >
                     <svg class="w-4 h-4 text-[#1A467C] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="square" stroke-width="2.5" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
                     </svg>
-                    <span>Tiket & Kartu</span>
+                    <span>Tiket & QR</span>
                 </button>
             </nav>
         </div>
@@ -161,7 +181,7 @@
                 <a 
                     href="{{ $pengaturan->link_grup_wa }}" 
                     target="_blank"
-                    class="btn-smooth w-full inline-flex items-center justify-center gap-2 py-2 bg-[#25D366] text-black border-2 border-black font-black text-xs uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000]"
+                    class="btn-tactile w-full inline-flex items-center justify-center gap-2 py-2 bg-[#25D366] text-black border-2 border-black font-black text-xs uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000]"
                 >
                     <span>Grup WhatsApp</span>
                 </a>
@@ -171,7 +191,7 @@
                 @csrf
                 <button 
                     type="submit" 
-                    class="btn-smooth w-full py-2 bg-[#CA2C2A] hover:bg-[#901C1A] text-white border-2 border-black font-black text-xs uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] flex items-center justify-center gap-1.5 cursor-pointer"
+                    class="btn-tactile w-full py-2 bg-[#CA2C2A] hover:bg-[#901C1A] text-white border-2 border-black font-black text-xs uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] flex items-center justify-center gap-1.5 cursor-pointer"
                 >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="square" stroke-width="2.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -184,13 +204,13 @@
     </aside>
 
     <!-- ============================================================== -->
-    <!-- MAIN APPLICATION WRAPPER                                       -->
+    <!-- MAIN CONTENT VIEWPORT                                          -->
     <!-- ============================================================== -->
     <div class="flex-1 flex flex-col min-w-0">
 
-        <!-- Mobile Top Bar (Visible on mobile only) -->
-        <header class="md:hidden bg-white border-b-2 border-black sticky top-0 z-30 p-3.5 flex items-center justify-between shadow-[0_2px_0px_0px_#000000]">
-            <div class="flex items-center gap-2.5">
+        <!-- Mobile Top Bar (Single clean header bar on mobile) -->
+        <header class="md:hidden bg-white border-b-2 border-black sticky top-0 z-30 p-3 flex items-center justify-between shadow-[0_2px_0px_0px_#000000]">
+            <div class="flex items-center gap-2">
                 <img 
                     src="{{ asset('logo/logo.png') }}" 
                     alt="Logo HIMA IF" 
@@ -204,13 +224,13 @@
 
             <div class="bg-[#1A467C] border border-black px-2 py-0.5 text-white shadow-[1px_1px_0px_0px_#000000]">
                 <span class="text-[9px] font-black uppercase tracking-wider">
-                    Sesi P{{ $pengaturan->pertemuan_aktif ?? 1 }}
+                    Sesi {{ $pengaturan->pertemuan_aktif ?? 1 }}
                 </span>
             </div>
         </header>
 
         <!-- Main Content Area -->
-        <main class="flex-1 p-4 sm:p-6 lg:p-8 max-w-5xl w-full mx-auto pb-24 md:pb-8 space-y-6">
+        <main class="flex-1 p-3.5 sm:p-6 lg:p-8 max-w-5xl w-full mx-auto pb-24 md:pb-8 space-y-4 sm:space-y-6">
 
             <!-- Flash Alert Success -->
             @if (session('success'))
@@ -222,86 +242,75 @@
             <!-- ========================================================== -->
             <!-- TAB 1: BERANDA & REKAP KEHADIRAN                           -->
             <!-- ========================================================== -->
-            <section id="tab-panel-beranda" class="space-y-6">
+            <section id="tab-panel-beranda" class="tab-snap-in space-y-4 sm:space-y-6">
 
                 <!-- Greeting Banner -->
-                <div class="bg-white border-2 border-black p-5 sm:p-6 shadow-[5px_5px_0px_0px_#000000]">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                        <div>
-                            <span class="inline-block bg-[#1A467C] text-white text-[10px] font-black uppercase px-2.5 py-0.5 tracking-wider border border-black mb-1.5 shadow-[1px_1px_0px_0px_#000000]">
-                                PESERTA POKJA
+                <div class="card-tactile bg-white border-2 border-black p-4 sm:p-6 shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000]">
+                    <div class="flex items-center justify-between gap-3">
+                        <div class="min-w-0 flex-1">
+                            <span class="inline-block bg-[#1A467C] text-white text-[10px] font-black uppercase px-2 py-0.5 tracking-wider border border-black mb-1 shadow-[1px_1px_0px_0px_#000000]">
+                                MAHASISWA
                             </span>
-                            <h2 class="text-xl sm:text-2xl font-black uppercase tracking-tight text-gray-950">
+                            <h2 class="text-base sm:text-2xl font-black uppercase tracking-tight text-gray-950 truncate">
                                 {{ $mahasiswa->nama }}
                             </h2>
-                            <p class="text-xs font-mono font-bold text-gray-600 mt-1">
-                                NIM: <span class="text-[#1A467C] font-black">{{ $mahasiswa->nim }}</span> • Kelas: <span class="bg-blue-50 border border-[#2A82C6] text-[#1A467C] px-2 py-0.5 text-xs font-black">{{ $mahasiswa->kelas }}</span>
+                            <p class="text-xs font-mono font-bold text-gray-600 mt-0.5 sm:mt-1 truncate">
+                                NIM: <span class="text-[#1A467C] font-black">{{ $mahasiswa->nim }}</span> • Kelas: <span class="bg-blue-50 border border-[#2A82C6] text-[#1A467C] px-1.5 py-0.2 text-xs font-black">{{ $mahasiswa->kelas }}</span>
                             </p>
                         </div>
 
-                        <div class="flex items-center gap-2">
-                            <button 
-                                type="button" 
-                                onclick="switchTab('scan')" 
-                                class="btn-smooth inline-flex items-center gap-1.5 px-4 py-2.5 bg-[#15803d] hover:bg-[#166534] text-white border-2 border-black text-xs font-black uppercase tracking-wider shadow-[3px_3px_0px_0px_#000000] cursor-pointer"
-                            >
-                                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="square" stroke-width="2.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                                    <path stroke-width="2.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
-                                <span>Scan Presensi</span>
-                            </button>
-                        </div>
+                        <!-- Scan Button: Clean Camera Icon on Mobile / Compact with Label on Desktop -->
+                        <button 
+                            type="button" 
+                            onclick="switchTab('scan')" 
+                            title="Buka Scanner Presensi"
+                            class="btn-tactile p-2.5 sm:px-4 sm:py-2.5 bg-[#15803d] hover:bg-[#166534] text-white border-2 border-black shadow-[3px_3px_0px_0px_#000000] flex items-center justify-center gap-1.5 cursor-pointer shrink-0"
+                        >
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="square" stroke-width="2.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                <path stroke-linecap="square" stroke-width="2.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            <span class="hidden sm:inline text-xs font-black uppercase">Scan</span>
+                        </button>
                     </div>
                 </div>
 
-                <!-- 3 Stat Cards Ringkas -->
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-                    <div class="bg-white border-2 border-black p-4 shadow-[4px_4px_0px_0px_#000000] flex items-center justify-between">
-                        <div>
-                            <span class="text-[10px] font-black uppercase tracking-wider text-[#1A467C]">Total Kehadiran</span>
-                            <h3 class="text-2xl font-black text-gray-950 font-mono mt-0.5">{{ $totalHadir }} / 7</h3>
-                        </div>
-                        <span class="text-[10px] font-black text-[#1A467C] bg-blue-50 border border-[#2A82C6] px-2 py-0.5 uppercase">Pertemuan</span>
+                <!-- 3 Stat Cards Ringkas (Clean, Without Extra Badges) -->
+                <div class="grid grid-cols-3 gap-2.5 sm:gap-4">
+                    <div class="card-tactile bg-white border-2 border-black p-3 sm:p-4 shadow-[2px_2px_0px_0px_#000000] sm:shadow-[4px_4px_0px_0px_#000000]">
+                        <span class="text-[9px] sm:text-xs font-black uppercase tracking-wider text-[#1A467C] block truncate">Total Hadir</span>
+                        <h3 class="text-xl sm:text-3xl font-black text-gray-950 font-mono mt-1 leading-none">{{ $totalHadir }}<span class="text-xs sm:text-lg text-gray-500 font-bold">/7</span></h3>
                     </div>
 
-                    <div class="bg-white border-2 border-black p-4 shadow-[4px_4px_0px_0px_#000000] flex items-center justify-between">
-                        <div>
-                            <span class="text-[10px] font-black uppercase tracking-wider text-green-800">Persentase Hadir</span>
-                            <h3 class="text-2xl font-black text-green-700 font-mono mt-0.5">{{ $persenHadir }}%</h3>
-                        </div>
-                        <span class="text-[10px] font-black text-green-900 bg-green-50 border border-green-700 px-2 py-0.5 uppercase">Progres</span>
+                    <div class="card-tactile bg-white border-2 border-black p-3 sm:p-4 shadow-[2px_2px_0px_0px_#000000] sm:shadow-[4px_4px_0px_0px_#000000]">
+                        <span class="text-[9px] sm:text-xs font-black uppercase tracking-wider text-green-800 block truncate">Persentase</span>
+                        <h3 class="text-xl sm:text-3xl font-black text-green-700 font-mono mt-1 leading-none">{{ $persenHadir }}%</h3>
                     </div>
 
-                    <div class="bg-white border-2 border-black p-4 shadow-[4px_4px_0px_0px_#000000] flex items-center justify-between">
-                        <div>
-                            <span class="text-[10px] font-black uppercase tracking-wider text-gray-700">Sesi Berjalan</span>
-                            <h3 class="text-2xl font-black text-[#1A467C] font-mono mt-0.5">P{{ $pengaturan->pertemuan_aktif ?? 1 }}</h3>
-                        </div>
-                        <span class="text-[10px] font-black text-white {{ ($pengaturan->is_scan_aktif ?? false) ? 'bg-green-700' : 'bg-gray-600' }} border border-black px-2 py-0.5 uppercase">
-                            {{ ($pengaturan->is_scan_aktif ?? false) ? 'SCAN AKTIF' : 'TUTUP' }}
-                        </span>
+                    <div class="card-tactile bg-white border-2 border-black p-3 sm:p-4 shadow-[2px_2px_0px_0px_#000000] sm:shadow-[4px_4px_0px_0px_#000000]">
+                        <span class="text-[9px] sm:text-xs font-black uppercase tracking-wider text-gray-700 block truncate">Sesi Aktif</span>
+                        <h3 class="text-xl sm:text-3xl font-black text-[#1A467C] font-mono mt-1 leading-none">Sesi {{ $pengaturan->pertemuan_aktif ?? 1 }}</h3>
                     </div>
                 </div>
 
                 <!-- Rekapitulasi Kehadiran 7 Pertemuan -->
-                <div class="bg-white border-2 border-black p-5 sm:p-6 shadow-[5px_5px_0px_0px_#000000] space-y-4">
-                    <div class="flex items-center justify-between border-b-2 border-black pb-3">
+                <div class="card-tactile bg-white border-2 border-black p-4 sm:p-6 shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000] space-y-3.5">
+                    <div class="flex items-center justify-between border-b-2 border-black pb-2.5">
                         <div>
-                            <h3 class="text-sm sm:text-base font-black uppercase text-[#1A467C]">
-                                Rekapitulasi Kehadiran 7 Pertemuan
+                            <h3 class="text-xs sm:text-base font-black uppercase text-[#1A467C]">
+                                Rekapitulasi Kehadiran
                             </h3>
-                            <p class="text-xs text-gray-600 font-semibold mt-0.5">
-                                Riwayat absensi kehadiran Anda pada setiap sesi pertemuan POKJA.
+                            <p class="text-[10px] sm:text-xs text-gray-600 font-semibold mt-0.5">
+                                Riwayat kehadiran Anda pada 7 pertemuan POKJA.
                             </p>
                         </div>
-                        <span class="text-xs font-mono font-black bg-gray-100 border border-black px-2.5 py-1">
+                        <span class="text-xs font-mono font-black bg-gray-100 border border-black px-2 py-0.5 shrink-0">
                             {{ $totalHadir }}/7 Hadir
                         </span>
                     </div>
 
-                    <!-- Grid 7 Pertemuan -->
-                    <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5 sm:gap-3">
+                    <!-- Grid 7 Pertemuan (Responsive 2 / 4 / 7 Cols) -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 sm:gap-3">
                         @for ($i = 1; $i <= 7; $i++)
                             @php
                                 $itemPresensi = $presensiMap->get($i);
@@ -309,31 +318,31 @@
                                 $isCurrentSesi = (int) ($pengaturan->pertemuan_aktif ?? 1) === $i;
                             @endphp
 
-                            <div class="p-3 border-2 border-black text-center {{ $isHadir ? 'bg-green-50 shadow-[2px_2px_0px_0px_#15803d]' : 'bg-gray-50 shadow-[2px_2px_0px_0px_#000000]' }} {{ $isCurrentSesi ? 'ring-2 ring-[#2A82C6]' : '' }}">
-                                <div class="flex items-center justify-between mb-1.5">
-                                    <span class="text-xs font-black font-mono {{ $isCurrentSesi ? 'text-[#1A467C]' : 'text-gray-900' }}">
+                            <div class="p-2 sm:p-2.5 border-2 border-black text-center {{ $isHadir ? 'bg-green-50 shadow-[2px_2px_0px_0px_#15803d]' : 'bg-gray-50 shadow-[1px_1px_0px_0px_#000000]' }} {{ $isCurrentSesi ? 'ring-2 ring-[#2A82C6]' : '' }}">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-[11px] font-black font-mono {{ $isCurrentSesi ? 'text-[#1A467C]' : 'text-gray-900' }}">
                                         P{{ $i }}
                                     </span>
                                     @if ($isHadir)
-                                        <span class="text-[10px] font-black text-green-700">✓</span>
+                                        <span class="text-[11px] font-black text-green-700">✓</span>
                                     @else
                                         <span class="text-[10px] font-mono text-gray-400">-</span>
                                     @endif
                                 </div>
 
-                                <div class="my-1">
+                                <div class="my-0.5">
                                     @if ($isHadir)
-                                        <span class="inline-block bg-green-700 text-white text-[9px] font-black uppercase px-1.5 py-0.2 border border-black">
+                                        <span class="inline-block bg-green-700 text-white text-[8px] sm:text-[9px] font-black uppercase px-1.5 py-0.2 border border-black">
                                             HADIR
                                         </span>
                                     @else
-                                        <span class="inline-block bg-gray-200 text-gray-600 text-[9px] font-bold uppercase px-1.5 py-0.2 border border-gray-400">
+                                        <span class="inline-block bg-gray-200 text-gray-600 text-[8px] sm:text-[9px] font-bold uppercase px-1.5 py-0.2 border border-gray-400">
                                             BELUM
                                         </span>
                                     @endif
                                 </div>
 
-                                <span class="text-[9px] font-mono font-bold text-gray-500 block truncate mt-1">
+                                <span class="text-[9px] font-mono font-bold text-gray-500 block truncate mt-0.5">
                                     {{ $isHadir ? \Carbon\Carbon::parse($itemPresensi->waktu_presensi)->format('H:i') : '-' }}
                                 </span>
                             </div>
@@ -344,31 +353,28 @@
             </section>
 
             <!-- ========================================================== -->
-            <!-- TAB 2: SCAN PRESENSI KAMERA (Terpadu & Otomatis)           -->
+            <!-- TAB 2: SCAN PRESENSI KAMERA (Terpadu, Simple & Responsive) -->
             <!-- ========================================================== -->
-            <section id="tab-panel-scan" class="hidden space-y-6">
+            <section id="tab-panel-scan" class="tab-snap-in hidden space-y-4 sm:space-y-6">
 
-                <div class="bg-white border-2 border-black p-5 sm:p-6 shadow-[5px_5px_0px_0px_#000000] space-y-4">
+                <div class="card-tactile bg-white border-2 border-black p-4 sm:p-6 shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000] space-y-4">
                     <div class="border-b-2 border-black pb-3 flex items-center justify-between">
                         <div>
                             <h3 class="text-sm sm:text-base font-black uppercase text-[#1A467C]">
-                                Scanner Presensi Proyektor
+                                Scanner Presensi
                             </h3>
-                            <p class="text-xs text-gray-600 font-semibold mt-0.5">
-                                Arahkan kamera HP ke QR Code yang sedang tayang di layar proyektor kelas.
+                            <p class="text-[11px] sm:text-xs text-gray-600 font-semibold mt-0.5">
+                                Arahkan kamera ke QR Code di layar proyektor kelas.
                             </p>
                         </div>
                         <span class="text-xs font-black bg-[#1A467C] text-white border border-black px-2.5 py-1">
-                            Sesi Pertemuan {{ $pengaturan->pertemuan_aktif ?? 1 }}
+                            Sesi {{ $pengaturan->pertemuan_aktif ?? 1 }}
                         </span>
                     </div>
 
-                    <!-- Locked Student Identity Card -->
-                    <div class="bg-blue-50 border-2 border-black p-3.5 space-y-1">
-                        <div class="flex items-center justify-between">
-                            <span class="text-[10px] font-black uppercase text-gray-500 tracking-wider">Identitas Terverifikasi</span>
-                            <span class="text-[9px] font-black bg-green-200 text-green-900 border border-green-800 px-1.5 py-0.2">✓ TERKUNCI</span>
-                        </div>
+                    <!-- Locked Student Identity Card (Clean, No Extra Badges) -->
+                    <div class="bg-blue-50 border-2 border-black p-3 space-y-0.5">
+                        <span class="text-[9px] font-black uppercase text-gray-500 tracking-wider">Identitas Mahasiswa</span>
                         <h4 class="text-sm font-black uppercase text-gray-950">{{ $mahasiswa->nama }}</h4>
                         <p class="text-xs font-mono font-bold text-gray-700">
                             NIM: <span class="text-[#1A467C] font-black">{{ $mahasiswa->nim }}</span> • Kelas: <span class="font-black">{{ $mahasiswa->kelas }}</span>
@@ -376,26 +382,26 @@
                         <input type="hidden" id="dash-input-nim" value="{{ $mahasiswa->nim }}">
                     </div>
 
-                    <!-- Status Sesi Panitia -->
+                    <!-- Status Sesi Panitia jika ditutup -->
                     @if (!($pengaturan->is_scan_aktif ?? false))
                         <div class="p-3 bg-red-50 border-2 border-black text-xs font-bold text-red-900 shadow-[2px_2px_0px_0px_#CA2C2A]">
                             Sesi presensi saat ini sedang DITUTUP oleh panitia di ruang kelas.
                         </div>
                     @endif
 
-                    <!-- Tombol Buka Kamera -->
+                    <!-- Tombol Buka Kamera (Clean Text: SCAN QR) -->
                     <div id="dash-camera-trigger">
                         <button 
                             type="button" 
                             id="dash-btn-start"
                             onclick="startDashScanner()"
-                            class="btn-smooth w-full py-4 bg-[#2A82C6] hover:bg-[#1A467C] text-white text-xs sm:text-sm font-black uppercase tracking-wider border-2 border-black shadow-[4px_4px_0px_0px_#000000] flex items-center justify-center gap-2 cursor-pointer"
+                            class="btn-tactile w-full py-3.5 bg-[#2A82C6] hover:bg-[#1A467C] text-white text-xs sm:text-sm font-black uppercase tracking-wider border-2 border-black shadow-[4px_4px_0px_0px_#000000] flex items-center justify-center gap-2 cursor-pointer"
                         >
                             <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="square" stroke-width="2.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                                <path stroke-width="2.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="square" stroke-width="2.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                             </svg>
-                            <span>Buka Kamera & Scan QR Proyektor</span>
+                            <span>SCAN QR</span>
                         </button>
                     </div>
 
@@ -408,7 +414,7 @@
                         <button 
                             type="button" 
                             onclick="stopDashScanner()"
-                            class="btn-smooth w-full py-2 bg-gray-200 hover:bg-gray-300 text-gray-900 border-2 border-black text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
+                            class="btn-tactile w-full py-2 bg-gray-200 hover:bg-gray-300 text-gray-900 border-2 border-black text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
                         >
                             Tutup Kamera
                         </button>
@@ -423,38 +429,17 @@
             </section>
 
             <!-- ========================================================== -->
-            <!-- TAB 3: TIKET & KARTU IDENTITAS PESERTA                     -->
+            <!-- TAB 3: TIKET & QR IDENTITAS (Clean, Without Extra Headers) -->
             <!-- ========================================================== -->
-            <section id="tab-panel-tiket" class="hidden space-y-6">
+            <section id="tab-panel-tiket" class="tab-snap-in hidden space-y-4 sm:space-y-6">
 
-                <!-- Kartu Identitas Peserta (Virtual ID Card) -->
-                <div class="bg-white border-2 border-black p-5 sm:p-6 shadow-[6px_6px_0px_0px_#000000] space-y-5">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b-2 border-black pb-4 gap-3">
-                        <div class="flex items-center gap-3">
-                            <img 
-                                src="{{ asset('logo/logo.png') }}" 
-                                alt="Logo HIMA IF" 
-                                class="w-10 h-10 object-contain bg-white p-1 border-2 border-black shadow-[2px_2px_0px_0px_#000000]"
-                            >
-                            <div>
-                                <h3 class="text-sm font-black uppercase tracking-wider text-[#1A467C]">
-                                    KARTU TIKET PESERTA RESMI
-                                </h3>
-                                <p class="text-[11px] font-bold text-gray-600">
-                                    {{ $pengaturan->nama_acara ?? 'POKJA HIMA IF 2026' }}
-                                </p>
-                            </div>
-                        </div>
-                        <span class="inline-block bg-green-100 text-green-900 font-black text-xs px-2.5 py-1 border border-black shadow-[1px_1px_0px_0px_#000000]">
-                            TERVERIFIKASI
-                        </span>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-                        <!-- Data Rincian -->
-                        <div class="space-y-3">
+                <div class="card-tactile bg-white border-2 border-black p-4 sm:p-6 shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000] space-y-4">
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 items-center">
+                        <!-- Data Rincian Mahasiswa -->
+                        <div class="space-y-2.5">
                             <div class="border-b border-gray-200 pb-2">
-                                <span class="text-[10px] font-bold text-gray-500 uppercase block">Nama Lengkap Peserta</span>
+                                <span class="text-[10px] font-bold text-gray-500 uppercase block">Nama Lengkap</span>
                                 <h4 class="text-base font-black text-gray-950 uppercase">{{ $mahasiswa->nama }}</h4>
                             </div>
 
@@ -487,7 +472,7 @@
                         </div>
 
                         <!-- QR Code Container -->
-                        <div class="bg-gray-50 border-2 border-black p-5 text-center shadow-[3px_3px_0px_0px_#000000]">
+                        <div class="bg-gray-50 border-2 border-black p-4 text-center shadow-[2px_2px_0px_0px_#000000]">
                             <div id="qrcode-canvas" class="inline-block p-2 bg-white border-2 border-black shadow-[2px_2px_0px_0px_#000000]"></div>
                             <p class="font-mono text-xs font-black text-[#1A467C] tracking-wider mt-2">
                                 {{ $mahasiswa->nim }}
@@ -506,7 +491,7 @@
     </div>
 
     <!-- ============================================================== -->
-    <!-- MOBILE BOTTOM NAVIGATION TOOLBAR (Ciri Khas Apps Mobile)       -->
+    <!-- MOBILE BOTTOM NAVIGATION TOOLBAR (Khas Mobile Apps)            -->
     <!-- ============================================================== -->
     <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t-[3px] border-black flex justify-around items-center py-2 px-1 shadow-[0_-3px_0px_0px_#000000]">
         
@@ -515,7 +500,7 @@
             type="button" 
             id="bot-nav-beranda"
             onclick="switchTab('beranda')" 
-            class="bottom-nav-active flex flex-col items-center gap-1 py-1 px-3 text-gray-600 cursor-pointer"
+            class="bottom-nav-active btn-tactile flex flex-col items-center gap-1 py-1 px-3 text-gray-600 cursor-pointer"
         >
             <div class="bottom-nav-icon w-8 h-8 rounded-none border border-black flex items-center justify-center">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -530,12 +515,12 @@
             type="button" 
             id="bot-nav-scan"
             onclick="switchTab('scan')" 
-            class="flex flex-col items-center gap-1 py-1 px-3 text-gray-600 cursor-pointer"
+            class="btn-tactile flex flex-col items-center gap-1 py-1 px-3 text-gray-600 cursor-pointer"
         >
             <div class="bottom-nav-icon w-8 h-8 rounded-none border border-black flex items-center justify-center">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="square" stroke-width="2.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                    <path stroke-width="2.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="square" stroke-width="2.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
             </div>
             <span class="text-[10px] font-black uppercase tracking-wider">Scan</span>
@@ -546,7 +531,7 @@
             type="button" 
             id="bot-nav-tiket"
             onclick="switchTab('tiket')" 
-            class="flex flex-col items-center gap-1 py-1 px-3 text-gray-600 cursor-pointer"
+            class="btn-tactile flex flex-col items-center gap-1 py-1 px-3 text-gray-600 cursor-pointer"
         >
             <div class="bottom-nav-icon w-8 h-8 rounded-none border border-black flex items-center justify-center">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -561,7 +546,7 @@
             @csrf
             <button 
                 type="submit" 
-                class="flex flex-col items-center gap-1 py-1 px-3 text-[#CA2C2A] cursor-pointer"
+                class="btn-tactile flex flex-col items-center gap-1 py-1 px-3 text-[#CA2C2A] cursor-pointer"
             >
                 <div class="w-8 h-8 rounded-none border border-black flex items-center justify-center bg-red-50 text-red-700">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -575,10 +560,10 @@
     </nav>
 
     <!-- ============================================================== -->
-    <!-- RESULT MODAL POP-UP (Untuk Scanner Dashboard)                  -->
+    <!-- RESULT MODAL POP-UP (Tactile Spring Feedback)                  -->
     <!-- ============================================================== -->
     <div id="dash-result-modal" class="hidden fixed inset-0 z-50 bg-black/60 p-4 flex items-center justify-center">
-        <div class="modal-slam w-full max-w-sm bg-white border-[3px] border-black p-5 sm:p-6 shadow-[8px_8px_0px_0px_#000000] space-y-4 text-center">
+        <div class="modal-spring-slam w-full max-w-sm bg-white border-[3px] border-black p-5 sm:p-6 shadow-[8px_8px_0px_0px_#000000] space-y-4 text-center">
             
             <div id="dash-modal-icon-wrapper" class="w-14 h-14 mx-auto border-2 border-black flex items-center justify-center font-black text-2xl shadow-[3px_3px_0px_0px_#000000]"></div>
 
@@ -591,7 +576,7 @@
             <button 
                 type="button" 
                 onclick="closeDashResultModal()"
-                class="btn-smooth w-full py-2.5 bg-[#2A82C6] hover:bg-[#1A467C] text-white text-xs font-black uppercase tracking-wider border-2 border-black shadow-[3px_3px_0px_0px_#000000] cursor-pointer"
+                class="btn-tactile w-full py-2.5 bg-[#2A82C6] hover:bg-[#1A467C] text-white text-xs font-black uppercase tracking-wider border-2 border-black shadow-[3px_3px_0px_0px_#000000] cursor-pointer"
             >
                 MENGERTI
             </button>
@@ -630,9 +615,9 @@
                 const btn = document.getElementById(`side-nav-${p}`);
                 if (btn) {
                     if (p === tabId) {
-                        btn.className = "nav-item-active btn-smooth w-full text-left px-3.5 py-2.5 border-2 border-black font-black text-xs uppercase tracking-wider flex items-center gap-2.5 cursor-pointer";
+                        btn.className = "nav-item-active btn-tactile w-full text-left px-3.5 py-2.5 border-2 border-black font-black text-xs uppercase tracking-wider flex items-center gap-2.5 cursor-pointer";
                     } else {
-                        btn.className = "btn-smooth w-full text-left px-3.5 py-2.5 bg-white hover:bg-gray-100 text-gray-900 border-2 border-black font-black text-xs uppercase tracking-wider flex items-center gap-2.5 shadow-[2px_2px_0px_0px_#000000] cursor-pointer";
+                        btn.className = "btn-tactile w-full text-left px-3.5 py-2.5 bg-white hover:bg-gray-100 text-gray-900 border-2 border-black font-black text-xs uppercase tracking-wider flex items-center gap-2.5 shadow-[2px_2px_0px_0px_#000000] cursor-pointer";
                     }
                 }
             });

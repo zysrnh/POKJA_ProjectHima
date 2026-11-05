@@ -99,80 +99,73 @@
             animation: shapePopSpin 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both !important;
         }
 
-        /* Live Validation Pop-in Checkmark */
+        /* Live Validation Bouncy Pop-in Checkmark (No Opacity) */
         @keyframes fieldCheckPop {
-            0% { transform: scale(0.7); }
-            100% { transform: scale(1); }
+            0% { transform: translateY(-50%) scale(0.5); }
+            65% { transform: translateY(-50%) scale(1.25); }
+            100% { transform: translateY(-50%) scale(1); }
         }
         .field-valid-badge {
-            animation: fieldCheckPop 0.15s ease-out forwards;
+            animation: fieldCheckPop 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
         }
 
-        /* Modal Smooth Pop-in with Tactile Spring */
-        @keyframes modalSpringIn {
+        /* Modal Tactile Snap (Zero Opacity / Zero Fade) */
+        @keyframes modalSnapIn {
             0% {
-                opacity: 0;
-                transform: scale(0.85) translateY(20px);
+                transform: translateY(-24px) scale(0.92);
             }
             70% {
-                transform: scale(1.02) translateY(-2px);
+                transform: translateY(3px) scale(1.02);
             }
             100% {
-                opacity: 1;
-                transform: scale(1) translateY(0);
+                transform: translateY(0) scale(1);
             }
         }
 
-        @keyframes modalSpringOut {
+        @keyframes modalSnapOut {
             0% {
-                opacity: 1;
-                transform: scale(1) translateY(0);
+                transform: translateY(0) scale(1);
             }
             100% {
-                opacity: 0;
-                transform: scale(0.85) translateY(16px);
+                transform: translateY(20px) scale(0.9);
             }
-        }
-
-        @keyframes backdropFade {
-            0% { opacity: 0; }
-            100% { opacity: 1; }
-        }
-
-        @keyframes backdropFadeOut {
-            0% { opacity: 1; }
-            100% { opacity: 0; }
         }
 
         .modal-spring-in {
-            animation: modalSpringIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            animation: modalSnapIn 0.28s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
         }
 
         .modal-spring-out {
-            animation: modalSpringOut 0.22s cubic-bezier(0.4, 0, 1, 1) forwards !important;
+            animation: modalSnapOut 0.18s cubic-bezier(0.2, 0.8, 0.2, 1) forwards !important;
         }
 
-        .backdrop-fade-in {
-            animation: backdropFade 0.25s ease-out forwards;
+        @keyframes checkmarkPop {
+            0% { transform: scale(0.6); }
+            65% { transform: scale(1.2); }
+            100% { transform: scale(1); }
         }
-
-        .backdrop-fade-out {
-            animation: backdropFadeOut 0.22s ease-in forwards !important;
-        }
-
         .checkmark-pop {
-            animation: checkmarkPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both;
+            animation: checkmarkPop 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28) 0.1s both;
         }
 
-        /* Smooth Interactive Controls */
+        /* Tactile Interactive Controls (Neubrutalism Click & Hover) */
         .btn-smooth {
-            transition: transform 0.18s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.18s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.15s ease;
+            transition: transform 0.12s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.12s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.12s ease;
         }
         .btn-smooth:hover {
             transform: translate(-2px, -2px);
         }
         .btn-smooth:active {
-            transform: translate(2px, 2px);
+            transform: translate(2px, 2px) !important;
+            box-shadow: 1px 1px 0px 0px #000000 !important;
+        }
+
+        .card-tilt {
+            transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.15s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .card-tilt:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 7px 7px 0px 0px #1A467C !important;
         }
     </style>
 </head>
@@ -188,7 +181,7 @@
     <div class="w-full max-w-4xl z-10 my-2 sm:my-8 space-y-3.5 sm:space-y-6">
 
         <!-- 1. BAGIAN ATAS: CARD JUDUL & LOGO POLAROID -->
-        <div class="bg-white border-2 border-[#1A467C] p-4 sm:p-8 shadow-[5px_5px_0px_0px_#1A467C] sm:shadow-[8px_8px_0px_0px_#1A467C]">
+        <div class="card-tilt bg-white border-2 border-[#1A467C] p-4 sm:p-8 shadow-[5px_5px_0px_0px_#1A467C] sm:shadow-[8px_8px_0px_0px_#1A467C]">
             <div class="flex flex-col md:flex-row items-center md:items-start gap-4 sm:gap-6 text-center md:text-left">
                 
                 <!-- Polaroid Logo Badge with Tape Header (Click to Wobble) -->
@@ -226,7 +219,7 @@
         </div>
 
         <!-- 2. BAGIAN TENGAH: CARD INFO ACARA (3 SEKAT ELEGAN) -->
-        <div class="bg-white border-2 border-[#1A467C] shadow-[5px_5px_0px_0px_#1A467C] sm:shadow-[6px_6px_0px_0px_#1A467C] grid grid-cols-3 divide-x-2 divide-[#1A467C]/20 p-2 sm:p-3">
+        <div class="card-tilt bg-white border-2 border-[#1A467C] shadow-[5px_5px_0px_0px_#1A467C] sm:shadow-[6px_6px_0px_0px_#1A467C] grid grid-cols-3 divide-x-2 divide-[#1A467C]/20 p-2 sm:p-3">
             
             <!-- Sekat 1: Tanggal Pelaksanaan -->
             <div class="px-1.5 sm:px-4 py-1 flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-1 sm:gap-3">
@@ -283,7 +276,7 @@
         </div>
 
         <!-- 3. BAGIAN BAWAH: CARD FORMULIR PENDAFTARAN -->
-        <div class="bg-white border-2 border-[#1A467C] p-4 sm:p-8 shadow-[5px_5px_0px_0px_#1A467C] sm:shadow-[8px_8px_0px_0px_#1A467C]">
+        <div class="card-tilt bg-white border-2 border-[#1A467C] p-4 sm:p-8 shadow-[5px_5px_0px_0px_#1A467C] sm:shadow-[8px_8px_0px_0px_#1A467C]">
 
             <!-- Alert Error Global jika ada validasi gagal -->
             @if ($errors->any())
@@ -513,7 +506,7 @@
             $linkGrupWa = $pengaturan->link_grup_wa ?? 'https://chat.whatsapp.com/';
         @endphp
 
-        <div id="modal-sukses" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs backdrop-fade-in transition-opacity duration-200">
+        <div id="modal-sukses" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60">
             <!-- Modal Card Content (Smooth Spring Pop-in Animated) -->
             <div id="modal-card" class="modal-spring-in w-full max-w-md bg-white border-2 border-[#1A467C] p-6 sm:p-7 shadow-[10px_10px_0px_0px_#1A467C] relative text-center">
                 
@@ -699,12 +692,10 @@
             const card = document.getElementById('modal-card');
             if (modal && card) {
                 card.classList.remove('modal-spring-in');
-                modal.classList.remove('backdrop-fade-in');
                 card.classList.add('modal-spring-out');
-                modal.classList.add('backdrop-fade-out');
                 setTimeout(() => {
                     modal.remove();
-                }, 220);
+                }, 180);
             }
         }
 

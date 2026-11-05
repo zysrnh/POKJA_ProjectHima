@@ -99,8 +99,10 @@ class MahasiswaController extends Controller
             }
         }
 
-        // Cari HANYA berdasarkan qr_token rahasia dari tiket resmi
-        $mahasiswa = Pendaftaran::where('qr_token', $rawToken)->first();
+        // Cari berdasarkan qr_token rahasia ATAU nim (fallback jika QR tiket fisik/email berisi nim)
+        $mahasiswa = Pendaftaran::where('qr_token', $rawToken)
+            ->orWhere('nim', $rawToken)
+            ->first();
 
         if (!$mahasiswa) {
             return response()->json([

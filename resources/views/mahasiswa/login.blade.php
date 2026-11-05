@@ -35,27 +35,41 @@
             background-size: 24px 24px;
         }
 
-        .btn-smooth {
-            transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.15s ease;
+        /* Tactile Button Press (Tanpa Opacity / Tanpa Fade) */
+        .btn-tactile {
+            transition: transform 0.12s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.12s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.12s ease;
         }
-        .btn-smooth:hover {
+        .btn-tactile:hover {
             transform: translate(-2px, -2px);
         }
-        .btn-smooth:active {
-            transform: translate(2px, 2px);
+        .btn-tactile:active {
+            transform: translate(2px, 2px) !important;
             box-shadow: 1px 1px 0px 0px #000000 !important;
         }
 
+        /* Card Scale Snap-in (Solid Tanpa Opacity) */
         @keyframes cardSnapIn {
             0% {
-                transform: translateY(-20px) scale(0.97);
+                transform: translateY(-16px) scale(0.96);
+            }
+            70% {
+                transform: translateY(2px) scale(1.01);
             }
             100% {
                 transform: translateY(0) scale(1);
             }
         }
         .snap-card {
-            animation: cardSnapIn 0.35s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+            animation: cardSnapIn 0.28s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+        }
+
+        /* Tab Switch Snap Animation */
+        @keyframes tabSnap {
+            0% { transform: translateY(4px) scale(0.99); }
+            100% { transform: translateY(0) scale(1); }
+        }
+        .tab-snap {
+            animation: tabSnap 0.18s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
         }
     </style>
 </head>
@@ -105,7 +119,7 @@
                     type="button" 
                     id="tab-btn-biasa" 
                     onclick="switchTab('biasa')"
-                    class="py-2 text-xs font-black uppercase tracking-wider border-2 border-black bg-white text-[#1A467C] shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
+                    class="btn-tactile py-2 text-xs font-black uppercase tracking-wider border-2 border-black bg-white text-[#1A467C] shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
                 >
                     Login Biasa
                 </button>
@@ -113,7 +127,7 @@
                     type="button" 
                     id="tab-btn-qr" 
                     onclick="switchTab('qr')"
-                    class="py-2 text-xs font-black uppercase tracking-wider border-2 border-transparent text-gray-600 hover:text-black cursor-pointer"
+                    class="btn-tactile py-2 text-xs font-black uppercase tracking-wider border-2 border-transparent text-gray-600 hover:text-black cursor-pointer"
                 >
                     Aktivasi QR Tiket
                 </button>
@@ -122,7 +136,7 @@
             <!-- ============================================================== -->
             <!-- TAB 1: FORM LOGIN BIASA (Email / NIM + Password)               -->
             <!-- ============================================================== -->
-            <div id="panel-biasa" class="space-y-4">
+            <div id="panel-biasa" class="tab-snap space-y-4">
                 <form action="{{ route('mahasiswa.login.post') }}" method="POST" class="space-y-4">
                     @csrf
 
@@ -139,8 +153,8 @@
                                 value="{{ old('identifier') }}"
                                 required
                                 autofocus
-                                placeholder="Contoh: 250414010 atau email kampus"
-                                class="w-full bg-[#F8FBFE] border-2 border-black text-gray-950 font-bold text-xs sm:text-sm px-3.5 py-2.5 pl-10 focus:bg-white focus:outline-none focus:shadow-[3px_3px_0px_0px_#000000] transition"
+                                placeholder="Contoh: 250414010 atau email kamu"
+                                class="w-full bg-[#F8FBFE] border-2 border-black text-gray-950 font-bold text-xs sm:text-sm px-3.5 py-2.5 pl-10 focus:bg-white focus:outline-none focus:translate-x-[-1px] focus:translate-y-[-1px] focus:shadow-[4px_4px_0px_0px_#000000] transition"
                             >
                             <svg class="w-4 h-4 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="square" stroke-width="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -157,7 +171,7 @@
                             <button 
                                 type="button" 
                                 onclick="switchTab('qr')" 
-                                class="text-[10px] font-bold text-[#2A82C6] hover:underline"
+                                class="text-[10px] font-bold text-[#2A82C6] hover:underline cursor-pointer"
                             >
                                 Belum punya password?
                             </button>
@@ -169,7 +183,7 @@
                                 name="password" 
                                 required
                                 placeholder="Masukkan password akun Anda..."
-                                class="w-full bg-[#F8FBFE] border-2 border-black text-gray-950 font-bold text-xs sm:text-sm px-3.5 py-2.5 pl-10 pr-10 focus:bg-white focus:outline-none focus:shadow-[3px_3px_0px_0px_#000000] transition"
+                                class="w-full bg-[#F8FBFE] border-2 border-black text-gray-950 font-bold text-xs sm:text-sm px-3.5 py-2.5 pl-10 pr-10 focus:bg-white focus:outline-none focus:translate-x-[-1px] focus:translate-y-[-1px] focus:shadow-[4px_4px_0px_0px_#000000] transition"
                             >
                             <svg class="w-4 h-4 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="square" stroke-width="2.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -190,7 +204,7 @@
                     <!-- Submit Login Biasa -->
                     <button 
                         type="submit" 
-                        class="btn-smooth w-full py-3 bg-[#2A82C6] hover:bg-[#1A467C] text-white text-xs sm:text-sm font-black uppercase tracking-wider border-2 border-black shadow-[4px_4px_0px_0px_#000000] flex items-center justify-center gap-2 cursor-pointer mt-2"
+                        class="btn-tactile w-full py-3 bg-[#2A82C6] hover:bg-[#1A467C] text-white text-xs sm:text-sm font-black uppercase tracking-wider border-2 border-black shadow-[4px_4px_0px_0px_#000000] flex items-center justify-center gap-2 cursor-pointer mt-2"
                     >
                         <span>Masuk ke Dashboard</span>
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -203,10 +217,10 @@
             <!-- ============================================================== -->
             <!-- TAB 2: AKTIVASI QR TIKET PENDAFTARAN (Pertama Kali Login)       -->
             <!-- ============================================================== -->
-            <div id="panel-qr" class="hidden space-y-4">
-                <div class="bg-blue-50 border-2 border-black p-3 text-xs text-blue-950 font-medium">
+            <div id="panel-qr" class="hidden tab-snap space-y-4">
+                <div class="bg-blue-50 border-2 border-black p-3 text-xs text-blue-950 font-medium shadow-[2px_2px_0px_0px_#1A467C]">
                     <p class="font-black text-[#1A467C] uppercase mb-0.5">Aktivasi Akun Mahasiswa</p>
-                    <p>Upload gambar QR tiket yang Anda terima di email untuk membuat password akun Anda.</p>
+                    <p>Upload file gambar QR tiket dari email Anda atau scan menggunakan kamera untuk membuat password baru.</p>
                 </div>
 
                 <!-- Input File QR Upload -->
@@ -221,7 +235,7 @@
                     <button 
                         type="button" 
                         onclick="document.getElementById('qr-file-input').click()"
-                        class="btn-smooth w-full py-3 bg-[#1A467C] hover:bg-[#153660] text-white border-2 border-black font-black text-xs sm:text-sm uppercase tracking-wider shadow-[3px_3px_0px_0px_#000000] flex items-center justify-center gap-2 cursor-pointer"
+                        class="btn-tactile w-full py-3 bg-[#1A467C] hover:bg-[#153660] text-white border-2 border-black font-black text-xs sm:text-sm uppercase tracking-wider shadow-[3px_3px_0px_0px_#000000] flex items-center justify-center gap-2 cursor-pointer"
                     >
                         <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="square" stroke-width="2.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -236,7 +250,7 @@
                         type="button" 
                         id="btn-scan-camera"
                         onclick="toggleCameraScanner()"
-                        class="btn-smooth w-full py-2.5 bg-white hover:bg-gray-100 text-gray-900 border-2 border-black font-black text-xs uppercase tracking-wider shadow-[3px_3px_0px_0px_#000000] flex items-center justify-center gap-2 cursor-pointer"
+                        class="btn-tactile w-full py-2.5 bg-white hover:bg-gray-100 text-gray-900 border-2 border-black font-black text-xs uppercase tracking-wider shadow-[3px_3px_0px_0px_#000000] flex items-center justify-center gap-2 cursor-pointer"
                     >
                         <svg class="w-4 h-4 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="square" stroke-width="2.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
@@ -262,7 +276,7 @@
                 </p>
                 <a 
                     href="{{ route('pendaftaran.index') }}" 
-                    class="btn-smooth inline-block px-4 py-1.5 bg-white hover:bg-gray-100 text-black border-2 border-black text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000]"
+                    class="btn-tactile inline-block px-4 py-1.5 bg-white hover:bg-gray-100 text-black border-2 border-black text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000]"
                 >
                     Formulir Registrasi
                 </a>
@@ -272,12 +286,15 @@
 
     </main>
 
+    <!-- Offscreen Scanner Container untuk Html5Qrcode scanFile (mencegah error layout container) -->
+    <div id="qr-file-scan-worker" style="position: fixed; left: -9999px; top: 0; width: 320px; height: 320px; pointer-events: none; z-index: -999;"></div>
+
     <!-- Footer -->
     <footer class="w-full text-center py-2 text-xs font-bold text-gray-500">
         &copy; {{ date('Y') }} POKJA HIMA IF • Sistem Terpadu Registrasi & Presensi
     </footer>
 
-    <!-- JavaScript: Tab Switching, QR Decoder from File, and Camera Scanner -->
+    <!-- JavaScript: Tab Switching, Robust QR Decoder (Multi-Resolution Canvas + Fallbacks), and Camera Scanner -->
     <script>
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
         let html5QrScanner = null;
@@ -290,14 +307,14 @@
             const panelQr = document.getElementById('panel-qr');
 
             if (mode === 'biasa') {
-                btnBiasa.className = "py-2 text-xs font-black uppercase tracking-wider border-2 border-black bg-white text-[#1A467C] shadow-[2px_2px_0px_0px_#000000] cursor-pointer";
-                btnQr.className = "py-2 text-xs font-black uppercase tracking-wider border-2 border-transparent text-gray-600 hover:text-black cursor-pointer";
+                btnBiasa.className = "btn-tactile py-2 text-xs font-black uppercase tracking-wider border-2 border-black bg-white text-[#1A467C] shadow-[2px_2px_0px_0px_#000000] cursor-pointer";
+                btnQr.className = "btn-tactile py-2 text-xs font-black uppercase tracking-wider border-2 border-transparent text-gray-600 hover:text-black cursor-pointer";
                 panelBiasa.classList.remove('hidden');
                 panelQr.classList.add('hidden');
                 stopCameraScanner();
             } else {
-                btnQr.className = "py-2 text-xs font-black uppercase tracking-wider border-2 border-black bg-white text-[#1A467C] shadow-[2px_2px_0px_0px_#000000] cursor-pointer";
-                btnBiasa.className = "py-2 text-xs font-black uppercase tracking-wider border-2 border-transparent text-gray-600 hover:text-black cursor-pointer";
+                btnQr.className = "btn-tactile py-2 text-xs font-black uppercase tracking-wider border-2 border-black bg-white text-[#1A467C] shadow-[2px_2px_0px_0px_#000000] cursor-pointer";
+                btnBiasa.className = "btn-tactile py-2 text-xs font-black uppercase tracking-wider border-2 border-transparent text-gray-600 hover:text-black cursor-pointer";
                 panelQr.classList.remove('hidden');
                 panelBiasa.classList.add('hidden');
             }
@@ -338,11 +355,11 @@
             }
         }
 
-        // Decode QR dari file gambar yang diupload (jsQR + Html5Qrcode fallback)
+        // Decode QR dari file gambar yang diupload (Multi-Resolution Canvas jsQR + Html5Qrcode Fallback)
         async function scanQrFromFile(input) {
             if (!input.files || input.files.length === 0) return;
             const file = input.files[0];
-            showStatus('Membaca QR tiket dari gambar...', 'info');
+            showStatus('Membaca QR tiket dari file...', 'info');
 
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -350,25 +367,47 @@
                 img.onload = async function() {
                     let decodedText = null;
 
-                    // 1. Prioritas jsQR via Offscreen Canvas (sangat cepat & akurat untuk file download)
-                    try {
-                        const canvas = document.createElement('canvas');
-                        canvas.width = img.naturalWidth || img.width;
-                        canvas.height = img.naturalHeight || img.height;
-                        const ctx = canvas.getContext('2d', { willReadFrequently: true });
-                        ctx.drawImage(img, 0, 0);
-                        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-
-                        if (window.jsQR) {
-                            const code = jsQR(imageData.data, imageData.width, imageData.height, {
+                    // 1. Coba decode via jsQR pada resolusi asli
+                    if (window.jsQR) {
+                        try {
+                            const canvas = document.createElement('canvas');
+                            canvas.width = img.naturalWidth || img.width;
+                            canvas.height = img.naturalHeight || img.height;
+                            const ctx = canvas.getContext('2d', { willReadFrequently: true });
+                            ctx.drawImage(img, 0, 0);
+                            const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                            const code = jsQR(imgData.data, imgData.width, imgData.height, {
                                 inversionAttempts: "attemptBoth",
                             });
                             if (code && code.data) {
                                 decodedText = code.data;
                             }
+                        } catch (err) {
+                            console.warn('jsQR original resolution pass error:', err);
                         }
-                    } catch (err) {
-                        console.warn('Canvas jsQR error:', err);
+
+                        // 2. Jika belum terbaca dan resolusi gambar besar (>600px), coba resize ke 500px (sweet-spot QR)
+                        if (!decodedText && (img.naturalWidth > 600 || img.naturalHeight > 600)) {
+                            try {
+                                const targetW = 500;
+                                const scale = targetW / img.naturalWidth;
+                                const targetH = Math.round(img.naturalHeight * scale);
+                                const canvas = document.createElement('canvas');
+                                canvas.width = targetW;
+                                canvas.height = targetH;
+                                const ctx = canvas.getContext('2d', { willReadFrequently: true });
+                                ctx.drawImage(img, 0, 0, targetW, targetH);
+                                const imgData = ctx.getImageData(0, 0, targetW, targetH);
+                                const code = jsQR(imgData.data, targetW, targetH, {
+                                    inversionAttempts: "attemptBoth",
+                                });
+                                if (code && code.data) {
+                                    decodedText = code.data;
+                                }
+                            } catch (err) {
+                                console.warn('jsQR resize pass error:', err);
+                            }
+                        }
                     }
 
                     if (decodedText) {
@@ -376,23 +415,24 @@
                         return;
                     }
 
-                    // 2. Fallback: Html5Qrcode scanFile (showImage: false)
+                    // 3. Fallback: Html5Qrcode scanFile via dedicated offscreen container
                     try {
-                        const html5Qr = new Html5Qrcode("qr-camera-reader");
+                        const html5Qr = new Html5Qrcode("qr-file-scan-worker");
                         const fallbackText = await html5Qr.scanFile(file, false);
+                        await html5Qr.clear();
                         if (fallbackText) {
                             verifyQrToken(fallbackText);
                             return;
                         }
                     } catch (err) {
-                        console.warn('Html5Qrcode scanFile error:', err);
+                        console.warn('Html5Qrcode scanFile fallback error:', err);
                     }
 
-                    showStatus('Tidak ditemukan QR code valid pada gambar tersebut. Pastikan Anda mengupload gambar QR tiket dari email.', 'error');
+                    showStatus('Tidak ditemukan QR code valid pada gambar tersebut. Pastikan Anda mengupload file gambar QR tiket dari email.', 'error');
                 };
 
                 img.onerror = function() {
-                    showStatus('Gagal memuat file gambar. Pastikan format file PNG atau JPG.', 'error');
+                    showStatus('Gagal membaca gambar. Pastikan format file PNG atau JPG.', 'error');
                 };
 
                 img.src = e.target.result;
@@ -425,8 +465,21 @@
                         (errorMessage) => {}
                     );
                 } catch (err) {
-                    showStatus('Gagal mengakses kamera. Izinkan akses kamera atau gunakan opsi upload file gambar.', 'error');
-                    stopCameraScanner();
+                    // Fallback to front camera if environment fails
+                    try {
+                        await html5QrScanner.start(
+                            { facingMode: "user" },
+                            { fps: 10, qrbox: { width: 220, height: 220 } },
+                            (decodedText) => {
+                                stopCameraScanner();
+                                verifyQrToken(decodedText);
+                            },
+                            (errorMessage) => {}
+                        );
+                    } catch (err2) {
+                        showStatus('Gagal mengakses kamera. Izinkan akses kamera atau gunakan opsi upload file gambar.', 'error');
+                        stopCameraScanner();
+                    }
                 }
             }
         }

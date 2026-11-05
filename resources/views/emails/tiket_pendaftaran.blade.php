@@ -53,7 +53,7 @@
                                                 />
                                             @else
                                                 <img 
-                                                    src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&margin=4&data={{ urlencode($pendaftaran->nim) }}" 
+                                                    src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&margin=4&data={{ urlencode(route('mahasiswa.aktivasi', ['token' => $pendaftaran->qr_token])) }}" 
                                                     alt="QR Code {{ $pendaftaran->nim }}" 
                                                     width="180" 
                                                     height="180" 
