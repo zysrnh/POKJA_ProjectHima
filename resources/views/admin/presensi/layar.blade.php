@@ -156,16 +156,6 @@
                 </div>
             </div>
 
-            <!-- Short Link URL under QR -->
-            <div class="mt-6 pt-4 border-t-2 border-black w-full text-center">
-                <p class="text-xs font-bold text-gray-700">
-                    Scan di HP: 
-                    <span class="bg-[#1A467C] text-white px-2.5 py-1 font-mono font-black border border-black shadow-[2px_2px_0px_0px_#000000] inline-block">
-                        {{ url('/absen') }}
-                    </span>
-                </p>
-            </div>
-
         </div>
 
     </main>

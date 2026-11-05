@@ -17,17 +17,14 @@
 <div class="max-w-3xl mx-auto space-y-4 sm:space-y-5">
 
     <!-- Card 1: Header Banner (Enters First) -->
-    <div class="snap-in-1 card-interactive bg-white border-2 border-[#000000] p-4 sm:p-6 shadow-[5px_5px_0px_0px_#000000]">
-        <div class="flex items-start justify-between gap-3">
+    <div class="snap-in-1 card-interactive bg-white border-2 border-[#000000] p-4 sm:p-5 shadow-[5px_5px_0px_0px_#000000]">
+        <div class="flex items-center justify-between gap-3">
             <div>
-                <span class="inline-block bg-[#1A467C] text-white text-[10px] font-black uppercase px-2.5 py-0.5 tracking-wider border border-black mb-1.5 shadow-[1px_1px_0px_0px_#000000]">
-                    KONTROL SISTEM
-                </span>
                 <h3 class="text-base sm:text-lg font-black uppercase tracking-tight text-[#1A467C]">
-                    Kelola Informasi Acara & Contact Person
+                    Pengaturan Acara & Grup WhatsApp
                 </h3>
-                <p class="text-xs font-semibold text-gray-600 mt-1">
-                    Informasi ini otomatis disinkronkan ke form pendaftaran, pop-up tiket, dan email mahasiswa.
+                <p class="text-xs font-semibold text-gray-600 mt-0.5">
+                    Informasi ini otomatis disinkronkan ke form pendaftaran, tiket, dan email mahasiswa.
                 </p>
             </div>
             <div class="w-9 h-9 sm:w-10 sm:h-10 bg-[#2A82C6] border-2 border-black flex items-center justify-center text-white shrink-0 shadow-[2px_2px_0px_0px_#000000]">
@@ -193,24 +190,14 @@
             </div>
         </div>
 
-        <!-- Card 4: Action Buttons (Enters Fourth) -->
-        <div class="snap-in-4 bg-white border-2 border-[#000000] p-4 shadow-[4px_4px_0px_0px_#000000] flex flex-wrap items-center justify-between gap-3">
+        <!-- Card 4: Action Button (Minimalist Single Action) -->
+        <div class="snap-in-4 bg-white border-2 border-[#000000] p-4 shadow-[4px_4px_0px_0px_#000000] flex items-center justify-end">
             <button 
                 type="submit" 
-                class="btn-smooth px-5 sm:px-7 py-2.5 sm:py-3 bg-[#2A82C6] hover:bg-[#1A467C] text-white text-xs sm:text-sm font-black uppercase tracking-wider border-2 border-[#000000] shadow-[3px_3px_0px_0px_#000000] cursor-pointer"
+                class="btn-smooth px-6 py-2.5 sm:py-3 bg-[#1A467C] hover:bg-[#0F2A4A] text-white text-xs sm:text-sm font-black uppercase tracking-wider border-2 border-[#000000] shadow-[3px_3px_0px_0px_#000000] cursor-pointer"
             >
                 Simpan Semua Pengaturan
             </button>
-            <a 
-                href="{{ route('pendaftaran.index') }}" 
-                target="_blank"
-                class="btn-smooth px-4 py-2.5 sm:py-3 border-2 border-[#000000] bg-white text-[#1A467C] hover:bg-blue-50 text-xs sm:text-sm font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] inline-flex items-center gap-1.5"
-            >
-                <span>Lihat di Form</span>
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="square" stroke-width="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                </svg>
-            </a>
         </div>
     </form>
 

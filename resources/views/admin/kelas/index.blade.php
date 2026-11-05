@@ -71,16 +71,18 @@
                             </td>
                             <td class="py-3.5 px-3.5 text-center">
                                 <div class="flex items-center justify-center gap-1.5">
-                                    <!-- Edit Button -->
+                                    <!-- Edit Button (Icon Only Neubrutalism) -->
                                     <a 
                                         href="{{ route('admin.kelas.edit', $kelas->id) }}" 
-                                        class="btn-smooth px-2.5 py-1 bg-amber-400 hover:bg-amber-500 text-black text-[11px] font-black uppercase tracking-wider border border-black shadow-[1px_1px_0px_0px_#000000]"
-                                        title="Edit Kelas"
+                                        class="btn-smooth w-7 h-7 sm:w-8 sm:h-8 bg-amber-400 hover:bg-amber-500 text-black border border-black flex items-center justify-center shadow-[1px_1px_0px_0px_#000000]"
+                                        title="Edit Kelas {{ $kelas->nama_kelas }}"
                                     >
-                                        Edit
+                                        <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="square" stroke-width="2.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
                                     </a>
 
-                                    <!-- Delete Button -->
+                                    <!-- Delete Button (Icon Only Neubrutalism) -->
                                     <form 
                                         action="{{ route('admin.kelas.destroy', $kelas->id) }}" 
                                         method="POST" 
@@ -91,10 +93,12 @@
                                         @method('DELETE')
                                         <button 
                                             type="submit" 
-                                            class="btn-smooth px-2.5 py-1 bg-[#CA2C2A] hover:bg-[#901C1A] text-white text-[11px] font-black uppercase tracking-wider border border-[#901C1A] shadow-[1px_1px_0px_0px_#000000] cursor-pointer"
-                                            title="Hapus Kelas"
+                                            class="btn-smooth w-7 h-7 sm:w-8 sm:h-8 bg-[#CA2C2A] hover:bg-[#901C1A] text-white border border-[#901C1A] flex items-center justify-center shadow-[1px_1px_0px_0px_#000000] cursor-pointer"
+                                            title="Hapus Kelas {{ $kelas->nama_kelas }}"
                                         >
-                                            Hapus
+                                            <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="square" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
                                         </button>
                                     </form>
                                 </div>

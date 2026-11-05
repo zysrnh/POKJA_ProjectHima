@@ -277,18 +277,33 @@
                                 {{ $totalHadir }}/7 ({{ round(($totalHadir/7)*100) }}%)
                             </td>
 
-                            <!-- Tombol Toggle Kehadiran Cepat (Pertemuan Terpilih) -->
+                            <!-- Tombol Toggle Kehadiran Cepat (Pertemuan Terpilih - Minimalist Icon) -->
                             <td class="py-3 px-3 text-center">
                                 <form action="{{ route('admin.presensi.toggle', $item->id) }}" method="POST" class="inline">
                                     @csrf
                                     @method('PATCH')
                                     <input type="hidden" name="pertemuan" value="{{ $pertemuanDipilih }}">
-                                    <button 
-                                        type="submit" 
-                                        class="btn-smooth px-2.5 py-1 text-[10px] font-black uppercase tracking-wider border border-black shadow-[1px_1px_0px_0px_#000000] cursor-pointer {{ $isHadirDipilih ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-800' }}"
-                                    >
-                                        {{ $isHadirDipilih ? '✓ HADIR' : '+ ABSENKAN' }}
-                                    </button>
+                                    @if ($isHadirDipilih)
+                                        <button 
+                                            type="submit" 
+                                            class="btn-smooth w-7 h-7 sm:w-8 sm:h-8 bg-[#15803d] hover:bg-[#166534] text-white border-2 border-black inline-flex items-center justify-center shadow-[1px_1px_0px_0px_#000000] cursor-pointer"
+                                            title="Hadir di P{{ $pertemuanDipilih }} — Klik untuk batalkan"
+                                        >
+                                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="square" stroke-width="3" d="M5 13l4 4L19 7" />
+                                            </svg>
+                                        </button>
+                                    @else
+                                        <button 
+                                            type="submit" 
+                                            class="btn-smooth w-7 h-7 sm:w-8 sm:h-8 bg-white hover:bg-gray-100 text-gray-800 border-2 border-black inline-flex items-center justify-center shadow-[1px_1px_0px_0px_#000000] cursor-pointer"
+                                            title="Tandai Hadir di Pertemuan {{ $pertemuanDipilih }}"
+                                        >
+                                            <svg class="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="square" stroke-width="2.8" d="M12 4v16m8-8H4" />
+                                            </svg>
+                                        </button>
+                                    @endif
                                 </form>
                             </td>
                         </tr>
@@ -326,16 +341,31 @@
                         <h4 class="font-black text-sm text-gray-950 uppercase">{{ $item->nama }}</h4>
                         <p class="text-xs font-mono font-bold text-gray-600">{{ $item->nim }} • {{ $item->kelas }}</p>
                     </div>
-                    <form action="{{ route('admin.presensi.toggle', $item->id) }}" method="POST">
+                    <form action="{{ route('admin.presensi.toggle', $item->id) }}" method="POST" class="inline shrink-0">
                         @csrf
                         @method('PATCH')
                         <input type="hidden" name="pertemuan" value="{{ $pertemuanDipilih }}">
-                        <button 
-                            type="submit" 
-                            class="btn-smooth px-2.5 py-1 text-[10px] font-black uppercase tracking-wider border border-black shadow-[1px_1px_0px_0px_#000000] {{ $isHadirDipilih ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-800' }}"
-                        >
-                            {{ $isHadirDipilih ? '✓ HADIR P' . $pertemuanDipilih : '+ ABSENKAN' }}
-                        </button>
+                        @if ($isHadirDipilih)
+                            <button 
+                                type="submit" 
+                                class="btn-smooth w-8 h-8 bg-[#15803d] hover:bg-[#166534] text-white border-2 border-black flex items-center justify-center shadow-[1px_1px_0px_0px_#000000] cursor-pointer"
+                                title="Hadir di P{{ $pertemuanDipilih }} — Klik untuk batalkan"
+                            >
+                                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="square" stroke-width="3" d="M5 13l4 4L19 7" />
+                                </svg>
+                            </button>
+                        @else
+                            <button 
+                                type="submit" 
+                                class="btn-smooth w-8 h-8 bg-white hover:bg-gray-100 text-gray-800 border-2 border-black flex items-center justify-center shadow-[1px_1px_0px_0px_#000000] cursor-pointer"
+                                title="Tandai Hadir P{{ $pertemuanDipilih }}"
+                            >
+                                <svg class="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="square" stroke-width="2.8" d="M12 4v16m8-8H4" />
+                                </svg>
+                            </button>
+                        @endif
                     </form>
                 </div>
 

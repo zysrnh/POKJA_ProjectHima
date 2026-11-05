@@ -234,34 +234,32 @@
                 </div>
             </div>
 
-            <!-- Row 2: Action Buttons (Sync & Export) -->
+            <!-- Row 2: Action Buttons (Icon Only Neubrutalism) -->
             <div class="flex items-center justify-end gap-2 pt-1 border-t border-gray-200">
-                <!-- Sync Google Sheet Button -->
-                <form action="{{ route('admin.pendaftar.sync') }}" method="POST" class="inline flex-1 sm:flex-none">
+                <!-- Sync Google Sheet Button (Icon Only) -->
+                <form action="{{ route('admin.pendaftar.sync') }}" method="POST" class="inline">
                     @csrf
                     <button 
                         type="submit" 
                         onclick="return confirm('Sinkronkan seluruh data di database ke Google Spreadsheet?')"
-                        class="btn-smooth w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-[#2A82C6] hover:bg-[#1A467C] text-white text-xs font-black uppercase tracking-wider border-2 border-[#000000] shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
+                        class="btn-smooth w-9 h-9 sm:w-10 sm:h-10 bg-white hover:bg-blue-50 text-[#1A467C] border-2 border-black flex items-center justify-center shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
                         title="Sinkronkan seluruh data pendaftar ke Google Spreadsheet"
                     >
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="square" stroke-width="2.2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                         </svg>
-                        <span>Sinkron Sheet</span>
                     </button>
                 </form>
 
-                <!-- Export Excel Button -->
+                <!-- Export Excel Button (Icon Only) -->
                 <a 
                     href="{{ route('admin.pendaftar.export', ['search' => $search, 'kelas' => $kelasFilter, 'status_kehadiran' => $statusFilter]) }}" 
-                    class="btn-smooth flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-green-700 hover:bg-green-800 text-white text-xs font-black uppercase tracking-wider border-2 border-[#000000] shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
-                    title="Export data ke file Excel berformat styling rapi"
+                    class="btn-smooth w-9 h-9 sm:w-10 sm:h-10 bg-green-700 hover:bg-green-800 text-white border-2 border-black flex items-center justify-center shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
+                    title="Export data ke file Excel berformat styling rapi (.xls)"
                 >
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="square" stroke-width="2.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
-                    <span>Export (.xls)</span>
                 </a>
             </div>
 
@@ -389,20 +387,26 @@
                         <span id="label-status-m-{{ $item->id }}">{{ $isHadir ? 'HADIR' : 'BELUM' }}</span>
                     </button>
 
-                    <!-- Edit & Delete Buttons -->
+                    <!-- Edit & Delete Buttons (Icon Only Neubrutalism) -->
                     <div class="flex items-center gap-1.5">
                         <a 
                             href="{{ route('admin.pendaftar.edit', $item->id) }}" 
-                            class="btn-smooth px-3 py-1.5 bg-amber-400 hover:bg-amber-500 text-black text-xs font-black uppercase border-2 border-[#000000] shadow-[2px_2px_0px_0px_#000000]"
+                            class="btn-smooth w-8 h-8 bg-amber-400 hover:bg-amber-500 text-black border border-black flex items-center justify-center shadow-[1px_1px_0px_0px_#000000]"
+                            title="Edit Data {{ $item->nama }}"
                         >
-                            Edit
+                            <svg class="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="square" stroke-width="2.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
                         </a>
                         <button 
                             type="button"
                             onclick="confirmSingleDelete({{ $item->id }}, '{{ addslashes($item->nama) }}')"
-                            class="btn-smooth px-3 py-1.5 bg-[#CA2C2A] hover:bg-[#901C1A] text-white text-xs font-black uppercase border-2 border-[#000000] shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
+                            class="btn-smooth w-8 h-8 bg-[#CA2C2A] hover:bg-[#901C1A] text-white border border-black flex items-center justify-center shadow-[1px_1px_0px_0px_#000000] cursor-pointer"
+                            title="Hapus Data {{ $item->nama }}"
                         >
-                            Hapus
+                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="square" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
                         </button>
                     </div>
                 </div>
@@ -527,22 +531,28 @@
                                 {{ $item->created_at ? $item->created_at->timezone('Asia/Jakarta')->format('d/m/y H:i') : '-' }}
                             </td>
                             <td class="py-3 px-3 text-center">
-                                <div class="flex items-center justify-center gap-1">
-                                    <!-- Edit Button -->
+                                <div class="flex items-center justify-center gap-1.5">
+                                    <!-- Edit Button (Icon Only Neubrutalism) -->
                                     <a 
                                         href="{{ route('admin.pendaftar.edit', $item->id) }}" 
-                                        class="btn-smooth px-2.5 py-1 bg-amber-400 hover:bg-amber-500 text-black text-[11px] font-black uppercase tracking-wider border border-black shadow-[1px_1px_0px_0px_#000000]"
+                                        class="btn-smooth w-7 h-7 sm:w-8 sm:h-8 bg-amber-400 hover:bg-amber-500 text-black border border-black flex items-center justify-center shadow-[1px_1px_0px_0px_#000000]"
+                                        title="Edit Data {{ $item->nama }}"
                                     >
-                                        Edit
+                                        <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="square" stroke-width="2.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
                                     </a>
 
-                                    <!-- Delete Button -->
+                                    <!-- Delete Button (Icon Only Neubrutalism) -->
                                     <button 
                                         type="button"
                                         onclick="confirmSingleDelete({{ $item->id }}, '{{ addslashes($item->nama) }}')"
-                                        class="btn-smooth px-2.5 py-1 bg-[#CA2C2A] hover:bg-[#901C1A] text-white text-[11px] font-black uppercase tracking-wider border border-[#901C1A] shadow-[1px_1px_0px_0px_#000000] cursor-pointer"
+                                        class="btn-smooth w-7 h-7 sm:w-8 sm:h-8 bg-[#CA2C2A] hover:bg-[#901C1A] text-white border border-[#901C1A] flex items-center justify-center shadow-[1px_1px_0px_0px_#000000] cursor-pointer"
+                                        title="Hapus Data {{ $item->nama }}"
                                     >
-                                        Hapus
+                                        <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="square" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
                                     </button>
                                 </div>
                             </td>
