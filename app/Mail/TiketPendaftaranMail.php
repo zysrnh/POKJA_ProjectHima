@@ -9,6 +9,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Http;
 
 class TiketPendaftaranMail extends Mailable
 {
@@ -16,7 +17,7 @@ class TiketPendaftaranMail extends Mailable
 
     public $pendaftaran;
     public $pengaturan;
-    public $qrCodeUrl;
+    public $qrBinary;
 
     /**
      * Create a new message instance.
@@ -25,10 +26,15 @@ class TiketPendaftaranMail extends Mailable
     {
         $this->pendaftaran = $pendaftaran;
         $this->pengaturan = $pengaturan;
-        
-        // QR Code API yang kompatibel dengan seluruh Email Client (Gmail, Apple Mail, Outlook)
-        $qrData = $pendaftaran->nim;
-        $this->qrCodeUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=8&data=' . urlencode($qrData);
+
+        // Ambil binary image QR Code agar bisa disematkan langsung (Inline CID)
+        // Keuntungan: Gmail / Outlook TIDAK AKAN memblokir gambar
+        try {
+            $response = Http::timeout(5)->get('https://api.qrserver.com/v1/create-qr-code/?size=250x250&margin=4&data=' . urlencode($pendaftaran->nim));
+            $this->qrBinary = $response->successful() ? $response->body() : null;
+        } catch (\Throwable $e) {
+            $this->qrBinary = null;
+        }
     }
 
     /**
@@ -37,7 +43,7 @@ class TiketPendaftaranMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Tiket & QR Code Pendaftaran ' . ($this->pengaturan->nama_acara ?? 'POKJA HIMA IF 2026') . ' - ' . $this->pendaftaran->nama,
+            subject: 'Tiket & QR Code Presensi - ' . ($this->pengaturan->nama_acara ?? 'POKJA HIMA IF 2026'),
         );
     }
 
@@ -59,4 +65,3 @@ class TiketPendaftaranMail extends Mailable
         return [];
     }
 }
-

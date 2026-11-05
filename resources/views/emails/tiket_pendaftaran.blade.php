@@ -5,126 +5,108 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tiket Pendaftaran POKJA HIMA IF</title>
 </head>
-<body style="margin: 0; padding: 0; background-color: #E8F2FA; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #111827;">
+<body style="margin: 0; padding: 0; background-color: #F3F4F6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1F2937;">
 
     <!-- Wrapper Table -->
-    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #E8F2FA; padding: 30px 10px;">
+    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #F3F4F6; padding: 24px 12px;">
         <tr>
             <td align="center">
                 
-                <!-- Main Card (Neubrutalism Style) -->
-                <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 580px; background-color: #FFFFFF; border: 3px solid #1A467C; box-shadow: 6px 6px 0px #1A467C;">
+                <!-- Main Clean Card -->
+                <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 520px; background-color: #FFFFFF; border: 2px solid #1A467C;">
                     
-                    <!-- Header Banner -->
+                    <!-- Clean Header Bar -->
                     <tr>
-                        <td style="background-color: #1A467C; padding: 22px 24px; border-bottom: 3px solid #0F2A4A; text-align: left;">
-                            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
-                                <tr>
-                                    <td>
-                                        <span style="display: inline-block; background-color: #CA2C2A; color: #FFFFFF; font-size: 10px; font-weight: 800; padding: 3px 8px; text-transform: uppercase; letter-spacing: 1px; border: 1px solid #FFFFFF; margin-bottom: 6px;">
-                                            TIKET RESMI PENDAFTARAN
-                                        </span>
-                                        <h1 style="margin: 0; color: #FFFFFF; font-size: 18px; font-weight: 900; letter-spacing: 0.5px; text-transform: uppercase;">
-                                            {{ $pengaturan->nama_acara ?? 'POKJA HIMA IF 2026' }}
-                                        </h1>
-                                        <p style="margin: 4px 0 0 0; color: #93C5FD; font-size: 11px; font-weight: 600;">
-                                            Himpunan Mahasiswa Informatika - Institut Digital Ekonomi LPKIA
-                                        </p>
-                                    </td>
-                                </tr>
-                            </table>
+                        <td style="background-color: #1A467C; padding: 20px 24px; text-align: left;">
+                            <h1 style="margin: 0; color: #FFFFFF; font-size: 17px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase;">
+                                {{ $pengaturan->nama_acara ?? 'POKJA HIMA IF 2026' }}
+                            </h1>
+                            <p style="margin: 3px 0 0 0; color: #BFDBFE; font-size: 11px;">
+                                Himpunan Mahasiswa Informatika - Institut Digital Ekonomi LPKIA
+                            </p>
                         </td>
                     </tr>
 
                     <!-- Body Content -->
                     <tr>
-                        <td style="padding: 26px 24px;">
+                        <td style="padding: 24px;">
                             
                             <!-- Greeting -->
-                            <p style="margin: 0 0 16px 0; font-size: 14px; line-height: 1.5; color: #1F2937;">
-                                Halo <strong>{{ $pendaftaran->nama }}</strong>, pendaftaran Anda untuk acara <strong>{{ $pengaturan->nama_acara ?? 'POKJA HIMA IF' }}</strong> telah berhasil dicatat!
+                            <p style="margin: 0 0 16px 0; font-size: 14px; line-height: 1.5; color: #111827;">
+                                Halo <strong>{{ $pendaftaran->nama }}</strong>, pendaftaran Anda telah berhasil dicatat. Berikut adalah tiket dan QR Code presensi kehadiran Anda:
                             </p>
 
-                            <!-- QR Code Section (Ticket Pass) -->
-                            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #F8FBFE; border: 2px dashed #1A467C; margin-bottom: 22px; text-align: center;">
+                            <!-- QR Code Section (Clean Centered Box) -->
+                            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #F9FAFB; border: 1px solid #E5E7EB; margin-bottom: 20px; text-align: center;">
                                 <tr>
-                                    <td style="padding: 20px 16px;">
-                                        <span style="display: inline-block; background-color: #1A467C; color: #FFFFFF; font-size: 10px; font-weight: 800; padding: 3px 10px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">
-                                            QR CODE PRESENSI KEHADIRAN
-                                        </span>
+                                    <td style="padding: 24px 16px;">
                                         
-                                        <!-- QR Code Image -->
-                                        <div style="margin: 8px auto 12px auto; display: inline-block; padding: 8px; background-color: #FFFFFF; border: 2px solid #000000; box-shadow: 4px 4px 0px #000000;">
-                                            <img src="{{ $qrCodeUrl }}" alt="QR Code Presensi {{ $pendaftaran->nim }}" width="190" height="190" style="display: block; border: 0;" />
+                                        <!-- Inline Embedded QR Code -->
+                                        <div style="display: inline-block; padding: 8px; background-color: #FFFFFF; border: 1px solid #D1D5DB;">
+                                            @if (!empty($qrBinary))
+                                                <img 
+                                                    src="{{ $message->embedData($qrBinary, 'qrcode.png', 'image/png') }}" 
+                                                    alt="QR Code {{ $pendaftaran->nim }}" 
+                                                    width="180" 
+                                                    height="180" 
+                                                    style="display: block; border: 0;" 
+                                                />
+                                            @else
+                                                <img 
+                                                    src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&margin=4&data={{ urlencode($pendaftaran->nim) }}" 
+                                                    alt="QR Code {{ $pendaftaran->nim }}" 
+                                                    width="180" 
+                                                    height="180" 
+                                                    style="display: block; border: 0;" 
+                                                />
+                                            @endif
                                         </div>
 
-                                        <p style="margin: 0; font-family: 'Courier New', Courier, monospace; font-size: 16px; font-weight: 900; color: #1A467C; letter-spacing: 1.5px;">
-                                            NIM: {{ $pendaftaran->nim }}
+                                        <p style="margin: 10px 0 0 0; font-family: monospace; font-size: 15px; font-weight: 800; color: #1A467C; letter-spacing: 1px;">
+                                            {{ $pendaftaran->nim }}
                                         </p>
-                                        <p style="margin: 4px 0 0 0; font-size: 11px; color: #4B5563; font-weight: 600;">
-                                            Tunjukkan QR Code ini kepada panitia saat registrasi ulang di lokasi acara.
+                                        <p style="margin: 4px 0 0 0; font-size: 11px; color: #6B7280;">
+                                            Tunjukkan QR Code ini kepada panitia saat registrasi di lokasi.
                                         </p>
                                     </td>
                                 </tr>
                             </table>
 
-                            <!-- Data Peserta Box -->
-                            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="border: 2px solid #1A467C; margin-bottom: 20px; font-size: 12px; border-collapse: collapse;">
-                                <tr style="background-color: #EEF6FC; border-bottom: 2px solid #1A467C;">
-                                    <td colspan="2" style="padding: 8px 12px; font-weight: 900; color: #1A467C; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px;">
-                                        Informasi Pendaftar
-                                    </td>
-                                </tr>
-                                <tr style="border-bottom: 1px solid #E5E7EB;">
-                                    <td style="padding: 8px 12px; font-weight: 700; color: #4B5563; width: 35%;">Nama Lengkap</td>
-                                    <td style="padding: 8px 12px; font-weight: 800; color: #111827;">{{ $pendaftaran->nama }}</td>
-                                </tr>
-                                <tr style="border-bottom: 1px solid #E5E7EB;">
-                                    <td style="padding: 8px 12px; font-weight: 700; color: #4B5563;">NIM</td>
-                                    <td style="padding: 8px 12px; font-weight: 800; color: #1A467C; font-family: monospace;">{{ $pendaftaran->nim }}</td>
-                                </tr>
-                                <tr style="border-bottom: 1px solid #E5E7EB;">
-                                    <td style="padding: 8px 12px; font-weight: 700; color: #4B5563;">Email Kampus</td>
-                                    <td style="padding: 8px 12px; font-weight: 700; color: #111827;">{{ $pendaftaran->email }}</td>
-                                </tr>
-                                <tr style="border-bottom: 1px solid #E5E7EB;">
-                                    <td style="padding: 8px 12px; font-weight: 700; color: #4B5563;">Kelas</td>
-                                    <td style="padding: 8px 12px; font-weight: 800; color: #1A467C; font-family: monospace;">{{ $pendaftaran->kelas }}</td>
+                            <!-- Clean Information Table -->
+                            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="font-size: 12px; border-collapse: collapse; margin-bottom: 22px;">
+                                <tr>
+                                    <td style="padding: 6px 0; color: #6B7280; width: 35%;">Nama Lengkap</td>
+                                    <td style="padding: 6px 0; color: #111827; font-weight: 700;">{{ $pendaftaran->nama }}</td>
                                 </tr>
                                 <tr>
-                                    <td style="padding: 8px 12px; font-weight: 700; color: #4B5563;">No. WhatsApp</td>
-                                    <td style="padding: 8px 12px; font-weight: 800; color: #111827; font-family: monospace;">{{ $pendaftaran->no_telp }}</td>
-                                </tr>
-                            </table>
-
-                            <!-- Jadwal & Lokasi Acara -->
-                            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="border: 2px solid #CA2C2A; margin-bottom: 22px; font-size: 12px; border-collapse: collapse;">
-                                <tr style="background-color: #FEF2F2; border-bottom: 2px solid #CA2C2A;">
-                                    <td colspan="2" style="padding: 8px 12px; font-weight: 900; color: #901C1A; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px;">
-                                        Jadwal & Lokasi Pelaksanaan
-                                    </td>
-                                </tr>
-                                <tr style="border-bottom: 1px solid #FEE2E2;">
-                                    <td style="padding: 8px 12px; font-weight: 700; color: #4B5563; width: 35%;">Tanggal</td>
-                                    <td style="padding: 8px 12px; font-weight: 800; color: #111827;">{{ $pengaturan->tanggal_acara ?? '13 Oktober 2026' }}</td>
-                                </tr>
-                                <tr style="border-bottom: 1px solid #FEE2E2;">
-                                    <td style="padding: 8px 12px; font-weight: 700; color: #4B5563;">Waktu</td>
-                                    <td style="padding: 8px 12px; font-weight: 800; color: #111827;">{{ $pengaturan->jam_acara ?? '08:00 WIB - Selesai' }}</td>
+                                    <td style="padding: 6px 0; color: #6B7280;">NIM</td>
+                                    <td style="padding: 6px 0; color: #111827; font-weight: 700; font-family: monospace;">{{ $pendaftaran->nim }}</td>
                                 </tr>
                                 <tr>
-                                    <td style="padding: 8px 12px; font-weight: 700; color: #4B5563;">Lokasi</td>
-                                    <td style="padding: 8px 12px; font-weight: 800; color: #CA2C2A;">{{ $pengaturan->lokasi_acara ?? 'Ruangan 105' }}</td>
+                                    <td style="padding: 6px 0; color: #6B7280;">Kelas</td>
+                                    <td style="padding: 6px 0; color: #111827; font-weight: 700;">{{ $pendaftaran->kelas }}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 6px 0; color: #6B7280;">Tanggal Acara</td>
+                                    <td style="padding: 6px 0; color: #111827; font-weight: 700;">{{ $pengaturan->tanggal_acara ?? '13 Oktober 2026' }}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 6px 0; color: #6B7280;">Waktu</td>
+                                    <td style="padding: 6px 0; color: #111827; font-weight: 700;">{{ $pengaturan->jam_acara ?? '08:00 WIB - Selesai' }}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 6px 0; color: #6B7280;">Lokasi</td>
+                                    <td style="padding: 6px 0; color: #111827; font-weight: 700;">{{ $pengaturan->lokasi_acara ?? 'Ruangan 105' }}</td>
                                 </tr>
                             </table>
 
-                            <!-- Call to Action: WhatsApp Group Button -->
+                            <!-- Action Button: WhatsApp Group -->
                             @if (!empty($pengaturan->link_grup_wa))
-                                <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-top: 10px;">
+                                <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-top: 8px;">
                                     <tr>
-                                        <td align="center">
-                                            <a href="{{ $pengaturan->link_grup_wa }}" target="_blank" style="display: block; background-color: #15803D; color: #FFFFFF; font-size: 13px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; padding: 13px 20px; text-decoration: none; border: 2px solid #0F2A4A; box-shadow: 4px 4px 0px #0F2A4A; text-align: center;">
-                                                GABUNG GRUP WHATSAPP PESERTA
+                                        <td>
+                                            <a href="{{ $pengaturan->link_grup_wa }}" target="_blank" style="display: block; background-color: #16A34A; color: #FFFFFF; font-size: 13px; font-weight: 700; text-align: center; text-decoration: none; padding: 12px 16px; border: 1px solid #15803D;">
+                                                Gabung Grup WhatsApp Peserta
                                             </a>
                                         </td>
                                     </tr>
@@ -134,14 +116,11 @@
                         </td>
                     </tr>
 
-                    <!-- Footer -->
+                    <!-- Clean Simple Footer -->
                     <tr>
-                        <td style="background-color: #0F2A4A; padding: 16px 20px; text-align: center; border-top: 2px solid #000000;">
-                            <p style="margin: 0; color: #FFFFFF; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">
-                                HIMA IF - INFORMATIKA LPKIA
-                            </p>
-                            <p style="margin: 4px 0 0 0; color: #93C5FD; font-size: 10px;">
-                                Email ini dibuat secara otomatis oleh sistem pendaftaran resmi POKJA HIMA IF.
+                        <td style="background-color: #F9FAFB; padding: 14px 24px; text-align: center; border-top: 1px solid #E5E7EB;">
+                            <p style="margin: 0; color: #6B7280; font-size: 11px;">
+                                &copy; 2026 HIMA IF - Institut Digital Ekonomi LPKIA
                             </p>
                         </td>
                     </tr>
@@ -154,4 +133,3 @@
 
 </body>
 </html>
-
