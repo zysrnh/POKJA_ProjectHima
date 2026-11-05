@@ -248,9 +248,6 @@
                     <span class="font-extrabold text-base sm:text-lg text-gray-900 block leading-snug">
                         {{ $pengaturan->lokasi_acara ?? 'Ruangan 105' }}
                     </span>
-                    <span class="font-semibold text-xs text-gray-600 block mt-1">
-                        Kampus Utama
-                    </span>
                 </div>
             </div>
 
