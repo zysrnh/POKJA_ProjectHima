@@ -196,14 +196,14 @@
 
     <div class="flex flex-1 min-h-screen relative overflow-x-hidden">
 
-        <!-- Sidebar Navigation (Desktop Collapsible Neubrutalism, Hidden on Mobile) -->
+        <!-- Sidebar Navigation (Desktop Sticky Collapsible Neubrutalism, Hidden on Mobile) -->
         <aside 
             id="admin-sidebar" 
-            class="hidden lg:flex flex-col justify-between static inset-y-0 left-0 z-50 w-64 bg-[#1A467C] text-white transition-all duration-200 ease-in-out border-r-2 border-[#000000] shrink-0"
+            class="hidden lg:flex flex-col justify-between sticky top-0 h-screen z-40 w-64 bg-[#1A467C] text-white transition-all duration-200 ease-in-out border-r-2 border-[#000000] shrink-0"
         >
-            <div class="w-64">
+            <div class="flex flex-col flex-1 min-h-0 overflow-y-auto w-64">
                 <!-- Brand Header in Sidebar with Logo -->
-                <div class="h-16 flex items-center justify-between px-4 bg-[#0F2A4A] border-b-2 border-[#000000]">
+                <div class="h-16 flex items-center justify-between px-4 bg-[#0F2A4A] border-b-2 border-[#000000] shrink-0">
                     <div class="flex items-center gap-2.5">
                         <img 
                             src="{{ asset('logo/logo.png') }}" 
@@ -218,7 +218,7 @@
                 </div>
 
                 <!-- Navigation Links -->
-                <nav class="p-3.5 space-y-2 text-xs font-bold uppercase tracking-wider">
+                <nav class="p-3.5 space-y-2 text-xs font-bold uppercase tracking-wider flex-1">
                     <!-- Menu 1: Data Pendaftar -->
                     <a 
                         href="{{ route('admin.dashboard') }}" 
@@ -265,8 +265,8 @@
                 </nav>
             </div>
 
-            <!-- Sidebar Footer -->
-            <div class="w-64 p-4 border-t-2 border-[#000000] text-[11px] text-gray-300 bg-[#0F2A4A]">
+            <!-- Sidebar Footer (Always docked at the bottom) -->
+            <div class="w-64 p-4 border-t-2 border-[#000000] text-[11px] text-gray-300 bg-[#0F2A4A] shrink-0">
                 <p class="font-bold text-white truncate">{{ Auth::user()->name ?? 'Administrator' }}</p>
                 <p class="truncate text-blue-200 font-mono">{{ Auth::user()->email ?? 'admin@pokja.com' }}</p>
             </div>
