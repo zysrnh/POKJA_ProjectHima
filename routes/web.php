@@ -38,6 +38,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/', [PendaftaranAdminController::class, 'index'])->name('dashboard');
         Route::get('/pendaftar/export', [PendaftaranAdminController::class, 'exportCsv'])->name('pendaftar.export');
         Route::post('/pendaftar/sync-spreadsheet', [PendaftaranAdminController::class, 'syncSpreadsheet'])->name('pendaftar.sync');
+        Route::post('/pendaftar/bulk-delete', [PendaftaranAdminController::class, 'bulkDestroy'])->name('pendaftar.bulk-destroy');
         Route::get('/pendaftar/{id}/edit', [PendaftaranAdminController::class, 'edit'])->name('pendaftar.edit');
         Route::put('/pendaftar/{id}', [PendaftaranAdminController::class, 'update'])->name('pendaftar.update');
         Route::patch('/pendaftar/{id}/toggle-kehadiran', [PendaftaranAdminController::class, 'toggleKehadiran'])->name('pendaftar.toggleKehadiran');

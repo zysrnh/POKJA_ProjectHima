@@ -207,6 +207,26 @@ class PendaftaranAdminController extends Controller
     }
 
     /**
+     * Menghapus banyak data pendaftar sekaligus (Bulk Delete).
+     */
+    public function bulkDestroy(Request $request)
+    {
+        $ids = $request->input('ids', []);
+
+        if (empty($ids) || !is_array($ids)) {
+            return redirect()->route('admin.dashboard')->with('error', 'Tidak ada data pendaftar yang dipilih untuk dihapus.');
+        }
+
+        $count = Pendaftaran::whereIn('id', $ids)->count();
+        Pendaftaran::whereIn('id', $ids)->delete();
+
+        // Sinkronisasi total ke Google Sheets agar seluruh baris terpilih terhapus dan nomor urut rapi
+        self::syncAllToGoogleSheets();
+
+        return redirect()->route('admin.dashboard')->with('success', "Sebanyak {$count} data pendaftar berhasil dihapus dan diperbarui di Google Sheets.");
+    }
+
+    /**
      * Manual Trigger Sync Semua Data Pendaftar ke Google Sheets.
      */
     public function syncSpreadsheet()
