@@ -68,6 +68,22 @@
                                         <p style="margin: 4px 0 0 0; font-size: 11px; color: #6B7280;">
                                             Tunjukkan QR Code ini kepada panitia saat registrasi di lokasi.
                                         </p>
+
+                                        <!-- Tombol Aktivasi Akun Langsung -->
+                                        @if (!empty($pendaftaran->qr_token))
+                                            <div style="margin-top: 18px; padding-top: 14px; border-top: 1px dashed #D1D5DB;">
+                                                <a 
+                                                    href="{{ route('mahasiswa.aktivasi', ['token' => $pendaftaran->qr_token]) }}" 
+                                                    target="_blank" 
+                                                    style="display: inline-block; background-color: #1A467C; color: #FFFFFF; font-weight: 800; font-size: 12px; text-transform: uppercase; text-decoration: none; padding: 12px 22px; border: 2px solid #000000; letter-spacing: 0.5px;"
+                                                >
+                                                    Aktivasi Akun & Atur Password
+                                                </a>
+                                                <p style="margin: 8px 0 0 0; font-size: 10px; color: #6B7280;">
+                                                    Klik tombol di atas untuk login pertama kali atau upload QR tiket ini di portal login.
+                                                </p>
+                                            </div>
+                                        @endif
                                     </td>
                                 </tr>
                             </table>

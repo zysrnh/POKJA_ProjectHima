@@ -99,10 +99,8 @@ class MahasiswaController extends Controller
             }
         }
 
-        // Cari berdasarkan qr_token atau NIM
-        $mahasiswa = Pendaftaran::where('qr_token', $rawToken)
-            ->orWhere('nim', $rawToken)
-            ->first();
+        // Cari HANYA berdasarkan qr_token rahasia dari tiket resmi
+        $mahasiswa = Pendaftaran::where('qr_token', $rawToken)->first();
 
         if (!$mahasiswa) {
             return response()->json([
@@ -130,9 +128,7 @@ class MahasiswaController extends Controller
         $token = trim($request->query('token', ''));
 
         if (!empty($token)) {
-            $mahasiswa = Pendaftaran::where('qr_token', $token)
-                ->orWhere('nim', $token)
-                ->first();
+            $mahasiswa = Pendaftaran::where('qr_token', $token)->first();
 
             if ($mahasiswa) {
                 session(['aktivasi_mahasiswa_id' => $mahasiswa->id]);

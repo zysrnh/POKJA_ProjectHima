@@ -23,7 +23,8 @@
             }
         }
     </script>
-    <!-- HTML5-QRCode Library for Reading QR from File or Camera -->
+    <!-- QR Code Scanning Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
     <style>
@@ -204,15 +205,12 @@
             <!-- ============================================================== -->
             <div id="panel-qr" class="hidden space-y-4">
                 <div class="bg-blue-50 border-2 border-black p-3 text-xs text-blue-950 font-medium">
-                    <p class="font-black text-[#1A467C] uppercase mb-0.5">Login Pertama Kali?</p>
-                    <p>Upload gambar QR tiket yang Anda terima di email atau scan langsung untuk membuat password baru.</p>
+                    <p class="font-black text-[#1A467C] uppercase mb-0.5">Aktivasi Akun Mahasiswa</p>
+                    <p>Upload gambar QR tiket yang Anda terima di email untuk membuat password akun Anda.</p>
                 </div>
 
                 <!-- Input File QR Upload -->
                 <div class="space-y-2">
-                    <label class="block text-xs font-black uppercase tracking-wider text-[#1A467C]">
-                        1. Upload Foto / Screenshot QR Tiket
-                    </label>
                     <input 
                         type="file" 
                         id="qr-file-input" 
@@ -223,12 +221,12 @@
                     <button 
                         type="button" 
                         onclick="document.getElementById('qr-file-input').click()"
-                        class="btn-smooth w-full py-2.5 bg-white hover:bg-gray-50 text-gray-900 border-2 border-black font-black text-xs uppercase tracking-wider shadow-[3px_3px_0px_0px_#000000] flex items-center justify-center gap-2 cursor-pointer"
+                        class="btn-smooth w-full py-3 bg-[#1A467C] hover:bg-[#153660] text-white border-2 border-black font-black text-xs sm:text-sm uppercase tracking-wider shadow-[3px_3px_0px_0px_#000000] flex items-center justify-center gap-2 cursor-pointer"
                     >
-                        <svg class="w-4 h-4 text-[#1A467C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="square" stroke-width="2.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
-                        <span>Pilih Gambar QR dari Galeri</span>
+                        <span>Pilih Gambar QR Tiket</span>
                     </button>
                 </div>
 
@@ -238,9 +236,9 @@
                         type="button" 
                         id="btn-scan-camera"
                         onclick="toggleCameraScanner()"
-                        class="btn-smooth w-full py-2.5 bg-[#15803d] hover:bg-[#166534] text-white border-2 border-black font-black text-xs uppercase tracking-wider shadow-[3px_3px_0px_0px_#000000] flex items-center justify-center gap-2 cursor-pointer"
+                        class="btn-smooth w-full py-2.5 bg-white hover:bg-gray-100 text-gray-900 border-2 border-black font-black text-xs uppercase tracking-wider shadow-[3px_3px_0px_0px_#000000] flex items-center justify-center gap-2 cursor-pointer"
                     >
-                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-4 h-4 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="square" stroke-width="2.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                             <path stroke-width="2.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                         </svg>
@@ -253,29 +251,8 @@
                     </div>
                 </div>
 
-                <!-- Atau Masukkan NIM / Token Manual -->
-                <div class="pt-2 border-t-2 border-black/10">
-                    <label for="manual-token" class="block text-xs font-black uppercase tracking-wider text-gray-700 mb-1">
-                        Atau Masukkan NIM Terdaftar Anda:
-                    </label>
-                    <div class="flex gap-2">
-                        <input 
-                            type="text" 
-                            id="manual-token" 
-                            placeholder="Contoh: 250414010"
-                            class="flex-1 bg-[#F8FBFE] border-2 border-black text-gray-950 font-mono font-bold text-xs px-3 py-2 focus:bg-white focus:outline-none"
-                        >
-                        <button 
-                            type="button" 
-                            onclick="submitManualToken()"
-                            class="btn-smooth px-3 py-2 bg-[#1A467C] text-white border-2 border-black text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
-                        >
-                            Cek
-                        </button>
-                    </div>
-                </div>
-
-                <div id="qr-status-msg" class="hidden p-2 text-xs font-bold border-2 border-black"></div>
+                <!-- Status Feedback Box -->
+                <div id="qr-status-msg" class="hidden p-3 text-xs font-bold border-2 border-black shadow-[2px_2px_0px_0px_#000000]"></div>
             </div>
 
             <!-- Bottom Register Link -->
@@ -361,19 +338,67 @@
             }
         }
 
-        // Decode QR dari file gambar yang diupload
+        // Decode QR dari file gambar yang diupload (jsQR + Html5Qrcode fallback)
         async function scanQrFromFile(input) {
             if (!input.files || input.files.length === 0) return;
             const file = input.files[0];
-            showStatus('Membaca QR dari gambar...', 'info');
+            showStatus('Membaca QR tiket dari gambar...', 'info');
 
-            try {
-                const html5Qr = new Html5Qrcode("qr-camera-reader");
-                const decodedText = await html5Qr.scanFile(file, true);
-                verifyQrToken(decodedText);
-            } catch (err) {
-                showStatus('Tidak ditemukan QR code valid pada gambar tersebut. Pastikan foto QR jelas.', 'error');
-            }
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = async function() {
+                    let decodedText = null;
+
+                    // 1. Prioritas jsQR via Offscreen Canvas (sangat cepat & akurat untuk file download)
+                    try {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = img.naturalWidth || img.width;
+                        canvas.height = img.naturalHeight || img.height;
+                        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+                        ctx.drawImage(img, 0, 0);
+                        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+                        if (window.jsQR) {
+                            const code = jsQR(imageData.data, imageData.width, imageData.height, {
+                                inversionAttempts: "attemptBoth",
+                            });
+                            if (code && code.data) {
+                                decodedText = code.data;
+                            }
+                        }
+                    } catch (err) {
+                        console.warn('Canvas jsQR error:', err);
+                    }
+
+                    if (decodedText) {
+                        verifyQrToken(decodedText);
+                        return;
+                    }
+
+                    // 2. Fallback: Html5Qrcode scanFile (showImage: false)
+                    try {
+                        const html5Qr = new Html5Qrcode("qr-camera-reader");
+                        const fallbackText = await html5Qr.scanFile(file, false);
+                        if (fallbackText) {
+                            verifyQrToken(fallbackText);
+                            return;
+                        }
+                    } catch (err) {
+                        console.warn('Html5Qrcode scanFile error:', err);
+                    }
+
+                    showStatus('Tidak ditemukan QR code valid pada gambar tersebut. Pastikan Anda mengupload gambar QR tiket dari email.', 'error');
+                };
+
+                img.onerror = function() {
+                    showStatus('Gagal memuat file gambar. Pastikan format file PNG atau JPG.', 'error');
+                };
+
+                img.src = e.target.result;
+            };
+
+            reader.readAsDataURL(file);
         }
 
         // Kamera Scanner QR
@@ -419,16 +444,6 @@
                     isCameraActive = false;
                 });
             }
-        }
-
-        function submitManualToken() {
-            const input = document.getElementById('manual-token');
-            const val = input.value.trim();
-            if (!val) {
-                showStatus('Silakan masukkan NIM atau kode tiket terlebih dahulu.', 'error');
-                return;
-            }
-            verifyQrToken(val);
         }
 
         function showStatus(msg, type) {
