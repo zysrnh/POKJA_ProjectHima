@@ -4,6 +4,59 @@
 @section('header_title', 'Data Pendaftar POKJA')
 
 @section('content')
+<style>
+    /* Neubrutalism Physical Spring Slam & Snap (100% Solid, Zero Opacity Fade) */
+    @keyframes brutalSlamIn {
+        0% {
+            transform: translateY(-90px) scale(0.82);
+        }
+        55% {
+            transform: translateY(14px) scale(1.04);
+        }
+        80% {
+            transform: translateY(-5px) scale(0.99);
+        }
+        100% {
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    @keyframes brutalSnapOut {
+        0% {
+            transform: translateY(0) scale(1);
+        }
+        30% {
+            transform: translateY(8px) scale(1.02);
+        }
+        100% {
+            transform: translateY(-130px) scale(0.7);
+        }
+    }
+
+    @keyframes bulkBarDrop {
+        0% {
+            transform: translateY(-22px) scaleY(0.75);
+        }
+        65% {
+            transform: translateY(4px) scaleY(1.02);
+        }
+        100% {
+            transform: translateY(0) scaleY(1);
+        }
+    }
+
+    .modal-slam-in {
+        animation: brutalSlamIn 0.32s cubic-bezier(0.2, 0.9, 0.3, 1.25) both !important;
+    }
+
+    .modal-snap-out {
+        animation: brutalSnapOut 0.2s cubic-bezier(0.4, 0, 1, 1) both !important;
+    }
+
+    .bulk-bar-drop {
+        animation: bulkBarDrop 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) both !important;
+    }
+</style>
 <div class="space-y-6">
 
     <!-- 4 Stat Cards (Neubrutalism) -->
@@ -345,8 +398,8 @@
 <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
 <!-- Custom Neubrutalism Confirmation Modal -->
-<div id="modal-delete" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs transition-opacity duration-200">
-    <div class="bg-white border-2 border-[#1A467C] shadow-[8px_8px_0px_0px_#1A467C] max-w-md w-full p-5 sm:p-6 relative">
+<div id="modal-delete" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+    <div id="modal-delete-box" class="bg-white border-2 border-[#1A467C] shadow-[8px_8px_0px_0px_#1A467C] max-w-md w-full p-5 sm:p-6 relative">
         
         <!-- Close Button -->
         <button 
@@ -445,9 +498,13 @@
         if (countSpan) countSpan.textContent = count;
 
         if (count > 0) {
-            bar.classList.remove('hidden');
+            if (bar.classList.contains('hidden')) {
+                bar.classList.remove('hidden');
+                bar.classList.add('bulk-bar-drop');
+            }
         } else {
             bar.classList.add('hidden');
+            bar.classList.remove('bulk-bar-drop');
         }
 
         if (master) {
@@ -463,18 +520,22 @@
         updateBulkBarState();
     }
 
-    // 2. Custom Neubrutalism Confirmation Modal Handlers
+    // 2. Custom Neubrutalism Physical Spring Modal Handlers (100% Solid, NO Fade)
     function confirmSingleDelete(id, nama) {
         const modal = document.getElementById('modal-delete');
+        const box = document.getElementById('modal-delete-box');
         const message = document.getElementById('modal-delete-message');
         const singleForm = document.getElementById('single-delete-form');
         const bulkForm = document.getElementById('bulk-delete-form');
 
-        if (modal && message && singleForm && bulkForm) {
+        if (modal && box && message && singleForm && bulkForm) {
             message.innerHTML = `Apakah Anda yakin ingin menghapus data pendaftar atas nama <strong>"${nama}"</strong>?`;
             singleForm.action = `{{ url('/admin/pendaftar') }}/${id}`;
             singleForm.classList.remove('hidden');
             bulkForm.classList.add('hidden');
+
+            box.classList.remove('modal-snap-out');
+            box.classList.add('modal-slam-in');
             modal.classList.remove('hidden');
         }
     }
@@ -485,12 +546,13 @@
         if (count === 0) return;
 
         const modal = document.getElementById('modal-delete');
+        const box = document.getElementById('modal-delete-box');
         const message = document.getElementById('modal-delete-message');
         const singleForm = document.getElementById('single-delete-form');
         const bulkForm = document.getElementById('bulk-delete-form');
         const containerInputs = document.getElementById('bulk-delete-hidden-inputs');
 
-        if (modal && message && singleForm && bulkForm && containerInputs) {
+        if (modal && box && message && singleForm && bulkForm && containerInputs) {
             message.innerHTML = `Apakah Anda yakin ingin menghapus <strong>${count} data mahasiswa terpilih</strong> secara massal?`;
             containerInputs.innerHTML = '';
             checkboxes.forEach(cb => {
@@ -503,13 +565,24 @@
 
             singleForm.classList.add('hidden');
             bulkForm.classList.remove('hidden');
+
+            box.classList.remove('modal-snap-out');
+            box.classList.add('modal-slam-in');
             modal.classList.remove('hidden');
         }
     }
 
     function closeDeleteModal() {
         const modal = document.getElementById('modal-delete');
-        if (modal) modal.classList.add('hidden');
+        const box = document.getElementById('modal-delete-box');
+        if (modal && box && !modal.classList.contains('hidden')) {
+            box.classList.remove('modal-slam-in');
+            box.classList.add('modal-snap-out');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                box.classList.remove('modal-snap-out');
+            }, 200);
+        }
     }
 
     // Close on Escape Key
@@ -517,10 +590,11 @@
         if (e.key === 'Escape') closeDeleteModal();
     });
 
+    // Solid Snappy Toast Notification (NO Fade)
     function showToast(message, isSuccess = true) {
         const container = document.getElementById('toast-container');
         const toast = document.createElement('div');
-        toast.className = `pointer-events-auto px-4 py-2.5 border-2 shadow-[4px_4px_0px_0px_#000000] text-xs font-black tracking-wide uppercase transition-all duration-300 transform translate-y-2 opacity-0 flex items-center gap-2 ${
+        toast.className = `pointer-events-auto px-4 py-2.5 border-2 shadow-[4px_4px_0px_0px_#000000] text-xs font-black tracking-wide uppercase transition-transform duration-200 transform translate-x-full flex items-center gap-2 ${
             isSuccess 
                 ? 'bg-green-700 text-white border-green-950' 
                 : 'bg-[#CA2C2A] text-white border-[#901C1A]'
@@ -533,15 +607,17 @@
         
         container.appendChild(toast);
         
-        // Animate in
+        // Solid snap in from right
         requestAnimationFrame(() => {
-            toast.classList.remove('translate-y-2', 'opacity-0');
+            toast.classList.remove('translate-x-full');
+            toast.classList.add('translate-x-0');
         });
 
-        // Remove after 2.5 seconds
+        // Snap out after 2.5 seconds
         setTimeout(() => {
-            toast.classList.add('opacity-0', 'translate-y-2');
-            setTimeout(() => toast.remove(), 300);
+            toast.classList.remove('translate-x-0');
+            toast.classList.add('translate-x-full');
+            setTimeout(() => toast.remove(), 250);
         }, 2500);
     }
 
