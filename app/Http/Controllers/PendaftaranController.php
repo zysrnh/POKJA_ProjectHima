@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\TiketPendaftaranMail;
 use App\Models\Kelas;
 use App\Models\Pendaftaran;
 use App\Models\Pengaturan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class PendaftaranController extends Controller
 {
@@ -116,9 +118,17 @@ class PendaftaranController extends Controller
             'no_telp.regex' => 'Format nomor WhatsApp tidak valid. Gunakan nomor Indonesia yang diawali 08 (panjang 10–14 digit).',
         ]);
 
-        Pendaftaran::create($validated);
+        $pendaftaran = Pendaftaran::create($validated);
 
-        // Sinkronisasi otomatis ke Google Sheets via Webhook
+        // 5. Kirim Tiket & QR Code Presensi ke Email Pendaftar
+        try {
+            $pengaturan = Pengaturan::find(1) ?? new Pengaturan();
+            Mail::to($pendaftaran->email)->send(new TiketPendaftaranMail($pendaftaran, $pengaturan));
+        } catch (\Throwable $e) {
+            Log::error('Pengiriman Email Tiket Pendaftaran Gagal: ' . $e->getMessage());
+        }
+
+        // 6. Sinkronisasi otomatis ke Google Sheets via Webhook
         $webhookUrl = env('GOOGLE_SHEET_WEBHOOK_URL');
         if (!empty($webhookUrl)) {
             try {
@@ -135,6 +145,6 @@ class PendaftaranController extends Controller
             }
         }
 
-        return redirect()->back()->with('success', 'Pendaftaran Anda berhasil dikirim!');
+        return redirect()->back()->with('success', 'Pendaftaran Anda berhasil dikirim! Tiket & QR Code presensi telah dikirimkan ke email kampus Anda.');
     }
 }
