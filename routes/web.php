@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\KelasAdminController;
 use App\Http\Controllers\Admin\PendaftaranAdminController;
 use App\Http\Controllers\Admin\PengaturanAcaraController;
 use App\Http\Controllers\Admin\PresensiAdminController;
+use App\Http\Controllers\MahasiswaController;
 use App\Http\Controllers\PendaftaranController;
 use App\Http\Controllers\PresensiMahasiswaController;
 use Illuminate\Support\Facades\Route;
@@ -25,6 +26,18 @@ Route::get('/absen', [PresensiMahasiswaController::class, 'showAbsen'])->name('p
 Route::post('/absen/scan', [PresensiMahasiswaController::class, 'submitScan'])
     ->middleware('throttle:60,1')
     ->name('presensi.scan');
+
+/*
+|--------------------------------------------------------------------------
+| Portal Mahasiswa (Login NIM & Dashboard Mandiri)
+|--------------------------------------------------------------------------
+*/
+Route::prefix('mahasiswa')->name('mahasiswa.')->group(function () {
+    Route::get('/login', [MahasiswaController::class, 'showLogin'])->name('login');
+    Route::post('/login', [MahasiswaController::class, 'login'])->name('login.post');
+    Route::get('/dashboard', [MahasiswaController::class, 'dashboard'])->name('dashboard');
+    Route::post('/logout', [MahasiswaController::class, 'logout'])->name('logout');
+});
 
 /*
 |--------------------------------------------------------------------------

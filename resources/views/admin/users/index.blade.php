@@ -24,8 +24,91 @@
         </a>
     </div>
 
-    <!-- Tabel Data Admin (Neubrutalism) -->
-    <div class="snap-in-2 bg-white border-2 border-[#1A467C] shadow-[6px_6px_0px_0px_#1A467C] overflow-hidden">
+    <!-- Mobile View: Clean Neubrutalism Cards (block lg:hidden) -->
+    <div class="snap-in-2 block lg:hidden space-y-3">
+        @forelse ($admins as $index => $admin)
+            <div class="bg-white border-2 border-black p-4 shadow-[4px_4px_0px_0px_#000000] space-y-3">
+                <div class="flex items-start justify-between gap-2">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h4 class="font-black text-sm text-gray-950 uppercase">{{ $admin->name }}</h4>
+                            @if ($admin->id === Auth::id())
+                                <span class="bg-blue-50 text-[#1A467C] border border-[#2A82C6] text-[9px] font-black px-1.5 py-0.2 uppercase">ANDA</span>
+                            @endif
+                        </div>
+                        <p class="text-xs font-mono font-bold text-gray-600 mt-0.5">{{ $admin->email }}</p>
+                    </div>
+
+                    <span class="inline-block bg-green-50 border border-green-700 text-green-900 text-[10px] px-2 py-0.5 font-black uppercase">
+                        Aktif
+                    </span>
+                </div>
+
+                <div class="flex items-center justify-between pt-2 border-t border-gray-200">
+                    <span class="text-[10px] font-mono text-gray-500">
+                        {{ $admin->created_at ? $admin->created_at->format('d/m/Y H:i') : '-' }}
+                    </span>
+
+                    <div class="flex items-center gap-1.5">
+                        <!-- Edit Button (Icon Only) -->
+                        <a 
+                            href="{{ route('admin.users.edit', $admin->id) }}" 
+                            class="btn-smooth w-8 h-8 bg-amber-400 hover:bg-amber-500 text-black border border-black flex items-center justify-center shadow-[1px_1px_0px_0px_#000000]"
+                            title="Edit Admin {{ $admin->name }}"
+                        >
+                            <svg class="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="square" stroke-width="2.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                        </a>
+
+                        <!-- Delete Button (Icon Only) -->
+                        @if ($admin->id !== Auth::id())
+                            <form 
+                                action="{{ route('admin.users.destroy', $admin->id) }}" 
+                                method="POST" 
+                                class="inline"
+                                onsubmit="return confirm('Apakah Anda yakin ingin menghapus akun admin {{ $admin->name }}?');"
+                            >
+                                @csrf
+                                @method('DELETE')
+                                <button 
+                                    type="submit" 
+                                    class="btn-smooth w-8 h-8 bg-[#CA2C2A] hover:bg-[#901C1A] text-white border border-[#901C1A] flex items-center justify-center shadow-[1px_1px_0px_0px_#000000] cursor-pointer"
+                                    title="Hapus Admin {{ $admin->name }}"
+                                >
+                                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="square" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                </button>
+                            </form>
+                        @else
+                            <span 
+                                class="w-8 h-8 bg-gray-200 border border-gray-400 text-gray-400 flex items-center justify-center cursor-not-allowed"
+                                title="Tidak dapat menghapus akun sendiri"
+                            >
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="square" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                            </span>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        @empty
+            <div class="bg-white border-2 border-black p-6 text-center text-gray-500 font-bold text-xs shadow-[3px_3px_0px_0px_#000000]">
+                Belum ada akun admin tambahan.
+            </div>
+        @endforelse
+
+        @if ($admins->hasPages())
+            <div class="pt-2">
+                {{ $admins->links() }}
+            </div>
+        @endif
+    </div>
+
+    <!-- Tabel Data Admin Desktop (hidden lg:block) -->
+    <div class="snap-in-2 hidden lg:block bg-white border-2 border-[#1A467C] shadow-[6px_6px_0px_0px_#1A467C] overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse text-xs sm:text-sm">
                 <thead>
