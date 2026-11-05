@@ -381,7 +381,7 @@
                         <!-- Dropdown Menu List (Neubrutalism Popover) -->
                         <div 
                             id="dropdown-kelas-menu" 
-                            class="hidden absolute z-30 top-full mt-1.5 left-0 right-0 bg-white border-2 border-[#1A467C] shadow-[6px_6px_0px_0px_#1A467C] max-h-56 overflow-y-auto divide-y divide-gray-100"
+                            class="hidden absolute z-50 left-0 right-0 bg-white border-2 border-[#1A467C] shadow-[5px_5px_0px_0px_#1A467C] sm:shadow-[6px_6px_0px_0px_#1A467C] max-h-48 sm:max-h-56 overflow-y-auto divide-y divide-gray-100"
                         >
                             @foreach ($kelasList as $k)
                                 <div 
@@ -511,13 +511,28 @@
     @endif
 
     <script>
-        // Custom Dropdown Kelas Functions
+        // Custom Dropdown Kelas Functions (Smart Auto Drop-up / Drop-down)
         function toggleKelasDropdown() {
             const menu = document.getElementById('dropdown-kelas-menu');
+            const trigger = document.getElementById('dropdown-kelas-trigger');
             const chevron = document.getElementById('dropdown-chevron-icon');
-            if (menu) {
+            if (menu && trigger) {
                 const isHidden = menu.classList.contains('hidden');
                 if (isHidden) {
+                    // Cek sisa ruang layar di bawah tombol trigger
+                    const rect = trigger.getBoundingClientRect();
+                    const spaceBelow = window.innerHeight - rect.bottom;
+                    const spaceAbove = rect.top;
+
+                    // Jika ruang di bawah kurang dari 230px, buka ke ATAS (drop-up) agar tidak terpotong layar
+                    if (spaceBelow < 230 && spaceAbove > spaceBelow) {
+                        menu.classList.remove('top-full', 'mt-1.5');
+                        menu.classList.add('bottom-full', 'mb-1.5');
+                    } else {
+                        menu.classList.remove('bottom-full', 'mb-1.5');
+                        menu.classList.add('top-full', 'mt-1.5');
+                    }
+
                     menu.classList.remove('hidden');
                     if (chevron) chevron.classList.add('rotate-180');
                 } else {
