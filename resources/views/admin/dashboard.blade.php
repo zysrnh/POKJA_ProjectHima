@@ -56,6 +56,26 @@
     .bulk-bar-drop {
         animation: bulkBarDrop 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) both !important;
     }
+
+    /* Interactive Physical Tactile Hover & Pressed Effects */
+    .card-interactive {
+        transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.15s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    .card-interactive:hover {
+        transform: translate(-3px, -3px);
+        box-shadow: 6px 6px 0px 0px #000000 !important;
+    }
+
+    .btn-smooth {
+        transition: transform 0.12s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.12s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.15s ease;
+    }
+    .btn-smooth:hover {
+        transform: translate(-2px, -2px);
+    }
+    .btn-smooth:active {
+        transform: translate(2px, 2px);
+        box-shadow: 0px 0px 0px 0px #000000 !important;
+    }
 </style>
 
 <div class="space-y-4 sm:space-y-6">
@@ -65,58 +85,70 @@
     <!-- ============================================================== -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
         <!-- Card 1: Total Pendaftar -->
-        <div class="bg-white border-2 border-[#000000] p-3 sm:p-5 shadow-[3px_3px_0px_0px_#000000] sm:shadow-[4px_4px_0px_0px_#000000] flex flex-col justify-between">
+        <div class="card-interactive bg-white border-2 border-[#000000] p-3 sm:p-5 shadow-[4px_4px_0px_0px_#000000] flex flex-col justify-between cursor-default">
             <div class="flex items-center justify-between gap-1">
                 <span class="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#1A467C]">Total Pendaftar</span>
-                <span class="w-6 h-6 sm:w-7 sm:h-7 bg-[#2A82C6] border border-[#000000] flex items-center justify-center text-white text-xs font-black shadow-[1px_1px_0px_0px_#000000]">
-                    👥
-                </span>
+                <div class="w-6 h-6 sm:w-7 sm:h-7 bg-[#2A82C6] border-2 border-[#000000] flex items-center justify-center text-white shadow-[1px_1px_0px_0px_#000000]">
+                    <!-- Clean SVG Users Icon -->
+                    <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="square" stroke-width="2.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                </div>
             </div>
             <div class="mt-2 sm:mt-3 flex items-baseline justify-between">
                 <span class="text-2xl sm:text-3xl font-black text-gray-950 font-mono" id="stat-total-pendaftar">{{ number_format($totalPendaftar) }}</span>
-                <span class="text-[9px] sm:text-[10px] font-bold text-[#1A467C] bg-blue-50 border border-[#2A82C6] px-1.5 py-0.2 uppercase">Mhs</span>
+                <span class="text-[9px] sm:text-[10px] font-black text-[#1A467C] bg-blue-50 border border-[#2A82C6] px-1.5 py-0.2 uppercase">Mhs</span>
             </div>
         </div>
 
         <!-- Card 2: Total Hadir -->
-        <div class="bg-white border-2 border-[#000000] p-3 sm:p-5 shadow-[3px_3px_0px_0px_#000000] sm:shadow-[4px_4px_0px_0px_#000000] flex flex-col justify-between">
+        <div class="card-interactive bg-white border-2 border-[#000000] p-3 sm:p-5 shadow-[4px_4px_0px_0px_#000000] flex flex-col justify-between cursor-default">
             <div class="flex items-center justify-between gap-1">
                 <span class="text-[10px] sm:text-xs font-black uppercase tracking-wider text-green-800">Sudah Hadir</span>
-                <span class="w-6 h-6 sm:w-7 sm:h-7 bg-green-600 border border-[#000000] flex items-center justify-center text-white text-xs font-black shadow-[1px_1px_0px_0px_#000000]">
-                    ✓
-                </span>
+                <div class="w-6 h-6 sm:w-7 sm:h-7 bg-[#15803d] border-2 border-[#000000] flex items-center justify-center text-white shadow-[1px_1px_0px_0px_#000000]">
+                    <!-- Clean SVG Check Icon -->
+                    <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="square" stroke-width="3" d="M5 13l4 4L19 7" />
+                    </svg>
+                </div>
             </div>
             <div class="mt-2 sm:mt-3 flex items-baseline justify-between">
-                <span class="text-2xl sm:text-3xl font-black text-green-700 font-mono" id="stat-total-hadir">{{ number_format($totalHadir) }}</span>
-                <span class="text-[9px] sm:text-[10px] font-bold text-green-900 bg-green-50 border border-green-700 px-1.5 py-0.2 uppercase">Hadir</span>
+                <span class="text-2xl sm:text-3xl font-black text-[#15803d] font-mono" id="stat-total-hadir">{{ number_format($totalHadir) }}</span>
+                <span class="text-[9px] sm:text-[10px] font-black text-green-900 bg-green-50 border border-green-700 px-1.5 py-0.2 uppercase">Hadir</span>
             </div>
         </div>
 
         <!-- Card 3: Belum Hadir -->
-        <div class="bg-white border-2 border-[#000000] p-3 sm:p-5 shadow-[3px_3px_0px_0px_#000000] sm:shadow-[4px_4px_0px_0px_#000000] flex flex-col justify-between">
+        <div class="card-interactive bg-white border-2 border-[#000000] p-3 sm:p-5 shadow-[4px_4px_0px_0px_#000000] flex flex-col justify-between cursor-default">
             <div class="flex items-center justify-between gap-1">
                 <span class="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#CA2C2A]">Belum Hadir</span>
-                <span class="w-6 h-6 sm:w-7 sm:h-7 bg-[#CA2C2A] border border-[#000000] flex items-center justify-center text-white text-xs font-black shadow-[1px_1px_0px_0px_#000000]">
-                    ✕
-                </span>
+                <div class="w-6 h-6 sm:w-7 sm:h-7 bg-[#CA2C2A] border-2 border-[#000000] flex items-center justify-center text-white shadow-[1px_1px_0px_0px_#000000]">
+                    <!-- Clean SVG Cross Icon -->
+                    <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="square" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </div>
             </div>
             <div class="mt-2 sm:mt-3 flex items-baseline justify-between">
                 <span class="text-2xl sm:text-3xl font-black text-[#CA2C2A] font-mono" id="stat-total-belum-hadir">{{ number_format($totalBelumHadir) }}</span>
-                <span class="text-[9px] sm:text-[10px] font-bold text-[#901C1A] bg-red-50 border border-[#CA2C2A] px-1.5 py-0.2 uppercase">Belum</span>
+                <span class="text-[9px] sm:text-[10px] font-black text-[#901C1A] bg-red-50 border border-[#CA2C2A] px-1.5 py-0.2 uppercase">Belum</span>
             </div>
         </div>
 
         <!-- Card 4: Pendaftar Hari Ini -->
-        <div class="bg-white border-2 border-[#000000] p-3 sm:p-5 shadow-[3px_3px_0px_0px_#000000] sm:shadow-[4px_4px_0px_0px_#000000] flex flex-col justify-between">
+        <div class="card-interactive bg-white border-2 border-[#000000] p-3 sm:p-5 shadow-[4px_4px_0px_0px_#000000] flex flex-col justify-between cursor-default">
             <div class="flex items-center justify-between gap-1">
                 <span class="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#1A467C]">Daftar Hari Ini</span>
-                <span class="w-6 h-6 sm:w-7 sm:h-7 bg-[#F59E0B] border border-[#000000] flex items-center justify-center text-black text-xs font-black shadow-[1px_1px_0px_0px_#000000]">
-                    ⚡
-                </span>
+                <div class="w-6 h-6 sm:w-7 sm:h-7 bg-[#F59E0B] border-2 border-[#000000] flex items-center justify-center text-black shadow-[1px_1px_0px_0px_#000000]">
+                    <!-- Clean SVG Calendar Clock Icon -->
+                    <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="square" stroke-width="2.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                </div>
             </div>
             <div class="mt-2 sm:mt-3 flex items-baseline justify-between">
                 <span class="text-2xl sm:text-3xl font-black text-gray-950 font-mono">{{ number_format($pendaftarHariIni) }}</span>
-                <span class="text-[9px] sm:text-[10px] font-bold text-[#F59E0B] bg-amber-50 border border-[#F59E0B] px-1.5 py-0.2 uppercase">Hari Ini</span>
+                <span class="text-[9px] sm:text-[10px] font-black text-[#B45309] bg-amber-50 border border-[#F59E0B] px-1.5 py-0.2 uppercase">Hari Ini</span>
             </div>
         </div>
     </div>
@@ -129,7 +161,7 @@
             
             <!-- Row 1: Search Input & Filter Fields -->
             <div class="flex flex-col md:flex-row items-stretch gap-2 sm:gap-3">
-                <!-- Search Input -->
+                <!-- Search Input with SVG Search Icon -->
                 <div class="flex-1 relative">
                     <input 
                         type="text" 
@@ -138,7 +170,9 @@
                         placeholder="Cari Nama, NIM, Email, No. WA..."
                         class="w-full bg-[#F8FBFE] border-2 border-[#000000] text-gray-900 text-xs sm:text-sm font-semibold px-3 py-2 sm:py-2.5 pl-8 focus:bg-white focus:outline-none focus:shadow-[3px_3px_0px_0px_#000000] transition"
                     >
-                    <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-500 text-xs">🔍</span>
+                    <svg class="w-4 h-4 text-gray-500 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="square" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
                 </div>
 
                 <!-- Filters Grid in Mobile -->
@@ -191,7 +225,7 @@
                     @if ($search || $kelasFilter || $statusFilter)
                         <a 
                             href="{{ route('admin.dashboard') }}" 
-                            class="btn-smooth px-3 py-2 sm:py-2.5 border-2 border-gray-400 bg-white text-gray-700 hover:bg-gray-100 text-xs font-bold uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] text-center"
+                            class="btn-smooth px-3 py-2 sm:py-2.5 border-2 border-gray-400 bg-white text-gray-700 hover:bg-gray-100 text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] text-center"
                             title="Reset Filter"
                         >
                             ✕
@@ -248,7 +282,7 @@
             <button 
                 type="button" 
                 onclick="batalPilihSemua()"
-                class="btn-smooth flex-1 sm:flex-none px-3 py-1.5 bg-white text-gray-900 border border-black text-xs font-bold uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
+                class="btn-smooth flex-1 sm:flex-none px-3 py-1.5 bg-white text-gray-900 border-2 border-black text-xs font-bold uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
             >
                 Batal
             </button>
@@ -292,7 +326,7 @@
                 }
                 $isHadir = ($item->status_kehadiran === 'hadir');
             @endphp
-            <div class="bg-white border-2 border-[#000000] shadow-[3px_3px_0px_0px_#000000] p-3.5 space-y-3" id="mobile-card-{{ $item->id }}">
+            <div class="card-interactive bg-white border-2 border-[#000000] shadow-[3px_3px_0px_0px_#000000] p-3.5 space-y-3" id="mobile-card-{{ $item->id }}">
                 
                 <!-- Card Header: Checkbox, Name, NIM, Class Badge -->
                 <div class="flex items-start justify-between gap-2">
@@ -328,22 +362,30 @@
                             class="inline-flex items-center gap-1 text-[#15803d] font-bold font-mono text-xs hover:underline"
                         >
                             <span>{{ $item->no_telp }}</span>
-                            <span>↗</span>
+                            <svg class="w-3 h-3 text-[#15803d]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="square" stroke-width="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                            </svg>
                         </a>
                     </div>
                 </div>
 
                 <!-- Card Footer: Kehadiran Button (No labels) & Action Buttons -->
                 <div class="flex items-center justify-between gap-2 pt-2 border-t border-gray-200">
-                    <!-- Clean Tactile Toggle Button (No Extra Redundant Text) -->
+                    <!-- Clean Tactile Toggle Button (SVG Icon + Text) -->
                     <button 
                         type="button"
                         onclick="toggleKehadiran({{ $item->id }}, this)"
                         id="toggle-btn-m-{{ $item->id }}"
-                        class="btn-smooth px-3 py-1.5 text-xs font-black uppercase border-2 border-[#000000] shadow-[2px_2px_0px_0px_#000000] flex items-center gap-1.5 cursor-pointer {{ $isHadir ? 'bg-[#15803d] text-white' : 'bg-gray-200 text-gray-700' }}"
+                        class="btn-smooth px-3 py-1.5 text-xs font-black uppercase border-2 border-[#000000] shadow-[2px_2px_0px_0px_#000000] flex items-center gap-1.5 cursor-pointer {{ $isHadir ? 'bg-[#15803d] text-white hover:bg-green-800' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' }}"
                         title="Klik untuk ubah kehadiran"
                     >
-                        <span id="btn-icon-m-{{ $item->id }}">{{ $isHadir ? '✓' : '✕' }}</span>
+                        <span id="btn-icon-m-{{ $item->id }}">
+                            @if ($isHadir)
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+                            @else
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-width="3" d="M6 18L18 6M6 6l12 12" /></svg>
+                            @endif
+                        </span>
                         <span id="label-status-m-{{ $item->id }}">{{ $isHadir ? 'HADIR' : 'BELUM' }}</span>
                     </button>
 
@@ -424,7 +466,7 @@
                             }
                             $isHadir = ($item->status_kehadiran === 'hadir');
                         @endphp
-                        <tr class="hover:bg-blue-50/40 transition" id="row-pendaftar-{{ $item->id }}">
+                        <tr class="hover:bg-blue-100/60 transition-colors" id="row-pendaftar-{{ $item->id }}">
                             <td class="py-3 px-3 text-center">
                                 <input 
                                     type="checkbox" 
@@ -461,7 +503,7 @@
                                 </a>
                             </td>
 
-                            <!-- Clean Tactile Presence Button (Single Button, No Side Text) -->
+                            <!-- Clean Tactile Presence Button with SVG Icons -->
                             <td class="py-3 px-3 text-center">
                                 <button 
                                     type="button" 
@@ -470,7 +512,13 @@
                                     class="btn-smooth inline-flex items-center justify-center gap-1.5 px-3 py-1 text-xs font-black uppercase border-2 border-[#000000] shadow-[2px_2px_0px_0px_#000000] cursor-pointer transition-colors {{ $isHadir ? 'bg-[#15803d] text-white hover:bg-green-800' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' }}"
                                     title="Klik untuk ubah status kehadiran"
                                 >
-                                    <span id="btn-icon-d-{{ $item->id }}">{{ $isHadir ? '✓' : '✕' }}</span>
+                                    <span id="btn-icon-d-{{ $item->id }}">
+                                        @if ($isHadir)
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+                                        @else
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-width="3" d="M6 18L18 6M6 6l12 12" /></svg>
+                                        @endif
+                                    </span>
                                     <span id="label-status-d-{{ $item->id }}">{{ $isHadir ? 'HADIR' : 'BELUM' }}</span>
                                 </button>
                             </td>
@@ -542,6 +590,7 @@
         <!-- Header Icon & Title -->
         <div class="flex items-center gap-3 mb-3.5">
             <div class="w-10 h-10 bg-red-100 border-2 border-[#CA2C2A] text-[#CA2C2A] flex items-center justify-center shrink-0 shadow-[2px_2px_0px_0px_#901C1A]">
+                <!-- Clean SVG Alert Triangle Icon -->
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="square" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
@@ -560,7 +609,9 @@
         </p>
 
         <div class="p-2.5 bg-red-50 border border-[#CA2C2A] text-[11px] font-bold text-red-950 mb-5 flex items-center gap-2">
-            <span class="shrink-0 text-base">⚠️</span>
+            <svg class="w-4 h-4 text-[#CA2C2A] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="square" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
             <span>Data yang dihapus otomatis <strong>ikut terhapus dari Google Spreadsheet</strong> secara sinkron.</span>
         </div>
 
@@ -730,10 +781,10 @@
     function showToast(message, isSuccess = true) {
         const container = document.getElementById('toast-container');
         const toast = document.createElement('div');
-        toast.className = `pointer-events-auto px-4 py-2.5 border-2 shadow-[4px_4px_0px_0px_#000000] text-xs font-black tracking-wide uppercase transition-transform duration-200 transform translate-x-full flex items-center gap-2 ${
+        toast.className = `pointer-events-auto px-4 py-2.5 border-2 border-black shadow-[4px_4px_0px_0px_#000000] text-xs font-black tracking-wide uppercase transition-transform duration-200 transform translate-x-full flex items-center gap-2 ${
             isSuccess 
-                ? 'bg-green-700 text-white border-green-950' 
-                : 'bg-[#CA2C2A] text-white border-[#901C1A]'
+                ? 'bg-green-700 text-white' 
+                : 'bg-[#CA2C2A] text-white'
         }`;
         
         toast.innerHTML = `
@@ -755,7 +806,7 @@
         }, 2500);
     }
 
-    // 3. Quick Toggle Kehadiran (Updates Mobile & Desktop simultaneously)
+    // 3. Quick Toggle Kehadiran (Updates Mobile & Desktop simultaneously with SVG Icons)
     async function toggleKehadiran(id, triggerBtn) {
         const btnM = document.getElementById(`toggle-btn-m-${id}`);
         const btnD = document.getElementById(`toggle-btn-d-${id}`);
@@ -787,17 +838,20 @@
             if (response.ok && data.success) {
                 const isHadir = data.is_hadir;
 
+                const checkSvg = `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-width="3" d="M5 13l4 4L19 7" /></svg>`;
+                const crossSvg = `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-width="3" d="M6 18L18 6M6 6l12 12" /></svg>`;
+
                 const updateButtonState = (btn, icon, label) => {
                     if (!btn) return;
                     if (isHadir) {
-                        btn.className = btn.className.replace(/bg-gray-\d+/g, '').replace('text-gray-700', '');
-                        btn.classList.add('bg-[#15803d]', 'text-white');
-                        if (icon) icon.textContent = '✓';
+                        btn.className = btn.className.replace(/bg-gray-\d+/g, '').replace('text-gray-700', '').replace('hover:bg-gray-300', '');
+                        btn.classList.add('bg-[#15803d]', 'text-white', 'hover:bg-green-800');
+                        if (icon) icon.innerHTML = checkSvg;
                         if (label) label.textContent = 'HADIR';
                     } else {
-                        btn.className = btn.className.replace('bg-[#15803d]', '').replace('text-white', '');
-                        btn.classList.add('bg-gray-200', 'text-gray-700');
-                        if (icon) icon.textContent = '✕';
+                        btn.className = btn.className.replace('bg-[#15803d]', '').replace('text-white', '').replace('hover:bg-green-800', '');
+                        btn.classList.add('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
+                        if (icon) icon.innerHTML = crossSvg;
                         if (label) label.textContent = 'BELUM';
                     }
                 };
