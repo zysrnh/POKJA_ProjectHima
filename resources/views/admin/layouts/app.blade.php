@@ -38,49 +38,26 @@
             }
         }
 
-        function isDesktop() {
-            return window.innerWidth >= 1024;
-        }
-
-        function toggleSidebar() {
+        function toggleDesktopSidebar() {
             const sidebar = document.getElementById('admin-sidebar');
-            const overlay = document.getElementById('sidebar-overlay');
-            
-            if (isDesktop()) {
-                const isCollapsed = sidebar.classList.contains('lg:w-0');
-                if (isCollapsed) {
-                    sidebar.classList.remove('lg:w-0', 'lg:-translate-x-full', 'lg:overflow-hidden', 'lg:border-r-0');
-                    sidebar.classList.add('lg:w-64', 'lg:translate-x-0');
-                    localStorage.setItem('admin_sidebar_desktop', 'open');
-                } else {
-                    sidebar.classList.remove('lg:w-64', 'lg:translate-x-0');
-                    sidebar.classList.add('lg:w-0', 'lg:-translate-x-full', 'lg:overflow-hidden', 'lg:border-r-0');
-                    localStorage.setItem('admin_sidebar_desktop', 'closed');
-                }
+            if (!sidebar) return;
+            const isCollapsed = sidebar.classList.contains('lg:w-0');
+            if (isCollapsed) {
+                sidebar.classList.remove('lg:w-0', 'lg:-translate-x-full', 'lg:overflow-hidden', 'lg:border-r-0');
+                sidebar.classList.add('lg:w-64', 'lg:translate-x-0');
+                localStorage.setItem('admin_sidebar_desktop', 'open');
             } else {
-                const isMobileOpen = !sidebar.classList.contains('-translate-x-full');
-                if (isMobileOpen) {
-                    sidebar.classList.add('-translate-x-full');
-                    overlay.classList.add('hidden');
-                } else {
-                    sidebar.classList.remove('-translate-x-full');
-                    overlay.classList.remove('hidden');
-                }
+                sidebar.classList.remove('lg:w-64', 'lg:translate-x-0');
+                sidebar.classList.add('lg:w-0', 'lg:-translate-x-full', 'lg:overflow-hidden', 'lg:border-r-0');
+                localStorage.setItem('admin_sidebar_desktop', 'closed');
             }
         }
 
-        function closeMobileSidebar() {
-            const sidebar = document.getElementById('admin-sidebar');
-            const overlay = document.getElementById('sidebar-overlay');
-            sidebar.classList.add('-translate-x-full');
-            overlay.classList.add('hidden');
-        }
-
         document.addEventListener('DOMContentLoaded', () => {
-            if (isDesktop()) {
+            if (window.innerWidth >= 1024) {
                 const savedState = localStorage.getItem('admin_sidebar_desktop');
                 const sidebar = document.getElementById('admin-sidebar');
-                if (savedState === 'closed') {
+                if (sidebar && savedState === 'closed') {
                     sidebar.classList.remove('lg:w-64', 'lg:translate-x-0');
                     sidebar.classList.add('lg:w-0', 'lg:-translate-x-full', 'lg:overflow-hidden', 'lg:border-r-0');
                 }
@@ -109,18 +86,11 @@
 <body class="text-[#000000] min-h-screen flex flex-col antialiased selection:bg-[#2A82C6] selection:text-white">
 
     <div class="flex flex-1 min-h-screen relative overflow-x-hidden">
-        
-        <!-- Mobile Backdrop Overlay -->
-        <div 
-            id="sidebar-overlay" 
-            onclick="closeMobileSidebar()" 
-            class="fixed inset-0 bg-black/60 z-40 lg:hidden hidden transition-opacity duration-200"
-        ></div>
 
-        <!-- Sidebar Navigation (Desktop & Mobile Collapsible Neubrutalism) -->
+        <!-- Sidebar Navigation (Desktop Collapsible Neubrutalism, Hidden on Mobile) -->
         <aside 
             id="admin-sidebar" 
-            class="fixed lg:static inset-y-0 left-0 z-50 w-64 lg:w-64 bg-[#1A467C] text-white flex flex-col justify-between -translate-x-full lg:translate-x-0 transition-all duration-200 ease-in-out border-r-2 border-[#000000] shrink-0"
+            class="hidden lg:flex flex-col justify-between static inset-y-0 left-0 z-50 w-64 bg-[#1A467C] text-white transition-all duration-200 ease-in-out border-r-2 border-[#000000] shrink-0"
         >
             <div class="w-64">
                 <!-- Brand Header in Sidebar with Logo -->
@@ -136,12 +106,6 @@
                             <span class="text-[10px] text-[#2A82C6] font-bold uppercase tracking-wider block">Admin Panel</span>
                         </div>
                     </div>
-                    <!-- Close button on mobile -->
-                    <button onclick="closeMobileSidebar()" class="lg:hidden text-white/70 hover:text-white p-1" title="Tutup Menu">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="square" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
                 </div>
 
                 <!-- Navigation Links -->
@@ -203,32 +167,50 @@
         <div class="flex-1 flex flex-col min-w-0 transition-all duration-200">
 
             <!-- Top Header -->
-            <header class="bg-white border-b-2 border-[#1A467C] h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 sticky top-0 z-30 shadow-[0_2px_0px_0px_#1A467C]">
-                <!-- Left: Universal Sidebar Toggle Button -->
-                <div class="flex items-center gap-3">
+            <header class="bg-white border-b-2 border-[#1A467C] h-16 flex items-center justify-between px-3 sm:px-6 lg:px-8 sticky top-0 z-30 shadow-[0_2px_0px_0px_#1A467C]">
+                <!-- Left: Desktop Toggle / Mobile Brand -->
+                <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+                    <!-- Desktop Sidebar Toggle Button -->
                     <button 
                         type="button" 
-                        onclick="toggleSidebar()" 
-                        class="btn-smooth p-2 bg-white border-2 border-[#1A467C] text-[#1A467C] shadow-[2px_2px_0px_0px_#1A467C] cursor-pointer"
+                        onclick="toggleDesktopSidebar()" 
+                        class="btn-smooth hidden lg:inline-flex p-2 bg-white border-2 border-[#1A467C] text-[#1A467C] shadow-[2px_2px_0px_0px_#1A467C] cursor-pointer"
                         title="Buka / Tutup Sidebar"
                     >
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="square" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16" />
                         </svg>
                     </button>
-                    <h2 class="text-xs sm:text-base font-black text-[#1A467C] uppercase tracking-wide">
+
+                    <!-- Mobile Brand Icon & Title -->
+                    <div class="flex items-center gap-2 lg:hidden">
+                        <img 
+                            src="{{ asset('logo/logo.png') }}" 
+                            alt="Logo HIMA IF" 
+                            class="w-7 h-7 sm:w-8 sm:h-8 object-contain bg-white p-0.5 border border-[#1A467C] shrink-0"
+                        >
+                        <div class="min-w-0">
+                            <span class="font-black text-[11px] text-[#1A467C] leading-none block uppercase truncate">POKJA HIMA IF</span>
+                            <span class="text-[9px] font-bold text-[#CA2C2A] leading-none block uppercase truncate mt-0.5">@yield('header_title', 'Admin Panel')</span>
+                        </div>
+                    </div>
+
+                    <!-- Desktop Header Title -->
+                    <h2 class="hidden lg:block text-sm lg:text-base font-black text-[#1A467C] uppercase tracking-wide truncate">
                         @yield('header_title', 'Dashboard')
                     </h2>
                 </div>
 
                 <!-- Right: External Link & Logout -->
-                <div class="flex items-center gap-2 sm:gap-3">
+                <div class="flex items-center gap-1.5 sm:gap-3 shrink-0">
                     <a 
                         href="{{ route('pendaftaran.index') }}" 
                         target="_blank" 
-                        class="btn-smooth hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 border-2 border-[#1A467C] text-xs font-bold uppercase tracking-wider text-[#1A467C] bg-white shadow-[2px_2px_0px_0px_#1A467C]"
+                        class="btn-smooth inline-flex items-center gap-1 px-2.5 py-1.5 sm:px-3 sm:py-1.5 border-2 border-[#1A467C] text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[#1A467C] bg-white shadow-[2px_2px_0px_0px_#1A467C]"
+                        title="Buka Halaman Form Pendaftaran"
                     >
-                        <span>Lihat Form</span>
+                        <span class="hidden sm:inline">Lihat Form</span>
+                        <span class="sm:hidden">Web</span>
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="square" stroke-width="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                         </svg>
@@ -238,7 +220,7 @@
                         @csrf
                         <button 
                             type="submit" 
-                            class="btn-smooth px-3.5 py-1.5 bg-[#CA2C2A] hover:bg-[#901C1A] active:bg-[#901C1A] text-white text-xs font-bold uppercase tracking-wider border-2 border-[#901C1A] shadow-[2px_2px_0px_0px_#901C1A] cursor-pointer"
+                            class="btn-smooth px-3 py-1.5 sm:px-3.5 sm:py-1.5 bg-[#CA2C2A] hover:bg-[#901C1A] active:bg-[#901C1A] text-white text-[11px] sm:text-xs font-bold uppercase tracking-wider border-2 border-[#901C1A] shadow-[2px_2px_0px_0px_#901C1A] cursor-pointer"
                         >
                             Keluar
                         </button>
@@ -246,8 +228,8 @@
                 </div>
             </header>
 
-            <!-- Page Body Content -->
-            <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6">
+            <!-- Page Body Content (Added pb-28 for mobile so bottom toolbar never blocks content) -->
+            <main class="flex-1 p-3 sm:p-6 lg:p-8 space-y-4 sm:space-y-6 pb-28 lg:pb-8">
                 <!-- Flash Messages -->
                 @if (session('success'))
                     <div class="p-3.5 bg-green-50 border-2 border-green-700 text-green-900 text-xs sm:text-sm font-semibold shadow-[4px_4px_0px_0px_#15803d]">
@@ -273,6 +255,74 @@
         </div>
 
     </div>
+
+    <!-- ============================================================== -->
+    <!-- MOBILE BOTTOM APP TOOLBAR (Fixed Neubrutalism Bottom Nav)       -->
+    <!-- ============================================================== -->
+    <nav 
+        aria-label="Mobile Navigation Toolbar" 
+        class="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t-2 border-[#1A467C] shadow-[0px_-4px_12px_rgba(26,70,124,0.15)] px-1 pt-1.5 pb-2 flex items-center justify-around"
+    >
+        <!-- Tab 1: Data Pendaftar -->
+        <a 
+            href="{{ route('admin.dashboard') }}" 
+            class="flex-1 flex flex-col items-center justify-center py-1 transition-all active:scale-95 {{ request()->routeIs('admin.dashboard') || request()->routeIs('admin.pendaftar.*') ? 'text-[#1A467C]' : 'text-gray-500 hover:text-[#1A467C]' }}"
+        >
+            <div class="p-1 border-2 transition-all {{ request()->routeIs('admin.dashboard') || request()->routeIs('admin.pendaftar.*') ? 'bg-[#2A82C6] text-white border-[#1A467C] shadow-[2px_2px_0px_0px_#1A467C]' : 'border-transparent text-gray-500' }}">
+                <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="square" stroke-width="2.2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                </svg>
+            </div>
+            <span class="text-[9px] uppercase tracking-tight mt-0.5 font-bold {{ request()->routeIs('admin.dashboard') || request()->routeIs('admin.pendaftar.*') ? 'font-black text-[#1A467C]' : '' }}">
+                Pendaftar
+            </span>
+        </a>
+
+        <!-- Tab 2: Kelola Kelas -->
+        <a 
+            href="{{ route('admin.kelas.index') }}" 
+            class="flex-1 flex flex-col items-center justify-center py-1 transition-all active:scale-95 {{ request()->routeIs('admin.kelas.*') ? 'text-[#1A467C]' : 'text-gray-500 hover:text-[#1A467C]' }}"
+        >
+            <div class="p-1 border-2 transition-all {{ request()->routeIs('admin.kelas.*') ? 'bg-[#2A82C6] text-white border-[#1A467C] shadow-[2px_2px_0px_0px_#1A467C]' : 'border-transparent text-gray-500' }}">
+                <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="square" stroke-width="2.2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+            </div>
+            <span class="text-[9px] uppercase tracking-tight mt-0.5 font-bold {{ request()->routeIs('admin.kelas.*') ? 'font-black text-[#1A467C]' : '' }}">
+                Kelas
+            </span>
+        </a>
+
+        <!-- Tab 3: Kelola Admin -->
+        <a 
+            href="{{ route('admin.users.index') }}" 
+            class="flex-1 flex flex-col items-center justify-center py-1 transition-all active:scale-95 {{ request()->routeIs('admin.users.*') ? 'text-[#1A467C]' : 'text-gray-500 hover:text-[#1A467C]' }}"
+        >
+            <div class="p-1 border-2 transition-all {{ request()->routeIs('admin.users.*') ? 'bg-[#2A82C6] text-white border-[#1A467C] shadow-[2px_2px_0px_0px_#1A467C]' : 'border-transparent text-gray-500' }}">
+                <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="square" stroke-width="2.2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+            </div>
+            <span class="text-[9px] uppercase tracking-tight mt-0.5 font-bold {{ request()->routeIs('admin.users.*') ? 'font-black text-[#1A467C]' : '' }}">
+                Admin
+            </span>
+        </a>
+
+        <!-- Tab 4: Pengaturan Acara -->
+        <a 
+            href="{{ route('admin.pengaturan.index') }}" 
+            class="flex-1 flex flex-col items-center justify-center py-1 transition-all active:scale-95 {{ request()->routeIs('admin.pengaturan.*') ? 'text-[#1A467C]' : 'text-gray-500 hover:text-[#1A467C]' }}"
+        >
+            <div class="p-1 border-2 transition-all {{ request()->routeIs('admin.pengaturan.*') ? 'bg-[#2A82C6] text-white border-[#1A467C] shadow-[2px_2px_0px_0px_#1A467C]' : 'border-transparent text-gray-500' }}">
+                <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="square" stroke-width="2.2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+            </div>
+            <span class="text-[9px] uppercase tracking-tight mt-0.5 font-bold {{ request()->routeIs('admin.pengaturan.*') ? 'font-black text-[#1A467C]' : '' }}">
+                Acara
+            </span>
+        </a>
+    </nav>
 
 </body>
 </html>
