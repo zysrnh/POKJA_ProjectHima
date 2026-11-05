@@ -88,14 +88,46 @@
             }
         }
 
+        /* Smooth Floating Card Keyframes */
+        @keyframes floatCard1 {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-4px); }
+        }
+        @keyframes floatCard2 {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(3.5px); }
+        }
+        @keyframes floatCard3 {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-3.5px); }
+        }
+
         .anim-fade-1 {
-            animation: slideFadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation: slideFadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards, floatCard1 5.5s ease-in-out 0.5s infinite;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
         }
+        .anim-fade-1:hover {
+            animation-play-state: paused;
+            transform: translateY(-6px);
+        }
+
         .anim-fade-2 {
-            animation: slideFadeUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+            animation: slideFadeUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both, floatCard2 6.2s ease-in-out 0.65s infinite;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
         }
+        .anim-fade-2:hover {
+            animation-play-state: paused;
+            transform: translateY(-5px);
+        }
+
         .anim-fade-3 {
-            animation: slideFadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+            animation: slideFadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both, floatCard3 7s ease-in-out 0.8s infinite;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+        .anim-fade-3:focus-within,
+        .anim-fade-3:hover {
+            animation-play-state: paused;
+            transform: translateY(-3px);
         }
 
         /* Modal Smooth Pop-in with Tactile Spring */
