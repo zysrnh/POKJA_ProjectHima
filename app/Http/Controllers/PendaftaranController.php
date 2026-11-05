@@ -6,6 +6,8 @@ use App\Models\Kelas;
 use App\Models\Pendaftaran;
 use App\Models\Pengaturan;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class PendaftaranController extends Controller
 {
@@ -100,6 +102,22 @@ class PendaftaranController extends Controller
         ]);
 
         Pendaftaran::create($validated);
+
+        // Sinkronisasi otomatis ke Google Sheets via Webhook
+        $webhookUrl = env('GOOGLE_SHEET_WEBHOOK_URL');
+        if (!empty($webhookUrl)) {
+            try {
+                Http::timeout(5)->post($webhookUrl, [
+                    'nama' => $validated['nama'],
+                    'nim' => $validated['nim'],
+                    'kelas' => $validated['kelas'],
+                    'no_telp' => $validated['no_telp'],
+                    'created_at' => now()->timezone('Asia/Jakarta')->format('d/m/Y H:i:s'),
+                ]);
+            } catch (\Throwable $e) {
+                Log::warning('Sinkronisasi Google Sheet Webhook gagal: ' . $e->getMessage());
+            }
+        }
 
         return redirect()->back()->with('success', 'Pendaftaran Anda berhasil dikirim!');
     }
