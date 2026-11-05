@@ -14,6 +14,7 @@ class Pendaftaran extends Model
     protected $fillable = [
         'nama',
         'nim',
+        'email',
         'kelas',
         'no_telp',
         'status_kehadiran',

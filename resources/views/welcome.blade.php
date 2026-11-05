@@ -383,8 +383,8 @@
                 <!-- Fields Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-5">
                     
-                    <!-- Field: Nama Lengkap -->
-                    <div>
+                    <!-- Field: Nama Lengkap (Full Width) -->
+                    <div class="md:col-span-2">
                         <label for="nama" class="block text-xs font-black uppercase tracking-wider text-[#1A467C] mb-1 sm:mb-1.5 flex items-center justify-between">
                             <span>Nama Lengkap <span class="text-[#CA2C2A]">*</span></span>
                             <span id="hint-nama" class="text-[10px] font-mono text-gray-400">min. 3 huruf</span>
@@ -411,11 +411,11 @@
                         @enderror
                     </div>
 
-                    <!-- Field: NIM -->
+                    <!-- Field: NIM (Tepat 9 Digit) -->
                     <div>
                         <label for="nim" class="block text-xs font-black uppercase tracking-wider text-[#1A467C] mb-1 sm:mb-1.5 flex items-center justify-between">
                             <span>NIM <span class="text-[#CA2C2A]">*</span></span>
-                            <span id="hint-nim" class="text-[10px] font-mono text-gray-400">angka</span>
+                            <span id="hint-nim" class="text-[10px] font-mono text-gray-400">tepat 9 digit</span>
                         </label>
                         <div class="relative">
                             <input 
@@ -423,8 +423,8 @@
                                 id="nim" 
                                 name="nim" 
                                 inputmode="numeric"
-                                maxlength="20"
-                                oninput="this.value = this.value.replace(/\s+/g, ''); validateLive('nim')"
+                                maxlength="9"
+                                oninput="this.value = this.value.replace(/\D/g, ''); validateLive('nim')"
                                 value="{{ session('success') ? '' : old('nim') }}"
                                 placeholder="Contoh: 250414000"
                                 required
@@ -436,6 +436,34 @@
                             </div>
                         </div>
                         @error('nim')
+                            <p class="mt-1 text-xs font-bold text-[#CA2C2A]">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Field: Email -->
+                    <div>
+                        <label for="email" class="block text-xs font-black uppercase tracking-wider text-[#1A467C] mb-1 sm:mb-1.5 flex items-center justify-between">
+                            <span>Email <span class="text-[#CA2C2A]">*</span></span>
+                            <span id="hint-email" class="text-[10px] font-mono text-gray-400">email aktif</span>
+                        </label>
+                        <div class="relative">
+                            <input 
+                                type="email" 
+                                id="email" 
+                                name="email" 
+                                maxlength="150"
+                                oninput="validateLive('email')"
+                                value="{{ session('success') ? '' : old('email') }}"
+                                placeholder="Contoh: mahasiswa@gmail.com"
+                                required
+                                class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] pl-3.5 pr-8 py-2 sm:pl-4 sm:pr-9 sm:py-3 text-xs sm:text-sm font-semibold text-[#000000] focus:bg-white focus:outline-none focus:shadow-[4px_4px_0px_0px_#1A467C] transition-all duration-200 @error('email') border-[#CA2C2A] bg-red-50 @enderror"
+                            >
+                            <!-- Live Checkmark Badge -->
+                            <div id="check-email" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 bg-green-600 text-white border border-[#1A467C] text-[9px] sm:text-[11px] font-black flex items-center justify-center shadow-[1px_1px_0px_0px_#1A467C] field-valid-badge">
+                                ✓
+                            </div>
+                        </div>
+                        @error('email')
                             <p class="mt-1 text-xs font-bold text-[#CA2C2A]">{{ $message }}</p>
                         @enderror
                     </div>
@@ -815,7 +843,17 @@
                 const val = document.getElementById('nim')?.value.trim() || '';
                 const check = document.getElementById('check-nim');
                 if (check) {
-                    if (/^\d{6,20}$/.test(val)) {
+                    if (/^\d{9}$/.test(val)) {
+                        check.classList.remove('hidden');
+                    } else {
+                        check.classList.add('hidden');
+                    }
+                }
+            } else if (type === 'email') {
+                const val = document.getElementById('email')?.value.trim() || '';
+                const check = document.getElementById('check-email');
+                if (check) {
+                    if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) {
                         check.classList.remove('hidden');
                     } else {
                         check.classList.add('hidden');
@@ -839,6 +877,7 @@
             initTiltCards();
             validateLive('nama');
             validateLive('nim');
+            validateLive('email');
             validateLive('no_telp');
 
             const kelasVal = document.getElementById('input-kelas-value')?.value.trim();

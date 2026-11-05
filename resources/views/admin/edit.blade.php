@@ -43,6 +43,7 @@
                     name="nama" 
                     value="{{ old('nama', $pendaftaran->nama) }}"
                     required
+                    maxlength="100"
                     class="w-full bg-[#F8FBFE] border-2 @error('nama') border-[#CA2C2A] bg-red-50 @else border-[#1A467C] @enderror text-gray-950 font-bold text-sm px-4 py-3 focus:bg-white focus:outline-none focus:shadow-[3px_3px_0px_0px_#1A467C] transition"
                 >
                 @error('nama')
@@ -50,10 +51,10 @@
                 @enderror
             </div>
 
-            <!-- Field: NIM -->
+            <!-- Field: NIM (Tepat 9 Digit) -->
             <div>
                 <label for="nim" class="block text-xs font-black uppercase tracking-wider text-[#1A467C] mb-1.5">
-                    NIM (Nomor Induk Mahasiswa) <span class="text-[#CA2C2A]">*</span>
+                    NIM (Tepat 9 Digit Angka) <span class="text-[#CA2C2A]">*</span>
                 </label>
                 <input 
                     type="text" 
@@ -61,9 +62,32 @@
                     name="nim" 
                     value="{{ old('nim', $pendaftaran->nim) }}"
                     required
+                    inputmode="numeric"
+                    maxlength="9"
+                    oninput="this.value = this.value.replace(/\D/g, '')"
                     class="w-full bg-[#F8FBFE] border-2 @error('nim') border-[#CA2C2A] bg-red-50 @else border-[#1A467C] @enderror text-gray-950 font-bold font-mono text-sm px-4 py-3 focus:bg-white focus:outline-none focus:shadow-[3px_3px_0px_0px_#1A467C] transition"
                 >
                 @error('nim')
+                    <p class="mt-1 text-xs font-bold text-[#CA2C2A]">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <!-- Field: Email -->
+            <div>
+                <label for="email" class="block text-xs font-black uppercase tracking-wider text-[#1A467C] mb-1.5">
+                    Alamat Email <span class="text-[#CA2C2A]">*</span>
+                </label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    value="{{ old('email', $pendaftaran->email) }}"
+                    required
+                    maxlength="150"
+                    placeholder="nama@gmail.com"
+                    class="w-full bg-[#F8FBFE] border-2 @error('email') border-[#CA2C2A] bg-red-50 @else border-[#1A467C] @enderror text-gray-950 font-bold text-sm px-4 py-3 focus:bg-white focus:outline-none focus:shadow-[3px_3px_0px_0px_#1A467C] transition"
+                >
+                @error('email')
                     <p class="mt-1 text-xs font-bold text-[#CA2C2A]">{{ $message }}</p>
                 @enderror
             </div>

@@ -28,6 +28,7 @@ class PendaftaranAdminController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->where('nama', 'like', "%{$search}%")
                   ->orWhere('nim', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
                   ->orWhere('no_telp', 'like', "%{$search}%");
             });
         }
@@ -120,6 +121,7 @@ class PendaftaranAdminController extends Controller
         $request->merge([
             'nama' => trim(strip_tags($request->input('nama', ''))),
             'nim' => trim(strip_tags($request->input('nim', ''))),
+            'email' => trim(strip_tags(strtolower($request->input('email', '')))),
             'kelas' => trim(strip_tags($request->input('kelas', ''))),
             'no_telp' => trim(strip_tags($request->input('no_telp', ''))),
             'status_kehadiran' => trim(strip_tags($request->input('status_kehadiran', 'belum_hadir'))),
@@ -145,8 +147,15 @@ class PendaftaranAdminController extends Controller
             'nim' => [
                 'required', 
                 'numeric', 
-                'digits_between:8,20', 
+                'digits:9', 
                 'unique:pendaftarans,nim,' . $pendaftaran->id
+            ],
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:150',
+                'unique:pendaftarans,email,' . $pendaftaran->id
             ],
             'kelas' => [
                 'required', 
@@ -170,8 +179,13 @@ class PendaftaranAdminController extends Controller
             
             'nim.required' => 'NIM wajib diisi.',
             'nim.numeric' => 'NIM hanya boleh berisi angka.',
-            'nim.digits_between' => 'NIM harus berupa angka dengan panjang 8 hingga 20 digit.',
+            'nim.digits' => 'NIM harus tepat 9 digit angka.',
             'nim.unique' => 'NIM ini sudah terdaftar pada data lain.',
+
+            'email.required' => 'Email wajib diisi.',
+            'email.email' => 'Format email tidak valid.',
+            'email.max' => 'Email maksimal 150 karakter.',
+            'email.unique' => 'Email ini sudah terdaftar pada data lain.',
             
             'kelas.required' => 'Silakan pilih kelas.',
             'kelas.exists' => 'Kelas yang dipilih tidak valid atau belum terdaftar.',
@@ -200,14 +214,14 @@ class PendaftaranAdminController extends Controller
         $nama = $pendaftaran->nama;
         $pendaftaran->delete();
 
-        // Sinkronisasi ulang ke Google Sheets agar baris yang dihapus lenyap & nomor urut rapi kembali
+        // Sinkronisasi otomatis cerminan data ke Google Sheets
         self::syncAllToGoogleSheets();
 
-        return redirect()->route('admin.dashboard')->with('success', "Data pendaftar atas nama '{$nama}' berhasil dihapus dan diperbarui di Google Sheets.");
+        return redirect()->route('admin.dashboard')->with('success', "Data pendaftar \"{$nama}\" berhasil dihapus dan diperbarui di Google Sheets.");
     }
 
     /**
-     * Menghapus banyak data pendaftar sekaligus (Bulk Delete).
+     * Bulk Delete (Hapus Banyak Data Pendaftar Sekaligus).
      */
     public function bulkDestroy(Request $request)
     {
@@ -217,10 +231,9 @@ class PendaftaranAdminController extends Controller
             return redirect()->route('admin.dashboard')->with('error', 'Tidak ada data pendaftar yang dipilih untuk dihapus.');
         }
 
-        $count = Pendaftaran::whereIn('id', $ids)->count();
-        Pendaftaran::whereIn('id', $ids)->delete();
+        $count = Pendaftaran::whereIn('id', $ids)->delete();
 
-        // Sinkronisasi total ke Google Sheets agar seluruh baris terpilih terhapus dan nomor urut rapi
+        // Sinkronisasi pembaruan menyeluruh ke Google Sheets
         self::syncAllToGoogleSheets();
 
         return redirect()->route('admin.dashboard')->with('success', "Sebanyak {$count} data pendaftar berhasil dihapus dan diperbarui di Google Sheets.");
@@ -258,6 +271,7 @@ class PendaftaranAdminController extends Controller
                 $payloadData[] = [
                     'nama' => $p->nama,
                     'nim' => $p->nim,
+                    'email' => $p->email ?? '-',
                     'kelas' => $p->kelas,
                     'no_telp' => $p->no_telp,
                     'created_at' => $p->created_at ? $p->created_at->timezone('Asia/Jakarta')->format('d/m/Y H:i:s') : '-',
@@ -291,6 +305,7 @@ class PendaftaranAdminController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->where('nama', 'like', "%{$search}%")
                   ->orWhere('nim', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
                   ->orWhere('no_telp', 'like', "%{$search}%");
             });
         }
@@ -321,24 +336,26 @@ class PendaftaranAdminController extends Controller
             // Set Kolom Lebar
             echo '<colgroup>';
             echo '<col width="50" style="width: 50pt;">';
-            echo '<col width="250" style="width: 200pt;">';
-            echo '<col width="150" style="width: 120pt;">';
-            echo '<col width="100" style="width: 80pt;">';
-            echo '<col width="170" style="width: 130pt;">';
+            echo '<col width="230" style="width: 180pt;">';
+            echo '<col width="120" style="width: 100pt;">';
+            echo '<col width="200" style="width: 160pt;">';
+            echo '<col width="90" style="width: 70pt;">';
             echo '<col width="160" style="width: 120pt;">';
-            echo '<col width="200" style="width: 150pt;">';
+            echo '<col width="150" style="width: 110pt;">';
+            echo '<col width="180" style="width: 140pt;">';
             echo '</colgroup>';
 
             // Header Judul Laporan
-            echo '<tr><td colspan="7" style="font-size: 16pt; font-weight: bold; color: #1A467C; border: none; height: 35px; vertical-align: middle;">DATA PENDAFTARAN POKJA HIMA IF 2026</td></tr>';
-            echo '<tr><td colspan="7" style="font-size: 10pt; color: #555555; border: none; height: 22px; vertical-align: middle;">Dicetak pada: ' . date('d F Y, H:i') . ' WIB | Total Data: ' . $data->count() . ' (Hadir: ' . $totalHadir . ' | Belum Hadir: ' . $totalBelum . ')</td></tr>';
-            echo '<tr><td colspan="7" style="border: none; height: 10px;"></td></tr>';
+            echo '<tr><td colspan="8" style="font-size: 16pt; font-weight: bold; color: #1A467C; border: none; height: 35px; vertical-align: middle;">DATA PENDAFTARAN POKJA HIMA IF 2026</td></tr>';
+            echo '<tr><td colspan="8" style="font-size: 10pt; color: #555555; border: none; height: 22px; vertical-align: middle;">Dicetak pada: ' . date('d F Y, H:i') . ' WIB | Total Data: ' . $data->count() . ' (Hadir: ' . $totalHadir . ' | Belum Hadir: ' . $totalBelum . ')</td></tr>';
+            echo '<tr><td colspan="8" style="border: none; height: 10px;"></td></tr>';
 
             // Baris Header Kolom
             echo '<tr height="36" style="height: 28pt;">';
             echo '<th style="background-color: #1A467C; color: #FFFFFF; font-weight: bold; font-size: 11pt; text-align: center; vertical-align: middle; border: 1.5pt solid #0F2A4A; padding: 8px 5px;">NO</th>';
             echo '<th style="background-color: #1A467C; color: #FFFFFF; font-weight: bold; font-size: 11pt; text-align: center; vertical-align: middle; border: 1.5pt solid #0F2A4A; padding: 8px 10px;">NAMA LENGKAP</th>';
             echo '<th style="background-color: #1A467C; color: #FFFFFF; font-weight: bold; font-size: 11pt; text-align: center; vertical-align: middle; border: 1.5pt solid #0F2A4A; padding: 8px 10px;">NIM</th>';
+            echo '<th style="background-color: #1A467C; color: #FFFFFF; font-weight: bold; font-size: 11pt; text-align: center; vertical-align: middle; border: 1.5pt solid #0F2A4A; padding: 8px 10px;">EMAIL</th>';
             echo '<th style="background-color: #1A467C; color: #FFFFFF; font-weight: bold; font-size: 11pt; text-align: center; vertical-align: middle; border: 1.5pt solid #0F2A4A; padding: 8px 10px;">KELAS</th>';
             echo '<th style="background-color: #1A467C; color: #FFFFFF; font-weight: bold; font-size: 11pt; text-align: center; vertical-align: middle; border: 1.5pt solid #0F2A4A; padding: 8px 10px;">NO. WHATSAPP</th>';
             echo '<th style="background-color: #1A467C; color: #FFFFFF; font-weight: bold; font-size: 11pt; text-align: center; vertical-align: middle; border: 1.5pt solid #0F2A4A; padding: 8px 10px; white-space: nowrap;">STATUS KEHADIRAN</th>';
@@ -370,6 +387,7 @@ class PendaftaranAdminController extends Controller
                 echo '<td align="center" style="border: 0.5pt solid #B0C4DE; padding: 6px 8px; text-align: center; font-weight: bold; vertical-align: middle;">' . $no++ . '</td>';
                 echo '<td style="border: 0.5pt solid #B0C4DE; padding: 6px 10px; font-weight: bold; color: #111827; vertical-align: middle;">' . htmlspecialchars($item->nama) . '</td>';
                 echo '<td align="center" style="border: 0.5pt solid #B0C4DE; padding: 6px 10px; text-align: center; font-weight: bold; color: #1A467C; mso-number-format:\'\@\'; vertical-align: middle;">' . htmlspecialchars($item->nim) . '</td>';
+                echo '<td style="border: 0.5pt solid #B0C4DE; padding: 6px 10px; color: #374151; vertical-align: middle;">' . htmlspecialchars($item->email ?? '-') . '</td>';
                 echo '<td align="center" style="border: 0.5pt solid #B0C4DE; padding: 6px 10px; text-align: center; font-weight: bold; background-color: #EEF6FC; mso-number-format:\'\@\'; vertical-align: middle;">' . htmlspecialchars($item->kelas) . '</td>';
                 echo '<td align="center" style="border: 0.5pt solid #B0C4DE; padding: 6px 10px; text-align: center; mso-number-format:\'\@\'; vertical-align: middle;">' . htmlspecialchars($phone) . '</td>';
                 echo '<td align="center" style="border: 0.5pt solid #B0C4DE; padding: 6px 10px; text-align: center; white-space: nowrap; vertical-align: middle; ' . $statusStyle . '">' . $statusText . '</td>';

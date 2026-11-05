@@ -110,7 +110,7 @@
                         type="text" 
                         name="search" 
                         value="{{ $search }}"
-                        placeholder="Cari Nama, NIM, No. Telp..."
+                        placeholder="Cari Nama, NIM, Email, No. Telp..."
                         class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] text-gray-900 text-xs sm:text-sm font-semibold px-3.5 py-2.5 focus:bg-white focus:outline-none focus:shadow-[3px_3px_0px_0px_#1A467C] transition"
                     >
                 </div>
@@ -261,6 +261,7 @@
                         <th class="py-3.5 px-3.5 w-12 text-center">No</th>
                         <th class="py-3.5 px-3.5">Nama Lengkap</th>
                         <th class="py-3.5 px-3.5">NIM</th>
+                        <th class="py-3.5 px-3.5">Email</th>
                         <th class="py-3.5 px-3.5">Kelas</th>
                         <th class="py-3.5 px-3.5">No. Telepon / WA</th>
                         <th class="py-3.5 px-3.5 text-center min-w-[150px]">Kehadiran</th>
@@ -295,6 +296,9 @@
                             </td>
                             <td class="py-3.5 px-3.5 text-gray-900 font-mono font-bold">
                                 {{ $item->nim }}
+                            </td>
+                            <td class="py-3.5 px-3.5 text-gray-700 text-xs font-medium">
+                                {{ $item->email ?? '-' }}
                             </td>
                             <td class="py-3.5 px-3.5">
                                 <span class="inline-block bg-blue-50 border border-[#2A82C6] px-2 py-0.5 text-xs text-[#1A467C] font-bold font-mono">
@@ -371,7 +375,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="9" class="py-10 text-center text-gray-500 font-semibold text-xs sm:text-sm">
+                            <td colspan="10" class="py-10 text-center text-gray-500 font-semibold text-xs sm:text-sm">
                                 @if ($search || $kelasFilter || $statusFilter)
                                     Tidak ada data pendaftar yang cocok dengan pencarian / filter Anda.
                                 @else

@@ -45,6 +45,7 @@ class PendaftaranController extends Controller
         $request->merge([
             'nama' => trim(strip_tags($request->input('nama', ''))),
             'nim' => trim(strip_tags($request->input('nim', ''))),
+            'email' => trim(strip_tags(strtolower($request->input('email', '')))),
             'kelas' => trim(strip_tags($request->input('kelas', ''))),
             'no_telp' => trim(strip_tags($request->input('no_telp', ''))),
         ]);
@@ -70,8 +71,15 @@ class PendaftaranController extends Controller
             'nim' => [
                 'required', 
                 'numeric', 
-                'digits_between:8,20', 
+                'digits:9', 
                 'unique:pendaftarans,nim'
+            ],
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:150',
+                'unique:pendaftarans,email'
             ],
             'kelas' => [
                 'required', 
@@ -91,8 +99,13 @@ class PendaftaranController extends Controller
             
             'nim.required' => 'NIM wajib diisi.',
             'nim.numeric' => 'NIM hanya boleh berisi angka.',
-            'nim.digits_between' => 'NIM harus berupa angka dengan panjang 8 hingga 20 digit.',
+            'nim.digits' => 'NIM harus tepat 9 digit angka.',
             'nim.unique' => 'NIM ini sudah terdaftar sebelumnya.',
+
+            'email.required' => 'Alamat email wajib diisi.',
+            'email.email' => 'Format alamat email tidak valid.',
+            'email.max' => 'Alamat email maksimal 150 karakter.',
+            'email.unique' => 'Alamat email ini sudah terdaftar sebelumnya.',
             
             'kelas.required' => 'Silakan pilih kelas Anda.',
             'kelas.exists' => 'Kelas yang dipilih tidak valid atau belum terdaftar.',
@@ -110,6 +123,7 @@ class PendaftaranController extends Controller
                 Http::timeout(5)->post($webhookUrl, [
                     'nama' => $validated['nama'],
                     'nim' => $validated['nim'],
+                    'email' => $validated['email'],
                     'kelas' => $validated['kelas'],
                     'no_telp' => $validated['no_telp'],
                     'created_at' => now()->timezone('Asia/Jakarta')->format('d/m/Y H:i:s'),
