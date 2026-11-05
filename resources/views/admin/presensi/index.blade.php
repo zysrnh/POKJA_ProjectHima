@@ -17,19 +17,11 @@
 <div class="space-y-4 sm:space-y-6">
 
     <!-- ============================================================== -->
-    <!-- CARD 1: BANNER UTAMA & KONTROL PROYEKTOR (Enters First)        -->
+    <!-- CARD 1: BANNER UTAMA (Icon Only Actions)                       -->
     <!-- ============================================================== -->
-    <div class="snap-in-1 bg-white border-2 border-[#000000] p-4 sm:p-6 shadow-[5px_5px_0px_0px_#000000]">
-        <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+    <div class="snap-in-1 bg-white border-2 border-[#000000] p-4 sm:p-5 shadow-[5px_5px_0px_0px_#000000]">
+        <div class="flex items-center justify-between gap-4">
             <div>
-                <div class="flex items-center gap-2 mb-1.5">
-                    <span class="inline-block bg-[#1A467C] text-white text-[10px] font-black uppercase px-2.5 py-0.5 tracking-wider border border-black shadow-[1px_1px_0px_0px_#000000]">
-                        SISTEM PRESENSI TERPADU
-                    </span>
-                    <span class="inline-block {{ $pengaturan->is_scan_aktif ? 'bg-green-100 text-green-900 border-green-800' : 'bg-red-100 text-red-900 border-red-800' }} text-[10px] font-black uppercase px-2 py-0.5 border shadow-[1px_1px_0px_0px_#000000]">
-                        SESI SCAN: {{ $pengaturan->is_scan_aktif ? 'DIBUKA' : 'DITUTUP' }} (P{{ $pengaturan->pertemuan_aktif }})
-                    </span>
-                </div>
                 <h3 class="text-base sm:text-xl font-black uppercase tracking-tight text-[#1A467C]">
                     Presensi Kelas 7 Pertemuan & Rekapitulasi
                 </h3>
@@ -38,169 +30,135 @@
                 </p>
             </div>
 
-            <!-- Tombol Aksi Cepat -->
-            <div class="flex flex-wrap items-center gap-2.5 w-full lg:w-auto">
+            <!-- Tombol Aksi Cepat (Icon Only Neubrutalism) -->
+            <div class="flex items-center gap-2 shrink-0">
                 <!-- Buka Layar Proyektor (Tab Baru) -->
                 <a 
                     href="{{ route('admin.presensi.layar') }}" 
                     target="_blank"
-                    class="btn-smooth flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#2A82C6] hover:bg-[#1A467C] text-white text-xs sm:text-sm font-black uppercase tracking-wider border-2 border-[#000000] shadow-[3px_3px_0px_0px_#000000] cursor-pointer"
+                    class="btn-smooth w-10 h-10 bg-[#2A82C6] hover:bg-[#1A467C] text-white border-2 border-black flex items-center justify-center shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
+                    title="Buka Layar Proyektor Kelas"
                 >
-                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="square" stroke-width="2.5" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
-                    <span>BUKA LAYAR PROYEKTOR</span>
                 </a>
 
                 <!-- Sinkron Spreadsheet -->
-                <form action="{{ route('admin.presensi.sync') }}" method="POST" class="inline flex-1 sm:flex-none">
+                <form action="{{ route('admin.presensi.sync') }}" method="POST" class="inline">
                     @csrf
                     <button 
                         type="submit" 
                         onclick="return confirm('Sinkronkan seluruh data pendaftar & kehadiran 7 pertemuan ke Google Sheets?')"
-                        class="btn-smooth w-full inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 bg-white hover:bg-blue-50 text-[#1A467C] text-xs font-black uppercase tracking-wider border-2 border-[#000000] shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
-                        title="Sinkronkan Sheet 1: Peserta & Sheet 2: Kehadiran"
+                        class="btn-smooth w-10 h-10 bg-white hover:bg-blue-50 text-[#1A467C] border-2 border-black flex items-center justify-center shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
+                        title="Sinkronkan ke Google Sheets (Sheet Peserta & Sheet Kehadiran)"
                     >
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="square" stroke-width="2.2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                         </svg>
-                        <span>Sinkron Sheets</span>
                     </button>
                 </form>
 
                 <!-- Export Excel -->
                 <a 
                     href="{{ route('admin.presensi.export') }}" 
-                    class="btn-smooth flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 bg-green-700 hover:bg-green-800 text-white text-xs font-black uppercase tracking-wider border-2 border-[#000000] shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
+                    class="btn-smooth w-10 h-10 bg-green-700 hover:bg-green-800 text-white border-2 border-black flex items-center justify-center shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
                     title="Download Rekap 7 Pertemuan format .xls"
                 >
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="square" stroke-width="2.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
-                    <span>Export (.xls)</span>
                 </a>
             </div>
         </div>
     </div>
 
     <!-- ============================================================== -->
-    <!-- CARD 2: KONTROL SESI PERTEMUAN AKTIF (1-Klik Tactile Switch)   -->
+    <!-- CARD 2: TAB PILIHAN P1 - P7 & 1-KLIK TOGGLE SCAN (Icon Only)   -->
     <!-- ============================================================== -->
-    <div class="snap-in-2 bg-white border-2 border-[#000000] p-3.5 sm:p-5 shadow-[4px_4px_0px_0px_#000000]">
-        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+    <div class="snap-in-2 bg-white border-2 border-[#000000] p-3 sm:p-4 shadow-[4px_4px_0px_0px_#000000]">
+        <div class="flex items-center justify-between gap-3">
             
-            <!-- Left: Pertemuan Aktif Selector (Auto Submit on Change) -->
-            <form action="{{ route('admin.presensi.sesi') }}" method="POST" class="flex items-center gap-2.5">
+            <!-- Left: 7 Pertemuan Pill Tabs -->
+            <div class="flex items-center gap-1.5 overflow-x-auto pb-0.5">
+                @for ($p = 1; $p <= 7; $p++)
+                    <a 
+                        href="{{ route('admin.presensi.index', ['pertemuan' => $p, 'search' => $search, 'kelas' => $kelasFilter]) }}"
+                        class="btn-smooth shrink-0 px-3 sm:px-3.5 py-1.5 border-2 border-black text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] {{ $pertemuanDipilih === $p ? 'bg-[#2A82C6] text-white' : 'bg-white text-gray-800 hover:bg-gray-100' }}"
+                        title="Pilih Pertemuan {{ $p }}"
+                    >
+                        P{{ $p }}
+                    </a>
+                @endfor
+            </div>
+
+            <!-- Right: 1-Click Scan Toggle (Icon Only) -->
+            <form action="{{ route('admin.presensi.sesi') }}" method="POST" class="inline shrink-0">
                 @csrf
-                <span class="text-xs font-black uppercase tracking-wider text-gray-800 shrink-0">
-                    Sesi Pertemuan:
-                </span>
-                <select 
-                    name="pertemuan_aktif" 
-                    onchange="this.form.submit()"
-                    class="bg-[#F8FBFE] border-2 border-black font-black text-xs sm:text-sm px-3 py-1.5 focus:bg-white focus:outline-none focus:shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
-                    title="Ganti Pertemuan Aktif"
-                >
-                    @for ($p = 1; $p <= 7; $p++)
-                        <option value="{{ $p }}" {{ (int) $pengaturan->pertemuan_aktif === $p ? 'selected' : '' }}>
-                            Pertemuan {{ $p }}
-                        </option>
-                    @endfor
-                </select>
+                <input type="hidden" name="toggle_scan" value="1">
+                @if ($pengaturan->is_scan_aktif)
+                    <button 
+                        type="submit" 
+                        class="btn-smooth w-9 h-9 sm:w-10 sm:h-10 bg-[#CA2C2A] hover:bg-[#901C1A] text-white border-2 border-black flex items-center justify-center shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
+                        title="Sesi Scan Sedang DIBUKA — Klik untuk TUTUP sesi scan"
+                    >
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="square" stroke-width="2.8" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                @else
+                    <button 
+                        type="submit" 
+                        class="btn-smooth w-9 h-9 sm:w-10 sm:h-10 bg-[#15803d] hover:bg-[#166534] text-white border-2 border-black flex items-center justify-center shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
+                        title="Sesi Scan Sedang DITUTUP — Klik untuk BUKA sesi scan"
+                    >
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="square" stroke-width="3" d="M5 13l4 4L19 7" />
+                        </svg>
+                    </button>
+                @endif
             </form>
 
-            <!-- Right: Status Badge & 1-Click Toggle Button -->
-            <div class="flex items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-gray-200">
-                <div class="flex items-center gap-1.5">
-                    <span class="w-2.5 h-2.5 {{ $pengaturan->is_scan_aktif ? 'bg-green-500 animate-pulse' : 'bg-red-500' }} border border-black inline-block"></span>
-                    <span class="text-xs font-black uppercase tracking-wider {{ $pengaturan->is_scan_aktif ? 'text-green-800' : 'text-red-700' }}">
-                        {{ $pengaturan->is_scan_aktif ? 'SCAN DIBUKA' : 'SCAN DITUTUP' }}
-                    </span>
-                </div>
-
-                <form action="{{ route('admin.presensi.sesi') }}" method="POST" class="inline">
-                    @csrf
-                    <input type="hidden" name="toggle_scan" value="1">
-                    @if ($pengaturan->is_scan_aktif)
-                        <button 
-                            type="submit" 
-                            class="btn-smooth px-3 py-1.5 sm:px-4 sm:py-2 bg-[#CA2C2A] hover:bg-[#901C1A] text-white text-xs font-black uppercase tracking-wider border-2 border-black shadow-[2px_2px_0px_0px_#000000] flex items-center gap-1.5 cursor-pointer"
-                            title="Tutup sesi scan untuk mencegah absensi"
-                        >
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="square" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                            <span>TUTUP SESI SCAN</span>
-                        </button>
-                    @else
-                        <button 
-                            type="submit" 
-                            class="btn-smooth px-3 py-1.5 sm:px-4 sm:py-2 bg-[#15803d] hover:bg-[#166534] text-white text-xs font-black uppercase tracking-wider border-2 border-black shadow-[2px_2px_0px_0px_#000000] flex items-center gap-1.5 cursor-pointer"
-                            title="Buka sesi scan agar mahasiswa bisa scan di kelas"
-                        >
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="square" stroke-width="3" d="M5 13l4 4L19 7" />
-                            </svg>
-                            <span>BUKA SESI SCAN</span>
-                        </button>
-                    @endif
-                </form>
-            </div>
-
         </div>
     </div>
 
     <!-- ============================================================== -->
-    <!-- CARD 3: TAB SELECTOR PERTEMUAN 1 - 7 & STATS                   -->
+    <!-- CARD 3: 3 STAT CARDS PERTEMUAN TERPILIH                        -->
     <!-- ============================================================== -->
-    <div class="snap-in-3 space-y-3">
-        <!-- 7 Pertemuan Pill Tabs -->
-        <div class="flex items-center gap-1.5 overflow-x-auto pb-1">
-            @for ($p = 1; $p <= 7; $p++)
-                <a 
-                    href="{{ route('admin.presensi.index', ['pertemuan' => $p, 'search' => $search, 'kelas' => $kelasFilter]) }}"
-                    class="btn-smooth shrink-0 px-3.5 py-1.5 border-2 border-black text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] {{ $pertemuanDipilih === $p ? 'bg-[#2A82C6] text-white' : 'bg-white text-gray-800 hover:bg-gray-100' }}"
-                >
-                    P{{ $p }}
-                </a>
-            @endfor
+    <div class="snap-in-3 grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-4">
+        <div class="card-interactive bg-white border-2 border-black p-3.5 sm:p-4 shadow-[3px_3px_0px_0px_#000000] flex items-center justify-between">
+            <div>
+                <span class="text-[10px] font-black uppercase tracking-wider text-gray-600">Total Mahasiswa</span>
+                <h4 class="text-xl sm:text-2xl font-black text-gray-950 font-mono mt-0.5">{{ $totalMahasiswa }}</h4>
+            </div>
+            <span class="text-[9px] font-black text-[#1A467C] bg-blue-50 border border-[#2A82C6] px-1.5 py-0.5 uppercase">Mhs</span>
         </div>
 
-        <!-- 3 Stat Cards untuk Pertemuan yang Dipilih -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-4">
-            <div class="card-interactive bg-white border-2 border-black p-3.5 sm:p-4 shadow-[3px_3px_0px_0px_#000000] flex items-center justify-between">
-                <div>
-                    <span class="text-[10px] font-black uppercase tracking-wider text-gray-600">Total Mahasiswa</span>
-                    <h4 class="text-xl sm:text-2xl font-black text-gray-950 font-mono mt-0.5">{{ $totalMahasiswa }}</h4>
-                </div>
-                <span class="text-[9px] font-black text-[#1A467C] bg-blue-50 border border-[#2A82C6] px-1.5 py-0.5 uppercase">Mhs</span>
+        <div class="card-interactive bg-white border-2 border-black p-3.5 sm:p-4 shadow-[3px_3px_0px_0px_#000000] flex items-center justify-between">
+            <div>
+                <span class="text-[10px] font-black uppercase tracking-wider text-green-800">Hadir di Pertemuan {{ $pertemuanDipilih }}</span>
+                <h4 class="text-xl sm:text-2xl font-black text-green-700 font-mono mt-0.5">{{ $totalHadirPertemuan }}</h4>
             </div>
+            <span class="text-[9px] font-black text-green-900 bg-green-50 border border-green-700 px-1.5 py-0.5 uppercase">Hadir</span>
+        </div>
 
-            <div class="card-interactive bg-white border-2 border-black p-3.5 sm:p-4 shadow-[3px_3px_0px_0px_#000000] flex items-center justify-between">
-                <div>
-                    <span class="text-[10px] font-black uppercase tracking-wider text-green-800">Hadir di Pertemuan {{ $pertemuanDipilih }}</span>
-                    <h4 class="text-xl sm:text-2xl font-black text-green-700 font-mono mt-0.5">{{ $totalHadirPertemuan }}</h4>
-                </div>
-                <span class="text-[9px] font-black text-green-900 bg-green-50 border border-green-700 px-1.5 py-0.5 uppercase">Hadir</span>
+        <div class="card-interactive bg-white border-2 border-black p-3.5 sm:p-4 shadow-[3px_3px_0px_0px_#000000] flex items-center justify-between">
+            <div>
+                <span class="text-[10px] font-black uppercase tracking-wider text-[#CA2C2A]">Belum Hadir (P{{ $pertemuanDipilih }})</span>
+                <h4 class="text-xl sm:text-2xl font-black text-[#CA2C2A] font-mono mt-0.5">{{ $totalBelumHadirPertemuan }}</h4>
             </div>
-
-            <div class="card-interactive bg-white border-2 border-black p-3.5 sm:p-4 shadow-[3px_3px_0px_0px_#000000] flex items-center justify-between">
-                <div>
-                    <span class="text-[10px] font-black uppercase tracking-wider text-[#CA2C2A]">Belum Hadir (P{{ $pertemuanDipilih }})</span>
-                    <h4 class="text-xl sm:text-2xl font-black text-[#CA2C2A] font-mono mt-0.5">{{ $totalBelumHadirPertemuan }}</h4>
-                </div>
-                <span class="text-[9px] font-black text-[#901C1A] bg-red-50 border border-[#CA2C2A] px-1.5 py-0.5 uppercase">Belum</span>
-            </div>
+            <span class="text-[9px] font-black text-[#901C1A] bg-red-50 border border-[#CA2C2A] px-1.5 py-0.5 uppercase">Belum</span>
         </div>
     </div>
 
     <!-- ============================================================== -->
-    <!-- CARD 4: FILTER & PENCARIAN                                     -->
+    <!-- CARD 4: FILTER & PENCARIAN (Clean Neubrutalism Dropdown)        -->
     <!-- ============================================================== -->
     <div class="snap-in-4 bg-white border-2 border-black p-3 sm:p-4 shadow-[4px_4px_0px_0px_#000000]">
         <form action="{{ route('admin.presensi.index') }}" method="GET" class="flex flex-col sm:flex-row items-stretch gap-2.5">
             <input type="hidden" name="pertemuan" value="{{ $pertemuanDipilih }}">
 
+            <!-- Input Cari -->
             <div class="flex-1 relative">
                 <input 
                     type="text" 
@@ -214,21 +172,30 @@
                 </svg>
             </div>
 
-            <select 
-                name="kelas" 
-                class="bg-[#F8FBFE] border-2 border-black font-bold text-xs sm:text-sm px-3 py-2 focus:bg-white focus:outline-none focus:shadow-[2px_2px_0px_0px_#000000]"
-            >
-                <option value="">-- SEMUA KELAS --</option>
-                @foreach ($kelasList as $k)
-                    <option value="{{ $k->nama_kelas }}" {{ $kelasFilter === $k->nama_kelas ? 'selected' : '' }}>
-                        {{ $k->nama_kelas }}
-                    </option>
-                @endforeach
-            </select>
+            <!-- Dropdown Kelas Neubrutalism -->
+            <div class="relative w-full sm:w-56">
+                <select 
+                    name="kelas" 
+                    class="w-full bg-[#F8FBFE] border-2 border-black font-bold text-xs sm:text-sm px-3.5 py-2 pr-8 appearance-none focus:bg-white focus:outline-none focus:shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
+                >
+                    <option value="">-- SEMUA KELAS --</option>
+                    @foreach ($kelasList as $k)
+                        <option value="{{ $k->nama_kelas }}" {{ $kelasFilter === $k->nama_kelas ? 'selected' : '' }}>
+                            {{ $k->nama_kelas }}
+                        </option>
+                    @endforeach
+                </select>
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-black">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="square" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </div>
+            </div>
 
+            <!-- Tombol Filter -->
             <button 
                 type="submit" 
-                class="btn-smooth px-4 py-2 bg-[#1A467C] hover:bg-[#0F2A4A] text-white text-xs font-black uppercase tracking-wider border-2 border-black shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
+                class="btn-smooth px-5 py-2 bg-[#1A467C] hover:bg-[#0F2A4A] text-white text-xs font-black uppercase tracking-wider border-2 border-black shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
             >
                 FILTER
             </button>
@@ -400,4 +367,3 @@
 
 </div>
 @endsection
-

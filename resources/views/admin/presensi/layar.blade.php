@@ -33,6 +33,17 @@
             background-size: 28px 28px;
         }
 
+        .btn-smooth {
+            transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.15s ease;
+        }
+        .btn-smooth:hover {
+            transform: translate(-2px, -2px);
+        }
+        .btn-smooth:active {
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0px 0px #000000 !important;
+        }
+
         /* Tactile Drop Slam Notification Animation */
         @keyframes notifSlamIn {
             0% {
@@ -65,21 +76,6 @@
         .notif-card-out {
             animation: notifSlamOut 0.28s cubic-bezier(0.6, -0.28, 0.735, 0.045) forwards;
         }
-
-        /* Progress Bar Animation 5s */
-        .progress-bar-5s {
-            animation: shrinkBar 5s linear infinite;
-            transform-origin: left;
-        }
-
-        @keyframes shrinkBar {
-            0% {
-                width: 100%;
-            }
-            100% {
-                width: 0%;
-            }
-        }
     </style>
 </head>
 <body class="min-h-screen text-[#000000] flex flex-col justify-between p-4 sm:p-8 select-none overflow-x-hidden">
@@ -92,80 +88,58 @@
     </div>
 
     <!-- ============================================================== -->
-    <!-- TOP BAR: Brand & Acara & Fullscreen Button                     -->
+    <!-- TOP BAR: Brand Acara & Icon Actions Only                       -->
     <!-- ============================================================== -->
     <header class="flex items-center justify-between bg-white border-[3px] border-[#000000] p-4 sm:p-5 shadow-[6px_6px_0px_0px_#000000]">
         <div class="flex items-center gap-3.5">
             <img 
                 src="{{ asset('logo/logo.png') }}" 
                 alt="Logo HIMA IF" 
-                class="w-12 h-12 object-contain bg-white p-1 border-2 border-black shadow-[2px_2px_0px_0px_#000000]"
+                class="w-10 h-10 object-contain bg-white p-1 border-2 border-black shadow-[2px_2px_0px_0px_#000000]"
             >
-            <div>
-                <span class="inline-block bg-[#1A467C] text-white text-[11px] font-black uppercase px-2.5 py-0.5 tracking-wider border border-black shadow-[1px_1px_0px_0px_#000000] mb-0.5">
-                    LAYAR PROYEKTOR KELAS
-                </span>
-                <h1 class="text-lg sm:text-2xl font-black uppercase tracking-tight text-[#1A467C]">
-                    {{ $pengaturan->nama_acara }}
-                </h1>
-            </div>
+            <h1 class="text-base sm:text-xl font-black uppercase tracking-tight text-[#1A467C]">
+                {{ $pengaturan->nama_acara }}
+            </h1>
         </div>
 
-        <div class="flex items-center gap-3">
-            <!-- Badge Pertemuan Aktif -->
-            <div class="bg-[#2A82C6] border-2 border-black px-4 py-2 text-white shadow-[3px_3px_0px_0px_#000000]">
-                <span class="text-[10px] font-black uppercase tracking-wider block leading-none">SESI KELAS</span>
-                <span class="text-base sm:text-xl font-black uppercase leading-tight" id="display-pertemuan">
-                    PERTEMUAN {{ $pengaturan->pertemuan_aktif }}
-                </span>
+        <div class="flex items-center gap-2.5 sm:gap-3">
+            <!-- Badge P1 Saja -->
+            <div class="w-10 h-10 sm:w-11 sm:h-11 bg-[#2A82C6] border-2 border-black flex items-center justify-center text-white font-black text-sm sm:text-base shadow-[3px_3px_0px_0px_#000000]" id="display-pertemuan" title="Pertemuan {{ $pengaturan->pertemuan_aktif }}">
+                P{{ $pengaturan->pertemuan_aktif }}
             </div>
 
-            <!-- Tombol Fullscreen -->
+            <!-- Tombol Fullscreen (Icon Only) -->
             <button 
                 type="button" 
                 onclick="toggleFullscreen()"
-                class="bg-white hover:bg-gray-100 border-2 border-black p-2.5 sm:px-4 sm:py-2 text-xs font-black uppercase tracking-wider shadow-[3px_3px_0px_0px_#000000] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer flex items-center gap-1.5"
-                title="Layar Penuh"
+                class="btn-smooth w-10 h-10 sm:w-11 sm:h-11 bg-white hover:bg-gray-100 border-2 border-black flex items-center justify-center text-black shadow-[3px_3px_0px_0px_#000000] cursor-pointer"
+                title="Layar Penuh (Fullscreen)"
             >
                 <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="square" stroke-width="2.5" d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m4 0v4m0-4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
                 </svg>
-                <span class="hidden sm:inline">FULLSCREEN</span>
             </button>
 
-            <!-- Tombol Kembali ke Admin -->
+            <!-- Tombol Tutup Layar (Icon Only) -->
             <a 
                 href="{{ route('admin.presensi.index') }}" 
-                class="bg-[#CA2C2A] hover:bg-[#901C1A] border-2 border-black px-3.5 py-2 text-white text-xs font-black uppercase tracking-wider shadow-[3px_3px_0px_0px_#000000] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer"
+                class="btn-smooth w-10 h-10 sm:w-11 sm:h-11 bg-[#CA2C2A] hover:bg-[#901C1A] border-2 border-black flex items-center justify-center text-white shadow-[3px_3px_0px_0px_#000000] cursor-pointer"
+                title="Tutup Layar Proyektor"
             >
-                TUTUP LAYAR
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="square" stroke-width="2.8" d="M6 18L18 6M6 6l12 12" />
+                </svg>
             </a>
         </div>
     </header>
 
     <!-- ============================================================== -->
-    <!-- MAIN PROJECTION DISPLAY: Big Live QR & Counter                 -->
+    <!-- MAIN PROJECTION DISPLAY: Pure Clean Big QR Only                -->
     <!-- ============================================================== -->
     <main class="my-auto py-6 sm:py-10 flex flex-col items-center justify-center">
 
-        <div class="w-full max-w-xl bg-white border-[3px] border-[#000000] p-6 sm:p-8 shadow-[10px_10px_0px_0px_#000000] flex flex-col items-center text-center relative">
+        <div class="w-full max-w-md bg-white border-[3px] border-[#000000] p-6 sm:p-8 shadow-[10px_10px_0px_0px_#000000] flex flex-col items-center text-center relative">
             
-            <!-- Live Status & Counter Header -->
-            <div class="w-full flex items-center justify-between border-b-2 border-black pb-4 mb-6">
-                <div class="flex items-center gap-2">
-                    <span class="w-3.5 h-3.5 bg-green-500 border border-black animate-pulse inline-block"></span>
-                    <span class="text-xs sm:text-sm font-black uppercase tracking-wider text-green-700" id="status-scan-label">
-                        {{ $pengaturan->is_scan_aktif ? 'SESI SCAN DIBUKA' : 'SESI SCAN DITUTUP' }}
-                    </span>
-                </div>
-
-                <div class="bg-blue-50 border-2 border-black px-3 py-1 shadow-[2px_2px_0px_0px_#000000]">
-                    <span class="text-xs font-black uppercase tracking-wider text-[#1A467C]">
-                        HADIR: <span id="counter-hadir" class="text-sm font-mono text-[#2A82C6] font-black">{{ $totalHadir }}</span> / {{ $totalMahasiswa }}
-                    </span>
-                </div>
-            </div>
-
             <!-- QR Code Canvas Container -->
             <div class="relative bg-white border-4 border-black p-4 sm:p-5 shadow-[6px_6px_0px_0px_#000000]">
                 <!-- QR Box Render Target -->
@@ -175,35 +149,20 @@
 
                 <!-- Overlay jika sesi ditutup -->
                 <div id="closed-overlay" class="{{ $pengaturan->is_scan_aktif ? 'hidden' : 'flex' }} absolute inset-0 bg-red-600/95 border-2 border-black flex-col items-center justify-center p-6 text-white text-center">
-                    <svg class="w-16 h-16 mb-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-14 h-14 mb-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="square" stroke-width="2.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                     </svg>
-                    <span class="text-lg font-black uppercase tracking-tight">SESI SCAN DITUTUP</span>
-                    <p class="text-xs font-semibold mt-1">Silakan tunggu instruksi dari panitia di kelas.</p>
+                    <span class="text-base font-black uppercase tracking-tight">SESI SCAN DITUTUP</span>
                 </div>
             </div>
 
-            <!-- 5-Second Animated Progress Bar -->
-            <div class="w-full mt-6 space-y-1.5">
-                <div class="flex items-center justify-between text-[11px] font-black uppercase tracking-wider text-gray-700">
-                    <span>Refresh QR Dinamis</span>
-                    <span id="countdown-text" class="font-mono text-[#CA2C2A]">5 Detik</span>
-                </div>
-                <div class="w-full h-3 bg-gray-200 border-2 border-black overflow-hidden shadow-[2px_2px_0px_0px_#000000]">
-                    <div id="progress-bar" class="h-full bg-[#2A82C6] progress-bar-5s"></div>
-                </div>
-            </div>
-
-            <!-- Instruksi Mahasiswa di Proyektor -->
+            <!-- Short Link URL under QR -->
             <div class="mt-6 pt-4 border-t-2 border-black w-full text-center">
-                <p class="text-xs sm:text-sm font-bold text-gray-800">
-                    Buka di browser HP Anda: 
-                    <span class="bg-[#1A467C] text-white px-2.5 py-1 font-mono font-black border border-black shadow-[2px_2px_0px_0px_#000000] inline-block mt-1">
+                <p class="text-xs font-bold text-gray-700">
+                    Scan di HP: 
+                    <span class="bg-[#1A467C] text-white px-2.5 py-1 font-mono font-black border border-black shadow-[2px_2px_0px_0px_#000000] inline-block">
                         {{ url('/absen') }}
                     </span>
-                </p>
-                <p class="text-[11px] font-semibold text-gray-500 mt-2">
-                    Masukkan NIM Anda lalu arahkan kamera ke QR Code di atas.
                 </p>
             </div>
 
@@ -212,11 +171,14 @@
     </main>
 
     <!-- ============================================================== -->
-    <!-- FOOTER: Info & Copyright                                       -->
+    <!-- FLOATING HADIR COUNTER (Ujung Layar)                           -->
     <!-- ============================================================== -->
-    <footer class="text-center py-2 text-xs font-bold text-gray-700">
-        POKJA HIMA IF • Sistem Presensi Dinamis Otomatis
-    </footer>
+    <div class="fixed bottom-6 right-6 z-40 bg-white border-2 border-black px-4 py-2.5 shadow-[4px_4px_0px_0px_#000000] flex items-center gap-2">
+        <span class="w-2.5 h-2.5 bg-green-500 border border-black animate-pulse inline-block"></span>
+        <span class="text-xs font-black uppercase tracking-wider text-[#1A467C]">
+            HADIR: <span id="counter-hadir" class="font-mono text-sm text-[#2A82C6] font-black">{{ $totalHadir }}</span> / {{ $totalMahasiswa }}
+        </span>
+    </div>
 
     <!-- ============================================================== -->
     <!-- JAVASCRIPT: Dynamic 5s QR Refresh & Drop Notif Live Polling    -->
@@ -225,7 +187,6 @@
         let qrcode = null;
         let lastPayload = '';
         let lastSeenScanTime = '{{ now()->toIso8601String() }}';
-        let countdownSeconds = 5;
 
         // Inisialisasi QRCode.js pada #qrcode-box
         function initQR() {
@@ -250,22 +211,27 @@
                 const data = await response.json();
 
                 // Update info pertemuan
-                document.getElementById('display-pertemuan').innerText = `PERTEMUAN ${data.pertemuan}`;
-                document.getElementById('counter-hadir').innerText = data.total_hadir;
+                const displayPertemuan = document.getElementById('display-pertemuan');
+                if (displayPertemuan) {
+                    displayPertemuan.innerText = `P${data.pertemuan}`;
+                }
+
+                // Update floating counter
+                const counterHadir = document.getElementById('counter-hadir');
+                if (counterHadir) {
+                    counterHadir.innerText = data.total_hadir;
+                }
 
                 // Overlay status scan
                 const overlay = document.getElementById('closed-overlay');
-                const statusLabel = document.getElementById('status-scan-label');
-                if (data.is_scan_aktif) {
-                    overlay.classList.add('hidden');
-                    overlay.classList.remove('flex');
-                    statusLabel.innerText = "SESI SCAN DIBUKA";
-                    statusLabel.className = "text-xs sm:text-sm font-black uppercase tracking-wider text-green-700";
-                } else {
-                    overlay.classList.remove('hidden');
-                    overlay.classList.add('flex');
-                    statusLabel.innerText = "SESI SCAN DITUTUP";
-                    statusLabel.className = "text-xs sm:text-sm font-black uppercase tracking-wider text-red-700";
+                if (overlay) {
+                    if (data.is_scan_aktif) {
+                        overlay.classList.add('hidden');
+                        overlay.classList.remove('flex');
+                    } else {
+                        overlay.classList.remove('hidden');
+                        overlay.classList.add('flex');
+                    }
                 }
 
                 // Update QR HANYA jika payload baru
@@ -275,19 +241,9 @@
                     qrcode.makeCode(data.payload);
                 }
 
-                // Reset progress bar animasi
-                resetProgressBar();
-
             } catch (err) {
                 console.error("Gagal memperbarui token QR:", err);
             }
-        }
-
-        function resetProgressBar() {
-            const bar = document.getElementById('progress-bar');
-            bar.classList.remove('progress-bar-5s');
-            void bar.offsetWidth; // Trigger reflow
-            bar.classList.add('progress-bar-5s');
         }
 
         // Suara Tactile Beep Sintesis Web Audio API (Tanpa file mp3 luar)
@@ -298,8 +254,8 @@
                 const gain = audioCtx.createGain();
 
                 osc.type = 'triangle';
-                osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
-                osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.15); // A5
+                osc.frequency.setValueAtTime(587.33, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.15);
 
                 gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
                 gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
@@ -363,10 +319,11 @@
 
                 const data = await response.json();
                 if (data.scans && data.scans.length > 0) {
-                    // Update counter
-                    document.getElementById('counter-hadir').innerText = data.total_hadir;
+                    const counterHadir = document.getElementById('counter-hadir');
+                    if (counterHadir) {
+                        counterHadir.innerText = data.total_hadir;
+                    }
 
-                    // Tampilkan notifikasi tiap scan yang baru
                     data.scans.reverse().forEach(scan => {
                         showDropNotification(scan);
                     });
@@ -411,4 +368,3 @@
     </script>
 </body>
 </html>
-
