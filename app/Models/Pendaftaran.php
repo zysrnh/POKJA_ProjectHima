@@ -16,6 +16,7 @@ class Pendaftaran extends Model
         'nim',
         'email',
         'password',
+        'foto',
         'qr_token',
         'kelas',
         'no_telp',

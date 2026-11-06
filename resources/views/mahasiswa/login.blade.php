@@ -113,7 +113,7 @@
                 </div>
             @endif
 
-            <!-- 2 TABS SELECTION: LOGIN BIASA & AKTIVASI QR TIKET -->
+            <!-- 2 TABS SELECTION: LOGIN & AKTIVASI AKUN -->
             <div class="grid grid-cols-2 gap-2 border-2 border-black p-1 bg-gray-100 shadow-[2px_2px_0px_0px_#000000]">
                 <button 
                     type="button" 
@@ -121,7 +121,7 @@
                     onclick="switchTab('biasa')"
                     class="btn-tactile py-2 text-xs font-black uppercase tracking-wider border-2 border-black bg-white text-[#1A467C] shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
                 >
-                    Login Biasa
+                    Login
                 </button>
                 <button 
                     type="button" 
@@ -129,7 +129,7 @@
                     onclick="switchTab('qr')"
                     class="btn-tactile py-2 text-xs font-black uppercase tracking-wider border-2 border-transparent text-gray-600 hover:text-black cursor-pointer"
                 >
-                    Aktivasi QR Tiket
+                    Aktivasi Akun
                 </button>
             </div>
 
@@ -201,12 +201,12 @@
                         </div>
                     </div>
 
-                    <!-- Submit Login Biasa -->
+                    <!-- Submit Login -->
                     <button 
                         type="submit" 
                         class="btn-tactile w-full py-3 bg-[#2A82C6] hover:bg-[#1A467C] text-white text-xs sm:text-sm font-black uppercase tracking-wider border-2 border-black shadow-[4px_4px_0px_0px_#000000] flex items-center justify-center gap-2 cursor-pointer mt-2"
                     >
-                        <span>Masuk ke Dashboard</span>
+                        <span>Masuk</span>
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="square" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                         </svg>

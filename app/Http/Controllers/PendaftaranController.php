@@ -143,6 +143,20 @@ class PendaftaranController extends Controller
             }
         }
 
-        return redirect()->back()->with('success', 'Pendaftaran Anda berhasil dikirim! Tiket & QR Code presensi telah dikirimkan ke email kampus Anda.');
+        return redirect()->route('pendaftaran.sukses')->with('pendaftaran_id', $pendaftaran->id);
+    }
+
+    /**
+     * Menampilkan halaman sukses setelah pendaftaran.
+     */
+    public function sukses()
+    {
+        $pengaturan = Pengaturan::find(1) ?? new Pengaturan();
+        $pendaftaran = null;
+        if (session()->has('pendaftaran_id')) {
+            $pendaftaran = Pendaftaran::find(session('pendaftaran_id'));
+        }
+
+        return view('pendaftaran.sukses', compact('pengaturan', 'pendaftaran'));
     }
 }

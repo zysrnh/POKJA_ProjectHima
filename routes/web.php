@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 Route::get('/', [PendaftaranController::class, 'index'])->name('pendaftaran.index');
+Route::get('/sukses', [PendaftaranController::class, 'sukses'])->name('pendaftaran.sukses');
 Route::post('/daftar', [PendaftaranController::class, 'store'])
     ->middleware('throttle:10,1')
     ->name('pendaftaran.store');
@@ -41,6 +42,7 @@ Route::prefix('mahasiswa')->name('mahasiswa.')->group(function () {
     Route::get('/set-password', [MahasiswaController::class, 'showSetPassword'])->name('setPassword');
     Route::post('/set-password', [MahasiswaController::class, 'savePassword'])->name('savePassword');
     Route::get('/dashboard', [MahasiswaController::class, 'dashboard'])->name('dashboard');
+    Route::post('/profile', [MahasiswaController::class, 'updateProfile'])->name('profile.update');
     Route::post('/logout', [MahasiswaController::class, 'logout'])->name('logout');
 });
 

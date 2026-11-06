@@ -225,6 +225,70 @@ class MahasiswaController extends Controller
     }
 
     /**
+     * Memperbarui profil mahasiswa (email dan foto profil).
+     */
+    public function updateProfile(Request $request)
+    {
+        if (!session()->has('mahasiswa_id')) {
+            return redirect()->route('mahasiswa.login')->with('error', 'Silakan masuk ke akun Anda terlebih dahulu.');
+        }
+
+        $mahasiswa = Pendaftaran::find(session('mahasiswa_id'));
+
+        if (!$mahasiswa) {
+            return redirect()->route('mahasiswa.login')->with('error', 'Data mahasiswa tidak ditemukan.');
+        }
+
+        $request->validate([
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:150',
+                'unique:pendaftarans,email,' . $mahasiswa->id,
+            ],
+            'foto' => [
+                'nullable',
+                'image',
+                'mimes:jpeg,png,jpg,webp',
+                'max:2048',
+            ],
+        ], [
+            'email.required' => 'Alamat email wajib diisi.',
+            'email.email' => 'Format alamat email tidak valid.',
+            'email.unique' => 'Alamat email ini sudah digunakan oleh akun lain.',
+            'foto.image' => 'File yang diunggah harus berupa gambar.',
+            'foto.mimes' => 'Format foto harus berupa JPG, JPEG, PNG, atau WEBP.',
+            'foto.max' => 'Ukuran file foto maksimal 2 MB.',
+        ]);
+
+        $mahasiswa->email = strtolower(trim($request->email));
+
+        // Upload foto profil jika ada
+        if ($request->hasFile('foto')) {
+            $file = $request->file('foto');
+            $filename = 'avatar_' . $mahasiswa->nim . '_' . time() . '.' . $file->getClientOriginalExtension();
+            
+            $destinationPath = public_path('uploads/avatars');
+            if (!file_exists($destinationPath)) {
+                mkdir($destinationPath, 0755, true);
+            }
+
+            // Hapus foto lama jika ada
+            if (!empty($mahasiswa->foto) && file_exists(public_path('uploads/avatars/' . $mahasiswa->foto))) {
+                @unlink(public_path('uploads/avatars/' . $mahasiswa->foto));
+            }
+
+            $file->move($destinationPath, $filename);
+            $mahasiswa->foto = $filename;
+        }
+
+        $mahasiswa->save();
+
+        return redirect()->route('mahasiswa.dashboard')->with('success', 'Profil Anda berhasil diperbarui!');
+    }
+
+    /**
      * Logout mahasiswa dari dashboard.
      */
     public function logout()

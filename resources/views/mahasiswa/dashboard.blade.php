@@ -24,8 +24,6 @@
         }
     </script>
 
-    <!-- QRCode.js Library for Generating Ticket QR -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <!-- HTML5-QRCode Library for In-Browser Camera Scanner -->
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
@@ -45,7 +43,7 @@
             transform: translate(-2px, -2px);
         }
         .btn-tactile:active {
-            transform: translate(2px, 2px);
+            transform: translate(2px, 2px) !important;
             box-shadow: 1px 1px 0px 0px #000000 !important;
         }
 
@@ -118,8 +116,12 @@
             <!-- Student Profile Badge -->
             <div class="bg-gray-50 border-2 border-black p-3.5 shadow-[3px_3px_0px_0px_#000000] space-y-2">
                 <div class="flex items-center gap-2.5">
-                    <div class="w-9 h-9 bg-[#2A82C6] text-white border border-black flex items-center justify-center font-black text-xs shadow-[1px_1px_0px_0px_#000000] shrink-0">
-                        {{ strtoupper(substr($mahasiswa->nama, 0, 2)) }}
+                    <div class="w-10 h-10 bg-[#2A82C6] text-white border-2 border-black flex items-center justify-center font-black text-xs shadow-[1px_1px_0px_0px_#000000] shrink-0 overflow-hidden">
+                        @if (!empty($mahasiswa->foto) && file_exists(public_path('uploads/avatars/' . $mahasiswa->foto)))
+                            <img src="{{ asset('uploads/avatars/' . $mahasiswa->foto) }}" alt="Avatar" class="w-full h-full object-cover">
+                        @else
+                            {{ strtoupper(substr($mahasiswa->nama, 0, 2)) }}
+                        @endif
                     </div>
                     <div class="min-w-0">
                         <span class="text-[9px] font-black uppercase tracking-wider text-[#1A467C] block">MAHASISWA</span>
@@ -163,14 +165,14 @@
 
                 <button 
                     type="button" 
-                    id="side-nav-tiket"
-                    onclick="switchTab('tiket')" 
+                    id="side-nav-profil"
+                    onclick="switchTab('profil')" 
                     class="btn-tactile w-full text-left px-3.5 py-2.5 bg-white hover:bg-gray-100 text-gray-900 border-2 border-black font-black text-xs uppercase tracking-wider flex items-center gap-2.5 shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
                 >
                     <svg class="w-4 h-4 text-[#1A467C] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="square" stroke-width="2.5" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+                        <path stroke-linecap="square" stroke-width="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
-                    <span>Tiket & QR</span>
+                    <span>Profil Saya</span>
                 </button>
             </nav>
         </div>
@@ -239,24 +241,46 @@
                 </div>
             @endif
 
+            <!-- Flash Alert Error -->
+            @if ($errors->any())
+                <div class="p-3 bg-red-50 border-2 border-black text-xs font-bold text-red-900 shadow-[3px_3px_0px_0px_#CA2C2A]">
+                    <ul class="list-disc list-inside space-y-0.5">
+                        @foreach ($errors->all() as $err)
+                            <li>{{ $err }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
             <!-- ========================================================== -->
             <!-- TAB 1: BERANDA & REKAP KEHADIRAN                           -->
             <!-- ========================================================== -->
             <section id="tab-panel-beranda" class="tab-snap-in space-y-4 sm:space-y-6">
 
-                <!-- Greeting Banner -->
+                <!-- Greeting Banner with Avatar -->
                 <div class="card-tactile bg-white border-2 border-black p-4 sm:p-6 shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000]">
                     <div class="flex items-center justify-between gap-3">
-                        <div class="min-w-0 flex-1">
-                            <span class="inline-block bg-[#1A467C] text-white text-[10px] font-black uppercase px-2 py-0.5 tracking-wider border border-black mb-1 shadow-[1px_1px_0px_0px_#000000]">
-                                MAHASISWA
-                            </span>
-                            <h2 class="text-base sm:text-2xl font-black uppercase tracking-tight text-gray-950 truncate">
-                                {{ $mahasiswa->nama }}
-                            </h2>
-                            <p class="text-xs font-mono font-bold text-gray-600 mt-0.5 sm:mt-1 truncate">
-                                NIM: <span class="text-[#1A467C] font-black">{{ $mahasiswa->nim }}</span> • Kelas: <span class="bg-blue-50 border border-[#2A82C6] text-[#1A467C] px-1.5 py-0.2 text-xs font-black">{{ $mahasiswa->kelas }}</span>
-                            </p>
+                        <div class="flex items-center gap-3 min-w-0 flex-1">
+                            <!-- Avatar Display -->
+                            <div class="w-12 h-12 sm:w-14 sm:h-14 bg-[#2A82C6] text-white border-2 border-black flex items-center justify-center font-black text-base sm:text-lg shadow-[2px_2px_0px_0px_#000000] shrink-0 overflow-hidden">
+                                @if (!empty($mahasiswa->foto) && file_exists(public_path('uploads/avatars/' . $mahasiswa->foto)))
+                                    <img src="{{ asset('uploads/avatars/' . $mahasiswa->foto) }}" alt="Foto {{ $mahasiswa->nama }}" class="w-full h-full object-cover">
+                                @else
+                                    {{ strtoupper(substr($mahasiswa->nama, 0, 2)) }}
+                                @endif
+                            </div>
+
+                            <div class="min-w-0 flex-1">
+                                <span class="text-[9px] sm:text-[10px] font-black uppercase tracking-wider bg-blue-100 text-[#1A467C] border border-[#1A467C] px-2 py-0.5 inline-block shadow-[1px_1px_0px_0px_#000000]">
+                                    MAHASISWA
+                                </span>
+                                <h2 class="text-sm sm:text-xl font-black text-gray-950 uppercase tracking-tight truncate mt-1">
+                                    {{ $mahasiswa->nama }}
+                                </h2>
+                                <p class="text-[11px] sm:text-xs text-gray-600 font-semibold font-mono mt-0.5">
+                                    NIM: <span class="font-bold text-gray-950">{{ $mahasiswa->nim }}</span> • Kelas: <span class="bg-gray-100 border border-gray-400 px-1 py-0.2 text-[#1A467C] font-bold">{{ $mahasiswa->kelas }}</span>
+                                </p>
+                            </div>
                         </div>
 
                         <!-- Scan Button: Clean Camera Icon on Mobile / Compact with Label on Desktop -->
@@ -275,7 +299,7 @@
                     </div>
                 </div>
 
-                <!-- 3 Stat Cards Ringkas (Clean, Without Extra Badges) -->
+                <!-- 3 Stat Cards Ringkas -->
                 <div class="grid grid-cols-3 gap-2.5 sm:gap-4">
                     <div class="card-tactile bg-white border-2 border-black p-3 sm:p-4 shadow-[2px_2px_0px_0px_#000000] sm:shadow-[4px_4px_0px_0px_#000000]">
                         <span class="text-[9px] sm:text-xs font-black uppercase tracking-wider text-[#1A467C] block truncate">Total Hadir</span>
@@ -293,7 +317,7 @@
                     </div>
                 </div>
 
-                <!-- Rekapitulasi Kehadiran 7 Pertemuan -->
+                <!-- Rekapitulasi Kehadiran 7 Pertemuan (Tabel Rapi & Sleek, Tidak Kotak-Kotak) -->
                 <div class="card-tactile bg-white border-2 border-black p-4 sm:p-6 shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000] space-y-3.5">
                     <div class="flex items-center justify-between border-b-2 border-black pb-2.5">
                         <div>
@@ -301,7 +325,7 @@
                                 Rekapitulasi Kehadiran
                             </h3>
                             <p class="text-[10px] sm:text-xs text-gray-600 font-semibold mt-0.5">
-                                Riwayat kehadiran Anda pada 7 pertemuan POKJA.
+                                Riwayat presensi Anda pada 7 pertemuan POKJA.
                             </p>
                         </div>
                         <span class="text-xs font-mono font-black bg-gray-100 border border-black px-2 py-0.5 shrink-0">
@@ -309,44 +333,59 @@
                         </span>
                     </div>
 
-                    <!-- Grid 7 Pertemuan (Responsive 2 / 4 / 7 Cols) -->
-                    <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 sm:gap-3">
-                        @for ($i = 1; $i <= 7; $i++)
-                            @php
-                                $itemPresensi = $presensiMap->get($i);
-                                $isHadir = $itemPresensi && $itemPresensi->status === 'hadir';
-                                $isCurrentSesi = (int) ($pengaturan->pertemuan_aktif ?? 1) === $i;
-                            @endphp
-
-                            <div class="p-2 sm:p-2.5 border-2 border-black text-center {{ $isHadir ? 'bg-green-50 shadow-[2px_2px_0px_0px_#15803d]' : 'bg-gray-50 shadow-[1px_1px_0px_0px_#000000]' }} {{ $isCurrentSesi ? 'ring-2 ring-[#2A82C6]' : '' }}">
-                                <div class="flex items-center justify-between mb-1">
-                                    <span class="text-[11px] font-black font-mono {{ $isCurrentSesi ? 'text-[#1A467C]' : 'text-gray-900' }}">
-                                        P{{ $i }}
-                                    </span>
-                                    @if ($isHadir)
-                                        <span class="text-[11px] font-black text-green-700">✓</span>
-                                    @else
-                                        <span class="text-[10px] font-mono text-gray-400">-</span>
-                                    @endif
-                                </div>
-
-                                <div class="my-0.5">
-                                    @if ($isHadir)
-                                        <span class="inline-block bg-green-700 text-white text-[8px] sm:text-[9px] font-black uppercase px-1.5 py-0.2 border border-black">
-                                            HADIR
-                                        </span>
-                                    @else
-                                        <span class="inline-block bg-gray-200 text-gray-600 text-[8px] sm:text-[9px] font-bold uppercase px-1.5 py-0.2 border border-gray-400">
-                                            BELUM
-                                        </span>
-                                    @endif
-                                </div>
-
-                                <span class="text-[9px] font-mono font-bold text-gray-500 block truncate mt-0.5">
-                                    {{ $isHadir ? \Carbon\Carbon::parse($itemPresensi->waktu_presensi)->format('H:i') : '-' }}
-                                </span>
-                            </div>
-                        @endfor
+                    <!-- Tabel Vertikal Rapi untuk Mobile & Desktop -->
+                    <div class="border-2 border-black overflow-hidden shadow-[2px_2px_0px_0px_#000000]">
+                        <table class="w-full text-left text-xs border-collapse">
+                            <thead>
+                                <tr class="bg-[#1A467C] text-white border-b-2 border-black text-[10px] sm:text-xs uppercase font-black tracking-wider">
+                                    <th class="py-2.5 px-3">Sesi</th>
+                                    <th class="py-2.5 px-3">Waktu Presensi</th>
+                                    <th class="py-2.5 px-3 text-right">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200 bg-white">
+                                @for ($i = 1; $i <= 7; $i++)
+                                    @php
+                                        $itemPresensi = $presensiMap->get($i);
+                                        $isHadir = $itemPresensi && $itemPresensi->status === 'hadir';
+                                        $isCurrentSesi = (int) ($pengaturan->pertemuan_aktif ?? 1) === $i;
+                                    @endphp
+                                    <tr class="transition-colors hover:bg-blue-50/50 {{ $isCurrentSesi ? 'bg-amber-50/60 font-bold' : '' }}">
+                                        <td class="py-2.5 px-3 font-mono font-black text-gray-950">
+                                            <div class="flex items-center gap-1.5">
+                                                <span>Sesi {{ $i }}</span>
+                                                @if ($isCurrentSesi)
+                                                    <span class="text-[9px] font-sans font-black bg-amber-200 text-amber-900 border border-amber-800 px-1 py-0.2 uppercase">
+                                                        Aktif
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        </td>
+                                        <td class="py-2.5 px-3 font-mono text-[11px] sm:text-xs text-gray-700">
+                                            @if ($isHadir)
+                                                <span class="text-green-900 font-bold">
+                                                    {{ \Carbon\Carbon::parse($itemPresensi->waktu_presensi)->format('H:i') }} WIB
+                                                </span>
+                                            @else
+                                                <span class="text-gray-400 font-semibold">-</span>
+                                            @endif
+                                        </td>
+                                        <td class="py-2.5 px-3 text-right">
+                                            @if ($isHadir)
+                                                <span class="inline-flex items-center gap-1 bg-green-100 text-green-900 border border-green-800 text-[9px] sm:text-[10px] font-black uppercase px-2 py-0.5 shadow-[1px_1px_0px_0px_#15803d]">
+                                                    <span>✓</span>
+                                                    <span>HADIR</span>
+                                                </span>
+                                            @else
+                                                <span class="inline-block bg-gray-100 text-gray-600 border border-gray-400 text-[9px] sm:text-[10px] font-bold uppercase px-2 py-0.5">
+                                                    BELUM
+                                                </span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endfor
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
@@ -372,7 +411,7 @@
                         </span>
                     </div>
 
-                    <!-- Locked Student Identity Card (Clean, No Extra Badges) -->
+                    <!-- Locked Student Identity Card -->
                     <div class="bg-blue-50 border-2 border-black p-3 space-y-0.5">
                         <span class="text-[9px] font-black uppercase text-gray-500 tracking-wider">Identitas Mahasiswa</span>
                         <h4 class="text-sm font-black uppercase text-gray-950">{{ $mahasiswa->nama }}</h4>
@@ -382,106 +421,176 @@
                         <input type="hidden" id="dash-input-nim" value="{{ $mahasiswa->nim }}">
                     </div>
 
-                    <!-- Status Sesi Panitia jika ditutup -->
-                    @if (!($pengaturan->is_scan_aktif ?? false))
-                        <div class="p-3 bg-red-50 border-2 border-black text-xs font-bold text-red-900 shadow-[2px_2px_0px_0px_#CA2C2A]">
-                            Sesi presensi saat ini sedang DITUTUP oleh panitia di ruang kelas.
-                        </div>
-                    @endif
-
-                    <!-- Tombol Buka Kamera (Clean Text: SCAN QR) -->
-                    <div id="dash-camera-trigger">
+                    <!-- Scanner Camera Trigger Box -->
+                    <div id="dash-camera-trigger" class="space-y-2">
                         <button 
                             type="button" 
-                            id="dash-btn-start"
-                            onclick="startDashScanner()"
-                            class="btn-tactile w-full py-3.5 bg-[#2A82C6] hover:bg-[#1A467C] text-white text-xs sm:text-sm font-black uppercase tracking-wider border-2 border-black shadow-[4px_4px_0px_0px_#000000] flex items-center justify-center gap-2 cursor-pointer"
+                            onclick="startDashScanner()" 
+                            class="btn-tactile w-full py-4 bg-[#2A82C6] hover:bg-[#1A467C] text-white font-black text-xs sm:text-sm uppercase tracking-wider border-2 border-black shadow-[4px_4px_0px_0px_#000000] flex items-center justify-center gap-2 cursor-pointer"
                         >
                             <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="square" stroke-width="2.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                                 <path stroke-linecap="square" stroke-width="2.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                             </svg>
-                            <span>SCAN QR</span>
+                            <span>Buka Kamera & Scan QR</span>
                         </button>
                     </div>
 
-                    <!-- Viewport Kamera Scanner -->
+                    <!-- Live Scanner Camera Viewport Container -->
                     <div id="dash-camera-box" class="hidden space-y-3">
-                        <div class="relative bg-black border-2 border-black overflow-hidden shadow-[3px_3px_0px_0px_#000000]">
+                        <div class="relative bg-black border-2 border-black overflow-hidden shadow-[4px_4px_0px_0px_#000000]">
                             <div id="dash-qr-reader" class="w-full"></div>
                         </div>
 
                         <button 
                             type="button" 
-                            onclick="stopDashScanner()"
-                            class="btn-tactile w-full py-2 bg-gray-200 hover:bg-gray-300 text-gray-900 border-2 border-black text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
+                            onclick="stopDashScanner()" 
+                            class="btn-tactile w-full py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-900 border-2 border-black text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
                         >
                             Tutup Kamera
                         </button>
                     </div>
 
-                    <!-- Keterangan Minimalis Refresh 5 Detik -->
-                    <p class="text-center text-xs font-semibold text-gray-500 pt-1">
-                        QR di proyektor refresh otomatis tiap 5 detik.
+                    <p class="text-center text-[11px] font-semibold text-gray-500 pt-1">
+                        QR di proyektor kelas diperbarui otomatis secara dinamis tiap 5 detik.
                     </p>
                 </div>
 
             </section>
 
             <!-- ========================================================== -->
-            <!-- TAB 3: TIKET & QR IDENTITAS (Clean, Without Extra Headers) -->
+            <!-- TAB 3: PROFIL & PENGATURAN AKUN MAHASISWA                  -->
             <!-- ========================================================== -->
-            <section id="tab-panel-tiket" class="tab-snap-in hidden space-y-4 sm:space-y-6">
+            <section id="tab-panel-profil" class="tab-snap-in hidden space-y-4 sm:space-y-6">
 
-                <div class="card-tactile bg-white border-2 border-black p-4 sm:p-6 shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000] space-y-4">
+                <div class="card-tactile bg-white border-2 border-black p-4 sm:p-6 shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000] space-y-5">
                     
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 items-center">
-                        <!-- Data Rincian Mahasiswa -->
-                        <div class="space-y-2.5">
-                            <div class="border-b border-gray-200 pb-2">
-                                <span class="text-[10px] font-bold text-gray-500 uppercase block">Nama Lengkap</span>
-                                <h4 class="text-base font-black text-gray-950 uppercase">{{ $mahasiswa->nama }}</h4>
-                            </div>
-
-                            <div class="grid grid-cols-2 gap-2 border-b border-gray-200 pb-2">
-                                <div>
-                                    <span class="text-[10px] font-bold text-gray-500 uppercase block">NIM Kampus</span>
-                                    <span class="font-mono font-black text-sm text-[#1A467C]">{{ $mahasiswa->nim }}</span>
-                                </div>
-                                <div>
-                                    <span class="text-[10px] font-bold text-gray-500 uppercase block">Kelas</span>
-                                    <span class="font-mono font-black text-sm text-gray-950">{{ $mahasiswa->kelas }}</span>
-                                </div>
-                            </div>
-
-                            <div class="grid grid-cols-2 gap-2 border-b border-gray-200 pb-2">
-                                <div>
-                                    <span class="text-[10px] font-bold text-gray-500 uppercase block">Tanggal Acara</span>
-                                    <span class="font-bold text-xs text-gray-900">{{ $pengaturan->tanggal_acara ?? '13 Oktober 2026' }}</span>
-                                </div>
-                                <div>
-                                    <span class="text-[10px] font-bold text-gray-500 uppercase block">Ruangan</span>
-                                    <span class="font-bold text-xs text-gray-900">{{ $pengaturan->lokasi_acara ?? 'Ruangan 105' }}</span>
-                                </div>
-                            </div>
-
-                            <div>
-                                <span class="text-[10px] font-bold text-gray-500 uppercase block">No. WhatsApp</span>
-                                <span class="font-mono font-bold text-xs text-gray-800">{{ $mahasiswa->no_telp }}</span>
-                            </div>
-                        </div>
-
-                        <!-- QR Code Container -->
-                        <div class="bg-gray-50 border-2 border-black p-4 text-center shadow-[2px_2px_0px_0px_#000000]">
-                            <div id="qrcode-canvas" class="inline-block p-2 bg-white border-2 border-black shadow-[2px_2px_0px_0px_#000000]"></div>
-                            <p class="font-mono text-xs font-black text-[#1A467C] tracking-wider mt-2">
-                                {{ $mahasiswa->nim }}
-                            </p>
-                            <p class="text-[10px] font-semibold text-gray-500 mt-0.5">
-                                Tunjukkan QR Code ini kepada panitia saat registrasi di lokasi.
+                    <div class="border-b-2 border-black pb-3 flex items-center justify-between">
+                        <div>
+                            <h3 class="text-sm sm:text-base font-black uppercase text-[#1A467C]">
+                                Profil Mahasiswa
+                            </h3>
+                            <p class="text-[11px] sm:text-xs text-gray-600 font-semibold mt-0.5">
+                                Kelola foto profil dan perbarui alamat email Anda.
                             </p>
                         </div>
+                        <span class="text-[10px] font-mono font-black bg-blue-50 border border-black text-[#1A467C] px-2 py-1 uppercase shadow-[1px_1px_0px_0px_#000000]">
+                            AKUN AKTIF
+                        </span>
                     </div>
+
+                    <!-- Form Update Profil -->
+                    <form action="{{ route('mahasiswa.profile.update') }}" method="POST" enctype="multipart/form-data" class="space-y-5">
+                        @csrf
+
+                        <!-- Foto Profil Section -->
+                        <div class="bg-gray-50 border-2 border-black p-4 space-y-3">
+                            <span class="block text-xs font-black uppercase tracking-wider text-[#1A467C]">
+                                Foto Profil
+                            </span>
+                            
+                            <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4">
+                                <!-- Avatar Preview Box -->
+                                <div class="relative shrink-0">
+                                    <div class="w-24 h-24 bg-[#2A82C6] text-white border-2 border-black shadow-[3px_3px_0px_0px_#000000] flex items-center justify-center font-black text-2xl overflow-hidden">
+                                        @if (!empty($mahasiswa->foto) && file_exists(public_path('uploads/avatars/' . $mahasiswa->foto)))
+                                            <img id="avatar-preview" src="{{ asset('uploads/avatars/' . $mahasiswa->foto) }}" alt="Foto {{ $mahasiswa->nama }}" class="w-full h-full object-cover">
+                                        @else
+                                            <img id="avatar-preview" class="hidden w-full h-full object-cover" alt="Preview Foto">
+                                            <span id="avatar-placeholder">{{ strtoupper(substr($mahasiswa->nama, 0, 2)) }}</span>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <!-- Upload Input & Helper -->
+                                <div class="space-y-2 flex-1 text-center sm:text-left">
+                                    <input 
+                                        type="file" 
+                                        id="foto-input" 
+                                        name="foto" 
+                                        accept="image/png,image/jpeg,image/jpg,image/webp" 
+                                        onchange="previewAvatar(this)" 
+                                        class="hidden"
+                                    >
+                                    <button 
+                                        type="button" 
+                                        onclick="document.getElementById('foto-input').click()" 
+                                        class="btn-tactile inline-flex items-center gap-2 py-2 px-3.5 bg-white hover:bg-gray-100 text-gray-900 border-2 border-black text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
+                                    >
+                                        <svg class="w-4 h-4 text-[#1A467C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="square" stroke-width="2.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                            <path stroke-linecap="square" stroke-width="2.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        </svg>
+                                        <span>Pilih Foto Baru</span>
+                                    </button>
+                                    <p class="text-[11px] font-semibold text-gray-500">
+                                        Mendukung format JPG, PNG, atau WEBP. Maksimal ukuran 2 MB.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Setting Email -->
+                        <div>
+                            <label for="email" class="block text-xs font-black uppercase tracking-wider text-[#1A467C] mb-1.5">
+                                Alamat Email <span class="text-[#CA2C2A]">*</span>
+                            </label>
+                            <input 
+                                type="email" 
+                                id="email" 
+                                name="email" 
+                                value="{{ old('email', $mahasiswa->email) }}" 
+                                required
+                                placeholder="email@kamu.com" 
+                                class="w-full bg-[#F8FBFE] border-2 border-black text-gray-950 font-bold text-xs sm:text-sm px-3.5 py-2.5 focus:bg-white focus:outline-none focus:translate-x-[-1px] focus:translate-y-[-1px] focus:shadow-[4px_4px_0px_0px_#000000] transition"
+                            >
+                            <p class="text-[11px] font-semibold text-gray-500 mt-1">
+                                Digunakan untuk login portal serta menerima tiket dan pemberitahuan acara.
+                            </p>
+                        </div>
+
+                        <!-- Data Diri Mahasiswa (Read-Only) -->
+                        <div class="border-t-2 border-black pt-3.5 space-y-2.5">
+                            <span class="text-[11px] font-black uppercase tracking-wider text-gray-500 block">
+                                Informasi Mahasiswa (Terkunci)
+                            </span>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+                                <div class="bg-gray-100 border border-black p-2.5">
+                                    <span class="text-[10px] font-bold text-gray-500 uppercase block">Nama Lengkap</span>
+                                    <span class="font-black text-gray-950 uppercase">{{ $mahasiswa->nama }}</span>
+                                </div>
+
+                                <div class="bg-gray-100 border border-black p-2.5">
+                                    <span class="text-[10px] font-bold text-gray-500 uppercase block">NIM Kampus</span>
+                                    <span class="font-mono font-black text-[#1A467C]">{{ $mahasiswa->nim }}</span>
+                                </div>
+
+                                <div class="bg-gray-100 border border-black p-2.5">
+                                    <span class="text-[10px] font-bold text-gray-500 uppercase block">Kelas</span>
+                                    <span class="font-black text-gray-950">{{ $mahasiswa->kelas }}</span>
+                                </div>
+
+                                <div class="bg-gray-100 border border-black p-2.5">
+                                    <span class="text-[10px] font-bold text-gray-500 uppercase block">No. WhatsApp</span>
+                                    <span class="font-mono font-bold text-gray-950">{{ $mahasiswa->no_telp }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tombol Simpan -->
+                        <button 
+                            type="submit" 
+                            class="btn-tactile w-full py-3 bg-[#1A467C] hover:bg-[#153660] text-white text-xs sm:text-sm font-black uppercase tracking-wider border-2 border-black shadow-[4px_4px_0px_0px_#000000] flex items-center justify-center gap-2 cursor-pointer mt-2"
+                        >
+                            <span>Simpan Perubahan Profil</span>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="square" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                            </svg>
+                        </button>
+
+                    </form>
+
                 </div>
 
             </section>
@@ -526,19 +635,19 @@
             <span class="text-[10px] font-black uppercase tracking-wider">Scan</span>
         </button>
 
-        <!-- Tab 3: Tiket -->
+        <!-- Tab 3: Profil -->
         <button 
             type="button" 
-            id="bot-nav-tiket"
-            onclick="switchTab('tiket')" 
+            id="bot-nav-profil"
+            onclick="switchTab('profil')" 
             class="btn-tactile flex flex-col items-center gap-1 py-1 px-3 text-gray-600 cursor-pointer"
         >
             <div class="bottom-nav-icon w-8 h-8 rounded-none border border-black flex items-center justify-center">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="square" stroke-width="2.5" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+                    <path stroke-linecap="square" stroke-width="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
             </div>
-            <span class="text-[10px] font-black uppercase tracking-wider">Tiket</span>
+            <span class="text-[10px] font-black uppercase tracking-wider">Profil</span>
         </button>
 
         <!-- Tab 4: Keluar -->
@@ -578,27 +687,26 @@
                 onclick="closeDashResultModal()"
                 class="btn-tactile w-full py-2.5 bg-[#2A82C6] hover:bg-[#1A467C] text-white text-xs font-black uppercase tracking-wider border-2 border-black shadow-[3px_3px_0px_0px_#000000] cursor-pointer"
             >
-                MENGERTI
+                Tutup & Muat Ulang
             </button>
         </div>
     </div>
 
-    <!-- ============================================================== -->
-    <!-- JAVASCRIPT: TAB NAVIGATION, QR GENERATION, & LIVE SCANNER     -->
-    <!-- ============================================================== -->
+    <!-- JavaScript: Multi-Tab Controller, Avatar Preview, and In-Browser Scanner -->
     <script>
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-        let currentTab = 'beranda';
         let dashQrScanner = null;
         let isDashScanning = false;
         let isSubmittingScan = false;
 
-        // Switch Tab Handler (Desktop Sidebar & Mobile Bottom Navigation)
+        // Switch Tab Active State (Beranda, Scan, Profil)
         function switchTab(tabId) {
-            currentTab = tabId;
+            const panels = ['beranda', 'scan', 'profil'];
+            if (!panels.includes(tabId)) {
+                tabId = 'beranda';
+            }
 
-            // Panels
-            const panels = ['beranda', 'scan', 'tiket'];
+            // Panels Visibility
             panels.forEach(p => {
                 const el = document.getElementById(`tab-panel-${p}`);
                 if (el) {
@@ -643,23 +751,35 @@
             window.location.hash = tabId;
         }
 
-        // Generate QR Tiket Resmi
-        document.addEventListener('DOMContentLoaded', () => {
-            const qrCanvas = document.getElementById('qrcode-canvas');
-            if (qrCanvas) {
-                new QRCode(qrCanvas, {
-                    text: "{{ route('mahasiswa.aktivasi', ['token' => $mahasiswa->qr_token]) }}",
-                    width: 140,
-                    height: 140,
-                    colorDark: "#000000",
-                    colorLight: "#FFFFFF",
-                    correctLevel: QRCode.CorrectLevel.M
-                });
+        // Live Preview Foto Profil saat dipilih
+        function previewAvatar(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('avatar-preview');
+                    const placeholder = document.getElementById('avatar-placeholder');
+                    if (preview) {
+                        preview.src = e.target.result;
+                        preview.classList.remove('hidden');
+                    }
+                    if (placeholder) {
+                        placeholder.classList.add('hidden');
+                    }
+                };
+                reader.readAsDataURL(file);
             }
+        }
 
-            // Cek hash URL awal
+        // Cek URL Hash atau Query Param awal saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const tabParam = urlParams.get('tab');
             const hash = window.location.hash.replace('#', '');
-            if (['beranda', 'scan', 'tiket'].includes(hash)) {
+            
+            if (['beranda', 'scan', 'profil'].includes(tabParam)) {
+                switchTab(tabParam);
+            } else if (['beranda', 'scan', 'profil'].includes(hash)) {
                 switchTab(hash);
             }
         });
@@ -679,13 +799,12 @@
                 aspectRatio: 1.0
             };
 
-            // Coba environment dulu, fallback ke user webcam
             try {
                 await dashQrScanner.start(
                     { facingMode: "environment" },
                     config,
                     onDashScanSuccess,
-                    (err) => { /* abaikan frame errors */ }
+                    (err) => {}
                 );
                 isDashScanning = true;
             } catch (envErr) {
@@ -694,7 +813,7 @@
                         { facingMode: "user" },
                         config,
                         onDashScanSuccess,
-                        (err) => { /* abaikan */ }
+                        (err) => {}
                     );
                     isDashScanning = true;
                 } catch (userErr) {
@@ -788,7 +907,6 @@
 
         function closeDashResultModal() {
             document.getElementById('dash-result-modal').classList.add('hidden');
-            // Refresh halaman agar rekap kehadiran langsung ter-update
             window.location.reload();
         }
     </script>
