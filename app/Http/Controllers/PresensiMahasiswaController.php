@@ -14,12 +14,16 @@ class PresensiMahasiswaController extends Controller
     /**
      * Halaman Scanner Presensi Mahasiswa di HP (/absen).
      */
-    public function showAbsen()
+    public function showAbsen(Request $request)
     {
         $pengaturan = Pengaturan::first();
         $mahasiswaLogin = null;
 
         if (session()->has('mahasiswa_id')) {
+            if (!MahasiswaController::validateActiveDeviceSession($request)) {
+                return redirect()->route('mahasiswa.login')
+                    ->with('error', 'Sesi Anda telah berakhir karena akun ini baru saja login di perangkat lain.');
+            }
             $mahasiswaLogin = Pendaftaran::find(session('mahasiswa_id'));
         }
 
@@ -68,6 +72,23 @@ class PresensiMahasiswaController extends Controller
 
         $nim = trim($request->input('nim'));
         $payload = trim($request->input('qr_payload'));
+
+        // Validasi Single-Device Session jika mahasiswa dalam kondisi login
+        if (session()->has('mahasiswa_id')) {
+            if (!MahasiswaController::validateActiveDeviceSession($request)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Sesi akun Anda telah berakhir karena akun ini baru saja login di perangkat lain. Silakan muat ulang dan login kembali.',
+                ], 401);
+            }
+
+            if ((string) session('mahasiswa_nim') !== $nim) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'NIM presensi tidak sesuai dengan akun mahasiswa yang sedang aktif di perangkat ini.',
+                ], 403);
+            }
+        }
 
         // 1. Validasi Keberadaan Mahasiswa berdasarkan NIM
         $pendaftaran = Pendaftaran::where('nim', $nim)->first();

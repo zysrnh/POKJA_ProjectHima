@@ -6,6 +6,8 @@ use App\Mail\ResetPasswordMahasiswaMail;
 use App\Models\Pendaftaran;
 use App\Models\Pengaturan;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -16,12 +18,97 @@ use Illuminate\Support\Str;
 class MahasiswaController extends Controller
 {
     /**
+     * Mengikat sesi login mahasiswa ke satu perangkat aktif tunggal (Single-Device Session Lock)
+     * dan otomatis menendang/menghapus sesi aktif di perangkat sebelumnya.
+     */
+    public static function bindSingleDeviceSession(Request $request, Pendaftaran $mahasiswa): void
+    {
+        $request->session()->regenerate();
+
+        $cacheKey = 'mhs_active_session_' . $mahasiswa->id;
+        $previousSession = Cache::get($cacheKey);
+
+        // Hapus row session perangkat lama dari tabel sessions jika berbeda dengan session saat ini
+        if (
+            is_array($previousSession) &&
+            !empty($previousSession['session_id']) &&
+            $previousSession['session_id'] !== $request->session()->getId()
+        ) {
+            try {
+                DB::table('sessions')->where('id', $previousSession['session_id'])->delete();
+            } catch (\Throwable $e) {
+                Log::warning('Gagal menghapus sesi perangkat lama mahasiswa: ' . $e->getMessage());
+            }
+        }
+
+        $deviceToken = Str::random(40);
+
+        Cache::put($cacheKey, [
+            'session_id' => $request->session()->getId(),
+            'device_token' => $deviceToken,
+            'ip' => $request->ip(),
+            'user_agent' => substr((string) $request->userAgent(), 0, 255),
+            'updated_at' => now()->timestamp,
+        ], now()->addDays(7));
+
+        session([
+            'mahasiswa_id' => $mahasiswa->id,
+            'mahasiswa_nim' => $mahasiswa->nim,
+            'mahasiswa_nama' => $mahasiswa->nama,
+            'mahasiswa_device_token' => $deviceToken,
+        ]);
+    }
+
+    /**
+     * Memvalidasi apakah sesi perangkat saat ini masih merupakan perangkat aktif tunggal.
+     * Jika akun telah login di perangkat baru, bersihkan sesi perangkat lama dan kembalikan false.
+     */
+    public static function validateActiveDeviceSession(Request $request): bool
+    {
+        if (!session()->has('mahasiswa_id')) {
+            return false;
+        }
+
+        $mahasiswaId = session('mahasiswa_id');
+        $sessionDeviceToken = (string) session('mahasiswa_device_token', '');
+        $cacheKey = 'mhs_active_session_' . $mahasiswaId;
+        $activeSession = Cache::get($cacheKey);
+
+        if (is_array($activeSession) && !empty($activeSession['device_token'])) {
+            if (empty($sessionDeviceToken) || !hash_equals((string) $activeSession['device_token'], $sessionDeviceToken)) {
+                session()->forget(['mahasiswa_id', 'mahasiswa_nim', 'mahasiswa_nama', 'mahasiswa_device_token']);
+                return false;
+            }
+            return true;
+        }
+
+        // Jika cache baru saja di-flush oleh admin (optimize:clear), daftarkan ulang token perangkat aktif ini
+        $newToken = $sessionDeviceToken ?: Str::random(40);
+        Cache::put($cacheKey, [
+            'session_id' => $request->session()->getId(),
+            'device_token' => $newToken,
+            'ip' => $request->ip(),
+            'user_agent' => substr((string) $request->userAgent(), 0, 255),
+            'updated_at' => now()->timestamp,
+        ], now()->addDays(7));
+
+        session(['mahasiswa_device_token' => $newToken]);
+
+        return true;
+    }
+
+    /**
      * Menampilkan halaman login untuk mahasiswa.
      */
-    public function showLogin()
+    public function showLogin(Request $request)
     {
         if (session()->has('mahasiswa_id')) {
-            return redirect()->route('mahasiswa.dashboard');
+            if (self::validateActiveDeviceSession($request)) {
+                return redirect()->route('mahasiswa.dashboard');
+            }
+
+            return redirect()->route('mahasiswa.login')
+                ->with('error', 'Sesi Anda telah berakhir karena akun ini baru saja login di perangkat lain.');
         }
 
         $pengaturan = Pengaturan::first();
@@ -85,15 +172,8 @@ class MahasiswaController extends Controller
 
         RateLimiter::clear($throttleKey);
 
-        // Regenerasi session ID untuk mencegah Session Fixation
-        $request->session()->regenerate();
-
-        // Simpan sesi autentikasi mahasiswa
-        session([
-            'mahasiswa_id' => $mahasiswa->id,
-            'mahasiswa_nim' => $mahasiswa->nim,
-            'mahasiswa_nama' => $mahasiswa->nama,
-        ]);
+        // Kunci 1 Akun = 1 Perangkat Aktif & hapus sesi perangkat lama
+        self::bindSingleDeviceSession($request, $mahasiswa);
 
         return redirect()->route('mahasiswa.dashboard')->with('success', 'Selamat datang kembali, ' . $mahasiswa->nama . '!');
     }
@@ -206,14 +286,8 @@ class MahasiswaController extends Controller
         $mahasiswa->password = Hash::make($request->password);
         $mahasiswa->save();
 
-        $request->session()->regenerate();
-
-        // Login otomatis ke dashboard mahasiswa
-        session([
-            'mahasiswa_id' => $mahasiswa->id,
-            'mahasiswa_nim' => $mahasiswa->nim,
-            'mahasiswa_nama' => $mahasiswa->nama,
-        ]);
+        // Kunci 1 Akun = 1 Perangkat Aktif & hapus sesi perangkat lama
+        self::bindSingleDeviceSession($request, $mahasiswa);
 
         return redirect()->route('mahasiswa.dashboard')->with('success', 'Password Anda berhasil diperbarui! Selamat datang kembali.');
     }
@@ -328,16 +402,9 @@ class MahasiswaController extends Controller
         $mahasiswa->password = Hash::make($request->password);
         $mahasiswa->save();
 
-        // Hapus sesi aktivasi sementara & regenerasi session ID
+        // Hapus sesi aktivasi sementara & kunci ke perangkat aktif ini
         session()->forget('aktivasi_mahasiswa_id');
-        $request->session()->regenerate();
-
-        // Login otomatis ke dashboard
-        session([
-            'mahasiswa_id' => $mahasiswa->id,
-            'mahasiswa_nim' => $mahasiswa->nim,
-            'mahasiswa_nama' => $mahasiswa->nama,
-        ]);
+        self::bindSingleDeviceSession($request, $mahasiswa);
 
         return redirect()->route('mahasiswa.dashboard')->with('success', 'Password berhasil dibuat! Akun Anda kini telah aktif.');
     }
@@ -345,16 +412,20 @@ class MahasiswaController extends Controller
     /**
      * Menampilkan dashboard pribadi mahasiswa.
      */
-    public function dashboard()
+    public function dashboard(Request $request)
     {
         if (!session()->has('mahasiswa_id')) {
             return redirect()->route('mahasiswa.login')->with('error', 'Silakan masuk ke akun Anda terlebih dahulu.');
         }
 
+        if (!self::validateActiveDeviceSession($request)) {
+            return redirect()->route('mahasiswa.login')->with('error', 'Sesi Anda telah berakhir karena akun ini baru saja login di perangkat lain.');
+        }
+
         $mahasiswa = Pendaftaran::with('presensis')->find(session('mahasiswa_id'));
 
         if (!$mahasiswa) {
-            session()->forget(['mahasiswa_id', 'mahasiswa_nim', 'mahasiswa_nama']);
+            session()->forget(['mahasiswa_id', 'mahasiswa_nim', 'mahasiswa_nama', 'mahasiswa_device_token']);
             return redirect()->route('mahasiswa.login')->with('error', 'Data mahasiswa tidak ditemukan.');
         }
 
@@ -373,6 +444,10 @@ class MahasiswaController extends Controller
     {
         if (!session()->has('mahasiswa_id')) {
             return redirect()->route('mahasiswa.login')->with('error', 'Silakan masuk ke akun Anda terlebih dahulu.');
+        }
+
+        if (!self::validateActiveDeviceSession($request)) {
+            return redirect()->route('mahasiswa.login')->with('error', 'Sesi Anda telah berakhir karena akun ini baru saja login di perangkat lain.');
         }
 
         $mahasiswa = Pendaftaran::find(session('mahasiswa_id'));
@@ -461,7 +536,12 @@ class MahasiswaController extends Controller
      */
     public function logout(Request $request)
     {
-        session()->forget(['mahasiswa_id', 'mahasiswa_nim', 'mahasiswa_nama']);
+        $mahasiswaId = session('mahasiswa_id');
+        if ($mahasiswaId && self::validateActiveDeviceSession($request)) {
+            Cache::forget('mhs_active_session_' . $mahasiswaId);
+        }
+
+        session()->forget(['mahasiswa_id', 'mahasiswa_nim', 'mahasiswa_nama', 'mahasiswa_device_token']);
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 

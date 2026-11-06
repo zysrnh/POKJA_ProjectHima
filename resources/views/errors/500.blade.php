@@ -7,3 +7,4 @@
 @section('code_color', 'text-[#CA2C2A]')
 @section('title', 'Terjadi Gangguan pada Server')
 @section('message', 'Maaf, terjadi kendala teknis saat memproses permintaan Anda. Detail kesalahan telah dicatat secara otomatis oleh sistem untuk ditangani tim teknis.')
+

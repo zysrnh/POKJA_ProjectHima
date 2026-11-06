@@ -7,3 +7,4 @@
 @section('code_color', 'text-[#CA2C2A]')
 @section('title', 'Akses Ditolak oleh Sistem Keamanan')
 @section('message', !empty($exception?->getMessage()) ? $exception->getMessage() : 'Maaf, Anda tidak memiliki izin untuk mengakses halaman ini atau sistem mendeteksi aktivitas yang tidak diizinkan.')
+

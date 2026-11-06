@@ -7,3 +7,4 @@
 @section('code_color', 'text-[#1A467C]')
 @section('title', 'Sistem Sedang Pemeliharaan')
 @section('message', 'Layanan POKJA HIMA IF sedang dalam pembaruan atau perawatan rutin. Silakan akses kembali beberapa saat lagi.')
+

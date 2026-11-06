@@ -7,3 +7,4 @@
 @section('code_color', 'text-[#CA2C2A]')
 @section('title', 'Terlalu Banyak Permintaan')
 @section('message', 'Sistem mendeteksi pengiriman permintaan beruntun yang melebihi batas wajar dari alamat IP Anda. Silakan tunggu sekitar 1 menit sebelum mencoba kembali.')
+

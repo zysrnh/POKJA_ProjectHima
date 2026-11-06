@@ -167,3 +167,4 @@ class SecurityMiddleware
         abort(403, $message);
     }
 }
+
