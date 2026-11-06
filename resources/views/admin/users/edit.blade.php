@@ -1,18 +1,35 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Edit Akun Admin')
-@section('header_title', 'Edit Akun Admin')
+@section('title', $admin->id === Auth::id() ? 'Pengaturan Profil Saya' : 'Edit Akun Admin')
+@section('header_title', $admin->id === Auth::id() ? 'Pengaturan Profil Saya' : 'Edit Akun Admin')
 
 @section('content')
+@php
+    $isSelf = $admin->id === Auth::id();
+    $avatarUrl = $admin->avatarUrl();
+@endphp
 <div class="max-w-xl mx-auto">
 
     <div class="bg-white border-2 border-[#1A467C] p-6 sm:p-8 shadow-[6px_6px_0px_0px_#1A467C]">
-        <div class="border-b-2 border-[#1A467C] pb-4 mb-6">
-            <span class="inline-block bg-[#1A467C] text-white text-[10px] font-black uppercase px-2.5 py-0.5 tracking-wider mb-1">
-                MANAJEMEN PENGGUNA
-            </span>
-            <h3 class="text-base font-black uppercase tracking-tight text-[#1A467C]">Perbarui Informasi Admin</h3>
-            <p class="text-xs font-semibold text-gray-600 mt-1">Kosongkan kolom password jika Anda tidak ingin mengubah password akun.</p>
+        <div class="border-b-2 border-[#1A467C] pb-4 mb-6 flex items-center justify-between gap-2">
+            <div>
+                <div class="flex items-center gap-1.5 mb-1">
+                    <span class="inline-block bg-[#1A467C] text-white text-[10px] font-black uppercase px-2.5 py-0.5 tracking-wider">
+                        {{ $isSelf ? 'PROFIL ADMINISTRATOR' : 'MANAJEMEN PENGGUNA' }}
+                    </span>
+                    @if ($admin->isSuperAdmin())
+                        <span class="inline-block bg-amber-400 text-black border border-black text-[10px] font-black uppercase px-2 py-0.5 tracking-wider">
+                            SUPER ADMIN
+                        </span>
+                    @endif
+                </div>
+                <h3 class="text-base font-black uppercase tracking-tight text-[#1A467C]">
+                    {{ $isSelf ? 'Pengaturan Profil & Akun Saya' : 'Perbarui Informasi Admin' }}
+                </h3>
+                <p class="text-xs font-semibold text-gray-600 mt-1">
+                    Perbarui foto profil, nama, alamat email, atau kata sandi akun administrator.
+                </p>
+            </div>
         </div>
 
         @if ($errors->any())
@@ -26,9 +43,56 @@
             </div>
         @endif
 
-        <form action="{{ route('admin.users.update', $admin->id) }}" method="POST" class="space-y-5">
+        <form action="{{ route('admin.users.update', $admin->id) }}" method="POST" enctype="multipart/form-data" class="space-y-5">
             @csrf
             @method('PUT')
+
+            <!-- Field: Foto Profil Admin (Sama seperti Portal Mahasiswa) -->
+            <div>
+                <label class="block text-xs font-black uppercase tracking-wider text-[#1A467C] mb-2">
+                    Foto Profil Admin
+                </label>
+
+                <div class="flex flex-col sm:flex-row items-center gap-4 bg-[#F8FBFE] border-2 border-[#1A467C] p-4">
+                    <!-- Preview Avatar Box -->
+                    <div class="w-20 h-20 bg-[#2A82C6] text-white border-2 border-[#1A467C] flex items-center justify-center font-black text-xl shadow-[3px_3px_0px_0px_#1A467C] shrink-0 overflow-hidden relative">
+                        @if ($avatarUrl)
+                            <img id="admin-avatar-preview" src="{{ $avatarUrl }}" alt="Avatar {{ $admin->name }}" class="w-full h-full object-cover">
+                        @else
+                            <span id="admin-avatar-placeholder">{{ $admin->initials() }}</span>
+                            <img id="admin-avatar-preview" src="" alt="Preview" class="hidden w-full h-full object-cover">
+                        @endif
+                    </div>
+
+                    <div class="flex-1 w-full text-center sm:text-left space-y-2">
+                        <input 
+                            type="file" 
+                            id="foto-admin-input" 
+                            name="foto" 
+                            accept="image/jpeg,image/png,image/jpg,image/webp" 
+                            onchange="previewAdminAvatar(this)" 
+                            class="hidden"
+                        >
+                        <button 
+                            type="button" 
+                            onclick="document.getElementById('foto-admin-input').click()" 
+                            class="btn-smooth inline-flex items-center gap-2 py-2 px-3.5 bg-white hover:bg-gray-100 text-[#1A467C] border-2 border-[#1A467C] text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#1A467C] cursor-pointer"
+                        >
+                            <svg class="w-4 h-4 text-[#1A467C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="square" stroke-width="2.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                <path stroke-linecap="square" stroke-width="2.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            <span>Pilih Foto Baru</span>
+                        </button>
+                        <p class="text-[11px] font-semibold text-gray-500">
+                            Mendukung format JPG, PNG, atau WEBP. Maksimal ukuran 2 MB.
+                        </p>
+                    </div>
+                </div>
+                @error('foto')
+                    <p class="mt-1 text-xs font-bold text-[#CA2C2A]">{{ $message }}</p>
+                @enderror
+            </div>
 
             <!-- Field: Nama -->
             <div>
@@ -137,6 +201,24 @@
             input.type = 'password';
             eyeOpen.classList.remove('hidden');
             eyeClosed.classList.add('hidden');
+        }
+    }
+
+    function previewAdminAvatar(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById('admin-avatar-preview');
+                const placeholder = document.getElementById('admin-avatar-placeholder');
+                if (preview) {
+                    preview.src = e.target.result;
+                    preview.classList.remove('hidden');
+                }
+                if (placeholder) {
+                    placeholder.classList.add('hidden');
+                }
+            };
+            reader.readAsDataURL(input.files[0]);
         }
     }
 </script>

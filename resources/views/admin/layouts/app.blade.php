@@ -276,10 +276,34 @@
                 </nav>
             </div>
 
-            <!-- Sidebar Footer (Always docked at the bottom) -->
-            <div class="w-64 p-4 border-t-2 border-[#000000] text-[11px] text-gray-300 bg-[#0F2A4A] shrink-0">
-                <p class="font-bold text-white truncate">{{ Auth::user()->name ?? 'Administrator' }}</p>
-                <p class="truncate text-blue-200 font-mono">{{ Auth::user()->email ?? 'admin@pokja.com' }}</p>
+            <!-- Sidebar Footer (Interactive Profile Card docked at the bottom) -->
+            <div class="w-64 p-3.5 border-t-2 border-[#000000] bg-[#0F2A4A] shrink-0">
+                @php
+                    $authAdmin = Auth::user();
+                    $authAvatar = $authAdmin?->avatarUrl();
+                @endphp
+                <a 
+                    href="{{ $authAdmin ? route('admin.users.edit', $authAdmin->id) : '#' }}" 
+                    class="flex items-center gap-2.5 p-2 bg-[#1A467C] hover:bg-[#2A82C6] border-2 border-white transition shadow-[2px_2px_0px_0px_#000000] group"
+                    title="Klik untuk Pengaturan Profil Saya"
+                >
+                    <div class="w-9 h-9 bg-[#2A82C6] text-white border-2 border-white flex items-center justify-center font-black text-xs shrink-0 overflow-hidden">
+                        @if ($authAvatar)
+                            <img src="{{ $authAvatar }}" alt="Avatar" class="w-full h-full object-cover">
+                        @else
+                            {{ $authAdmin ? $authAdmin->initials() : 'AD' }}
+                        @endif
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <div class="flex items-center gap-1">
+                            <p class="font-black text-xs text-white truncate">{{ $authAdmin->name ?? 'Administrator' }}</p>
+                        </div>
+                        <p class="truncate text-[10px] text-blue-100 font-mono">{{ $authAdmin->email ?? 'admin@pokja.com' }}</p>
+                        <span class="inline-block mt-0.5 text-[9px] font-black uppercase px-1.5 py-0.2 border border-black {{ $authAdmin?->isSuperAdmin() ? 'bg-amber-400 text-black' : 'bg-white text-[#1A467C]' }}">
+                            {{ $authAdmin?->isSuperAdmin() ? 'SUPER ADMIN' : 'PROFIL SAYA' }}
+                        </span>
+                    </div>
+                </a>
             </div>
         </aside>
 
@@ -321,8 +345,25 @@
                     </h2>
                 </div>
 
-                <!-- Right: External Link & Logout -->
-                <div class="flex items-center gap-1.5 sm:gap-3 shrink-0">
+                <!-- Right: Profile Button, External Link & Logout -->
+                <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+                    @if (Auth::check())
+                        <a 
+                            href="{{ route('admin.users.edit', Auth::id()) }}" 
+                            class="btn-smooth inline-flex items-center gap-1.5 px-2 py-1 sm:px-2.5 sm:py-1 border-2 border-[#1A467C] text-[11px] sm:text-xs font-black uppercase tracking-wider text-[#1A467C] bg-[#F8FBFE] hover:bg-blue-50 shadow-[2px_2px_0px_0px_#1A467C]"
+                            title="Pengaturan Profil Saya"
+                        >
+                            <div class="w-5 h-5 sm:w-6 sm:h-6 bg-[#2A82C6] text-white border border-[#1A467C] flex items-center justify-center font-black text-[10px] shrink-0 overflow-hidden">
+                                @if (Auth::user()->avatarUrl())
+                                    <img src="{{ Auth::user()->avatarUrl() }}" alt="Avatar" class="w-full h-full object-cover">
+                                @else
+                                    {{ Auth::user()->initials() }}
+                                @endif
+                            </div>
+                            <span class="hidden md:inline">Profil Saya</span>
+                        </a>
+                    @endif
+
                     <a 
                         href="{{ route('pendaftaran.index') }}" 
                         target="_blank" 

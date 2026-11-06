@@ -31,6 +31,37 @@ class User extends Authenticatable
     }
 
     /**
+     * Mengambil URL foto profil admin dari direktori public/uploads/avatars jika ada.
+     */
+    public function avatarUrl(): ?string
+    {
+        if (!$this->id) {
+            return null;
+        }
+
+        $dir = public_path('uploads/avatars');
+        if (!is_dir($dir)) {
+            return null;
+        }
+
+        $files = glob($dir . DIRECTORY_SEPARATOR . 'admin_' . (int) $this->id . '_*.*');
+        if (!empty($files) && is_file($files[0])) {
+            return asset('uploads/avatars/' . basename($files[0]));
+        }
+
+        return null;
+    }
+
+    /**
+     * Mengambil 2 huruf inisial nama admin untuk fallback avatar.
+     */
+    public function initials(): string
+    {
+        $clean = trim((string) $this->name);
+        return $clean !== '' ? strtoupper(substr($clean, 0, 2)) : 'AD';
+    }
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>

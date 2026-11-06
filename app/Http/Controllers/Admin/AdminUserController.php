@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
 
 class AdminUserController extends Controller
@@ -123,6 +124,15 @@ class AdminUserController extends Controller
             'name' => ['required', 'string', 'min:3', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $admin->id],
             'password' => ['nullable', 'string', Password::min(8)->letters()->numbers()],
+            'foto' => [
+                'nullable',
+                'file',
+                'image',
+                'mimes:jpeg,png,jpg,webp',
+                'mimetypes:image/jpeg,image/png,image/webp',
+                'max:2048',
+                'dimensions:min_width=50,min_height=50,max_width=4096,max_height=4096',
+            ],
         ], [
             'name.required' => 'Nama admin wajib diisi.',
             'name.min' => 'Nama admin minimal 3 karakter.',
@@ -130,7 +140,49 @@ class AdminUserController extends Controller
             'email.email' => 'Format email tidak valid.',
             'email.unique' => 'Email ini sudah digunakan oleh akun lain.',
             'password.min' => 'Password admin minimal 8 karakter dengan kombinasi huruf dan angka.',
+            'foto.image' => 'File yang diunggah harus berupa gambar asli.',
+            'foto.mimes' => 'Format foto harus berupa JPG, JPEG, PNG, atau WEBP.',
+            'foto.mimetypes' => 'Konten file bukan gambar yang valid.',
+            'foto.max' => 'Ukuran file foto maksimal 2 MB.',
+            'foto.dimensions' => 'Resolusi foto minimal 50x50 piksel dan maksimal 4096x4096 piksel.',
         ]);
+
+        // Proses upload foto profil admin dengan inspeksi struktur binary gambar asli (Anti-Webshell)
+        if ($request->hasFile('foto')) {
+            $file = $request->file('foto');
+            $realPath = $file->getRealPath();
+            $imageInfo = @getimagesize($realPath);
+
+            $allowedMimeMap = [
+                'image/jpeg' => 'jpg',
+                'image/png' => 'png',
+                'image/webp' => 'webp',
+            ];
+
+            if ($imageInfo === false || !isset($imageInfo['mime']) || !array_key_exists($imageInfo['mime'], $allowedMimeMap)) {
+                return back()->withErrors(['foto' => 'File gambar rusak atau terdeteksi tidak aman.'])->withInput();
+            }
+
+            $safeExtension = $allowedMimeMap[$imageInfo['mime']];
+            $filename = 'admin_' . (int) $admin->id . '_' . Str::random(10) . '_' . time() . '.' . $safeExtension;
+
+            $destinationPath = public_path('uploads/avatars');
+            if (!file_exists($destinationPath)) {
+                mkdir($destinationPath, 0755, true);
+            }
+
+            // Hapus foto profil admin lama jika ada
+            $oldFiles = glob($destinationPath . DIRECTORY_SEPARATOR . 'admin_' . (int) $admin->id . '_*.*');
+            if (is_array($oldFiles)) {
+                foreach ($oldFiles as $oldFile) {
+                    if (is_file($oldFile)) {
+                        @unlink($oldFile);
+                    }
+                }
+            }
+
+            $file->move($destinationPath, $filename);
+        }
 
         $updateData = [
             'name' => $validated['name'],
@@ -143,7 +195,11 @@ class AdminUserController extends Controller
 
         $admin->update($updateData);
 
-        return redirect()->route('admin.users.index')->with('success', "Data akun admin '{$admin->name}' berhasil diperbarui.");
+        $msg = (int) $admin->id === (int) Auth::id()
+            ? 'Profil Anda berhasil diperbarui!'
+            : "Data akun admin '{$admin->name}' berhasil diperbarui.";
+
+        return redirect()->route('admin.users.index')->with('success', $msg);
     }
 
     /**
@@ -168,6 +224,17 @@ class AdminUserController extends Controller
 
         if (User::count() <= 1) {
             return redirect()->route('admin.users.index')->with('error', 'Tidak dapat menghapus akun admin terakhir di sistem.');
+        }
+
+        // Bersihkan file avatar admin jika ada
+        $destinationPath = public_path('uploads/avatars');
+        $oldFiles = glob($destinationPath . DIRECTORY_SEPARATOR . 'admin_' . (int) $admin->id . '_*.*');
+        if (is_array($oldFiles)) {
+            foreach ($oldFiles as $oldFile) {
+                if (is_file($oldFile)) {
+                    @unlink($oldFile);
+                }
+            }
         }
 
         $name = $admin->name;

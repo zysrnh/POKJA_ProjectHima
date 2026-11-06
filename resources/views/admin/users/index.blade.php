@@ -22,17 +22,30 @@
             </p>
         </div>
 
-        @if ($isCurrentUserSuperAdmin)
+        <div class="flex items-center gap-2 shrink-0">
             <a 
-                href="{{ route('admin.users.create') }}" 
-                class="btn-smooth w-10 h-10 sm:w-11 sm:h-11 bg-[#2A82C6] hover:bg-[#1A467C] text-white border-2 border-black flex items-center justify-center shadow-[2px_2px_0px_0px_#000000] cursor-pointer shrink-0"
-                title="Tambah Admin Baru"
+                href="{{ route('admin.users.edit', Auth::id()) }}" 
+                class="btn-smooth px-3 py-2 sm:px-4 sm:py-2.5 bg-amber-400 hover:bg-amber-500 text-black border-2 border-black text-xs font-black uppercase tracking-wider flex items-center gap-1.5 shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
+                title="Pengaturan Profil Saya"
             >
-                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="square" stroke-width="2.8" d="M12 4v16m8-8H4" />
+                <svg class="w-4 h-4 text-black shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="square" stroke-width="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
+                <span>Profil Saya</span>
             </a>
-        @endif
+
+            @if ($isCurrentUserSuperAdmin)
+                <a 
+                    href="{{ route('admin.users.create') }}" 
+                    class="btn-smooth w-10 h-10 sm:w-11 sm:h-11 bg-[#2A82C6] hover:bg-[#1A467C] text-white border-2 border-black flex items-center justify-center shadow-[2px_2px_0px_0px_#000000] cursor-pointer shrink-0"
+                    title="Tambah Admin Baru"
+                >
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="square" stroke-width="2.8" d="M12 4v16m8-8H4" />
+                    </svg>
+                </a>
+            @endif
+        </div>
     </div>
 
     <!-- Mobile View: Clean Neubrutalism Cards (block lg:hidden) -->
@@ -41,22 +54,32 @@
             @php
                 $canEditRow = $isCurrentUserSuperAdmin || $admin->id === Auth::id();
                 $canDeleteRow = $isCurrentUserSuperAdmin && !$admin->isSuperAdmin() && $admin->id !== Auth::id();
+                $rowAvatar = $admin->avatarUrl();
             @endphp
             <div class="bg-white border-2 border-black p-4 shadow-[4px_4px_0px_0px_#000000] space-y-3">
                 <div class="flex items-start justify-between gap-2">
-                    <div>
-                        <div class="flex flex-wrap items-center gap-1.5">
-                            <h4 class="font-black text-sm text-gray-950 uppercase">{{ $admin->name }}</h4>
-                            @if ($admin->isSuperAdmin())
-                                <span class="bg-[#1A467C] text-white border border-black text-[9px] font-black px-1.5 py-0.5 uppercase tracking-wider">SUPER ADMIN</span>
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <div class="w-10 h-10 bg-[#2A82C6] text-white border-2 border-black flex items-center justify-center font-black text-xs shadow-[1px_1px_0px_0px_#000000] shrink-0 overflow-hidden">
+                            @if ($rowAvatar)
+                                <img src="{{ $rowAvatar }}" alt="Avatar {{ $admin->name }}" class="w-full h-full object-cover">
                             @else
-                                <span class="bg-gray-100 text-gray-700 border border-gray-400 text-[9px] font-black px-1.5 py-0.5 uppercase">ADMIN</span>
-                            @endif
-                            @if ($admin->id === Auth::id())
-                                <span class="bg-blue-50 text-[#1A467C] border border-[#2A82C6] text-[9px] font-black px-1.5 py-0.5 uppercase">ANDA</span>
+                                {{ $admin->initials() }}
                             @endif
                         </div>
-                        <p class="text-xs font-mono font-bold text-gray-600 mt-0.5">{{ $admin->email }}</p>
+                        <div class="min-w-0">
+                            <div class="flex flex-wrap items-center gap-1.5">
+                                <h4 class="font-black text-sm text-gray-950 uppercase truncate">{{ $admin->name }}</h4>
+                                @if ($admin->isSuperAdmin())
+                                    <span class="bg-[#1A467C] text-white border border-black text-[9px] font-black px-1.5 py-0.5 uppercase tracking-wider">SUPER ADMIN</span>
+                                @else
+                                    <span class="bg-gray-100 text-gray-700 border border-gray-400 text-[9px] font-black px-1.5 py-0.5 uppercase">ADMIN</span>
+                                @endif
+                                @if ($admin->id === Auth::id())
+                                    <span class="bg-blue-50 text-[#1A467C] border border-[#2A82C6] text-[9px] font-black px-1.5 py-0.5 uppercase">ANDA</span>
+                                @endif
+                            </div>
+                            <p class="text-xs font-mono font-bold text-gray-600 mt-0.5 truncate">{{ $admin->email }}</p>
+                        </div>
                     </div>
 
                     <span class="inline-block bg-green-50 border border-green-700 text-green-900 text-[10px] px-2 py-0.5 font-black uppercase">
@@ -157,13 +180,21 @@
                         @php
                             $canEditRow = $isCurrentUserSuperAdmin || $admin->id === Auth::id();
                             $canDeleteRow = $isCurrentUserSuperAdmin && !$admin->isSuperAdmin() && $admin->id !== Auth::id();
+                            $rowAvatar = $admin->avatarUrl();
                         @endphp
                         <tr class="hover:bg-blue-50/40 transition">
                             <td class="py-3.5 px-3.5 text-center text-gray-700 font-mono font-bold">
                                 {{ $admins->firstItem() + $index }}
                             </td>
                             <td class="py-3.5 px-3.5 font-bold text-gray-950">
-                                <div class="flex items-center gap-2">
+                                <div class="flex items-center gap-2.5">
+                                    <div class="w-8 h-8 bg-[#2A82C6] text-white border border-black flex items-center justify-center font-black text-[11px] shadow-[1px_1px_0px_0px_#000000] shrink-0 overflow-hidden">
+                                        @if ($rowAvatar)
+                                            <img src="{{ $rowAvatar }}" alt="Avatar {{ $admin->name }}" class="w-full h-full object-cover">
+                                        @else
+                                            {{ $admin->initials() }}
+                                        @endif
+                                    </div>
                                     <span>{{ $admin->name }}</span>
                                     @if ($admin->id === Auth::id())
                                         <span class="bg-blue-50 text-[#1A467C] border border-[#2A82C6] text-[10px] font-black px-2 py-0.5 uppercase">AKUN ANDA</span>
