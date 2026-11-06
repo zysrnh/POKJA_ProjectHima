@@ -40,4 +40,25 @@ class Pendaftaran extends Model
     {
         return $this->hasMany(Presensi::class, 'pendaftaran_id');
     }
+
+    /**
+     * Get full URL to student's uploaded avatar or null if not set.
+     */
+    public function avatarUrl(): ?string
+    {
+        $filename = basename((string) $this->foto);
+        if (!empty($filename) && is_file(public_path('uploads/avatars/' . $filename))) {
+            return route('avatar.serve', ['filename' => $filename]);
+        }
+
+        return null;
+    }
+
+    /**
+     * Get 2-letter uppercase initials for fallback avatar display.
+     */
+    public function initials(): string
+    {
+        return strtoupper(substr(trim((string) $this->nama), 0, 2)) ?: 'MH';
+    }
 }

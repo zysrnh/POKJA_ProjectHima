@@ -377,15 +377,13 @@
                         </svg>
                     </a>
 
-                    <form action="{{ route('admin.logout') }}" method="POST" class="inline">
-                        @csrf
-                        <button 
-                            type="submit" 
-                            class="btn-smooth px-3 py-1.5 sm:px-3.5 sm:py-1.5 bg-[#CA2C2A] hover:bg-[#901C1A] active:bg-[#901C1A] text-white text-[11px] sm:text-xs font-bold uppercase tracking-wider border-2 border-[#901C1A] shadow-[2px_2px_0px_0px_#901C1A] cursor-pointer"
-                        >
-                            Keluar
-                        </button>
-                    </form>
+                    <button 
+                        type="button" 
+                        onclick="openAdminLogoutModal()"
+                        class="btn-smooth px-3 py-1.5 sm:px-3.5 sm:py-1.5 bg-[#CA2C2A] hover:bg-[#901C1A] active:bg-[#901C1A] text-white text-[11px] sm:text-xs font-bold uppercase tracking-wider border-2 border-[#901C1A] shadow-[2px_2px_0px_0px_#901C1A] cursor-pointer"
+                    >
+                        Keluar
+                    </button>
                 </div>
             </header>
 
@@ -480,6 +478,67 @@
             </span>
         </a>
     </nav>
+
+    <!-- ============================================================== -->
+    <!-- MODAL KONFIRMASI LOGOUT ADMIN (Neubrutalism)                   -->
+    <!-- ============================================================== -->
+    <div id="admin-logout-modal" class="hidden fixed inset-0 z-50 bg-black/75 flex items-center justify-center p-4">
+        <div class="bg-white border-[3px] border-black shadow-[8px_8px_0px_0px_#000000] max-w-sm w-full p-5 sm:p-6 text-center space-y-4">
+            <div class="w-12 h-12 bg-[#CA2C2A] text-white border-2 border-black flex items-center justify-center mx-auto shadow-[3px_3px_0px_0px_#000000]">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="square" stroke-width="2.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+            </div>
+            <div>
+                <h3 class="text-base sm:text-lg font-black uppercase text-gray-950 tracking-tight">Keluar dari Panel Admin?</h3>
+                <p class="text-xs font-semibold text-gray-600 mt-1">
+                    Anda harus login kembali untuk mengakses manajemen data pendaftar dan presensi POKJA.
+                </p>
+            </div>
+            <div class="flex items-center gap-2.5 pt-2">
+                <button 
+                    type="button" 
+                    onclick="closeAdminLogoutModal()" 
+                    class="btn-smooth flex-1 py-2.5 bg-white hover:bg-gray-100 text-gray-900 border-2 border-black text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
+                >
+                    Batal
+                </button>
+                <form action="{{ route('admin.logout') }}" method="POST" class="flex-1">
+                    @csrf
+                    <button 
+                        type="submit" 
+                        class="btn-smooth w-full py-2.5 bg-[#CA2C2A] hover:bg-[#901C1A] text-white border-2 border-black text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
+                    >
+                        Ya, Keluar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openAdminLogoutModal() {
+            const modal = document.getElementById('admin-logout-modal');
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closeAdminLogoutModal() {
+            const modal = document.getElementById('admin-logout-modal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeAdminLogoutModal();
+            }
+        });
+
+        document.getElementById('admin-logout-modal')?.addEventListener('click', (e) => {
+            if (e.target.id === 'admin-logout-modal') {
+                closeAdminLogoutModal();
+            }
+        });
+    </script>
 
 </body>
 </html>

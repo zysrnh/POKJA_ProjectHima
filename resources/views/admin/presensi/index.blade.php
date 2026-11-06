@@ -245,7 +245,16 @@
                                 {{ $item->nim }}
                             </td>
                             <td class="py-3 px-3 font-bold text-gray-900">
-                                {{ $item->nama }}
+                                <div class="flex items-center gap-2.5">
+                                    <div class="w-8 h-8 bg-[#2A82C6] text-white border-2 border-black flex items-center justify-center font-black text-[11px] shrink-0 overflow-hidden shadow-[1px_1px_0px_0px_#000000]">
+                                        @if ($item->avatarUrl())
+                                            <img src="{{ $item->avatarUrl() }}" alt="Avatar {{ $item->nama }}" class="w-full h-full object-cover">
+                                        @else
+                                            {{ $item->initials() }}
+                                        @endif
+                                    </div>
+                                    <span>{{ $item->nama }}</span>
+                                </div>
                             </td>
                             <td class="py-3 px-3 text-center font-bold">
                                 <span class="bg-blue-50 border border-[#2A82C6] px-1.5 py-0.5 text-[10px] font-mono">
@@ -337,9 +346,18 @@
             @endphp
             <div class="card-interactive bg-white border-2 border-black p-3.5 shadow-[3px_3px_0px_0px_#000000] space-y-2.5">
                 <div class="flex items-start justify-between gap-2">
-                    <div>
-                        <h4 class="font-black text-sm text-gray-950 uppercase">{{ $item->nama }}</h4>
-                        <p class="text-xs font-mono font-bold text-gray-600">{{ $item->nim }} • {{ $item->kelas }}</p>
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <div class="w-9 h-9 bg-[#2A82C6] text-white border-2 border-black flex items-center justify-center font-black text-xs shrink-0 overflow-hidden shadow-[1px_1px_0px_0px_#000000]">
+                            @if ($item->avatarUrl())
+                                <img src="{{ $item->avatarUrl() }}" alt="Avatar {{ $item->nama }}" class="w-full h-full object-cover">
+                            @else
+                                {{ $item->initials() }}
+                            @endif
+                        </div>
+                        <div class="min-w-0">
+                            <h4 class="font-black text-sm text-gray-950 uppercase truncate">{{ $item->nama }}</h4>
+                            <p class="text-xs font-mono font-bold text-gray-600">{{ $item->nim }} • {{ $item->kelas }}</p>
+                        </div>
                     </div>
                     <form action="{{ route('admin.presensi.toggle', $item->id) }}" method="POST" class="inline shrink-0">
                         @csrf

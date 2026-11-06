@@ -269,16 +269,23 @@
             @endphp
             <div class="card-interactive bg-white border-2 border-[#000000] shadow-[3px_3px_0px_0px_#000000] p-3.5 space-y-3" id="mobile-card-{{ $item->id }}">
                 
-                <!-- Card Header: Checkbox, Name, NIM, Class Badge -->
+                <!-- Card Header: Checkbox, Avatar, Name, NIM, Class Badge -->
                 <div class="flex items-start justify-between gap-2">
-                    <div class="flex items-start gap-2.5 min-w-0">
+                    <div class="flex items-center gap-2.5 min-w-0">
                         <input 
                             type="checkbox" 
-                            class="row-checkbox w-4 h-4 accent-[#1A467C] cursor-pointer mt-0.5"
+                            class="row-checkbox w-4 h-4 accent-[#1A467C] cursor-pointer shrink-0"
                             value="{{ $item->id }}"
                             data-name="{{ $item->nama }}"
                             onchange="updateBulkBarState()"
                         >
+                        <div class="w-9 h-9 bg-[#2A82C6] text-white border-2 border-[#000000] flex items-center justify-center font-black text-xs shrink-0 overflow-hidden shadow-[1px_1px_0px_0px_#000000]">
+                            @if ($item->avatarUrl())
+                                <img src="{{ $item->avatarUrl() }}" alt="Avatar {{ $item->nama }}" class="w-full h-full object-cover">
+                            @else
+                                {{ $item->initials() }}
+                            @endif
+                        </div>
                         <div class="min-w-0">
                             <h4 class="font-black text-sm text-[#000000] leading-tight truncate">{{ $item->nama }}</h4>
                             <p class="font-mono text-xs font-bold text-[#1A467C] mt-0.5">{{ $item->nim }}</p>
@@ -411,7 +418,16 @@
                                 {{ $pendaftarans->firstItem() + $index }}
                             </td>
                             <td class="py-3 px-3.5 font-bold text-gray-950">
-                                {{ $item->nama }}
+                                <div class="flex items-center gap-2.5">
+                                    <div class="w-9 h-9 bg-[#2A82C6] text-white border-2 border-[#000000] flex items-center justify-center font-black text-xs shrink-0 overflow-hidden shadow-[2px_2px_0px_0px_#000000]">
+                                        @if ($item->avatarUrl())
+                                            <img src="{{ $item->avatarUrl() }}" alt="Avatar {{ $item->nama }}" class="w-full h-full object-cover">
+                                        @else
+                                            {{ $item->initials() }}
+                                        @endif
+                                    </div>
+                                    <span>{{ $item->nama }}</span>
+                                </div>
                             </td>
                             <td class="py-3 px-3 text-gray-900 font-mono font-bold">
                                 {{ $item->nim }}
