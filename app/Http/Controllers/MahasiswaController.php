@@ -139,16 +139,10 @@ class MahasiswaController extends Controller
         $maskedName = strlen($namePart) > 2 ? substr($namePart, 0, 2) . str_repeat('*', max(strlen($namePart) - 2, 3)) : $namePart . '***';
         $maskedEmail = $maskedName . '@' . $domainPart;
 
-        $redirect = back()->with(
+        return back()->with(
             'success_reset',
             'Tautan atur ulang kata sandi berhasil dikirim ke ' . $maskedEmail . '. Jika belum muncul di Kotak Masuk (Utama), mohon periksa folder SPAM atau tab Promosi di Gmail Anda.'
         );
-
-        if (app()->environment('local')) {
-            $redirect->with('local_reset_url', $resetUrl);
-        }
-
-        return $redirect;
     }
 
     /**
