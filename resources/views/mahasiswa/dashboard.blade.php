@@ -118,7 +118,7 @@
                 <div class="flex items-center gap-2.5">
                     <div class="w-10 h-10 bg-[#2A82C6] text-white border-2 border-black flex items-center justify-center font-black text-xs shadow-[1px_1px_0px_0px_#000000] shrink-0 overflow-hidden">
                         @if (!empty($mahasiswa->foto) && file_exists(public_path('uploads/avatars/' . $mahasiswa->foto)))
-                            <img src="{{ asset('uploads/avatars/' . $mahasiswa->foto) }}" alt="Avatar" class="w-full h-full object-cover">
+                            <img src="{{ route('avatar.serve', ['filename' => basename($mahasiswa->foto)]) }}" alt="Avatar" class="w-full h-full object-cover">
                         @else
                             {{ strtoupper(substr($mahasiswa->nama, 0, 2)) }}
                         @endif
@@ -255,7 +255,7 @@
                             <!-- Avatar Display -->
                             <div class="w-12 h-12 sm:w-14 sm:h-14 bg-[#2A82C6] text-white border-2 border-black flex items-center justify-center font-black text-base sm:text-lg shadow-[2px_2px_0px_0px_#000000] shrink-0 overflow-hidden">
                                 @if (!empty($mahasiswa->foto) && file_exists(public_path('uploads/avatars/' . $mahasiswa->foto)))
-                                    <img src="{{ asset('uploads/avatars/' . $mahasiswa->foto) }}" alt="Foto {{ $mahasiswa->nama }}" class="w-full h-full object-cover">
+                                    <img src="{{ route('avatar.serve', ['filename' => basename($mahasiswa->foto)]) }}" alt="Foto {{ $mahasiswa->nama }}" class="w-full h-full object-cover">
                                 @else
                                     {{ strtoupper(substr($mahasiswa->nama, 0, 2)) }}
                                 @endif
@@ -410,7 +410,7 @@
                                 <div class="relative shrink-0">
                                     <div class="w-24 h-24 bg-[#2A82C6] text-white border-2 border-black shadow-[3px_3px_0px_0px_#000000] flex items-center justify-center font-black text-2xl overflow-hidden">
                                         @if (!empty($mahasiswa->foto) && file_exists(public_path('uploads/avatars/' . $mahasiswa->foto)))
-                                            <img id="avatar-preview" src="{{ asset('uploads/avatars/' . $mahasiswa->foto) }}" alt="Foto {{ $mahasiswa->nama }}" class="w-full h-full object-cover">
+                                            <img id="avatar-preview" src="{{ route('avatar.serve', ['filename' => basename($mahasiswa->foto)]) }}" alt="Foto {{ $mahasiswa->nama }}" class="w-full h-full object-cover">
                                         @else
                                             <img id="avatar-preview" class="hidden w-full h-full object-cover" alt="Preview Foto">
                                             <span id="avatar-placeholder">{{ strtoupper(substr($mahasiswa->nama, 0, 2)) }}</span>

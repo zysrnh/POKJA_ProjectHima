@@ -29,6 +29,27 @@ Route::middleware('throttle:120,1')->group(function () {
         ->middleware('throttle:10,1')
         ->name('pendaftaran.store');
 
+    // Stream Avatar Image Directly via Laravel (Kompatibel penuh dengan Subfolder cPanel tanpa perlu symlink)
+    $serveAvatar = function (string $filename) {
+        $safeName = basename($filename);
+        $path = public_path('uploads/avatars/' . $safeName);
+
+        if (!is_file($path)) {
+            abort(404);
+        }
+
+        return response()->file($path, [
+            'Cache-Control' => 'public, max-age=86400',
+        ]);
+    };
+
+    Route::get('/avatar-file/{filename}', $serveAvatar)
+        ->where('filename', '[A-Za-z0-9_\-\.]+')
+        ->name('avatar.serve');
+
+    Route::get('/uploads/avatars/{filename}', $serveAvatar)
+        ->where('filename', '[A-Za-z0-9_\-\.]+');
+
     // Scanner Absensi Mahasiswa di HP
     Route::get('/absen', [PresensiMahasiswaController::class, 'showAbsen'])->name('presensi.absen');
     Route::post('/absen/scan', [PresensiMahasiswaController::class, 'submitScan'])

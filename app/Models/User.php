@@ -46,7 +46,7 @@ class User extends Authenticatable
 
         $files = glob($dir . DIRECTORY_SEPARATOR . 'admin_' . (int) $this->id . '_*.*');
         if (!empty($files) && is_file($files[0])) {
-            return asset('uploads/avatars/' . basename($files[0]));
+            return route('avatar.serve', ['filename' => basename($files[0])]);
         }
 
         return null;
