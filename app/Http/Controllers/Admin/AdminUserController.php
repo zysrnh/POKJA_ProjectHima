@@ -13,27 +13,40 @@ class AdminUserController extends Controller
 {
     /**
      * Menampilkan daftar akun admin.
+     * Urutkan Super Admin di posisi paling atas.
      */
     public function index()
     {
-        $admins = User::latest()->paginate(10);
+        $admins = User::orderByRaw("CASE WHEN LOWER(email) = ? THEN 0 ELSE 1 END", [User::SUPER_ADMIN_EMAIL])
+            ->latest()
+            ->paginate(10);
 
         return view('admin.users.index', compact('admins'));
     }
 
     /**
-     * Menampilkan form tambah admin baru.
+     * Menampilkan form tambah admin baru (Hanya Super Admin).
      */
     public function create()
     {
+        if (!Auth::user()?->isSuperAdmin()) {
+            return redirect()->route('admin.users.index')
+                ->with('error', 'Akses ditolak! Hanya Super Admin yang dapat menambahkan akun admin baru.');
+        }
+
         return view('admin.users.create');
     }
 
     /**
-     * Menyimpan data admin baru ke database dengan validasi password ketat.
+     * Menyimpan data admin baru ke database dengan validasi password ketat (Hanya Super Admin).
      */
     public function store(Request $request)
     {
+        if (!Auth::user()?->isSuperAdmin()) {
+            return redirect()->route('admin.users.index')
+                ->with('error', 'Akses ditolak! Hanya Super Admin yang dapat menambahkan akun admin baru.');
+        }
+
         $request->merge([
             'name' => trim(strip_tags($request->input('name', ''))),
             'email' => strtolower(trim(strip_tags($request->input('email', '')))),
@@ -65,25 +78,46 @@ class AdminUserController extends Controller
 
     /**
      * Menampilkan form edit akun admin.
+     * Admin biasa hanya boleh mengedit akunnya sendiri; Super Admin bebas mengedit semua akun.
      */
     public function edit($id)
     {
         $admin = User::findOrFail($id);
+        $currentUser = Auth::user();
+
+        if (!$currentUser?->isSuperAdmin() && (int) $admin->id !== (int) Auth::id()) {
+            return redirect()->route('admin.users.index')
+                ->with('error', 'Akses ditolak! Hanya Super Admin yang dapat mengubah data atau password akun admin lain.');
+        }
 
         return view('admin.users.edit', compact('admin'));
     }
 
     /**
      * Memperbarui data akun admin.
+     * Admin biasa hanya boleh memperbarui akunnya sendiri; Super Admin bebas memperbarui semua akun.
      */
     public function update(Request $request, $id)
     {
         $admin = User::findOrFail($id);
+        $currentUser = Auth::user();
+
+        if (!$currentUser?->isSuperAdmin() && (int) $admin->id !== (int) Auth::id()) {
+            return redirect()->route('admin.users.index')
+                ->with('error', 'Akses ditolak! Hanya Super Admin yang dapat mengubah data atau password akun admin lain.');
+        }
 
         $request->merge([
             'name' => trim(strip_tags($request->input('name', ''))),
             'email' => strtolower(trim(strip_tags($request->input('email', '')))),
         ]);
+
+        // Cegah akun Super Admin kehilangan email Super Admin-nya secara tidak sengaja
+        if ($admin->isSuperAdmin() && $request->input('email') !== User::SUPER_ADMIN_EMAIL) {
+            return back()
+                ->withErrors(['email' => 'Email utama Super Admin (' . User::SUPER_ADMIN_EMAIL . ') dikunci dan tidak dapat diubah.'])
+                ->withInput();
+        }
 
         $validated = $request->validate([
             'name' => ['required', 'string', 'min:3', 'max:255'],
@@ -113,19 +147,29 @@ class AdminUserController extends Controller
     }
 
     /**
-     * Menghapus akun admin.
+     * Menghapus akun admin (Hanya Super Admin, dan akun Super Admin tidak dapat dihapus).
      */
     public function destroy($id)
     {
+        if (!Auth::user()?->isSuperAdmin()) {
+            return redirect()->route('admin.users.index')
+                ->with('error', 'Akses ditolak! Hanya Super Admin yang memiliki wewenang menghapus akun admin.');
+        }
+
         if ((int) $id === (int) Auth::id()) {
             return redirect()->route('admin.users.index')->with('error', 'Anda tidak dapat menghapus akun admin yang sedang Anda gunakan saat ini.');
+        }
+
+        $admin = User::findOrFail($id);
+
+        if ($admin->isSuperAdmin()) {
+            return redirect()->route('admin.users.index')->with('error', 'Akun Super Admin utama tidak dapat dihapus.');
         }
 
         if (User::count() <= 1) {
             return redirect()->route('admin.users.index')->with('error', 'Tidak dapat menghapus akun admin terakhir di sistem.');
         }
 
-        $admin = User::findOrFail($id);
         $name = $admin->name;
         $admin->delete();
 
