@@ -7,10 +7,42 @@ use App\Models\Presensi;
 use App\Models\Pengaturan;
 use App\Http\Controllers\Admin\PresensiAdminController;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 class PresensiMahasiswaController extends Controller
 {
+    /**
+     * Mendorong event scan real-time ke Cache agar langsung muncul Pop-Up di layar proyektor.
+     */
+    private function pushProyektorScanEvent(Pendaftaran $pendaftaran, int $pertemuan, string $waktuStr, bool $already = false): void
+    {
+        try {
+            $events = Cache::get('proyektor_scan_events', []);
+            if (!is_array($events)) {
+                $events = [];
+            }
+
+            $events[] = [
+                'seq' => (int) round(microtime(true) * 1000),
+                'id' => $pendaftaran->id,
+                'nama' => $pendaftaran->nama,
+                'nim' => $pendaftaran->nim,
+                'kelas' => $pendaftaran->kelas,
+                'pertemuan' => $pertemuan,
+                'waktu' => $waktuStr,
+                'already' => $already,
+            ];
+
+            if (count($events) > 20) {
+                $events = array_slice($events, -20);
+            }
+
+            Cache::put('proyektor_scan_events', $events, now()->addMinutes(15));
+        } catch (\Throwable $e) {
+            Log::warning('Gagal menyimpan event proyektor ke cache: ' . $e->getMessage());
+        }
+    }
     /**
      * Halaman Scanner Presensi Mahasiswa di HP (/absen).
      */
@@ -158,7 +190,11 @@ class PresensiMahasiswaController extends Controller
             ->first();
 
         if ($sudahHadir) {
-            $jam = $sudahHadir->waktu_hadir ? $sudahHadir->waktu_hadir->timezone('Asia/Jakarta')->format('H:i:s') : '-';
+            $jam = $sudahHadir->waktu_hadir ? $sudahHadir->waktu_hadir->timezone('Asia/Jakarta')->format('H:i:s') : now()->timezone('Asia/Jakarta')->format('H:i:s');
+
+            // Tetap kirim pop-up ke layar proyektor agar mahasiswa/panitia melihat konfirmasi visual
+            $this->pushProyektorScanEvent($pendaftaran, $pertemuanDariQR, $jam, true);
+
             return response()->json([
                 'success' => true,
                 'already' => true,
@@ -167,6 +203,13 @@ class PresensiMahasiswaController extends Controller
                 'kelas' => $pendaftaran->kelas,
                 'pertemuan' => $pertemuanDariQR,
                 'waktu' => $jam,
+                'data' => [
+                    'nama' => $pendaftaran->nama,
+                    'nim' => $pendaftaran->nim,
+                    'kelas' => $pendaftaran->kelas,
+                    'pertemuan' => $pertemuanDariQR,
+                    'waktu' => $jam . ' WIB',
+                ],
                 'message' => "{$pendaftaran->nama} SUDAH tercatat hadir di Pertemuan {$pertemuanDariQR} pada pukul {$jam} WIB.",
             ]);
         }
@@ -184,10 +227,19 @@ class PresensiMahasiswaController extends Controller
                 ]
             );
 
-            // Sinkronisasi otomatis ke Google Sheets tab Kehadiran
-            PresensiAdminController::syncAllWithKehadiranToSheets();
-
             $waktuStr = $presensi->waktu_hadir->timezone('Asia/Jakarta')->format('H:i:s');
+
+            // Dorong notifikasi real-time ke Layar Proyektor
+            $this->pushProyektorScanEvent($pendaftaran, $pertemuanDariQR, $waktuStr, false);
+
+            // Jalankan sinkronisasi Google Sheets di background setelah response dikirim agar scan HP instan
+            app()->terminating(function () {
+                try {
+                    PresensiAdminController::syncAllWithKehadiranToSheets();
+                } catch (\Throwable $e) {
+                    Log::warning('Background sync sheets error: ' . $e->getMessage());
+                }
+            });
 
             return response()->json([
                 'success' => true,
@@ -197,6 +249,13 @@ class PresensiMahasiswaController extends Controller
                 'kelas' => $pendaftaran->kelas,
                 'pertemuan' => $pertemuanDariQR,
                 'waktu' => $waktuStr,
+                'data' => [
+                    'nama' => $pendaftaran->nama,
+                    'nim' => $pendaftaran->nim,
+                    'kelas' => $pendaftaran->kelas,
+                    'pertemuan' => $pertemuanDariQR,
+                    'waktu' => $waktuStr . ' WIB',
+                ],
                 'message' => "Hadir Berhasil! {$pendaftaran->nama} ({$pendaftaran->kelas}) tercatat pada Pertemuan {$pertemuanDariQR}.",
             ]);
         } catch (\Throwable $e) {

@@ -89,6 +89,16 @@
             animation: modalSpringSlam 0.28s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
         }
 
+        @keyframes iconBouncePop {
+            0% { transform: scale(0.3) rotate(-12deg); }
+            60% { transform: scale(1.18) rotate(4deg); }
+            80% { transform: scale(0.95) rotate(-2deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+        .icon-bounce-pop {
+            animation: iconBouncePop 0.45s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+        }
+
         /* Tactile Tab Snap Pop Animation (No Opacity) */
         @keyframes tabSnapIn {
             0% { transform: translateY(6px) scale(0.99); }
@@ -590,17 +600,36 @@
     </nav>
 
     <!-- ============================================================== -->
-    <!-- RESULT MODAL POP-UP (Tactile Spring Feedback)                  -->
+    <!-- RESULT MODAL POP-UP (Tactile Spring Feedback + Receipt Box)    -->
     <!-- ============================================================== -->
     <div id="dash-result-modal" class="hidden fixed inset-0 z-50 bg-black/60 p-4 flex items-center justify-center">
         <div class="modal-spring-slam w-full max-w-sm bg-white border-[3px] border-black p-5 sm:p-6 shadow-[8px_8px_0px_0px_#000000] space-y-4 text-center">
             
-            <div id="dash-modal-icon-wrapper" class="w-14 h-14 mx-auto border-2 border-black flex items-center justify-center font-black text-2xl shadow-[3px_3px_0px_0px_#000000]"></div>
+            <div class="relative w-16 h-16 mx-auto flex items-center justify-center">
+                <div id="dash-modal-pulse" class="hidden absolute inset-0 bg-green-400 border-2 border-black animate-ping"></div>
+                <div id="dash-modal-icon-wrapper" class="relative w-16 h-16 border-2 border-black flex items-center justify-center font-black text-3xl shadow-[3px_3px_0px_0px_#000000]"></div>
+            </div>
 
             <div>
-                <span id="dash-modal-badge" class="inline-block text-[10px] font-black uppercase px-2 py-0.5 border border-black shadow-[1px_1px_0px_0px_#000000] mb-1"></span>
+                <span id="dash-modal-badge" class="inline-block text-[10px] font-black uppercase px-2.5 py-0.5 border border-black shadow-[1px_1px_0px_0px_#000000] mb-1"></span>
                 <h3 id="dash-modal-title" class="text-base sm:text-lg font-black uppercase text-gray-950"></h3>
                 <p id="dash-modal-desc" class="text-xs font-semibold text-gray-700 mt-1"></p>
+            </div>
+
+            <!-- Kartu Bukti Presensi Mahasiswa -->
+            <div id="dash-modal-student-box" class="hidden bg-blue-50 border-2 border-black p-3 text-left space-y-1.5 text-xs shadow-[2px_2px_0px_0px_#000000]">
+                <div class="flex justify-between gap-2">
+                    <span class="font-bold text-gray-600">NAMA:</span>
+                    <span id="dash-detail-nama" class="font-black text-gray-950 uppercase truncate"></span>
+                </div>
+                <div class="flex justify-between gap-2">
+                    <span class="font-bold text-gray-600">NIM / KELAS:</span>
+                    <span id="dash-detail-nim-kelas" class="font-black text-[#1A467C] font-mono"></span>
+                </div>
+                <div class="flex justify-between gap-2">
+                    <span class="font-bold text-gray-600">WAKTU SCAN:</span>
+                    <span id="dash-detail-waktu" class="font-black text-green-800 font-mono"></span>
+                </div>
             </div>
 
             <button 
@@ -608,7 +637,7 @@
                 onclick="closeDashResultModal()"
                 class="btn-tactile w-full py-2.5 bg-[#2A82C6] hover:bg-[#1A467C] text-white text-xs font-black uppercase tracking-wider border-2 border-black shadow-[3px_3px_0px_0px_#000000] cursor-pointer"
             >
-                Tutup & Muat Ulang
+                Selesai & Muat Ulang
             </button>
         </div>
     </div>
@@ -850,31 +879,69 @@
             }
         }
 
-        // Modal Feedback Presensi Dashboard
+        // Suara Feedback Scan di HP
+        function playDashScanSound(isSuccess) {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = isSuccess ? 'triangle' : 'sawtooth';
+                osc.frequency.setValueAtTime(isSuccess ? 523.25 : 240, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(isSuccess ? 783.99 : 160, ctx.currentTime + 0.18);
+                gain.gain.setValueAtTime(0.25, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.32);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.32);
+            } catch (e) {}
+        }
+
+        // Modal Feedback Presensi Dashboard dengan Animasi Pop
         function showDashResultModal(data, isHttpOk) {
             const modal = document.getElementById('dash-result-modal');
             const iconWrapper = document.getElementById('dash-modal-icon-wrapper');
+            const pulseRing = document.getElementById('dash-modal-pulse');
             const badge = document.getElementById('dash-modal-badge');
             const title = document.getElementById('dash-modal-title');
             const desc = document.getElementById('dash-modal-desc');
+            const studentBox = document.getElementById('dash-modal-student-box');
 
-            iconWrapper.className = "w-14 h-14 mx-auto border-2 border-black flex items-center justify-center font-black text-2xl shadow-[3px_3px_0px_0px_#000000]";
-            badge.className = "inline-block text-[10px] font-black uppercase px-2 py-0.5 border border-black shadow-[1px_1px_0px_0px_#000000] mb-1";
+            iconWrapper.className = "icon-bounce-pop relative w-16 h-16 border-2 border-black flex items-center justify-center font-black text-3xl shadow-[3px_3px_0px_0px_#000000]";
+            badge.className = "inline-block text-[10px] font-black uppercase px-2.5 py-0.5 border border-black shadow-[1px_1px_0px_0px_#000000] mb-1";
 
             if (isHttpOk && data.success) {
+                playDashScanSound(true);
+                if (navigator.vibrate) navigator.vibrate([80, 40, 120]);
+                pulseRing?.classList.remove('hidden');
+                setTimeout(() => pulseRing?.classList.add('hidden'), 900);
+
                 iconWrapper.classList.add('bg-green-400', 'text-black');
                 iconWrapper.innerHTML = '✓';
                 badge.classList.add('bg-green-100', 'text-green-900');
-                badge.innerText = 'BERHASIL HADIR';
+                badge.innerText = data.already ? 'SUDAH TERCATAT HADIR' : 'BERHASIL HADIR';
                 title.innerText = 'PRESENSI BERHASIL!';
                 desc.innerText = data.message || 'Presensi kehadiran Anda telah tercatat di sistem.';
+
+                if (data.data || data.nama) {
+                    const info = data.data || data;
+                    document.getElementById('dash-detail-nama').innerText = info.nama || '-';
+                    document.getElementById('dash-detail-nim-kelas').innerText = `${info.nim || '-'} (${info.kelas || '-'})`;
+                    document.getElementById('dash-detail-waktu').innerText = info.waktu || 'Baru Saja';
+                    studentBox?.classList.remove('hidden');
+                }
             } else {
+                playDashScanSound(false);
+                if (navigator.vibrate) navigator.vibrate([200, 80, 200]);
+                pulseRing?.classList.add('hidden');
+
                 iconWrapper.classList.add('bg-red-400', 'text-black');
                 iconWrapper.innerHTML = '✕';
                 badge.classList.add('bg-red-100', 'text-red-900');
                 badge.innerText = 'GAGAL';
                 title.innerText = 'PRESENSI GAGAL';
                 desc.innerText = data.message || 'Gagal memproses presensi.';
+                studentBox?.classList.add('hidden');
             }
 
             modal.classList.remove('hidden');

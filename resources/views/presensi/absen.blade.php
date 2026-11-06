@@ -465,21 +465,23 @@
             const desc = document.getElementById('modal-desc');
             const studentBox = document.getElementById('modal-student-box');
 
-            iconWrapper.className = "w-14 h-14 mx-auto border-2 border-black flex items-center justify-center font-black text-2xl shadow-[3px_3px_0px_0px_#000000]";
+            iconWrapper.className = "w-16 h-16 mx-auto border-2 border-black flex items-center justify-center font-black text-3xl shadow-[3px_3px_0px_0px_#000000] transition-transform duration-300 scale-105";
             badge.className = "inline-block text-[10px] font-black uppercase px-2 py-0.5 border border-black shadow-[1px_1px_0px_0px_#000000] mb-1";
 
             if (isHttpOk && data.success) {
+                if (navigator.vibrate) navigator.vibrate([80, 40, 120]);
                 iconWrapper.classList.add('bg-green-400', 'text-black');
                 iconWrapper.innerHTML = '✓';
                 badge.classList.add('bg-green-100', 'text-green-900');
-                badge.innerText = 'BERHASIL HADIR';
+                badge.innerText = data.already ? 'SUDAH TERCATAT HADIR' : 'BERHASIL HADIR';
                 title.innerText = 'PRESENSI BERHASIL!';
                 desc.innerText = data.message || 'Kehadiran Anda pada sesi ini telah berhasil dicatat.';
 
-                if (data.data) {
-                    document.getElementById('detail-nama').innerText = data.data.nama || '-';
-                    document.getElementById('detail-nim-kelas').innerText = `${data.data.nim || '-'} (${data.data.kelas || '-'})`;
-                    document.getElementById('detail-waktu').innerText = data.data.waktu || 'Baru Saja';
+                const info = data.data || data;
+                if (info && info.nama) {
+                    document.getElementById('detail-nama').innerText = info.nama || '-';
+                    document.getElementById('detail-nim-kelas').innerText = `${info.nim || '-'} (${info.kelas || '-'})`;
+                    document.getElementById('detail-waktu').innerText = info.waktu || 'Baru Saja';
                     studentBox.classList.remove('hidden');
                 } else {
                     studentBox.classList.add('hidden');

@@ -18,7 +18,7 @@ class AdminUserSeeder extends Seeder
                 'email' => 'superadmin@pokja.com',
                 'name' => 'Super Admin POKJA',
                 'password' => Hash::make('Pokja2026#Super!Admin'),
-            ],
+            ],  
             [
                 'email' => 'presensi@pokja.com',
                 'name' => 'Admin Presensi & Acara',

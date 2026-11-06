@@ -8,6 +8,8 @@ use App\Models\Presensi;
 use App\Models\Pengaturan;
 use App\Models\Kelas;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -90,8 +92,9 @@ class PresensiAdminController extends Controller
 
         $totalMahasiswa = Pendaftaran::count();
         $totalHadir = Presensi::where('pertemuan', $pengaturan->pertemuan_aktif)->where('status', 'hadir')->count();
+        $initialSeq = (int) round(microtime(true) * 1000);
 
-        return view('admin.presensi.layar', compact('pengaturan', 'totalMahasiswa', 'totalHadir'));
+        return view('admin.presensi.layar', compact('pengaturan', 'totalMahasiswa', 'totalHadir', 'initialSeq'));
     }
 
     /**
@@ -132,36 +135,63 @@ class PresensiAdminController extends Controller
     {
         $pengaturan = Pengaturan::first();
         $pertemuan = (int) ($pengaturan->pertemuan_aktif ?? 1);
-        $since = $request->input('since'); // Timestamp ISO atau ID
+        $sinceSeq = (int) $request->input('since_seq', 0);
+        $nowMs = (int) round(microtime(true) * 1000);
 
-        $query = Presensi::with('pendaftaran')
-            ->where('pertemuan', $pertemuan)
-            ->where('status', 'hadir')
-            ->latest('waktu_hadir');
+        $scans = collect();
 
-        if (!empty($since)) {
-            $query->where('waktu_hadir', '>', $since);
-        } else {
-            $query->limit(5);
+        // 1. Ambil dari antrean event real-time di Cache (menangkap scan baru & scan ulang)
+        $cachedEvents = Cache::get('proyektor_scan_events', []);
+        if (is_array($cachedEvents) && !empty($cachedEvents)) {
+            foreach ($cachedEvents as $ev) {
+                if (($ev['seq'] ?? 0) > $sinceSeq && (int) ($ev['pertemuan'] ?? $pertemuan) === $pertemuan) {
+                    $scans->push([
+                        'seq' => (int) $ev['seq'],
+                        'id' => $ev['id'] ?? 0,
+                        'nama' => $ev['nama'] ?? 'Mahasiswa',
+                        'nim' => $ev['nim'] ?? '-',
+                        'kelas' => $ev['kelas'] ?? '-',
+                        'pertemuan' => $ev['pertemuan'] ?? $pertemuan,
+                        'waktu' => $ev['waktu'] ?? now()->timezone('Asia/Jakarta')->format('H:i:s'),
+                        'already' => (bool) ($ev['already'] ?? false),
+                    ]);
+                }
+            }
         }
 
-        $scans = $query->get()->map(function ($p) {
-            return [
-                'id' => $p->id,
-                'nama' => $p->pendaftaran->nama ?? 'Mahasiswa',
-                'nim' => $p->pendaftaran->nim ?? '-',
-                'kelas' => $p->pendaftaran->kelas ?? '-',
-                'waktu' => $p->waktu_hadir ? $p->waktu_hadir->timezone('Asia/Jakarta')->format('H:i:s') : '-',
-                'iso' => $p->waktu_hadir ? $p->waktu_hadir->toIso8601String() : now()->toIso8601String(),
-            ];
-        });
+        // 2. Fallback cek langsung tabel Presensi jika ada perubahan dari database
+        if ($scans->isEmpty() && $sinceSeq > 0) {
+            $sinceCarbon = Carbon::createFromTimestampMs($sinceSeq)->timezone(config('app.timezone', 'Asia/Jakarta'));
 
+            $dbScans = Presensi::with('pendaftaran')
+                ->where('pertemuan', $pertemuan)
+                ->where('status', 'hadir')
+                ->where('waktu_hadir', '>', $sinceCarbon->format('Y-m-d H:i:s'))
+                ->orderBy('waktu_hadir', 'asc')
+                ->get();
+
+            foreach ($dbScans as $p) {
+                $tsMs = $p->waktu_hadir ? (int) ($p->waktu_hadir->timestamp * 1000) : $nowMs;
+                $scans->push([
+                    'seq' => max($tsMs, $sinceSeq + 1),
+                    'id' => $p->id,
+                    'nama' => $p->pendaftaran->nama ?? 'Mahasiswa',
+                    'nim' => $p->pendaftaran->nim ?? '-',
+                    'kelas' => $p->pendaftaran->kelas ?? '-',
+                    'pertemuan' => $pertemuan,
+                    'waktu' => $p->waktu_hadir ? $p->waktu_hadir->timezone('Asia/Jakarta')->format('H:i:s') : '-',
+                    'already' => false,
+                ]);
+            }
+        }
+
+        $latestSeq = $scans->isNotEmpty() ? (int) $scans->max('seq') : max($sinceSeq, $nowMs);
         $totalHadir = Presensi::where('pertemuan', $pertemuan)->where('status', 'hadir')->count();
 
         return response()->json([
-            'scans' => $scans,
+            'scans' => $scans->values(),
             'total_hadir' => $totalHadir,
-            'current_time' => now()->toIso8601String(),
+            'latest_seq' => $latestSeq,
         ]);
     }
 

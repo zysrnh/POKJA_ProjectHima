@@ -83,15 +83,25 @@
         .notif-card-out {
             animation: notifSlamOut 0.28s cubic-bezier(0.6, -0.28, 0.735, 0.045) forwards;
         }
+
+        @keyframes qrSuccessPulse {
+            0% { transform: scale(1); box-shadow: 10px 10px 0px 0px #000000; }
+            40% { transform: scale(1.03); box-shadow: 0px 0px 0px 8px #22c55e, 12px 12px 0px 8px #000000; }
+            100% { transform: scale(1); box-shadow: 10px 10px 0px 0px #000000; }
+        }
+
+        .qr-scan-flash {
+            animation: qrSuccessPulse 0.65s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+        }
     </style>
 </head>
 <body class="min-h-screen text-[#000000] flex flex-col justify-between p-4 sm:p-8 select-none overflow-x-hidden">
 
     <!-- ============================================================== -->
-    <!-- FLOATING SLAM NOTIFICATIONS CONTAINER (Drops from Top)         -->
+    <!-- FLOATING SLAM NOTIFICATIONS CONTAINER (Pop-Up Saat Ada Scan)   -->
     <!-- ============================================================== -->
-    <div id="notif-container" class="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-xl px-4 space-y-2.5 pointer-events-none">
-        <!-- Notifikasi card dimasukkan secara dinamis via JS -->
+    <div id="notif-container" class="fixed top-24 left-1/2 -translate-x-1/2 z-50 w-full max-w-lg px-4 space-y-3 pointer-events-none">
+        <!-- Notifikasi pop-up mahasiswa yang baru scan muncul di sini -->
     </div>
 
     <!-- ============================================================== -->
@@ -127,9 +137,10 @@
                 </svg>
             </button>
 
-            <!-- Tombol Tutup Layar (Icon Only) -->
+            <!-- Tombol Tutup Layar (Instant Exit Tanpa Blank) -->
             <a 
                 href="{{ route('admin.presensi.index') }}" 
+                onclick="return exitProjectorMode(event)"
                 class="btn-smooth w-10 h-10 sm:w-11 sm:h-11 bg-[#CA2C2A] hover:bg-[#901C1A] border-2 border-black flex items-center justify-center text-white shadow-[3px_3px_0px_0px_#000000] cursor-pointer"
                 title="Tutup Layar Proyektor"
             >
@@ -145,7 +156,7 @@
     <!-- ============================================================== -->
     <main class="my-auto py-6 sm:py-10 flex flex-col items-center justify-center">
 
-        <div class="w-full max-w-md bg-white border-[3px] border-[#000000] p-6 sm:p-8 shadow-[10px_10px_0px_0px_#000000] flex flex-col items-center text-center relative">
+        <div id="qr-outer-card" class="w-full max-w-md bg-white border-[3px] border-[#000000] p-6 sm:p-8 shadow-[10px_10px_0px_0px_#000000] flex flex-col items-center text-center relative">
             
             <!-- QR Code Canvas Container -->
             <div class="relative bg-white border-4 border-black p-4 sm:p-5 shadow-[6px_6px_0px_0px_#000000]">
@@ -183,7 +194,11 @@
     <script>
         let qrcode = null;
         let lastPayload = '';
-        let lastSeenScanTime = '{{ now()->toIso8601String() }}';
+        let lastSeenSeq = {{ $initialSeq ?? (int) round(microtime(true) * 1000) }};
+        let isExiting = false;
+        let qrIntervalId = null;
+        let scanIntervalId = null;
+        let activeAbortController = null;
 
         // Inisialisasi QRCode.js pada #qrcode-box
         function initQR() {
@@ -201,9 +216,14 @@
 
         // Fetch Token QR Baru dari Backend
         async function fetchNewToken() {
+            if (isExiting) return;
             try {
-                const response = await fetch("{{ route('admin.presensi.token') }}");
-                if (!response.ok) return;
+                const controller = new AbortController();
+                const response = await fetch("{{ route('admin.presensi.token') }}", {
+                    signal: controller.signal,
+                    headers: { 'Accept': 'application/json' }
+                });
+                if (!response.ok || isExiting) return;
 
                 const data = await response.json();
 
@@ -239,7 +259,9 @@
                 }
 
             } catch (err) {
-                console.error("Gagal memperbarui token QR:", err);
+                if (!isExiting) {
+                    console.error("Gagal memperbarui token QR:", err);
+                }
             }
         }
 
@@ -252,67 +274,97 @@
 
                 osc.type = 'triangle';
                 osc.frequency.setValueAtTime(587.33, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.15);
+                osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.16);
 
-                gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.38);
 
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
 
                 osc.start();
-                osc.stop(audioCtx.currentTime + 0.35);
+                osc.stop(audioCtx.currentTime + 0.38);
             } catch (e) {
                 // Ignore audio restriction
             }
         }
 
-        // Tampilkan Notifikasi Fisik Jatuh dari Atas (Drop Slam)
+        // Efek Flash Hijau pada Kotak QR saat ada yang berhasil scan
+        function flashQrCard() {
+            const card = document.getElementById('qr-outer-card');
+            if (!card) return;
+            card.classList.remove('qr-scan-flash');
+            void card.offsetWidth;
+            card.classList.add('qr-scan-flash');
+        }
+
+        // Tampilkan Pop-Up Mahasiswa yang Baru Saja Scan di Layar Proyektor
         function showDropNotification(scan) {
             playSuccessChime();
+            flashQrCard();
 
             const container = document.getElementById('notif-container');
             const notif = document.createElement('div');
-            notif.className = "notif-card-in bg-white border-[3px] border-[#000000] p-4 shadow-[6px_6px_0px_0px_#000000] flex items-center justify-between gap-3 text-black";
+            notif.className = "notif-card-in bg-white border-[3px] border-[#000000] p-4 sm:p-5 shadow-[8px_8px_0px_0px_#000000] flex items-center justify-between gap-4 text-black";
+
+            const badgeColor = scan.already ? 'bg-amber-400 text-black' : 'bg-[#15803d] text-white';
+            const badgeText = scan.already ? 'SUDAH TERCATAT HADIR' : 'PRESENSI BERHASIL';
 
             notif.innerHTML = `
-                <div class="flex items-center gap-3 min-w-0">
-                    <div class="w-10 h-10 bg-[#15803d] border-2 border-black flex items-center justify-center text-white font-black text-lg shadow-[2px_2px_0px_0px_#000000] shrink-0">
+                <div class="flex items-center gap-3.5 min-w-0 flex-1">
+                    <div class="w-12 h-12 sm:w-14 sm:h-14 bg-[#15803d] border-2 border-black flex items-center justify-center text-white font-black text-2xl shadow-[3px_3px_0px_0px_#000000] shrink-0">
                         ✓
                     </div>
-                    <div class="min-w-0">
-                        <div class="flex items-center gap-1.5">
-                            <span class="bg-[#1A467C] text-white text-[9px] font-black uppercase px-1.5 py-0.2 tracking-wider border border-black">
-                                HADIR
+                    <div class="min-w-0 flex-1">
+                        <div class="flex flex-wrap items-center gap-1.5 mb-1">
+                            <span class="${badgeColor} text-[10px] font-black uppercase px-2 py-0.5 tracking-wider border border-black shadow-[1px_1px_0px_0px_#000000]">
+                                ${badgeText}
                             </span>
-                            <span class="text-[11px] font-bold text-gray-500 font-mono">${scan.waktu} WIB</span>
+                            <span class="bg-blue-50 text-[#1A467C] border border-black text-[10px] font-black uppercase px-2 py-0.5 font-mono">
+                                ${scan.kelas}
+                            </span>
+                            <span class="text-[11px] font-bold text-gray-600 font-mono">${scan.waktu} WIB</span>
                         </div>
-                        <h4 class="text-sm sm:text-base font-black uppercase text-gray-950 truncate mt-0.5">
+                        <h4 class="text-base sm:text-lg font-black uppercase text-gray-950 truncate leading-tight">
                             ${scan.nama}
                         </h4>
-                        <p class="text-xs font-bold text-gray-600 font-mono">
-                            ${scan.nim} • ${scan.kelas}
+                        <p class="text-xs sm:text-sm font-black text-[#1A467C] font-mono mt-0.5">
+                            NIM: ${scan.nim}
                         </p>
                     </div>
                 </div>
-                <div class="w-3 h-3 bg-green-500 border border-black shrink-0"></div>
+                <div class="w-3.5 h-3.5 bg-green-500 border-2 border-black shrink-0 animate-ping"></div>
             `;
 
             container.prepend(notif);
 
-            // Auto dismiss setelah 3.5 detik
+            // Batasi maksimal 3 pop-up bertumpuk di layar
+            while (container.children.length > 3) {
+                container.lastElementChild.remove();
+            }
+
+            // Auto dismiss setelah 4.2 detik
             setTimeout(() => {
                 notif.classList.remove('notif-card-in');
                 notif.classList.add('notif-card-out');
                 setTimeout(() => notif.remove(), 300);
-            }, 3500);
+            }, 4200);
         }
 
         // Polling Cek Mahasiswa Baru yang Berhasil Scan
         async function pollRecentScans() {
+            if (isExiting) return;
             try {
-                const response = await fetch(`{{ route('admin.presensi.recent-scans') }}?since=${encodeURIComponent(lastSeenScanTime)}`);
-                if (!response.ok) return;
+                if (activeAbortController) {
+                    activeAbortController.abort();
+                }
+                activeAbortController = new AbortController();
+
+                const response = await fetch(`{{ route('admin.presensi.recent-scans') }}?since_seq=${lastSeenSeq}`, {
+                    signal: activeAbortController.signal,
+                    headers: { 'Accept': 'application/json' }
+                });
+                if (!response.ok || isExiting) return;
 
                 const data = await response.json();
                 if (data.scans && data.scans.length > 0) {
@@ -321,16 +373,19 @@
                         counterHadir.innerText = data.total_hadir;
                     }
 
-                    data.scans.reverse().forEach(scan => {
+                    data.scans.forEach(scan => {
+                        if (scan.seq && scan.seq > lastSeenSeq) {
+                            lastSeenSeq = scan.seq;
+                        }
                         showDropNotification(scan);
                     });
-                }
-
-                if (data.current_time) {
-                    lastSeenScanTime = data.current_time;
+                } else if (data.latest_seq && data.latest_seq > lastSeenSeq) {
+                    lastSeenSeq = data.latest_seq;
                 }
             } catch (err) {
-                console.error("Gagal polling recent scans:", err);
+                if (!isExiting && err.name !== 'AbortError') {
+                    console.error("Gagal polling recent scans:", err);
+                }
             }
         }
 
@@ -347,18 +402,53 @@
             }
         }
 
+        // Keluar dari Mode Proyektor Secara Instan (Tanpa Blank / Tanpa Session Lock)
+        function exitProjectorMode(e) {
+            if (e) e.preventDefault();
+            isExiting = true;
+
+            if (qrIntervalId) clearInterval(qrIntervalId);
+            if (scanIntervalId) clearInterval(scanIntervalId);
+            if (activeAbortController) {
+                try { activeAbortController.abort(); } catch (_) {}
+            }
+
+            const targetUrl = "{{ route('admin.presensi.index') }}";
+
+            if (document.fullscreenElement && document.exitFullscreen) {
+                document.exitFullscreen().catch(() => {}).finally(() => {
+                    if (window.opener && !window.opener.closed) {
+                        window.close();
+                    } else {
+                        window.location.replace(targetUrl);
+                    }
+                });
+                return false;
+            }
+
+            if (window.opener && !window.opener.closed) {
+                window.close();
+                setTimeout(() => {
+                    window.location.replace(targetUrl);
+                }, 150);
+            } else {
+                window.location.replace(targetUrl);
+            }
+            return false;
+        }
+
         // Jalankan saat load
         document.addEventListener('DOMContentLoaded', () => {
             initQR();
             fetchNewToken();
 
             // Refresh token QR tiap 5 detik tepat
-            setInterval(() => {
+            qrIntervalId = setInterval(() => {
                 fetchNewToken();
             }, 5000);
 
             // Polling cek siapa yang baru absen tiap 1.5 detik
-            setInterval(() => {
+            scanIntervalId = setInterval(() => {
                 pollRecentScans();
             }, 1500);
         });
