@@ -6,6 +6,7 @@ use App\Models\Pendaftaran;
 use App\Models\Pengaturan;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
@@ -34,9 +35,13 @@ class ResetPasswordMahasiswaMail extends Mailable
     public function envelope(): Envelope
     {
         $namaAcara = $this->pengaturan->nama_acara ?? 'POKJA HIMA IF 2026';
+        $fromEmail = config('mail.from.address') ?? 'registration@pokja.hmif-lpkia.my.id';
+        $fromName = config('mail.from.name') ?? 'POKJA HIMA IF';
 
         return new Envelope(
-            subject: 'Permintaan Reset Password - ' . $namaAcara,
+            from: new Address($fromEmail, $fromName),
+            replyTo: [new Address($fromEmail, $fromName)],
+            subject: 'Tautan Atur Ulang Kata Sandi - ' . $namaAcara,
         );
     }
 

@@ -287,8 +287,25 @@
 
                 <!-- Flash Reset Success -->
                 @if (session('success_reset'))
-                    <div class="p-3 bg-green-50 border-2 border-black text-xs font-bold text-green-900 shadow-[2px_2px_0px_0px_#15803d]">
-                        {{ session('success_reset') }}
+                    <div class="p-3.5 bg-green-50 border-2 border-black text-xs font-bold text-green-900 shadow-[3px_3px_0px_0px_#15803d] space-y-2.5">
+                        <p>{{ session('success_reset') }}</p>
+
+                        @if (session('local_reset_url'))
+                            <div class="pt-2 border-t border-green-800/20">
+                                <span class="text-[10px] uppercase font-black tracking-wider text-green-950 block mb-1">
+                                    Akses Langsung (Testing Lokal):
+                                </span>
+                                <a 
+                                    href="{{ session('local_reset_url') }}" 
+                                    class="btn-tactile inline-flex items-center gap-1.5 px-3 py-2 bg-green-700 hover:bg-green-800 text-white font-black text-xs uppercase tracking-wider border-2 border-black shadow-[2px_2px_0px_0px_#000000]"
+                                >
+                                    <span>Buka Form Reset Password</span>
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="square" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                    </svg>
+                                </a>
+                            </div>
+                        @endif
                     </div>
                 @endif
 
