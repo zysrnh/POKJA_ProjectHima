@@ -9,35 +9,48 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class PendaftaranAdminController extends Controller
 {
+    /**
+     * Helper Sanitasi Sel Excel terhadap CSV/Formula Injection (=, +, -, @).
+     */
+    protected static function sanitizeExcelCell(?string $value): string
+    {
+        $clean = trim((string) $value);
+        if ($clean !== '' && in_array($clean[0], ['=', '+', '-', '@', "\t", "\r"], true)) {
+            $clean = "'" . $clean;
+        }
+        return htmlspecialchars($clean, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    }
+
     /**
      * Menampilkan dashboard dan tabel data pendaftar.
      */
     public function index(Request $request)
     {
-        $search = $request->input('search');
-        $kelasFilter = $request->input('kelas');
-        $statusFilter = $request->input('status_kehadiran');
+        $search = trim(strip_tags((string) $request->input('search', '')));
+        $kelasFilter = trim(strip_tags((string) $request->input('kelas', '')));
+        $statusFilter = trim(strip_tags((string) $request->input('status_kehadiran', '')));
 
         $query = Pendaftaran::query()->latest();
 
-        if (!empty($search)) {
-            $query->where(function ($q) use ($search) {
-                $q->where('nama', 'like', "%{$search}%")
-                  ->orWhere('nim', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('no_telp', 'like', "%{$search}%");
+        if ($search !== '') {
+            // Escape wildcard SQL LIKE (% dan _) untuk mencegah Wildcard Injection / DoS
+            $escapedSearch = addcslashes($search, '%_\\');
+            $query->where(function ($q) use ($escapedSearch) {
+                $q->where('nama', 'like', "%{$escapedSearch}%")
+                  ->orWhere('nim', 'like', "%{$escapedSearch}%")
+                  ->orWhere('email', 'like', "%{$escapedSearch}%")
+                  ->orWhere('no_telp', 'like', "%{$escapedSearch}%");
             });
         }
 
-        if (!empty($kelasFilter)) {
+        if ($kelasFilter !== '') {
             $query->where('kelas', $kelasFilter);
         }
 
-        if (!empty($statusFilter)) {
+        if ($statusFilter !== '') {
             $query->where('status_kehadiran', $statusFilter);
         }
 
@@ -75,7 +88,7 @@ class PendaftaranAdminController extends Controller
         $pendaftaran = Pendaftaran::findOrFail($id);
 
         if ($request->has('status')) {
-            $targetStatus = in_array($request->input('status'), ['hadir', 'tidak_hadir', 'belum_hadir']) 
+            $targetStatus = in_array($request->input('status'), ['hadir', 'tidak_hadir', 'belum_hadir'], true) 
                 ? $request->input('status') 
                 : 'belum_hadir';
             $pendaftaran->status_kehadiran = $targetStatus;
@@ -155,7 +168,6 @@ class PendaftaranAdminController extends Controller
                 'string',
                 'email',
                 'max:150',
-                'ends_with:@fellow.lpkia.ac.id',
                 'unique:pendaftarans,email,' . $pendaftaran->id
             ],
             'kelas' => [
@@ -185,7 +197,6 @@ class PendaftaranAdminController extends Controller
 
             'email.required' => 'Email wajib diisi.',
             'email.email' => 'Format email tidak valid.',
-            'email.ends_with' => 'Email harus menggunakan domain resmi kampus (@fellow.lpkia.ac.id).',
             'email.max' => 'Email maksimal 150 karakter.',
             'email.unique' => 'Email ini sudah terdaftar pada data lain.',
             
@@ -233,7 +244,12 @@ class PendaftaranAdminController extends Controller
             return redirect()->route('admin.dashboard')->with('error', 'Tidak ada data pendaftar yang dipilih untuk dihapus.');
         }
 
-        $count = Pendaftaran::whereIn('id', $ids)->delete();
+        $safeIds = array_filter(array_map('intval', $ids), fn ($val) => $val > 0);
+        if (empty($safeIds)) {
+            return redirect()->route('admin.dashboard')->with('error', 'ID pendaftar tidak valid.');
+        }
+
+        $count = Pendaftaran::whereIn('id', $safeIds)->delete();
 
         // Sinkronisasi pembaruan menyeluruh ke Google Sheets
         self::syncAllToGoogleSheets();
@@ -293,30 +309,31 @@ class PendaftaranAdminController extends Controller
     }
 
     /**
-     * Export data pendaftar ke file Excel (.xls) berformat styling rapi dan profesional.
+     * Export data pendaftar ke file Excel (.xls) berformat styling rapi dan anti Formula Injection.
      */
     public function exportCsv(Request $request)
     {
-        $search = $request->input('search');
-        $kelasFilter = $request->input('kelas');
-        $statusFilter = $request->input('status_kehadiran');
+        $search = trim(strip_tags((string) $request->input('search', '')));
+        $kelasFilter = trim(strip_tags((string) $request->input('kelas', '')));
+        $statusFilter = trim(strip_tags((string) $request->input('status_kehadiran', '')));
 
         $query = Pendaftaran::query()->latest();
 
-        if (!empty($search)) {
-            $query->where(function ($q) use ($search) {
-                $q->where('nama', 'like', "%{$search}%")
-                  ->orWhere('nim', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('no_telp', 'like', "%{$search}%");
+        if ($search !== '') {
+            $escapedSearch = addcslashes($search, '%_\\');
+            $query->where(function ($q) use ($escapedSearch) {
+                $q->where('nama', 'like', "%{$escapedSearch}%")
+                  ->orWhere('nim', 'like', "%{$escapedSearch}%")
+                  ->orWhere('email', 'like', "%{$escapedSearch}%")
+                  ->orWhere('no_telp', 'like', "%{$escapedSearch}%");
             });
         }
 
-        if (!empty($kelasFilter)) {
+        if ($kelasFilter !== '') {
             $query->where('kelas', $kelasFilter);
         }
 
-        if (!empty($statusFilter)) {
+        if ($statusFilter !== '') {
             $query->where('status_kehadiran', $statusFilter);
         }
 
@@ -387,11 +404,11 @@ class PendaftaranAdminController extends Controller
 
                 echo '<tr height="28" style="height: 22pt; background-color: ' . $bgRow . ';">';
                 echo '<td align="center" style="border: 0.5pt solid #B0C4DE; padding: 6px 8px; text-align: center; font-weight: bold; vertical-align: middle;">' . $no++ . '</td>';
-                echo '<td style="border: 0.5pt solid #B0C4DE; padding: 6px 10px; font-weight: bold; color: #111827; vertical-align: middle;">' . htmlspecialchars($item->nama) . '</td>';
-                echo '<td align="center" style="border: 0.5pt solid #B0C4DE; padding: 6px 10px; text-align: center; font-weight: bold; color: #1A467C; mso-number-format:\'\@\'; vertical-align: middle;">' . htmlspecialchars($item->nim) . '</td>';
-                echo '<td style="border: 0.5pt solid #B0C4DE; padding: 6px 10px; color: #374151; vertical-align: middle;">' . htmlspecialchars($item->email ?? '-') . '</td>';
-                echo '<td align="center" style="border: 0.5pt solid #B0C4DE; padding: 6px 10px; text-align: center; font-weight: bold; background-color: #EEF6FC; mso-number-format:\'\@\'; vertical-align: middle;">' . htmlspecialchars($item->kelas) . '</td>';
-                echo '<td align="center" style="border: 0.5pt solid #B0C4DE; padding: 6px 10px; text-align: center; mso-number-format:\'\@\'; vertical-align: middle;">' . htmlspecialchars($phone) . '</td>';
+                echo '<td style="border: 0.5pt solid #B0C4DE; padding: 6px 10px; font-weight: bold; color: #111827; vertical-align: middle;">' . self::sanitizeExcelCell($item->nama) . '</td>';
+                echo '<td align="center" style="border: 0.5pt solid #B0C4DE; padding: 6px 10px; text-align: center; font-weight: bold; color: #1A467C; mso-number-format:\'\@\'; vertical-align: middle;">' . self::sanitizeExcelCell($item->nim) . '</td>';
+                echo '<td style="border: 0.5pt solid #B0C4DE; padding: 6px 10px; color: #374151; vertical-align: middle;">' . self::sanitizeExcelCell($item->email ?? '-') . '</td>';
+                echo '<td align="center" style="border: 0.5pt solid #B0C4DE; padding: 6px 10px; text-align: center; font-weight: bold; background-color: #EEF6FC; mso-number-format:\'\@\'; vertical-align: middle;">' . self::sanitizeExcelCell($item->kelas) . '</td>';
+                echo '<td align="center" style="border: 0.5pt solid #B0C4DE; padding: 6px 10px; text-align: center; mso-number-format:\'\@\'; vertical-align: middle;">' . self::sanitizeExcelCell($phone) . '</td>';
                 echo '<td align="center" style="border: 0.5pt solid #B0C4DE; padding: 6px 10px; text-align: center; white-space: nowrap; vertical-align: middle; ' . $statusStyle . '">' . $statusText . '</td>';
                 echo '<td align="center" style="border: 0.5pt solid #B0C4DE; padding: 6px 10px; text-align: center; color: #4B5563; white-space: nowrap; vertical-align: middle;">' . ($item->created_at ? $item->created_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') . ' WIB' : '-') . '</td>';
                 echo '</tr>';

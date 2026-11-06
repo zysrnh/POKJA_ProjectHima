@@ -9,7 +9,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Str;
 
 class MahasiswaController extends Controller
 {
@@ -28,7 +30,7 @@ class MahasiswaController extends Controller
     }
 
     /**
-     * Memproses login mahasiswa biasa (Email / NIM + Password).
+     * Memproses login mahasiswa biasa (Email / NIM + Password) dengan RateLimiter & Session Regeneration.
      */
     public function login(Request $request)
     {
@@ -37,14 +39,22 @@ class MahasiswaController extends Controller
         ]);
 
         $request->validate([
-            'identifier' => ['required', 'string'],
-            'password' => ['required', 'string'],
+            'identifier' => ['required', 'string', 'max:150'],
+            'password' => ['required', 'string', 'max:255'],
         ], [
             'identifier.required' => 'Email kampus atau NIM wajib diisi.',
             'password.required' => 'Password akun wajib diisi.',
         ]);
 
         $identifier = $request->identifier;
+        $throttleKey = 'mhs_login:' . Str::lower($identifier) . '|' . $request->ip();
+
+        if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
+            $seconds = RateLimiter::availableIn($throttleKey);
+            return back()
+                ->withInput(['identifier' => $identifier])
+                ->with('error', "Terlalu banyak percobaan login gagal. Silakan tunggu {$seconds} detik lagi.");
+        }
 
         // Cari berdasarkan Email atau NIM
         $mahasiswa = Pendaftaran::where('email', $identifier)
@@ -52,6 +62,7 @@ class MahasiswaController extends Controller
             ->first();
 
         if (!$mahasiswa) {
+            RateLimiter::hit($throttleKey, 60);
             return back()
                 ->withInput(['identifier' => $identifier])
                 ->with('error', 'Akun tidak ditemukan. Pastikan Anda telah terdaftar sebagai peserta POKJA.');
@@ -66,10 +77,16 @@ class MahasiswaController extends Controller
 
         // Verifikasi password
         if (!Hash::check($request->password, $mahasiswa->password)) {
+            RateLimiter::hit($throttleKey, 60);
             return back()
                 ->withInput(['identifier' => $identifier])
                 ->with('error', 'Password yang Anda masukkan salah. Silakan coba lagi.');
         }
+
+        RateLimiter::clear($throttleKey);
+
+        // Regenerasi session ID untuk mencegah Session Fixation
+        $request->session()->regenerate();
 
         // Simpan sesi autentikasi mahasiswa
         session([
@@ -91,7 +108,7 @@ class MahasiswaController extends Controller
         ]);
 
         $request->validate([
-            'reset_identifier' => ['required', 'string'],
+            'reset_identifier' => ['required', 'string', 'max:150'],
         ], [
             'reset_identifier.required' => 'Email kampus atau NIM wajib diisi.',
         ]);
@@ -179,7 +196,7 @@ class MahasiswaController extends Controller
         }
 
         $request->validate([
-            'password' => ['required', 'string', 'min:6', 'confirmed'],
+            'password' => ['required', 'string', 'min:6', 'max:255', 'confirmed'],
         ], [
             'password.required' => 'Password baru wajib diisi.',
             'password.min' => 'Password minimal terdiri dari 6 karakter.',
@@ -188,6 +205,8 @@ class MahasiswaController extends Controller
 
         $mahasiswa->password = Hash::make($request->password);
         $mahasiswa->save();
+
+        $request->session()->regenerate();
 
         // Login otomatis ke dashboard mahasiswa
         session([
@@ -204,12 +223,12 @@ class MahasiswaController extends Controller
      */
     public function verifikasiQr(Request $request)
     {
-        $rawToken = trim($request->input('token', ''));
+        $rawToken = trim(strip_tags($request->input('token', '')));
 
         if (empty($rawToken)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Kode atau QR tiket tidak boleh kosong.',
+                'message' => 'Kode atau QR pendaftaran tidak boleh kosong.',
             ], 422);
         }
 
@@ -217,11 +236,11 @@ class MahasiswaController extends Controller
         if (str_contains($rawToken, 'token=')) {
             parse_str(parse_url($rawToken, PHP_URL_QUERY) ?? '', $queryParams);
             if (!empty($queryParams['token'])) {
-                $rawToken = $queryParams['token'];
+                $rawToken = trim(strip_tags((string) $queryParams['token']));
             }
         }
 
-        // Cari berdasarkan qr_token rahasia ATAU nim (fallback jika QR tiket fisik/email berisi nim)
+        // Cari berdasarkan qr_token rahasia ATAU nim (fallback jika QR berisi nim)
         $mahasiswa = Pendaftaran::where('qr_token', $rawToken)
             ->orWhere('nim', $rawToken)
             ->first();
@@ -229,7 +248,7 @@ class MahasiswaController extends Controller
         if (!$mahasiswa) {
             return response()->json([
                 'success' => false,
-                'message' => 'QR tiket pendaftaran tidak valid atau tidak terdaftar di sistem.',
+                'message' => 'QR pendaftaran tidak valid atau tidak terdaftar di sistem.',
             ], 404);
         }
 
@@ -249,7 +268,7 @@ class MahasiswaController extends Controller
      */
     public function aktivasiDirect(Request $request)
     {
-        $token = trim($request->query('token', ''));
+        $token = trim(strip_tags((string) $request->query('token', '')));
 
         if (!empty($token)) {
             $mahasiswa = Pendaftaran::where('qr_token', $token)->first();
@@ -269,7 +288,7 @@ class MahasiswaController extends Controller
     public function showSetPassword()
     {
         if (!session()->has('aktivasi_mahasiswa_id')) {
-            return redirect()->route('mahasiswa.login')->with('error', 'Sesi aktivasi telah berakhir. Silakan scan/upload QR tiket Anda kembali.');
+            return redirect()->route('mahasiswa.login')->with('error', 'Sesi aktivasi telah berakhir. Silakan scan/upload QR Anda kembali.');
         }
 
         $mahasiswa = Pendaftaran::find(session('aktivasi_mahasiswa_id'));
@@ -299,7 +318,7 @@ class MahasiswaController extends Controller
         }
 
         $request->validate([
-            'password' => ['required', 'string', 'min:6', 'confirmed'],
+            'password' => ['required', 'string', 'min:6', 'max:255', 'confirmed'],
         ], [
             'password.required' => 'Password baru wajib diisi.',
             'password.min' => 'Password minimal terdiri dari 6 karakter.',
@@ -309,8 +328,9 @@ class MahasiswaController extends Controller
         $mahasiswa->password = Hash::make($request->password);
         $mahasiswa->save();
 
-        // Hapus sesi aktivasi sementara
+        // Hapus sesi aktivasi sementara & regenerasi session ID
         session()->forget('aktivasi_mahasiswa_id');
+        $request->session()->regenerate();
 
         // Login otomatis ke dashboard
         session([
@@ -323,7 +343,7 @@ class MahasiswaController extends Controller
     }
 
     /**
-     * Menampilkan dashboard pribadi mahasiswa (profil, tiket, rekap presensi 7 pertemuan).
+     * Menampilkan dashboard pribadi mahasiswa.
      */
     public function dashboard()
     {
@@ -347,7 +367,7 @@ class MahasiswaController extends Controller
     }
 
     /**
-     * Memperbarui profil mahasiswa (email dan foto profil).
+     * Memperbarui profil mahasiswa (email dan foto profil) dengan validasi MIME & Image Binary ketat.
      */
     public function updateProfile(Request $request)
     {
@@ -361,6 +381,10 @@ class MahasiswaController extends Controller
             return redirect()->route('mahasiswa.login')->with('error', 'Data mahasiswa tidak ditemukan.');
         }
 
+        $request->merge([
+            'email' => strtolower(trim(strip_tags($request->input('email', '')))),
+        ]);
+
         $request->validate([
             'email' => [
                 'required',
@@ -371,34 +395,56 @@ class MahasiswaController extends Controller
             ],
             'foto' => [
                 'nullable',
+                'file',
                 'image',
                 'mimes:jpeg,png,jpg,webp',
+                'mimetypes:image/jpeg,image/png,image/webp',
                 'max:2048',
+                'dimensions:min_width=50,min_height=50,max_width=4096,max_height=4096',
             ],
         ], [
             'email.required' => 'Alamat email wajib diisi.',
             'email.email' => 'Format alamat email tidak valid.',
             'email.unique' => 'Alamat email ini sudah digunakan oleh akun lain.',
-            'foto.image' => 'File yang diunggah harus berupa gambar.',
+            'foto.image' => 'File yang diunggah harus berupa gambar asli.',
             'foto.mimes' => 'Format foto harus berupa JPG, JPEG, PNG, atau WEBP.',
+            'foto.mimetypes' => 'Konten file bukan gambar yang valid.',
             'foto.max' => 'Ukuran file foto maksimal 2 MB.',
+            'foto.dimensions' => 'Resolusi foto minimal 50x50 piksel dan maksimal 4096x4096 piksel.',
         ]);
 
-        $mahasiswa->email = strtolower(trim($request->email));
+        $mahasiswa->email = $request->email;
 
-        // Upload foto profil jika ada
+        // Upload foto profil dengan inspeksi struktur binary gambar asli (Anti-Webshell)
         if ($request->hasFile('foto')) {
             $file = $request->file('foto');
-            $filename = 'avatar_' . $mahasiswa->nim . '_' . time() . '.' . $file->getClientOriginalExtension();
-            
+            $realPath = $file->getRealPath();
+            $imageInfo = @getimagesize($realPath);
+
+            $allowedMimeMap = [
+                'image/jpeg' => 'jpg',
+                'image/png' => 'png',
+                'image/webp' => 'webp',
+            ];
+
+            if ($imageInfo === false || !isset($imageInfo['mime']) || !array_key_exists($imageInfo['mime'], $allowedMimeMap)) {
+                return back()->withErrors(['foto' => 'File gambar rusak atau terdeteksi tidak aman.']);
+            }
+
+            $safeExtension = $allowedMimeMap[$imageInfo['mime']];
+            $filename = 'avatar_' . $mahasiswa->nim . '_' . Str::random(12) . '_' . time() . '.' . $safeExtension;
+
             $destinationPath = public_path('uploads/avatars');
             if (!file_exists($destinationPath)) {
                 mkdir($destinationPath, 0755, true);
             }
 
-            // Hapus foto lama jika ada
-            if (!empty($mahasiswa->foto) && file_exists(public_path('uploads/avatars/' . $mahasiswa->foto))) {
-                @unlink(public_path('uploads/avatars/' . $mahasiswa->foto));
+            // Hapus foto lama jika ada (pastikan hanya basename untuk mencegah path traversal)
+            if (!empty($mahasiswa->foto)) {
+                $oldFile = $destinationPath . DIRECTORY_SEPARATOR . basename($mahasiswa->foto);
+                if (is_file($oldFile)) {
+                    @unlink($oldFile);
+                }
             }
 
             $file->move($destinationPath, $filename);
@@ -411,11 +457,13 @@ class MahasiswaController extends Controller
     }
 
     /**
-     * Logout mahasiswa dari dashboard.
+     * Logout mahasiswa dari dashboard dan invalidasi session secara menyeluruh.
      */
-    public function logout()
+    public function logout(Request $request)
     {
         session()->forget(['mahasiswa_id', 'mahasiswa_nim', 'mahasiswa_nama']);
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
         return redirect()->route('mahasiswa.login')->with('success', 'Anda telah berhasil keluar dari akun mahasiswa.');
     }

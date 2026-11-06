@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
 
 class AdminUserController extends Controller
 {
@@ -29,27 +30,34 @@ class AdminUserController extends Controller
     }
 
     /**
-     * Menyimpan data admin baru ke database.
+     * Menyimpan data admin baru ke database dengan validasi password ketat.
      */
     public function store(Request $request)
     {
+        $request->merge([
+            'name' => trim(strip_tags($request->input('name', ''))),
+            'email' => strtolower(trim(strip_tags($request->input('email', '')))),
+        ]);
+
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'min:3', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
-            'password' => ['required', 'string', 'min:6'],
+            'password' => ['required', 'string', Password::min(8)->letters()->numbers()],
         ], [
             'name.required' => 'Nama admin wajib diisi.',
+            'name.min' => 'Nama admin minimal 3 karakter.',
             'email.required' => 'Email wajib diisi.',
             'email.email' => 'Format email tidak valid.',
             'email.unique' => 'Email ini sudah terdaftar sebagai admin.',
             'password.required' => 'Password wajib diisi.',
-            'password.min' => 'Password minimal terdiri dari 6 karakter.',
+            'password.min' => 'Password admin minimal 8 karakter dengan kombinasi huruf dan angka.',
         ]);
 
         User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
+            'email_verified_at' => now(),
         ]);
 
         return redirect()->route('admin.users.index')->with('success', "Akun admin '{$validated['name']}' berhasil ditambahkan.");
@@ -72,16 +80,22 @@ class AdminUserController extends Controller
     {
         $admin = User::findOrFail($id);
 
+        $request->merge([
+            'name' => trim(strip_tags($request->input('name', ''))),
+            'email' => strtolower(trim(strip_tags($request->input('email', '')))),
+        ]);
+
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'min:3', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $admin->id],
-            'password' => ['nullable', 'string', 'min:6'],
+            'password' => ['nullable', 'string', Password::min(8)->letters()->numbers()],
         ], [
             'name.required' => 'Nama admin wajib diisi.',
+            'name.min' => 'Nama admin minimal 3 karakter.',
             'email.required' => 'Email wajib diisi.',
             'email.email' => 'Format email tidak valid.',
             'email.unique' => 'Email ini sudah digunakan oleh akun lain.',
-            'password.min' => 'Password minimal terdiri dari 6 karakter.',
+            'password.min' => 'Password admin minimal 8 karakter dengan kombinasi huruf dan angka.',
         ]);
 
         $updateData = [
@@ -103,8 +117,12 @@ class AdminUserController extends Controller
      */
     public function destroy($id)
     {
-        if ($id == Auth::id()) {
+        if ((int) $id === (int) Auth::id()) {
             return redirect()->route('admin.users.index')->with('error', 'Anda tidak dapat menghapus akun admin yang sedang Anda gunakan saat ini.');
+        }
+
+        if (User::count() <= 1) {
+            return redirect()->route('admin.users.index')->with('error', 'Tidak dapat menghapus akun admin terakhir di sistem.');
         }
 
         $admin = User::findOrFail($id);
