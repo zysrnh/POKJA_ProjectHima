@@ -31,12 +31,15 @@ Route::post('/absen/cek-nim', [PresensiMahasiswaController::class, 'cekNim'])->n
 
 /*
 |--------------------------------------------------------------------------
-| Portal Mahasiswa (Login NIM & Dashboard Mandiri)
+| Portal Mahasiswa (Login NIM, Aktivasi, Lupa Password & Dashboard)
 |--------------------------------------------------------------------------
 */
 Route::prefix('mahasiswa')->name('mahasiswa.')->group(function () {
     Route::get('/login', [MahasiswaController::class, 'showLogin'])->name('login');
     Route::post('/login', [MahasiswaController::class, 'login'])->name('login.post');
+    Route::post('/lupa-password', [MahasiswaController::class, 'sendResetLink'])->name('lupaPassword.post');
+    Route::get('/reset-password/{id}', [MahasiswaController::class, 'showResetPassword'])->name('showResetPassword');
+    Route::post('/reset-password/{id}', [MahasiswaController::class, 'updatePassword'])->name('updatePassword');
     Route::get('/aktivasi', [MahasiswaController::class, 'aktivasiDirect'])->name('aktivasi');
     Route::post('/verifikasi-qr', [MahasiswaController::class, 'verifikasiQr'])->name('verifikasiQr');
     Route::get('/set-password', [MahasiswaController::class, 'showSetPassword'])->name('setPassword');

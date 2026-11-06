@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\ResetPasswordMahasiswaMail;
 use App\Models\Pendaftaran;
 use App\Models\Pengaturan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\URL;
 
 class MahasiswaController extends Controller
 {
@@ -57,7 +61,7 @@ class MahasiswaController extends Controller
         if (empty($mahasiswa->password)) {
             return back()
                 ->withInput(['identifier' => $identifier])
-                ->with('error', 'Akun Anda belum memiliki password. Silakan gunakan tab "Aktivasi QR Tiket" untuk membuat password pertama kali.');
+                ->with('error', 'Akun Anda belum memiliki password. Silakan gunakan tab "Aktivasi Akun" untuk membuat password pertama kali.');
         }
 
         // Verifikasi password
@@ -75,6 +79,121 @@ class MahasiswaController extends Controller
         ]);
 
         return redirect()->route('mahasiswa.dashboard')->with('success', 'Selamat datang kembali, ' . $mahasiswa->nama . '!');
+    }
+
+    /**
+     * Mengirim tautan reset password ke email mahasiswa.
+     */
+    public function sendResetLink(Request $request)
+    {
+        $request->merge([
+            'reset_identifier' => trim(strip_tags($request->input('reset_identifier', ''))),
+        ]);
+
+        $request->validate([
+            'reset_identifier' => ['required', 'string'],
+        ], [
+            'reset_identifier.required' => 'Email kampus atau NIM wajib diisi.',
+        ]);
+
+        $identifier = $request->reset_identifier;
+
+        $mahasiswa = Pendaftaran::where('email', $identifier)
+            ->orWhere('nim', $identifier)
+            ->first();
+
+        if (!$mahasiswa) {
+            return back()
+                ->withInput(['reset_identifier' => $identifier])
+                ->with('error_reset', 'Data akun tidak ditemukan. Pastikan Email atau NIM yang dimasukkan sudah benar.');
+        }
+
+        if (empty($mahasiswa->email)) {
+            return back()
+                ->withInput(['reset_identifier' => $identifier])
+                ->with('error_reset', 'Akun ini tidak memiliki alamat email yang tercatat. Silakan hubungi panitia POKJA.');
+        }
+
+        // Buat temporary signed URL yang kedaluwarsa dalam 60 menit
+        $resetUrl = URL::temporarySignedRoute(
+            'mahasiswa.showResetPassword',
+            now()->addMinutes(60),
+            ['id' => $mahasiswa->id]
+        );
+
+        $pengaturan = Pengaturan::first();
+
+        try {
+            Mail::to($mahasiswa->email)->send(new ResetPasswordMahasiswaMail($mahasiswa, $pengaturan, $resetUrl));
+        } catch (\Throwable $e) {
+            Log::error('Pengiriman Email Reset Password Mahasiswa Gagal: ' . $e->getMessage());
+            return back()
+                ->withInput(['reset_identifier' => $identifier])
+                ->with('error_reset', 'Gagal mengirim email reset password. Pastikan server email terhubung atau coba lagi nanti.');
+        }
+
+        // Sensor sebagian email untuk privasi (contoh: jo***@domain.com)
+        $parts = explode('@', $mahasiswa->email);
+        $namePart = $parts[0];
+        $domainPart = $parts[1] ?? '';
+        $maskedName = strlen($namePart) > 2 ? substr($namePart, 0, 2) . str_repeat('*', max(strlen($namePart) - 2, 3)) : $namePart . '***';
+        $maskedEmail = $maskedName . '@' . $domainPart;
+
+        return back()->with('success_reset', 'Tautan atur ulang password telah dikirim ke ' . $maskedEmail . '. Silakan periksa inbox atau spam email Anda.');
+    }
+
+    /**
+     * Menampilkan form reset password dari tautan bertanda tangan (signed URL).
+     */
+    public function showResetPassword(Request $request, $id)
+    {
+        if (!$request->hasValidSignature()) {
+            return redirect()->route('mahasiswa.login')->with('error', 'Tautan atur ulang password tidak valid atau telah kedaluwarsa. Silakan ajukan ulang.');
+        }
+
+        $mahasiswa = Pendaftaran::find($id);
+
+        if (!$mahasiswa) {
+            return redirect()->route('mahasiswa.login')->with('error', 'Data mahasiswa tidak ditemukan.');
+        }
+
+        return view('mahasiswa.reset_password', compact('mahasiswa'));
+    }
+
+    /**
+     * Memproses pembaruan password dari tautan bertanda tangan (signed URL).
+     */
+    public function updatePassword(Request $request, $id)
+    {
+        if (!$request->hasValidSignature()) {
+            return redirect()->route('mahasiswa.login')->with('error', 'Tautan atur ulang password tidak valid atau telah kedaluwarsa. Silakan ajukan ulang.');
+        }
+
+        $mahasiswa = Pendaftaran::find($id);
+
+        if (!$mahasiswa) {
+            return redirect()->route('mahasiswa.login')->with('error', 'Data mahasiswa tidak ditemukan.');
+        }
+
+        $request->validate([
+            'password' => ['required', 'string', 'min:6', 'confirmed'],
+        ], [
+            'password.required' => 'Password baru wajib diisi.',
+            'password.min' => 'Password minimal terdiri dari 6 karakter.',
+            'password.confirmed' => 'Konfirmasi password tidak cocok dengan password baru.',
+        ]);
+
+        $mahasiswa->password = Hash::make($request->password);
+        $mahasiswa->save();
+
+        // Login otomatis ke dashboard mahasiswa
+        session([
+            'mahasiswa_id' => $mahasiswa->id,
+            'mahasiswa_nim' => $mahasiswa->nim,
+            'mahasiswa_nama' => $mahasiswa->nama,
+        ]);
+
+        return redirect()->route('mahasiswa.dashboard')->with('success', 'Password Anda berhasil diperbarui! Selamat datang kembali.');
     }
 
     /**
@@ -107,7 +226,7 @@ class MahasiswaController extends Controller
         if (!$mahasiswa) {
             return response()->json([
                 'success' => false,
-                'message' => 'QR Tiket pendaftaran tidak valid atau tidak terdaftar di sistem.',
+                'message' => 'QR tiket pendaftaran tidak valid atau tidak terdaftar di sistem.',
             ], 404);
         }
 

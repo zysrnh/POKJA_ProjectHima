@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tiket Pendaftaran POKJA HIMA IF</title>
+    <title>QR Code Pendaftaran & Presensi - POKJA HIMA IF</title>
 </head>
 <body style="margin: 0; padding: 0; background-color: #F3F4F6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1F2937;">
 
@@ -33,7 +33,7 @@
                             
                             <!-- Greeting -->
                             <p style="margin: 0 0 16px 0; font-size: 14px; line-height: 1.5; color: #111827;">
-                                Halo <strong>{{ $pendaftaran->nama }}</strong>, pendaftaran Anda telah berhasil dicatat. Berikut adalah tiket dan QR Code presensi kehadiran Anda:
+                                Halo <strong>{{ $pendaftaran->nama }}</strong>, terima kasih telah mendaftar. Pendaftaran kamu telah berhasil dicatat di sistem {{ $pengaturan->nama_acara ?? 'POKJA HIMA IF 2026' }}. Berikut adalah QR Code pendaftaran dan presensi kehadiran kamu:
                             </p>
 
                             <!-- QR Code Section (Clean Centered Box) -->
@@ -66,7 +66,7 @@
                                             {{ $pendaftaran->nim }}
                                         </p>
                                         <p style="margin: 4px 0 0 0; font-size: 11px; color: #6B7280;">
-                                            Tunjukkan QR Code ini kepada panitia saat registrasi di lokasi.
+                                            Simpan QR Code ini untuk registrasi presensi di lokasi acara atau aktivasi akun portal.
                                         </p>
 
                                         <!-- Tombol Aktivasi Akun Langsung -->
@@ -77,10 +77,10 @@
                                                     target="_blank" 
                                                     style="display: inline-block; background-color: #1A467C; color: #FFFFFF; font-weight: 800; font-size: 12px; text-transform: uppercase; text-decoration: none; padding: 12px 22px; border: 2px solid #000000; letter-spacing: 0.5px;"
                                                 >
-                                                    Aktivasi Akun & Atur Password
+                                                    Aktivasi Akun & Buat Password
                                                 </a>
                                                 <p style="margin: 8px 0 0 0; font-size: 10px; color: #6B7280;">
-                                                    Klik tombol di atas untuk login pertama kali atau upload QR tiket ini di portal login.
+                                                    Klik tombol di atas untuk membuat password baru akun portal mahasiswa kamu.
                                                 </p>
                                             </div>
                                         @endif

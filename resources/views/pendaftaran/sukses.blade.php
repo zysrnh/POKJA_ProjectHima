@@ -78,10 +78,7 @@
                 </div>
 
                 <div>
-                    <span class="inline-block bg-green-100 text-green-900 border border-green-800 text-[10px] font-black uppercase px-2.5 py-0.5 tracking-wider shadow-[1px_1px_0px_0px_#000000]">
-                        ✓ PENDAFTARAN BERHASIL DICATAT
-                    </span>
-                    <h1 class="text-xl sm:text-2xl font-black text-[#1A467C] uppercase tracking-tight mt-1.5">
+                    <h1 class="text-xl sm:text-2xl font-black text-[#1A467C] uppercase tracking-tight">
                         Selamat Bergabung!
                     </h1>
                     @if ($pendaftaran)
@@ -108,11 +105,11 @@
                             </svg>
                         </div>
                         <h2 class="text-xs sm:text-sm font-black uppercase text-[#1A467C] tracking-wide">
-                            1. Cek Email & Unduh QR Tiket
+                            1. Cek Email & Unduh QR Pendaftaran
                         </h2>
                     </div>
                     <p class="text-xs font-semibold text-gray-700 leading-relaxed pl-10">
-                        Tiket resmi dan <strong>QR Code Aktivasi Akun</strong> telah kami kirimkan ke email Anda:
+                        <strong>QR Code pendaftaran</strong> telah kami kirimkan ke email Anda:
                         <span class="font-mono font-bold text-[#1A467C] bg-white px-1.5 py-0.5 border border-gray-300 block sm:inline mt-1 sm:mt-0">
                             {{ $pendaftaran ? $pendaftaran->email : 'email terdaftar Anda' }}
                         </span>
@@ -138,7 +135,7 @@
                         </h2>
                     </div>
                     <p class="text-xs font-semibold text-gray-700 leading-relaxed pl-10">
-                        Wajib bergabung ke grup WhatsApp untuk koordinasi jadwal, materi kegiatan, dan instruksi penting dari panitia POKJA.
+                        Untuk koordinasi jadwal, materi kegiatan, dan instruksi penting dari panitia POKJA.
                     </p>
                     <div class="pl-10 pt-1">
                         <a 
@@ -189,3 +186,4 @@
 
 </body>
 </html>
+

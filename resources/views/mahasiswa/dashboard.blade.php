@@ -113,7 +113,7 @@
                 </div>
             </div>
 
-            <!-- Student Profile Badge -->
+            <!-- Student Profile Badge (Tanpa Label Mahasiswa) -->
             <div class="bg-gray-50 border-2 border-black p-3.5 shadow-[3px_3px_0px_0px_#000000] space-y-2">
                 <div class="flex items-center gap-2.5">
                     <div class="w-10 h-10 bg-[#2A82C6] text-white border-2 border-black flex items-center justify-center font-black text-xs shadow-[1px_1px_0px_0px_#000000] shrink-0 overflow-hidden">
@@ -124,8 +124,7 @@
                         @endif
                     </div>
                     <div class="min-w-0">
-                        <span class="text-[9px] font-black uppercase tracking-wider text-[#1A467C] block">MAHASISWA</span>
-                        <h4 class="text-xs font-black text-gray-950 truncate uppercase leading-tight mt-0.5" title="{{ $mahasiswa->nama }}">
+                        <h4 class="text-xs font-black text-gray-950 truncate uppercase leading-tight" title="{{ $mahasiswa->nama }}">
                             {{ $mahasiswa->nama }}
                         </h4>
                     </div>
@@ -147,7 +146,7 @@
                     <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="square" stroke-width="2.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                     </svg>
-                    <span>Ringkasan & Rekap</span>
+                    <span>Ringkasan Presensi</span>
                 </button>
 
                 <button 
@@ -177,30 +176,28 @@
             </nav>
         </div>
 
-        <!-- Sidebar Bottom Logout -->
+        <!-- Sidebar Bottom Logout with Confirmation Modal Trigger -->
         <div class="p-5 border-t-2 border-black space-y-3">
             @if (!empty($pengaturan->link_grup_wa))
                 <a 
                     href="{{ $pengaturan->link_grup_wa }}" 
-                    target="_blank"
+                    target="_blank" 
                     class="btn-tactile w-full inline-flex items-center justify-center gap-2 py-2 bg-[#25D366] text-black border-2 border-black font-black text-xs uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000]"
                 >
                     <span>Grup WhatsApp</span>
                 </a>
             @endif
 
-            <form action="{{ route('mahasiswa.logout') }}" method="POST">
-                @csrf
-                <button 
-                    type="submit" 
-                    class="btn-tactile w-full py-2 bg-[#CA2C2A] hover:bg-[#901C1A] text-white border-2 border-black font-black text-xs uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] flex items-center justify-center gap-1.5 cursor-pointer"
-                >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="square" stroke-width="2.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                    </svg>
-                    <span>Keluar Akun</span>
-                </button>
-            </form>
+            <button 
+                type="button" 
+                onclick="openLogoutModal()"
+                class="btn-tactile w-full py-2 bg-[#CA2C2A] hover:bg-[#901C1A] text-white border-2 border-black font-black text-xs uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] flex items-center justify-center gap-1.5 cursor-pointer"
+            >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="square" stroke-width="2.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                <span>Keluar Akun</span>
+            </button>
         </div>
 
     </aside>
@@ -210,7 +207,7 @@
     <!-- ============================================================== -->
     <div class="flex-1 flex flex-col min-w-0">
 
-        <!-- Mobile Top Bar (Single clean header bar on mobile) -->
+        <!-- Mobile Top Bar (Clean Brand Bar, Badge Sesi 1 Di-remove sesuai revisi) -->
         <header class="md:hidden bg-white border-b-2 border-black sticky top-0 z-30 p-3 flex items-center justify-between shadow-[0_2px_0px_0px_#000000]">
             <div class="flex items-center gap-2">
                 <img 
@@ -222,12 +219,6 @@
                     <h1 class="text-xs font-black uppercase text-[#1A467C] leading-none">POKJA HIMA IF</h1>
                     <span class="text-[9px] font-bold text-gray-500 uppercase mt-0.5 block">Portal Mahasiswa</span>
                 </div>
-            </div>
-
-            <div class="bg-[#1A467C] border border-black px-2 py-0.5 text-white shadow-[1px_1px_0px_0px_#000000]">
-                <span class="text-[9px] font-black uppercase tracking-wider">
-                    Sesi {{ $pengaturan->pertemuan_aktif ?? 1 }}
-                </span>
             </div>
         </header>
 
@@ -253,11 +244,11 @@
             @endif
 
             <!-- ========================================================== -->
-            <!-- TAB 1: BERANDA & REKAP KEHADIRAN                           -->
+            <!-- TAB 1: BERANDA RINGKASAN                                   -->
             <!-- ========================================================== -->
             <section id="tab-panel-beranda" class="tab-snap-in space-y-4 sm:space-y-6">
 
-                <!-- Greeting Banner with Avatar -->
+                <!-- Greeting Banner with Avatar (Tanpa Label Mahasiswa) -->
                 <div class="card-tactile bg-white border-2 border-black p-4 sm:p-6 shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000]">
                     <div class="flex items-center justify-between gap-3">
                         <div class="flex items-center gap-3 min-w-0 flex-1">
@@ -271,10 +262,7 @@
                             </div>
 
                             <div class="min-w-0 flex-1">
-                                <span class="text-[9px] sm:text-[10px] font-black uppercase tracking-wider bg-blue-100 text-[#1A467C] border border-[#1A467C] px-2 py-0.5 inline-block shadow-[1px_1px_0px_0px_#000000]">
-                                    MAHASISWA
-                                </span>
-                                <h2 class="text-sm sm:text-xl font-black text-gray-950 uppercase tracking-tight truncate mt-1">
+                                <h2 class="text-sm sm:text-xl font-black text-gray-950 uppercase tracking-tight truncate">
                                     {{ $mahasiswa->nama }}
                                 </h2>
                                 <p class="text-[11px] sm:text-xs text-gray-600 font-semibold font-mono mt-0.5">
@@ -314,78 +302,6 @@
                     <div class="card-tactile bg-white border-2 border-black p-3 sm:p-4 shadow-[2px_2px_0px_0px_#000000] sm:shadow-[4px_4px_0px_0px_#000000]">
                         <span class="text-[9px] sm:text-xs font-black uppercase tracking-wider text-gray-700 block truncate">Sesi Aktif</span>
                         <h3 class="text-xl sm:text-3xl font-black text-[#1A467C] font-mono mt-1 leading-none">Sesi {{ $pengaturan->pertemuan_aktif ?? 1 }}</h3>
-                    </div>
-                </div>
-
-                <!-- Rekapitulasi Kehadiran 7 Pertemuan (Tabel Rapi & Sleek, Tidak Kotak-Kotak) -->
-                <div class="card-tactile bg-white border-2 border-black p-4 sm:p-6 shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000] space-y-3.5">
-                    <div class="flex items-center justify-between border-b-2 border-black pb-2.5">
-                        <div>
-                            <h3 class="text-xs sm:text-base font-black uppercase text-[#1A467C]">
-                                Rekapitulasi Kehadiran
-                            </h3>
-                            <p class="text-[10px] sm:text-xs text-gray-600 font-semibold mt-0.5">
-                                Riwayat presensi Anda pada 7 pertemuan POKJA.
-                            </p>
-                        </div>
-                        <span class="text-xs font-mono font-black bg-gray-100 border border-black px-2 py-0.5 shrink-0">
-                            {{ $totalHadir }}/7 Hadir
-                        </span>
-                    </div>
-
-                    <!-- Tabel Vertikal Rapi untuk Mobile & Desktop -->
-                    <div class="border-2 border-black overflow-hidden shadow-[2px_2px_0px_0px_#000000]">
-                        <table class="w-full text-left text-xs border-collapse">
-                            <thead>
-                                <tr class="bg-[#1A467C] text-white border-b-2 border-black text-[10px] sm:text-xs uppercase font-black tracking-wider">
-                                    <th class="py-2.5 px-3">Sesi</th>
-                                    <th class="py-2.5 px-3">Waktu Presensi</th>
-                                    <th class="py-2.5 px-3 text-right">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-200 bg-white">
-                                @for ($i = 1; $i <= 7; $i++)
-                                    @php
-                                        $itemPresensi = $presensiMap->get($i);
-                                        $isHadir = $itemPresensi && $itemPresensi->status === 'hadir';
-                                        $isCurrentSesi = (int) ($pengaturan->pertemuan_aktif ?? 1) === $i;
-                                    @endphp
-                                    <tr class="transition-colors hover:bg-blue-50/50 {{ $isCurrentSesi ? 'bg-amber-50/60 font-bold' : '' }}">
-                                        <td class="py-2.5 px-3 font-mono font-black text-gray-950">
-                                            <div class="flex items-center gap-1.5">
-                                                <span>Sesi {{ $i }}</span>
-                                                @if ($isCurrentSesi)
-                                                    <span class="text-[9px] font-sans font-black bg-amber-200 text-amber-900 border border-amber-800 px-1 py-0.2 uppercase">
-                                                        Aktif
-                                                    </span>
-                                                @endif
-                                            </div>
-                                        </td>
-                                        <td class="py-2.5 px-3 font-mono text-[11px] sm:text-xs text-gray-700">
-                                            @if ($isHadir)
-                                                <span class="text-green-900 font-bold">
-                                                    {{ \Carbon\Carbon::parse($itemPresensi->waktu_presensi)->format('H:i') }} WIB
-                                                </span>
-                                            @else
-                                                <span class="text-gray-400 font-semibold">-</span>
-                                            @endif
-                                        </td>
-                                        <td class="py-2.5 px-3 text-right">
-                                            @if ($isHadir)
-                                                <span class="inline-flex items-center gap-1 bg-green-100 text-green-900 border border-green-800 text-[9px] sm:text-[10px] font-black uppercase px-2 py-0.5 shadow-[1px_1px_0px_0px_#15803d]">
-                                                    <span>✓</span>
-                                                    <span>HADIR</span>
-                                                </span>
-                                            @else
-                                                <span class="inline-block bg-gray-100 text-gray-600 border border-gray-400 text-[9px] sm:text-[10px] font-bold uppercase px-2 py-0.5">
-                                                    BELUM
-                                                </span>
-                                            @endif
-                                        </td>
-                                    </tr>
-                                @endfor
-                            </tbody>
-                        </table>
                     </div>
                 </div>
 
@@ -545,7 +461,7 @@
                                 class="w-full bg-[#F8FBFE] border-2 border-black text-gray-950 font-bold text-xs sm:text-sm px-3.5 py-2.5 focus:bg-white focus:outline-none focus:translate-x-[-1px] focus:translate-y-[-1px] focus:shadow-[4px_4px_0px_0px_#000000] transition"
                             >
                             <p class="text-[11px] font-semibold text-gray-500 mt-1">
-                                Digunakan untuk login portal serta menerima tiket dan pemberitahuan acara.
+                                Digunakan untuk login portal serta menerima pemberitahuan acara.
                             </p>
                         </div>
 
@@ -650,21 +566,19 @@
             <span class="text-[10px] font-black uppercase tracking-wider">Profil</span>
         </button>
 
-        <!-- Tab 4: Keluar -->
-        <form action="{{ route('mahasiswa.logout') }}" method="POST" class="inline">
-            @csrf
-            <button 
-                type="submit" 
-                class="btn-tactile flex flex-col items-center gap-1 py-1 px-3 text-[#CA2C2A] cursor-pointer"
-            >
-                <div class="w-8 h-8 rounded-none border border-black flex items-center justify-center bg-red-50 text-red-700">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="square" stroke-width="2.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                    </svg>
-                </div>
-                <span class="text-[10px] font-black uppercase tracking-wider">Keluar</span>
-            </button>
-        </form>
+        <!-- Tab 4: Keluar dengan Konfirmasi -->
+        <button 
+            type="button" 
+            onclick="openLogoutModal()"
+            class="btn-tactile flex flex-col items-center gap-1 py-1 px-3 text-[#CA2C2A] cursor-pointer"
+        >
+            <div class="w-8 h-8 rounded-none border border-black flex items-center justify-center bg-red-50 text-red-700">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="square" stroke-width="2.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+            </div>
+            <span class="text-[10px] font-black uppercase tracking-wider">Keluar</span>
+        </button>
 
     </nav>
 
@@ -692,12 +606,66 @@
         </div>
     </div>
 
-    <!-- JavaScript: Multi-Tab Controller, Avatar Preview, and In-Browser Scanner -->
+    <!-- ============================================================== -->
+    <!-- LOGOUT CONFIRMATION MODAL POP-UP (Neubrutalism)                -->
+    <!-- ============================================================== -->
+    <div id="logout-confirm-modal" class="hidden fixed inset-0 z-50 bg-black/60 p-4 flex items-center justify-center">
+        <div class="modal-spring-slam w-full max-w-sm bg-white border-[3px] border-black p-5 sm:p-6 shadow-[8px_8px_0px_0px_#000000] space-y-4 text-center">
+            
+            <div class="w-14 h-14 mx-auto bg-red-100 text-[#CA2C2A] border-2 border-black flex items-center justify-center font-black text-2xl shadow-[3px_3px_0px_0px_#000000]">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="square" stroke-width="2.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+            </div>
+
+            <div>
+                <span class="inline-block text-[10px] font-black uppercase px-2 py-0.5 border border-black bg-red-100 text-red-900 shadow-[1px_1px_0px_0px_#000000] mb-1">
+                    KONFIRMASI
+                </span>
+                <h3 class="text-base sm:text-lg font-black uppercase text-gray-950">
+                    Keluar dari Akun?
+                </h3>
+                <p class="text-xs font-semibold text-gray-600 mt-1">
+                    Apakah Anda yakin ingin keluar dari sesi portal mahasiswa?
+                </p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2.5 pt-1">
+                <button 
+                    type="button" 
+                    onclick="closeLogoutModal()"
+                    class="btn-tactile py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-900 text-xs font-black uppercase tracking-wider border-2 border-black shadow-[3px_3px_0px_0px_#000000] cursor-pointer"
+                >
+                    Batal
+                </button>
+                <form action="{{ route('mahasiswa.logout') }}" method="POST" class="w-full">
+                    @csrf
+                    <button 
+                        type="submit" 
+                        class="btn-tactile w-full py-2.5 bg-[#CA2C2A] hover:bg-[#901C1A] text-white text-xs font-black uppercase tracking-wider border-2 border-black shadow-[3px_3px_0px_0px_#000000] cursor-pointer"
+                    >
+                        Ya, Keluar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript: Multi-Tab Controller, Avatar Preview, Scanner, and Logout Modal -->
     <script>
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
         let dashQrScanner = null;
         let isDashScanning = false;
         let isSubmittingScan = false;
+
+        // Open & Close Logout Confirmation Modal
+        function openLogoutModal() {
+            document.getElementById('logout-confirm-modal').classList.remove('hidden');
+        }
+
+        function closeLogoutModal() {
+            document.getElementById('logout-confirm-modal').classList.add('hidden');
+        }
 
         // Switch Tab Active State (Beranda, Scan, Profil)
         function switchTab(tabId) {

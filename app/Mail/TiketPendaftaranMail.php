@@ -43,7 +43,7 @@ class TiketPendaftaranMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Tiket & QR Code Presensi - ' . ($this->pengaturan->nama_acara ?? 'POKJA HIMA IF 2026'),
+            subject: 'QR Code Pendaftaran & Presensi - ' . ($this->pengaturan->nama_acara ?? 'POKJA HIMA IF 2026'),
         );
     }
 

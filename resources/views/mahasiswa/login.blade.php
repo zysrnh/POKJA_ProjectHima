@@ -94,7 +94,7 @@
                         Portal Mahasiswa POKJA
                     </h1>
                     <p class="text-xs font-semibold text-gray-600 mt-0.5">
-                        Masuk untuk melihat tiket, kartu peserta & rekap presensi.
+                        Masuk untuk presensi mandiri dan melihat informasi kegiatan.
                     </p>
                 </div>
             </div>
@@ -170,10 +170,10 @@
                             </label>
                             <button 
                                 type="button" 
-                                onclick="switchTab('qr')" 
-                                class="text-[10px] font-bold text-[#2A82C6] hover:underline cursor-pointer"
+                                onclick="switchTab('lupa')" 
+                                class="text-[10px] font-bold text-[#CA2C2A] hover:underline cursor-pointer"
                             >
-                                Belum punya password?
+                                Lupa password?
                             </button>
                         </div>
                         <div class="relative">
@@ -215,7 +215,7 @@
             </div>
 
             <!-- ============================================================== -->
-            <!-- TAB 2: AKTIVASI QR TIKET PENDAFTARAN (Pertama Kali Login)       -->
+            <!-- TAB 2: AKTIVASI AKUN DENGAN QR TIKET                           -->
             <!-- ============================================================== -->
             <div id="panel-qr" class="hidden tab-snap space-y-4">
                 <div class="bg-blue-50 border-2 border-black p-3 text-xs text-blue-950 font-medium shadow-[2px_2px_0px_0px_#1A467C]">
@@ -248,7 +248,7 @@
                 <div class="space-y-2">
                     <button 
                         type="button" 
-                        id="btn-scan-camera"
+                        id="btn-scan-camera" 
                         onclick="toggleCameraScanner()"
                         class="btn-tactile w-full py-2.5 bg-white hover:bg-gray-100 text-gray-900 border-2 border-black font-black text-xs uppercase tracking-wider shadow-[3px_3px_0px_0px_#000000] flex items-center justify-center gap-2 cursor-pointer"
                     >
@@ -267,6 +267,74 @@
 
                 <!-- Status Feedback Box -->
                 <div id="qr-status-msg" class="hidden p-3 text-xs font-bold border-2 border-black shadow-[2px_2px_0px_0px_#000000]"></div>
+            </div>
+
+            <!-- ============================================================== -->
+            <!-- TAB 3: LUPA PASSWORD (Kirim Tautan Reset ke Email)              -->
+            <!-- ============================================================== -->
+            <div id="panel-lupa" class="hidden tab-snap space-y-4">
+                <div class="bg-amber-50 border-2 border-black p-3 text-xs text-amber-950 font-medium shadow-[2px_2px_0px_0px_#d97706]">
+                    <p class="font-black text-amber-900 uppercase mb-0.5">Lupa Password Akun</p>
+                    <p>Masukkan Email kampus atau NIM yang terdaftar. Kami akan mengirimkan tautan untuk mengatur ulang kata sandi Anda.</p>
+                </div>
+
+                <!-- Flash Reset Error -->
+                @if (session('error_reset'))
+                    <div class="p-3 bg-red-50 border-2 border-black text-xs font-bold text-red-900 shadow-[2px_2px_0px_0px_#CA2C2A]">
+                        {{ session('error_reset') }}
+                    </div>
+                @endif
+
+                <!-- Flash Reset Success -->
+                @if (session('success_reset'))
+                    <div class="p-3 bg-green-50 border-2 border-black text-xs font-bold text-green-900 shadow-[2px_2px_0px_0px_#15803d]">
+                        {{ session('success_reset') }}
+                    </div>
+                @endif
+
+                <form action="{{ route('mahasiswa.lupaPassword.post') }}" method="POST" class="space-y-4">
+                    @csrf
+
+                    <div>
+                        <label for="reset_identifier" class="block text-xs font-black uppercase tracking-wider text-[#1A467C] mb-1.5">
+                            Email Kampus / NIM <span class="text-[#CA2C2A]">*</span>
+                        </label>
+                        <div class="relative">
+                            <input 
+                                type="text" 
+                                id="reset_identifier" 
+                                name="reset_identifier" 
+                                value="{{ old('reset_identifier') }}"
+                                required
+                                placeholder="Contoh: 250414010 atau email kamu"
+                                class="w-full bg-[#F8FBFE] border-2 border-black text-gray-950 font-bold text-xs sm:text-sm px-3.5 py-2.5 pl-10 focus:bg-white focus:outline-none focus:translate-x-[-1px] focus:translate-y-[-1px] focus:shadow-[4px_4px_0px_0px_#000000] transition"
+                            >
+                            <svg class="w-4 h-4 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="square" stroke-width="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <button 
+                        type="submit" 
+                        class="btn-tactile w-full py-3 bg-[#1A467C] hover:bg-[#153660] text-white text-xs sm:text-sm font-black uppercase tracking-wider border-2 border-black shadow-[4px_4px_0px_0px_#000000] flex items-center justify-center gap-2 cursor-pointer mt-2"
+                    >
+                        <span>Kirim Tautan Reset Password</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="square" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                        </svg>
+                    </button>
+
+                    <div class="text-center pt-1">
+                        <button 
+                            type="button" 
+                            onclick="switchTab('biasa')"
+                            class="text-xs font-bold text-gray-600 hover:text-black hover:underline cursor-pointer"
+                        >
+                            ← Kembali ke Form Login
+                        </button>
+                    </div>
+                </form>
             </div>
 
             <!-- Bottom Register Link -->
@@ -305,18 +373,28 @@
             const btnQr = document.getElementById('tab-btn-qr');
             const panelBiasa = document.getElementById('panel-biasa');
             const panelQr = document.getElementById('panel-qr');
+            const panelLupa = document.getElementById('panel-lupa');
 
             if (mode === 'biasa') {
                 btnBiasa.className = "btn-tactile py-2 text-xs font-black uppercase tracking-wider border-2 border-black bg-white text-[#1A467C] shadow-[2px_2px_0px_0px_#000000] cursor-pointer";
                 btnQr.className = "btn-tactile py-2 text-xs font-black uppercase tracking-wider border-2 border-transparent text-gray-600 hover:text-black cursor-pointer";
                 panelBiasa.classList.remove('hidden');
                 panelQr.classList.add('hidden');
+                panelLupa.classList.add('hidden');
                 stopCameraScanner();
-            } else {
+            } else if (mode === 'qr') {
                 btnQr.className = "btn-tactile py-2 text-xs font-black uppercase tracking-wider border-2 border-black bg-white text-[#1A467C] shadow-[2px_2px_0px_0px_#000000] cursor-pointer";
                 btnBiasa.className = "btn-tactile py-2 text-xs font-black uppercase tracking-wider border-2 border-transparent text-gray-600 hover:text-black cursor-pointer";
                 panelQr.classList.remove('hidden');
                 panelBiasa.classList.add('hidden');
+                panelLupa.classList.add('hidden');
+            } else if (mode === 'lupa') {
+                btnBiasa.className = "btn-tactile py-2 text-xs font-black uppercase tracking-wider border-2 border-transparent text-gray-600 hover:text-black cursor-pointer";
+                btnQr.className = "btn-tactile py-2 text-xs font-black uppercase tracking-wider border-2 border-transparent text-gray-600 hover:text-black cursor-pointer";
+                panelLupa.classList.remove('hidden');
+                panelBiasa.classList.add('hidden');
+                panelQr.classList.add('hidden');
+                stopCameraScanner();
             }
         }
 
@@ -465,7 +543,6 @@
                         (errorMessage) => {}
                     );
                 } catch (err) {
-                    // Fallback to front camera if environment fails
                     try {
                         await html5QrScanner.start(
                             { facingMode: "user" },
@@ -511,6 +588,12 @@
             }
             box.innerText = msg;
         }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            @if (session('error_reset') || session('success_reset'))
+                switchTab('lupa');
+            @endif
+        });
     </script>
 
 </body>
