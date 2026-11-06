@@ -13,12 +13,33 @@ class AdminUserSeeder extends Seeder
      */
     public function run(): void
     {
-        User::updateOrCreate(
-            ['email' => 'admin@pokja.com'],
+        $admins = [
             [
-                'name' => 'Administrator POKJA',
-                'password' => Hash::make('password123'),
-            ]
-        );
+                'email' => 'superadmin@pokja.com',
+                'name' => 'Super Admin POKJA',
+                'password' => Hash::make('Pokja2026#Super!Admin'),
+            ],
+            [
+                'email' => 'presensi@pokja.com',
+                'name' => 'Admin Presensi & Acara',
+                'password' => Hash::make('HimaIF2026*Presensi!Acc'),
+            ],
+            [
+                'email' => 'sekretariat@pokja.com',
+                'name' => 'Admin Sekretariat',
+                'password' => Hash::make('Pokja2026$Sekretariat!Pro'),
+            ],
+        ];
+
+        foreach ($admins as $admin) {
+            User::updateOrCreate(
+                ['email' => $admin['email']],
+                [
+                    'name' => $admin['name'],
+                    'password' => $admin['password'],
+                    'email_verified_at' => now(),
+                ]
+            );
+        }
     }
 }
