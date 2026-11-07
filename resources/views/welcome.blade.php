@@ -174,19 +174,20 @@
     <!-- Floating Interactive Geometric Accents (Click/Tap for fun tactile pop) -->
     <div onclick="popShape(this)" title="Klik aku!" class="cursor-pointer select-none absolute top-6 sm:top-8 left-4 sm:left-8 w-10 h-10 sm:w-14 sm:h-14 bg-[#2A82C6]/30 border-2 border-[#1A467C] shadow-[3px_3px_0px_0px_#1A467C] sm:shadow-[4px_4px_0px_0px_#1A467C] hover:scale-110 active:scale-90 transition-transform anim-float-1 z-0"></div>
     <div onclick="popShape(this)" title="Klik aku!" class="cursor-pointer select-none absolute bottom-8 sm:bottom-12 left-4 sm:left-12 w-8 h-8 sm:w-10 sm:h-10 bg-[#CA2C2A]/25 border-2 border-[#901C1A] shadow-[2px_2px_0px_0px_#901C1A] sm:shadow-[3px_3px_0px_0px_#901C1A] hover:scale-110 active:scale-90 transition-transform anim-float-2 z-0"></div>
-    <div onclick="popShape(this)" title="Klik aku!" class="cursor-pointer select-none absolute top-12 sm:top-16 right-4 sm:right-12 w-9 h-9 sm:w-12 sm:h-12 bg-white/90 border-2 border-[#1A467C] shadow-[3px_3px_0px_0px_#1A467C] sm:shadow-[4px_4px_0px_0px_#1A467C] hover:scale-110 active:scale-90 transition-transform anim-float-2 z-0"></div>
-    <div onclick="popShape(this)" title="Klik aku!" class="hidden sm:block cursor-pointer select-none absolute bottom-24 right-14 w-12 h-12 bg-[#1A467C]/20 border-2 border-[#000000] shadow-[3px_3px_0px_0px_#000000] hover:scale-110 active:scale-90 transition-transform anim-float-1 z-0"></div>
+    <div onclick="popShape(this)" title="Klik aku!" class="hidden sm:block cursor-pointer select-none absolute top-28 right-12 w-10 h-10 bg-white/90 border-2 border-[#1A467C] shadow-[3px_3px_0px_0px_#1A467C] hover:scale-110 active:scale-90 transition-transform anim-float-2 z-0"></div>
+    <div onclick="popShape(this)" title="Klik aku!" class="cursor-pointer select-none absolute bottom-6 sm:bottom-8 right-4 sm:right-16 w-11 h-11 sm:w-16 sm:h-16 bg-[#1A467C]/20 border-2 border-[#000000] shadow-[3px_3px_0px_0px_#000000] sm:shadow-[4px_4px_0px_0px_#000000] hover:scale-110 active:scale-90 transition-transform anim-float-1 z-0"></div>
 
-    <!-- Floating Action Button: Login Portal Mahasiswa (Icon Only Neubrutalism) -->
+    <!-- Floating Action Button: Login Portal Mahasiswa (Top-Right Neubrutalism) -->
     <a 
         href="{{ session('mahasiswa_id') ? route('mahasiswa.dashboard') : route('mahasiswa.login') }}" 
         title="{{ session('mahasiswa_id') ? 'Buka Dashboard Mahasiswa' : 'Masuk Portal Mahasiswa' }}"
         aria-label="{{ session('mahasiswa_id') ? 'Buka Dashboard Mahasiswa' : 'Masuk Portal Mahasiswa' }}"
-        class="btn-smooth fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-40 w-12 h-12 sm:w-14 sm:h-14 bg-[#1A467C] hover:bg-[#2A82C6] text-white border-2 border-[#000000] shadow-[4px_4px_0px_0px_#000000] flex items-center justify-center cursor-pointer"
+        class="btn-smooth fixed top-3.5 right-3.5 sm:top-6 sm:right-8 z-40 px-4 py-2 sm:px-5 sm:py-2.5 bg-[#1A467C] hover:bg-[#2A82C6] text-white text-xs sm:text-sm font-black uppercase tracking-wider border-2 border-[#000000] shadow-[4px_4px_0px_0px_#000000] flex items-center justify-center gap-2 cursor-pointer"
     >
-        <svg class="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="square" stroke-width="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        <svg class="w-4 h-4 sm:w-5 sm:h-5 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="square" stroke-width="2.5" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
         </svg>
+        <span>LOGIN</span>
     </a>
 
     <!-- Main Wrapper: Separated Sequential Cards (Judul -> Waktu & Tempat -> Form) -->
