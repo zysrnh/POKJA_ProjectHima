@@ -168,3 +168,4 @@ class MahasiswaDummySeeder extends Seeder
         }
     }
 }
+

@@ -28,40 +28,34 @@
     <!-- ============================================================== -->
     <!-- 1. TOMBOL AKSI CEPAT & HEADER BANNER                           -->
     <!-- ============================================================== -->
-    <div class="snap-in-1 bg-white border-2 border-[#000000] p-4 sm:p-5 shadow-[5px_5px_0px_0px_#000000] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5">
-        <div>
-            <div class="flex items-center gap-2">
-                <span class="bg-[#1A467C] text-white text-[10px] font-black uppercase px-2 py-0.5 border border-black">POINTKU POKJA</span>
-                <h3 class="text-base sm:text-xl font-black uppercase tracking-tight text-[#1A467C]">
-                    Manajemen Point Keaktifan
-                </h3>
-            </div>
-            <p class="text-xs font-semibold text-gray-600 mt-1">
-                Kelola penambahan & pengurangan point keaktifan mahasiswa secara terintegrasi dengan data pendaftar POKJA.
-            </p>
-        </div>
+    <div class="snap-in-1 bg-white border-2 border-[#000000] px-4 py-3 sm:px-5 sm:py-3.5 shadow-[5px_5px_0px_0px_#000000] flex items-center justify-between gap-3">
+        <h3 class="text-base sm:text-xl font-black uppercase tracking-tight text-[#1A467C]">
+            POINTKU POKJA
+        </h3>
 
-        <div class="flex items-center gap-2 w-full sm:w-auto shrink-0">
+        <div class="flex items-center gap-2 shrink-0">
             <button 
                 type="button" 
                 onclick="openPointModal('add')"
-                class="btn-smooth flex-1 sm:flex-none px-4 py-2.5 bg-[#15803d] hover:bg-[#166534] text-white text-xs font-black uppercase tracking-wider border-2 border-black shadow-[3px_3px_0px_0px_#000000] flex items-center justify-center gap-1.5 cursor-pointer"
+                title="Tambah Point"
+                aria-label="Tambah Point"
+                class="btn-smooth w-9 h-9 sm:w-10 sm:h-10 bg-[#15803d] hover:bg-[#166534] text-white border-2 border-black shadow-[2px_2px_0px_0px_#000000] flex items-center justify-center cursor-pointer"
             >
-                <svg class="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="square" stroke-width="3" d="M12 4v16m8-8H4" />
                 </svg>
-                <span>Tambah Point</span>
             </button>
 
             <button 
                 type="button" 
                 onclick="openPointModal('reduce')"
-                class="btn-smooth flex-1 sm:flex-none px-4 py-2.5 bg-[#CA2C2A] hover:bg-[#901C1A] text-white text-xs font-black uppercase tracking-wider border-2 border-black shadow-[3px_3px_0px_0px_#000000] flex items-center justify-center gap-1.5 cursor-pointer"
+                title="Kurangi Point"
+                aria-label="Kurangi Point"
+                class="btn-smooth w-9 h-9 sm:w-10 sm:h-10 bg-[#CA2C2A] hover:bg-[#901C1A] text-white border-2 border-black shadow-[2px_2px_0px_0px_#000000] flex items-center justify-center cursor-pointer"
             >
-                <svg class="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="square" stroke-width="3" d="M20 12H4" />
                 </svg>
-                <span>Kurangi Point</span>
             </button>
         </div>
     </div>
