@@ -21,6 +21,11 @@ class Pendaftaran extends Model
         'kelas',
         'no_telp',
         'status_kehadiran',
+        'total_point',
+    ];
+
+    protected $casts = [
+        'total_point' => 'integer',
     ];
 
     protected $hidden = [
@@ -39,6 +44,11 @@ class Pendaftaran extends Model
     public function presensis()
     {
         return $this->hasMany(Presensi::class, 'pendaftaran_id');
+    }
+
+    public function pointHistories()
+    {
+        return $this->hasMany(PointHistory::class, 'pendaftaran_id');
     }
 
     /**

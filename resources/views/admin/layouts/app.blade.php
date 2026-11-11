@@ -241,6 +241,17 @@
                         <span>Presensi Kelas</span>
                     </a>
 
+                    <!-- Menu 3: Kelola Point Keaktifan -->
+                    <a 
+                        href="{{ route('admin.poin.index') }}" 
+                        class="flex items-center gap-3 px-3.5 py-3 border-2 transition {{ request()->routeIs('admin.poin.*') ? 'bg-[#2A82C6] border-white text-white shadow-[3px_3px_0px_0px_#000000]' : 'border-transparent text-gray-200 hover:bg-[#0F2A4A] hover:text-white' }}"
+                    >
+                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="square" stroke-width="2.5" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                        </svg>
+                        <span>Kelola Point</span>
+                    </a>
+
                     <!-- Menu 3: Kelola Kelas -->
                     <a 
                         href="{{ route('admin.kelas.index') }}" 
@@ -430,6 +441,21 @@
             </div>
             <span class="text-[9px] uppercase tracking-tight mt-0.5 font-bold {{ request()->routeIs('admin.presensi.*') ? 'font-black text-[#1A467C]' : '' }}">
                 Presensi
+            </span>
+        </a>
+
+        <!-- Tab 3: Kelola Point -->
+        <a 
+            href="{{ route('admin.poin.index') }}" 
+            class="flex-1 flex flex-col items-center justify-center py-1 transition-all active:scale-95 {{ request()->routeIs('admin.poin.*') ? 'text-[#1A467C]' : 'text-gray-500 hover:text-[#1A467C]' }}"
+        >
+            <div class="p-1 border-2 transition-all {{ request()->routeIs('admin.poin.*') ? 'bg-[#2A82C6] text-white border-[#1A467C] shadow-[2px_2px_0px_0px_#1A467C]' : 'border-transparent text-gray-500' }}">
+                <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="square" stroke-width="2.2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                </svg>
+            </div>
+            <span class="text-[9px] uppercase tracking-tight mt-0.5 font-bold {{ request()->routeIs('admin.poin.*') ? 'font-black text-[#1A467C]' : '' }}">
+                Point
             </span>
         </a>
 

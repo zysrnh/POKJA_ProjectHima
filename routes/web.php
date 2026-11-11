@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Admin\KelasAdminController;
 use App\Http\Controllers\Admin\PendaftaranAdminController;
 use App\Http\Controllers\Admin\PengaturanAcaraController;
+use App\Http\Controllers\Admin\PointAdminController;
 use App\Http\Controllers\Admin\PresensiAdminController;
 use App\Http\Controllers\MahasiswaController;
 use App\Http\Controllers\PendaftaranController;
@@ -134,6 +135,12 @@ Route::middleware('throttle:120,1')->group(function () {
             Route::patch('/presensi/{id}/toggle', [PresensiAdminController::class, 'toggleManual'])->whereNumber('id')->name('presensi.toggle');
             Route::post('/presensi/sync-spreadsheet', [PresensiAdminController::class, 'syncSpreadsheet'])->name('presensi.sync');
             Route::get('/presensi/export', [PresensiAdminController::class, 'exportExcel'])->name('presensi.export');
+
+            // Kelola Point Keaktifan Mahasiswa
+            Route::get('/poin', [PointAdminController::class, 'index'])->name('poin.index');
+            Route::post('/poin', [PointAdminController::class, 'store'])->name('poin.store');
+            Route::get('/poin/{id}/riwayat', [PointAdminController::class, 'history'])->whereNumber('id')->name('poin.history');
+            Route::delete('/poin/riwayat/{historyId}', [PointAdminController::class, 'destroyHistory'])->whereNumber('historyId')->name('poin.destroyHistory');
 
             // Kelola Kelas
             Route::resource('kelas', KelasAdminController::class)->except(['show']);
