@@ -174,14 +174,10 @@
 
                                 <!-- Tiang Batang Vertikal Menjulang Ke Atas -->
                                 <div 
-                                    class="podium-bar w-full {{ $col['barHeight'] }} {{ $col['barBg'] }} border-t-[3px] border-x-[3px] border-black shadow-[4px_0px_0px_0px_#000000] flex flex-col items-center justify-between py-3 sm:py-4 px-2 relative"
+                                    class="podium-bar w-full {{ $col['barHeight'] }} {{ $col['barBg'] }} border-t-[3px] border-x-[3px] border-black shadow-[4px_0px_0px_0px_#000000] flex flex-col items-center justify-center gap-2 py-3 sm:py-4 px-2 relative"
                                     style="animation-delay: {{ $col['delay'] }};"
                                 >
-                                    <span class="px-2 py-0.5 text-[8px] sm:text-[10px] font-black uppercase tracking-wider border border-black {{ $col['badgeBg'] }}">
-                                        {{ $col['label'] }}
-                                    </span>
-
-                                    <span class="font-mono font-black text-2xl sm:text-5xl text-black/90 leading-none select-none">
+                                    <span class="font-mono font-black text-3xl sm:text-5xl text-black/90 leading-none select-none">
                                         #{{ $col['rank'] }}
                                     </span>
 
