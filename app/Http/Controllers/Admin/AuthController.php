@@ -30,6 +30,7 @@ class AuthController extends Controller
     {
         $request->merge([
             'email' => strtolower(trim(strip_tags($request->input('email', '')))),
+            'password' => trim((string) $request->input('password', '')),
         ]);
 
         $credentials = $request->validate([
@@ -44,7 +45,7 @@ class AuthController extends Controller
         // Kunci RateLimiter berdasarkan kombinasi email dan alamat IP
         $throttleKey = Str::transliterate(Str::lower($request->input('email')) . '|' . $request->ip());
 
-        if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
+        if (RateLimiter::tooManyAttempts($throttleKey, 10)) {
             $seconds = RateLimiter::availableIn($throttleKey);
             Log::warning('Admin Login Brute-Force Lockout', [
                 'email' => $request->input('email'),
