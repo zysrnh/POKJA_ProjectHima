@@ -23,17 +23,17 @@
     }
 </style>
 
-<div class="space-y-4 sm:space-y-6">
+<div class="space-y-6 sm:space-y-8">
 
     <!-- ============================================================== -->
     <!-- 1. HEADER BANNER & TOMBOL AKSI (+ / -)                         -->
     <!-- ============================================================== -->
-    <div class="snap-in-1 bg-white border-2 border-[#000000] px-4 py-3 sm:px-5 sm:py-3.5 shadow-[5px_5px_0px_0px_#000000] flex items-center justify-between gap-3">
+    <div class="snap-in-1 bg-white border-2 border-[#000000] px-4 py-3.5 sm:px-6 sm:py-4 shadow-[5px_5px_0px_0px_#000000] flex items-center justify-between gap-4">
         <h3 class="text-base sm:text-xl font-black uppercase tracking-tight text-[#1A467C]">
             POINTKU POKJA
         </h3>
 
-        <div class="flex items-center gap-2 shrink-0">
+        <div class="flex items-center gap-2.5 shrink-0">
             <button 
                 type="button" 
                 onclick="openPointModal('add')"
@@ -63,37 +63,37 @@
     <!-- ============================================================== -->
     <!-- 2. 3 KARTU STATISTIK RINGKASAN                                 -->
     <!-- ============================================================== -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-        <div class="snap-in-2 card-interactive bg-white border-2 border-black p-4 shadow-[4px_4px_0px_0px_#000000] flex items-center justify-between">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+        <div class="snap-in-2 card-interactive bg-white border-2 border-black p-4 sm:p-5 shadow-[4px_4px_0px_0px_#000000] flex items-center justify-between">
             <div>
                 <span class="text-[11px] font-black uppercase tracking-wider text-[#1A467C] block">Total Mahasiswa</span>
-                <span class="text-2xl sm:text-3xl font-black text-gray-950 font-mono mt-1 block">{{ number_format($totalMahasiswa) }}</span>
+                <span class="text-2xl sm:text-3xl font-black text-gray-950 font-mono mt-1.5 block">{{ number_format($totalMahasiswa) }}</span>
             </div>
-            <div class="w-10 h-10 bg-[#2A82C6] text-white border-2 border-black flex items-center justify-center shadow-[2px_2px_0px_0px_#000000]">
+            <div class="w-11 h-11 bg-[#2A82C6] text-white border-2 border-black flex items-center justify-center shadow-[2px_2px_0px_0px_#000000]">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="square" stroke-width="2.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
             </div>
         </div>
 
-        <div class="snap-in-3 card-interactive bg-white border-2 border-black p-4 shadow-[4px_4px_0px_0px_#000000] flex items-center justify-between">
+        <div class="snap-in-3 card-interactive bg-white border-2 border-black p-4 sm:p-5 shadow-[4px_4px_0px_0px_#000000] flex items-center justify-between">
             <div>
                 <span class="text-[11px] font-black uppercase tracking-wider text-[#15803d] block">Total Point Aktif</span>
-                <span class="text-2xl sm:text-3xl font-black text-[#15803d] font-mono mt-1 block">{{ number_format($totalPointDiberikan) }} <span class="text-xs font-bold uppercase">Pts</span></span>
+                <span class="text-2xl sm:text-3xl font-black text-[#15803d] font-mono mt-1.5 block">{{ number_format($totalPointDiberikan) }} <span class="text-xs font-bold uppercase">Pts</span></span>
             </div>
-            <div class="w-10 h-10 bg-amber-400 text-black border-2 border-black flex items-center justify-center shadow-[2px_2px_0px_0px_#000000]">
+            <div class="w-11 h-11 bg-amber-400 text-black border-2 border-black flex items-center justify-center shadow-[2px_2px_0px_0px_#000000]">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="square" stroke-width="2.5" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
                 </svg>
             </div>
         </div>
 
-        <div class="snap-in-4 card-interactive bg-white border-2 border-black p-4 shadow-[4px_4px_0px_0px_#000000] flex items-center justify-between">
+        <div class="snap-in-4 card-interactive bg-white border-2 border-black p-4 sm:p-5 shadow-[4px_4px_0px_0px_#000000] flex items-center justify-between">
             <div>
                 <span class="text-[11px] font-black uppercase tracking-wider text-[#1A467C] block">Aktivitas Hari Ini</span>
-                <span class="text-2xl sm:text-3xl font-black text-gray-950 font-mono mt-1 block">{{ number_format($transaksiHariIni) }}</span>
+                <span class="text-2xl sm:text-3xl font-black text-gray-950 font-mono mt-1.5 block">{{ number_format($transaksiHariIni) }}</span>
             </div>
-            <div class="w-10 h-10 bg-[#1A467C] text-white border-2 border-black flex items-center justify-center shadow-[2px_2px_0px_0px_#000000]">
+            <div class="w-11 h-11 bg-[#1A467C] text-white border-2 border-black flex items-center justify-center shadow-[2px_2px_0px_0px_#000000]">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="square" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -104,17 +104,17 @@
     <!-- ============================================================== -->
     <!-- 3. PREVIEW LEADERBOARD TOP 3 MAHASISWA                         -->
     <!-- ============================================================== -->
-    <div class="snap-in-5 bg-white border-2 border-black shadow-[5px_5px_0px_0px_#000000] p-4 sm:p-5 space-y-4">
-        <div class="flex items-center justify-between gap-2 border-b-2 border-black pb-3">
-            <div class="flex items-center gap-2">
-                <span class="bg-amber-400 text-black text-xs font-black px-2 py-0.5 border border-black">TOP 3</span>
+    <div class="snap-in-5 bg-white border-2 border-black shadow-[5px_5px_0px_0px_#000000] p-5 sm:p-6 space-y-5">
+        <div class="flex items-center justify-between gap-3 border-b-2 border-black pb-3.5">
+            <div class="flex items-center gap-2.5">
+                <span class="bg-amber-400 text-black text-xs font-black px-2.5 py-0.5 border border-black">TOP 3</span>
                 <h4 class="text-xs sm:text-sm font-black uppercase tracking-wider text-[#1A467C]">
                     Peringkat Teratas Leaderboard
                 </h4>
             </div>
             <a 
                 href="{{ route('admin.poin.leaderboard') }}" 
-                class="btn-smooth px-3 py-1.5 bg-[#1A467C] hover:bg-[#2A82C6] text-white text-[11px] font-black uppercase tracking-wider border-2 border-black shadow-[2px_2px_0px_0px_#000000]"
+                class="btn-smooth px-3.5 py-1.5 bg-[#1A467C] hover:bg-[#2A82C6] text-white text-[11px] font-black uppercase tracking-wider border-2 border-black shadow-[2px_2px_0px_0px_#000000]"
             >
                 Lihat Semua →
             </a>
@@ -131,12 +131,12 @@
                     ['rank' => 3, 'label' => 'PERINGKAT #3', 'bg' => 'bg-orange-200', 'badgeBg' => 'bg-[#CA2C2A] text-white', 'mhs' => $third],
                 ];
             @endphp
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5 items-stretch">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 items-stretch pt-1">
                 @foreach ($podiumItems as $pod)
                     @if ($pod['mhs'])
                         @php $mhs = $pod['mhs']; @endphp
-                        <div class="card-interactive {{ $pod['bg'] }} border-2 border-black p-4 shadow-[4px_4px_0px_0px_#000000] flex items-center justify-between gap-3 {{ $pod['rank'] === 1 ? 'order-1 md:order-2' : ($pod['rank'] === 2 ? 'order-2 md:order-1' : 'order-3') }}">
-                            <div class="flex items-center gap-3 min-w-0">
+                        <div class="card-interactive {{ $pod['bg'] }} border-2 border-black p-4 sm:p-5 shadow-[4px_4px_0px_0px_#000000] flex items-center justify-between gap-4 {{ $pod['rank'] === 1 ? 'order-1 md:order-2' : ($pod['rank'] === 2 ? 'order-2 md:order-1' : 'order-3') }}">
+                            <div class="flex items-center gap-3.5 min-w-0">
                                 <div class="w-12 h-12 bg-white text-[#1A467C] border-2 border-black flex items-center justify-center font-black text-sm shrink-0 overflow-hidden shadow-[2px_2px_0px_0px_#000000]">
                                     @if ($mhs->avatarUrl())
                                         <img src="{{ $mhs->avatarUrl() }}" alt="Avatar {{ $mhs->nama }}" class="w-full h-full object-cover">
@@ -144,17 +144,17 @@
                                         {{ $mhs->initials() }}
                                     @endif
                                 </div>
-                                <div class="min-w-0">
-                                    <span class="inline-block px-1.5 py-0.2 text-[9px] font-black uppercase border border-black {{ $pod['badgeBg'] }}">
+                                <div class="min-w-0 space-y-1">
+                                    <span class="inline-block px-2 py-0.5 text-[9px] font-black uppercase border border-black {{ $pod['badgeBg'] }}">
                                         {{ $pod['label'] }}
                                     </span>
-                                    <h5 class="font-black text-xs sm:text-sm text-gray-950 uppercase truncate mt-1">{{ $mhs->nama }}</h5>
+                                    <h5 class="font-black text-xs sm:text-sm text-gray-950 uppercase truncate">{{ $mhs->nama }}</h5>
                                     <p class="font-mono text-[11px] font-bold text-gray-800">{{ $mhs->nim }} • {{ $mhs->kelas }}</p>
                                 </div>
                             </div>
-                            <div class="bg-white border-2 border-black px-2.5 py-1.5 shadow-[2px_2px_0px_0px_#000000] text-center shrink-0">
+                            <div class="bg-white border-2 border-black px-3 py-2 shadow-[2px_2px_0px_0px_#000000] text-center shrink-0">
                                 <span class="font-mono font-black text-base sm:text-lg text-gray-950 block leading-none">{{ (int) $mhs->total_point }}</span>
-                                <span class="text-[9px] font-black uppercase text-[#1A467C]">Pts</span>
+                                <span class="text-[9px] font-black uppercase text-[#1A467C] mt-0.5 block">Pts</span>
                             </div>
                         </div>
                     @endif
@@ -168,17 +168,17 @@
     <!-- ============================================================== -->
     <!-- 4. GRID 2 KOLOM: RINGKASAN LIST MAHASISWA & AKTIVITAS TERBARU  -->
     <!-- ============================================================== -->
-    <div class="snap-in-6 grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 items-start">
+    <div class="snap-in-6 grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-start">
 
         <!-- KOLOM KIRI: RINGKASAN DAFTAR POINT MAHASISWA -->
         <div class="bg-white border-2 border-black shadow-[5px_5px_0px_0px_#000000] overflow-hidden">
-            <div class="px-4 py-3 border-b-2 border-black bg-blue-50/70 flex items-center justify-between gap-2">
+            <div class="px-5 py-3.5 border-b-2 border-black bg-blue-50/70 flex items-center justify-between gap-3">
                 <h4 class="text-xs font-black uppercase tracking-wider text-[#1A467C]">
                     Daftar Point Mahasiswa
                 </h4>
                 <a 
                     href="{{ route('admin.poin.mahasiswa') }}" 
-                    class="btn-smooth px-2.5 py-1 bg-white hover:bg-[#1A467C] text-[#1A467C] hover:text-white text-[10px] font-black uppercase border-2 border-black shadow-[2px_2px_0px_0px_#000000]"
+                    class="btn-smooth px-3 py-1.5 bg-white hover:bg-[#1A467C] text-[#1A467C] hover:text-white text-[10px] font-black uppercase border-2 border-black shadow-[2px_2px_0px_0px_#000000]"
                 >
                     Semua Mahasiswa →
                 </a>
@@ -186,51 +186,53 @@
 
             <div class="divide-y divide-gray-200">
                 @forelse ($previewMahasiswa as $idx => $item)
-                    <div class="px-4 py-3 hover:bg-blue-50/40 transition flex items-center justify-between gap-2.5">
-                        <div class="flex items-center gap-2.5 min-w-0">
-                            <div class="w-8 h-8 bg-[#2A82C6] text-white border-2 border-black flex items-center justify-center font-black text-[11px] shrink-0 overflow-hidden shadow-[1px_1px_0px_0px_#000000]">
+                    <div class="px-5 py-4 hover:bg-blue-50/40 transition flex items-center justify-between gap-4">
+                        <div class="flex items-center gap-3.5 min-w-0">
+                            <div class="w-9 h-9 bg-[#2A82C6] text-white border-2 border-black flex items-center justify-center font-black text-xs shrink-0 overflow-hidden shadow-[2px_2px_0px_0px_#000000]">
                                 @if ($item->avatarUrl())
                                     <img src="{{ $item->avatarUrl() }}" alt="Avatar {{ $item->nama }}" class="w-full h-full object-cover">
                                 @else
                                     {{ $item->initials() }}
                                 @endif
                             </div>
-                            <div class="min-w-0">
-                                <p class="font-black text-xs text-gray-950 truncate">{{ $item->nama }}</p>
+                            <div class="min-w-0 space-y-0.5">
+                                <p class="font-black text-xs sm:text-sm text-gray-950 truncate">{{ $item->nama }}</p>
                                 <p class="font-mono text-[11px] font-bold text-[#1A467C]">{{ $item->nim }} • {{ $item->kelas }}</p>
                             </div>
                         </div>
 
-                        <div class="flex items-center gap-1.5 shrink-0">
-                            <span class="bg-green-100 border border-black px-2 py-0.5 font-mono font-black text-xs text-[#15803d]">
+                        <div class="flex items-center gap-3 shrink-0">
+                            <span class="bg-green-100 border border-black px-2.5 py-1 font-mono font-black text-xs text-[#15803d]">
                                 ★ {{ (int) $item->total_point }}
                             </span>
-                            <button 
-                                type="button"
-                                onclick="openHistoryModal({{ $item->id }}, '{{ addslashes($item->nama) }}', '{{ $item->nim }}')"
-                                class="btn-smooth w-7 h-7 bg-[#2A82C6] text-white border border-black flex items-center justify-center text-xs cursor-pointer"
-                                title="Riwayat Point"
-                            >
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="square" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                            </button>
-                            <button 
-                                type="button"
-                                onclick="quickSelectStudent('add', {{ $item->id }}, '{{ addslashes($item->nama) }}', '{{ $item->nim }}', '{{ addslashes($item->kelas) }}', {{ (int) $item->total_point }})"
-                                class="btn-smooth w-7 h-7 bg-[#15803d] text-white border border-black flex items-center justify-center font-black text-xs cursor-pointer"
-                                title="Tambah Point"
-                            >
-                                +
-                            </button>
-                            <button 
-                                type="button"
-                                onclick="quickSelectStudent('reduce', {{ $item->id }}, '{{ addslashes($item->nama) }}', '{{ $item->nim }}', '{{ addslashes($item->kelas) }}', {{ (int) $item->total_point }})"
-                                class="btn-smooth w-7 h-7 bg-[#CA2C2A] text-white border border-black flex items-center justify-center font-black text-xs cursor-pointer"
-                                title="Kurangi Point"
-                            >
-                                -
-                            </button>
+                            <div class="flex items-center gap-2">
+                                <button 
+                                    type="button"
+                                    onclick="openHistoryModal({{ $item->id }}, '{{ addslashes($item->nama) }}', '{{ $item->nim }}')"
+                                    class="btn-smooth w-8 h-8 bg-[#2A82C6] text-white border border-black flex items-center justify-center text-xs cursor-pointer shadow-[1px_1px_0px_0px_#000000]"
+                                    title="Riwayat Point"
+                                >
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="square" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </button>
+                                <button 
+                                    type="button"
+                                    onclick="quickSelectStudent('add', {{ $item->id }}, '{{ addslashes($item->nama) }}', '{{ $item->nim }}', '{{ addslashes($item->kelas) }}', {{ (int) $item->total_point }})"
+                                    class="btn-smooth w-8 h-8 bg-[#15803d] text-white border border-black flex items-center justify-center font-black text-xs cursor-pointer shadow-[1px_1px_0px_0px_#000000]"
+                                    title="Tambah Point"
+                                >
+                                    +
+                                </button>
+                                <button 
+                                    type="button"
+                                    onclick="quickSelectStudent('reduce', {{ $item->id }}, '{{ addslashes($item->nama) }}', '{{ $item->nim }}', '{{ addslashes($item->kelas) }}', {{ (int) $item->total_point }})"
+                                    class="btn-smooth w-8 h-8 bg-[#CA2C2A] text-white border border-black flex items-center justify-center font-black text-xs cursor-pointer shadow-[1px_1px_0px_0px_#000000]"
+                                    title="Kurangi Point"
+                                >
+                                    -
+                                </button>
+                            </div>
                         </div>
                     </div>
                 @empty
@@ -243,13 +245,13 @@
 
         <!-- KOLOM KANAN: AKTIVITAS POINT TERBARU -->
         <div class="bg-white border-2 border-black shadow-[5px_5px_0px_0px_#000000] overflow-hidden">
-            <div class="px-4 py-3 border-b-2 border-black bg-blue-50/70 flex items-center justify-between gap-2">
+            <div class="px-5 py-3.5 border-b-2 border-black bg-blue-50/70 flex items-center justify-between gap-3">
                 <h4 class="text-xs font-black uppercase tracking-wider text-[#1A467C]">
                     Aktivitas Point Terbaru
                 </h4>
                 <a 
                     href="{{ route('admin.poin.aktivitas') }}" 
-                    class="btn-smooth px-2.5 py-1 bg-white hover:bg-[#1A467C] text-[#1A467C] hover:text-white text-[10px] font-black uppercase border-2 border-black shadow-[2px_2px_0px_0px_#000000]"
+                    class="btn-smooth px-3 py-1.5 bg-white hover:bg-[#1A467C] text-[#1A467C] hover:text-white text-[10px] font-black uppercase border-2 border-black shadow-[2px_2px_0px_0px_#000000]"
                 >
                     Semua Aktivitas →
                 </a>
@@ -261,13 +263,13 @@
                         $isAdd = $act->tipe === 'tambah';
                         $mhs = $act->pendaftaran;
                     @endphp
-                    <div class="px-4 py-3 hover:bg-blue-50/30 transition flex items-start justify-between gap-3">
-                        <div class="flex items-start gap-2.5 min-w-0">
-                            <span class="w-8 h-8 border-2 border-black font-mono font-black text-xs flex items-center justify-center shrink-0 shadow-[1px_1px_0px_0px_#000000] {{ $isAdd ? 'bg-[#15803d] text-white' : 'bg-[#CA2C2A] text-white' }}">
+                    <div class="px-5 py-4 hover:bg-blue-50/30 transition flex items-start justify-between gap-4">
+                        <div class="flex items-start gap-3.5 min-w-0">
+                            <span class="w-9 h-9 border-2 border-black font-mono font-black text-xs flex items-center justify-center shrink-0 shadow-[2px_2px_0px_0px_#000000] {{ $isAdd ? 'bg-[#15803d] text-white' : 'bg-[#CA2C2A] text-white' }}">
                                 {{ $isAdd ? '+' : '-' }}{{ (int) $act->jumlah }}
                             </span>
-                            <div class="min-w-0">
-                                <p class="font-black text-xs text-gray-950 truncate">
+                            <div class="min-w-0 space-y-1">
+                                <p class="font-black text-xs sm:text-sm text-gray-950 truncate">
                                     {{ $mhs->nama ?? 'Mahasiswa' }}
                                     @if ($mhs)
                                         <span class="font-mono text-[10px] font-bold text-[#1A467C]">({{ $mhs->kelas }})</span>
@@ -281,7 +283,7 @@
                                 </p>
                             </div>
                         </div>
-                        <span class="shrink-0 font-mono text-[10px] font-bold text-gray-500">
+                        <span class="shrink-0 font-mono text-[10px] font-bold text-gray-500 pt-0.5">
                             {{ $act->created_at ? $act->created_at->timezone('Asia/Jakarta')->format('d/m H:i') : '-' }}
                         </span>
                     </div>
@@ -718,3 +720,4 @@
     });
 </script>
 @endsection
+
