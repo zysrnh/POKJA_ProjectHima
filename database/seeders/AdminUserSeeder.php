@@ -15,10 +15,20 @@ class AdminUserSeeder extends Seeder
     {
         $admins = [
             [
-                'email' => 'superadmin@pokja.com',
-                'name' => 'Super Admin POKJA',
-                'password' => Hash::make('Pokja2026#Super!Admin'),
-            ],  
+                'email' => 'naoo@hmif.my.id',
+                'name' => 'Nao',
+                'password' => Hash::make('admin12345'),
+            ],
+            [
+                'email' => 'admin1@hmif.my.id',
+                'name' => 'Admin 1 POKJA',
+                'password' => Hash::make('admin12345'),
+            ],
+            [
+                'email' => 'admin2@hmif.my.id',
+                'name' => 'Admin 2 POKJA',
+                'password' => Hash::make('admin12345'),
+            ],
             [
                 'email' => 'presensi@pokja.com',
                 'name' => 'Admin Presensi & Acara',

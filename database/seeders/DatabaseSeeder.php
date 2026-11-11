@@ -14,10 +14,16 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call([
+        $seeders = [
             AdminUserSeeder::class,
             KelasSeeder::class,
             PengaturanSeeder::class,
-        ]);
+        ];
+
+        if (app()->environment('local')) {
+            $seeders[] = MahasiswaDummySeeder::class;
+        }
+
+        $this->call($seeders);
     }
 }
