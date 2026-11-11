@@ -126,33 +126,36 @@
                 $second = $topThree->get(1);
                 $third = $topThree->get(2);
                 $podiumItems = [
-                    ['rank' => 2, 'label' => 'PERINGKAT #2', 'bg' => 'bg-sky-100', 'badgeBg' => 'bg-[#2A82C6] text-white', 'mhs' => $second],
                     ['rank' => 1, 'label' => 'PERINGKAT #1', 'bg' => 'bg-amber-300', 'badgeBg' => 'bg-black text-amber-300', 'mhs' => $first],
+                    ['rank' => 2, 'label' => 'PERINGKAT #2', 'bg' => 'bg-sky-100', 'badgeBg' => 'bg-[#2A82C6] text-white', 'mhs' => $second],
                     ['rank' => 3, 'label' => 'PERINGKAT #3', 'bg' => 'bg-orange-200', 'badgeBg' => 'bg-[#CA2C2A] text-white', 'mhs' => $third],
                 ];
             @endphp
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 items-stretch pt-1">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 items-stretch pt-3">
                 @foreach ($podiumItems as $pod)
                     @if ($pod['mhs'])
                         @php $mhs = $pod['mhs']; @endphp
-                        <div class="card-interactive {{ $pod['bg'] }} border-2 border-black p-4 sm:p-5 shadow-[4px_4px_0px_0px_#000000] flex items-center justify-between gap-4 {{ $pod['rank'] === 1 ? 'order-1 md:order-2' : ($pod['rank'] === 2 ? 'order-2 md:order-1' : 'order-3') }}">
+                        <div class="card-interactive relative {{ $pod['bg'] }} border-2 border-black px-4 pt-5 pb-4 sm:px-5 sm:pt-6 sm:pb-5 shadow-[4px_4px_0px_0px_#000000] flex items-center justify-between gap-4">
+                            <!-- Badge Peringkat Menempel di Garis Atas Card -->
+                            <span class="absolute -top-3 left-4 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider border-2 border-black {{ $pod['badgeBg'] }} shadow-[2px_2px_0px_0px_#000000]">
+                                {{ $pod['label'] }}
+                            </span>
+
                             <div class="flex items-center gap-3.5 min-w-0">
-                                <div class="w-12 h-12 bg-white text-[#1A467C] border-2 border-black flex items-center justify-center font-black text-sm shrink-0 overflow-hidden shadow-[2px_2px_0px_0px_#000000]">
+                                <div class="w-11 h-11 bg-white text-[#1A467C] border-2 border-black flex items-center justify-center font-black text-sm shrink-0 overflow-hidden shadow-[2px_2px_0px_0px_#000000]">
                                     @if ($mhs->avatarUrl())
                                         <img src="{{ $mhs->avatarUrl() }}" alt="Avatar {{ $mhs->nama }}" class="w-full h-full object-cover">
                                     @else
                                         {{ $mhs->initials() }}
                                     @endif
                                 </div>
-                                <div class="min-w-0 space-y-1">
-                                    <span class="inline-block px-2 py-0.5 text-[9px] font-black uppercase border border-black {{ $pod['badgeBg'] }}">
-                                        {{ $pod['label'] }}
-                                    </span>
+                                <div class="min-w-0 space-y-0.5">
                                     <h5 class="font-black text-xs sm:text-sm text-gray-950 uppercase truncate">{{ $mhs->nama }}</h5>
                                     <p class="font-mono text-[11px] font-bold text-gray-800">{{ $mhs->nim }} • {{ $mhs->kelas }}</p>
                                 </div>
                             </div>
-                            <div class="bg-white border-2 border-black px-3 py-2 shadow-[2px_2px_0px_0px_#000000] text-center shrink-0">
+
+                            <div class="bg-white border-2 border-black px-3 py-1.5 shadow-[2px_2px_0px_0px_#000000] text-center shrink-0">
                                 <span class="font-mono font-black text-base sm:text-lg text-gray-950 block leading-none">{{ (int) $mhs->total_point }}</span>
                                 <span class="text-[9px] font-black uppercase text-[#1A467C] mt-0.5 block">Pts</span>
                             </div>
