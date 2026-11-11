@@ -155,9 +155,9 @@
                                 </div>
                             </div>
 
-                            <div class="bg-white border-2 border-black px-3 py-1.5 shadow-[2px_2px_0px_0px_#000000] text-center shrink-0">
-                                <span class="font-mono font-black text-base sm:text-lg text-gray-950 block leading-none">{{ (int) $mhs->total_point }}</span>
-                                <span class="text-[9px] font-black uppercase text-[#1A467C] mt-0.5 block">Pts</span>
+                            <div class="bg-white border-2 border-black px-3 py-1.5 shadow-[2px_2px_0px_0px_#000000] inline-flex items-baseline gap-1 shrink-0">
+                                <span class="font-mono font-black text-base sm:text-lg text-gray-950 leading-none">{{ (int) $mhs->total_point }}</span>
+                                <span class="text-[10px] font-black uppercase text-[#1A467C] leading-none">Pts</span>
                             </div>
                         </div>
                     @endif
