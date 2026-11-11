@@ -138,6 +138,7 @@ Route::middleware('throttle:120,1')->group(function () {
 
             // Kelola Point Keaktifan Mahasiswa (PointKu Mode)
             Route::get('/poin', [PointAdminController::class, 'index'])->name('poin.index');
+            Route::get('/poin/mahasiswa', [PointAdminController::class, 'mahasiswa'])->name('poin.mahasiswa');
             Route::get('/poin/leaderboard', [PointAdminController::class, 'leaderboard'])->name('poin.leaderboard');
             Route::get('/poin/aktivitas', [PointAdminController::class, 'aktivitas'])->name('poin.aktivitas');
             Route::post('/poin', [PointAdminController::class, 'store'])->name('poin.store');

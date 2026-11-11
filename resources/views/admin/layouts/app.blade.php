@@ -258,18 +258,29 @@
                             Menu PointKu
                         </div>
 
-                        <!-- PointKu 1: Overview & Kelola Point -->
+                        <!-- PointKu 1: Overview PointKu -->
                         <a 
                             href="{{ route('admin.poin.index') }}" 
                             class="flex items-center gap-3 px-3.5 py-3 border-2 transition {{ request()->routeIs('admin.poin.index') ? 'bg-[#2A82C6] border-white text-white shadow-[3px_3px_0px_0px_#000000]' : 'border-transparent text-gray-200 hover:bg-[#0F2A4A] hover:text-white' }}"
                         >
                             <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="square" stroke-width="2.5" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                                <path stroke-linecap="square" stroke-width="2.5" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                             </svg>
                             <span>Overview Point</span>
                         </a>
 
-                        <!-- PointKu 2: Leaderboard Peringkat -->
+                        <!-- PointKu 2: Daftar Mahasiswa / List Point -->
+                        <a 
+                            href="{{ route('admin.poin.mahasiswa') }}" 
+                            class="flex items-center gap-3 px-3.5 py-3 border-2 transition {{ request()->routeIs('admin.poin.mahasiswa') ? 'bg-[#2A82C6] border-white text-white shadow-[3px_3px_0px_0px_#000000]' : 'border-transparent text-gray-200 hover:bg-[#0F2A4A] hover:text-white' }}"
+                        >
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="square" stroke-width="2.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                            </svg>
+                            <span>Daftar Point</span>
+                        </a>
+
+                        <!-- PointKu 3: Leaderboard Peringkat -->
                         <a 
                             href="{{ route('admin.poin.leaderboard') }}" 
                             class="flex items-center gap-3 px-3.5 py-3 border-2 transition {{ request()->routeIs('admin.poin.leaderboard') ? 'bg-[#2A82C6] border-white text-white shadow-[3px_3px_0px_0px_#000000]' : 'border-transparent text-gray-200 hover:bg-[#0F2A4A] hover:text-white' }}"
@@ -280,7 +291,7 @@
                             <span>Leaderboard</span>
                         </a>
 
-                        <!-- PointKu 3: Log Aktivitas Point -->
+                        <!-- PointKu 4: Log Aktivitas Point -->
                         <a 
                             href="{{ route('admin.poin.aktivitas') }}" 
                             class="flex items-center gap-3 px-3.5 py-3 border-2 transition {{ request()->routeIs('admin.poin.aktivitas') ? 'bg-[#2A82C6] border-white text-white shadow-[3px_3px_0px_0px_#000000]' : 'border-transparent text-gray-200 hover:bg-[#0F2A4A] hover:text-white' }}"
@@ -485,7 +496,7 @@
             >
                 <div class="p-1 border-2 transition-all {{ request()->routeIs('admin.poin.index') ? 'bg-[#2A82C6] text-white border-[#1A467C] shadow-[2px_2px_0px_0px_#1A467C]' : 'border-transparent text-gray-500' }}">
                     <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="square" stroke-width="2.2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                        <path stroke-linecap="square" stroke-width="2.2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                     </svg>
                 </div>
                 <span class="text-[9px] uppercase tracking-tight mt-0.5 font-bold {{ request()->routeIs('admin.poin.index') ? 'font-black text-[#1A467C]' : '' }}">
@@ -493,7 +504,22 @@
                 </span>
             </a>
 
-            <!-- Mobile PointKu Tab 2: Leaderboard -->
+            <!-- Mobile PointKu Tab 2: Daftar Point -->
+            <a 
+                href="{{ route('admin.poin.mahasiswa') }}" 
+                class="flex-1 flex flex-col items-center justify-center py-1 transition-all active:scale-95 {{ request()->routeIs('admin.poin.mahasiswa') ? 'text-[#1A467C]' : 'text-gray-500 hover:text-[#1A467C]' }}"
+            >
+                <div class="p-1 border-2 transition-all {{ request()->routeIs('admin.poin.mahasiswa') ? 'bg-[#2A82C6] text-white border-[#1A467C] shadow-[2px_2px_0px_0px_#1A467C]' : 'border-transparent text-gray-500' }}">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="square" stroke-width="2.2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                    </svg>
+                </div>
+                <span class="text-[9px] uppercase tracking-tight mt-0.5 font-bold {{ request()->routeIs('admin.poin.mahasiswa') ? 'font-black text-[#1A467C]' : '' }}">
+                    Daftar
+                </span>
+            </a>
+
+            <!-- Mobile PointKu Tab 3: Leaderboard -->
             <a 
                 href="{{ route('admin.poin.leaderboard') }}" 
                 class="flex-1 flex flex-col items-center justify-center py-1 transition-all active:scale-95 {{ request()->routeIs('admin.poin.leaderboard') ? 'text-[#1A467C]' : 'text-gray-500 hover:text-[#1A467C]' }}"
@@ -504,11 +530,11 @@
                     </svg>
                 </div>
                 <span class="text-[9px] uppercase tracking-tight mt-0.5 font-bold {{ request()->routeIs('admin.poin.leaderboard') ? 'font-black text-[#1A467C]' : '' }}">
-                    Leaderboard
+                    Rank
                 </span>
             </a>
 
-            <!-- Mobile PointKu Tab 3: Log Aktivitas -->
+            <!-- Mobile PointKu Tab 4: Log Aktivitas -->
             <a 
                 href="{{ route('admin.poin.aktivitas') }}" 
                 class="flex-1 flex flex-col items-center justify-center py-1 transition-all active:scale-95 {{ request()->routeIs('admin.poin.aktivitas') ? 'text-[#1A467C]' : 'text-gray-500 hover:text-[#1A467C]' }}"

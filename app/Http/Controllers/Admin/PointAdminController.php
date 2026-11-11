@@ -51,9 +51,53 @@ class PointAdminController extends Controller
     ];
 
     /**
-     * Tampilkan halaman Kelola Point Keaktifan Mahasiswa di Admin Panel.
+     * Tampilkan halaman Overview PointKu (Gabungan Ringkasan Leaderboard, Aktivitas Terbaru, & Daftar Mahasiswa).
      */
-    public function index(Request $request)
+    public function index()
+    {
+        $totalMahasiswa = Pendaftaran::count();
+        $totalPointDiberikan = (int) Pendaftaran::sum('total_point');
+        $transaksiHariIni = PointHistory::whereDate('created_at', now()->timezone('Asia/Jakarta')->toDateString())->count();
+
+        $topMahasiswa = Pendaftaran::withCount('pointHistories')
+            ->orderBy('total_point', 'desc')
+            ->orderBy('nama', 'asc')
+            ->take(6)
+            ->get();
+
+        $topThree = $topMahasiswa->take(3)->values();
+        $previewMahasiswa = $topMahasiswa->take(5)->values();
+
+        $recentActivities = PointHistory::with('pendaftaran')
+            ->orderBy('created_at', 'desc')
+            ->orderBy('id', 'desc')
+            ->take(5)
+            ->get();
+
+        $allMahasiswaList = Pendaftaran::select('id', 'nama', 'nim', 'kelas', 'total_point')
+            ->orderBy('nama', 'asc')
+            ->get();
+
+        $kategoriTambah = self::KATEGORI_TAMBAH;
+        $kategoriKurang = self::KATEGORI_KURANG;
+
+        return view('admin.poin.overview', compact(
+            'totalMahasiswa',
+            'totalPointDiberikan',
+            'transaksiHariIni',
+            'topThree',
+            'previewMahasiswa',
+            'recentActivities',
+            'allMahasiswaList',
+            'kategoriTambah',
+            'kategoriKurang'
+        ));
+    }
+
+    /**
+     * Tampilkan halaman Daftar Mahasiswa & Kelola Point Lengkap.
+     */
+    public function mahasiswa(Request $request)
     {
         $search = trim((string) $request->input('search', ''));
         $kelasFilter = trim((string) $request->input('kelas', ''));
@@ -83,15 +127,8 @@ class PointAdminController extends Controller
 
         $pendaftarans = $query->paginate(20)->withQueryString();
 
-        // Data Statistik
-        $totalMahasiswa = Pendaftaran::count();
-        $totalPointDiberikan = (int) Pendaftaran::sum('total_point');
-        $transaksiHariIni = PointHistory::whereDate('created_at', now()->timezone('Asia/Jakarta')->toDateString())->count();
-
-        // Daftar Kelas untuk dropdown filter
         $kelasList = Kelas::orderBy('nama_kelas')->get();
 
-        // Data ringkas seluruh mahasiswa untuk live search autocomplete di modal Tambah / Kurangi Point
         $allMahasiswaList = Pendaftaran::select('id', 'nama', 'nim', 'kelas', 'total_point')
             ->orderBy('nama', 'asc')
             ->get();
@@ -101,9 +138,6 @@ class PointAdminController extends Controller
 
         return view('admin.poin.index', compact(
             'pendaftarans',
-            'totalMahasiswa',
-            'totalPointDiberikan',
-            'transaksiHariIni',
             'kelasList',
             'allMahasiswaList',
             'kategoriTambah',

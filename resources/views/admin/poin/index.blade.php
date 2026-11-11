@@ -1,7 +1,7 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Kelola Point Mahasiswa')
-@section('header_title', 'Sistem Point Keaktifan Mahasiswa')
+@section('title', 'Daftar Point Mahasiswa')
+@section('header_title', 'Daftar Point Mahasiswa')
 
 @section('content')
 <style>
@@ -61,54 +61,10 @@
     </div>
 
     <!-- ============================================================== -->
-    <!-- 2. 3 KARTU STATISTIK (Neubrutalism Style)                      -->
+    <!-- 2. FILTER & PENCARIAN BAR                                      -->
     <!-- ============================================================== -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-        <!-- Stat 1: Total Mahasiswa -->
-        <div class="snap-in-2 card-interactive bg-white border-2 border-black p-4 shadow-[4px_4px_0px_0px_#000000] flex items-center justify-between">
-            <div>
-                <span class="text-[11px] font-black uppercase tracking-wider text-[#1A467C] block">Total Mahasiswa</span>
-                <span class="text-2xl sm:text-3xl font-black text-gray-950 font-mono mt-1 block">{{ number_format($totalMahasiswa) }}</span>
-            </div>
-            <div class="w-10 h-10 bg-[#2A82C6] text-white border-2 border-black flex items-center justify-center shadow-[2px_2px_0px_0px_#000000]">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="square" stroke-width="2.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-            </div>
-        </div>
-
-        <!-- Stat 2: Total Point Diberikan -->
-        <div class="snap-in-3 card-interactive bg-white border-2 border-black p-4 shadow-[4px_4px_0px_0px_#000000] flex items-center justify-between">
-            <div>
-                <span class="text-[11px] font-black uppercase tracking-wider text-[#15803d] block">Total Point Aktif</span>
-                <span class="text-2xl sm:text-3xl font-black text-[#15803d] font-mono mt-1 block">{{ number_format($totalPointDiberikan) }} <span class="text-xs font-bold uppercase">Pts</span></span>
-            </div>
-            <div class="w-10 h-10 bg-amber-400 text-black border-2 border-black flex items-center justify-center shadow-[2px_2px_0px_0px_#000000]">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="square" stroke-width="2.5" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                </svg>
-            </div>
-        </div>
-
-        <!-- Stat 3: Aktivitas Hari Ini -->
-        <div class="snap-in-4 card-interactive bg-white border-2 border-black p-4 shadow-[4px_4px_0px_0px_#000000] flex items-center justify-between">
-            <div>
-                <span class="text-[11px] font-black uppercase tracking-wider text-[#1A467C] block">Aktivitas Hari Ini</span>
-                <span class="text-2xl sm:text-3xl font-black text-gray-950 font-mono mt-1 block">{{ number_format($transaksiHariIni) }}</span>
-            </div>
-            <div class="w-10 h-10 bg-[#1A467C] text-white border-2 border-black flex items-center justify-center shadow-[2px_2px_0px_0px_#000000]">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="square" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-            </div>
-        </div>
-    </div>
-
-    <!-- ============================================================== -->
-    <!-- 3. FILTER & PENCARIAN BAR                                      -->
-    <!-- ============================================================== -->
-    <div class="snap-in-5 bg-white border-2 border-black p-3 sm:p-4 shadow-[4px_4px_0px_0px_#000000]">
-        <form action="{{ route('admin.poin.index') }}" method="GET" class="flex flex-col md:flex-row items-stretch gap-2.5">
+    <div class="snap-in-2 bg-white border-2 border-black p-3 sm:p-4 shadow-[4px_4px_0px_0px_#000000]">
+        <form action="{{ route('admin.poin.mahasiswa') }}" method="GET" class="flex flex-col md:flex-row items-stretch gap-2.5">
             <!-- Search Input -->
             <div class="flex-1 relative">
                 <input 
@@ -169,7 +125,7 @@
                 </button>
                 @if ($search || $kelasFilter || $sort !== 'point_desc')
                     <a 
-                        href="{{ route('admin.poin.index') }}" 
+                        href="{{ route('admin.poin.mahasiswa') }}" 
                         class="btn-smooth px-3 py-2 bg-white hover:bg-gray-100 text-gray-800 border-2 border-black text-xs font-black shadow-[2px_2px_0px_0px_#000000]"
                         title="Reset Filter"
                     >
