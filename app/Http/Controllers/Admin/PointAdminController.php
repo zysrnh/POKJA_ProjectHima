@@ -169,11 +169,28 @@ class PointAdminController extends Controller
         $topThree = $rankedMahasiswa->take(3)->values();
         $kelasList = Kelas::orderBy('nama_kelas')->get();
 
+        // Statistik akumulasi point per kelas untuk grafik Leaderboard
+        $rawKelasStats = Pendaftaran::selectRaw('kelas, COUNT(*) as total_mhs, COALESCE(SUM(total_point), 0) as total_point, COALESCE(ROUND(AVG(total_point), 1), 0) as avg_point')
+            ->groupBy('kelas')
+            ->get()
+            ->keyBy('kelas');
+
+        $kelasStats = $kelasList->map(function ($k) use ($rawKelasStats) {
+            $stat = $rawKelasStats->get($k->nama_kelas);
+            return [
+                'kelas' => $k->nama_kelas,
+                'total_mhs' => $stat ? (int) $stat->total_mhs : 0,
+                'total_point' => $stat ? (int) $stat->total_point : 0,
+                'avg_point' => $stat ? (float) $stat->avg_point : 0.0,
+            ];
+        })->values();
+
         return view('admin.poin.leaderboard', compact(
             'rankedMahasiswa',
             'topThree',
             'kelasList',
-            'kelasFilter'
+            'kelasFilter',
+            'kelasStats'
         ));
     }
 
