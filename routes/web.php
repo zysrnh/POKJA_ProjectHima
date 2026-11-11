@@ -136,8 +136,10 @@ Route::middleware('throttle:120,1')->group(function () {
             Route::post('/presensi/sync-spreadsheet', [PresensiAdminController::class, 'syncSpreadsheet'])->name('presensi.sync');
             Route::get('/presensi/export', [PresensiAdminController::class, 'exportExcel'])->name('presensi.export');
 
-            // Kelola Point Keaktifan Mahasiswa
+            // Kelola Point Keaktifan Mahasiswa (PointKu Mode)
             Route::get('/poin', [PointAdminController::class, 'index'])->name('poin.index');
+            Route::get('/poin/leaderboard', [PointAdminController::class, 'leaderboard'])->name('poin.leaderboard');
+            Route::get('/poin/aktivitas', [PointAdminController::class, 'aktivitas'])->name('poin.aktivitas');
             Route::post('/poin', [PointAdminController::class, 'store'])->name('poin.store');
             Route::get('/poin/{id}/riwayat', [PointAdminController::class, 'history'])->whereNumber('id')->name('poin.history');
             Route::delete('/poin/riwayat/{historyId}', [PointAdminController::class, 'destroyHistory'])->whereNumber('historyId')->name('poin.destroyHistory');

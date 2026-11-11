@@ -194,6 +194,10 @@
         </script>
     @endif
 
+    @php
+        $isPointKuMode = request()->routeIs('admin.poin.*');
+    @endphp
+
     <div class="flex flex-1 h-screen overflow-hidden relative">
 
         <!-- Sidebar Navigation (Desktop Fixed Pinned Neubrutalism, Hidden on Mobile) -->
@@ -212,78 +216,137 @@
                         >
                         <div>
                             <span class="font-black text-xs uppercase tracking-wider text-white block">POKJA HIMA IF</span>
-                            <span class="text-[10px] text-[#2A82C6] font-bold uppercase tracking-wider block">Admin Panel</span>
+                            <span class="text-[10px] {{ $isPointKuMode ? 'text-amber-400' : 'text-[#2A82C6]' }} font-bold uppercase tracking-wider block">
+                                {{ $isPointKuMode ? 'PointKu Panel' : 'Admin Panel' }}
+                            </span>
                         </div>
                     </div>
                 </div>
 
+                <!-- Workspace Switcher Button (Tepat di bawah Brand Header Sidebar) -->
+                <div class="px-3.5 pt-3.5 pb-2 border-b-2 border-[#000000] bg-[#0F2A4A]/60">
+                    @if ($isPointKuMode)
+                        <a 
+                            href="{{ route('admin.dashboard') }}" 
+                            class="btn-smooth w-full flex items-center justify-center gap-2 px-3 py-2.5 bg-white hover:bg-gray-100 text-[#1A467C] text-[11px] font-black uppercase tracking-wider border-2 border-black shadow-[3px_3px_0px_0px_#000000]"
+                            title="Kembali ke Panel Pendaftaran & Presensi POKJA"
+                        >
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="square" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                            </svg>
+                            <span>Panel Pendaftaran</span>
+                        </a>
+                    @else
+                        <a 
+                            href="{{ route('admin.poin.index') }}" 
+                            class="btn-smooth w-full flex items-center justify-center gap-2 px-3 py-2.5 bg-amber-400 hover:bg-amber-300 text-black text-[11px] font-black uppercase tracking-wider border-2 border-black shadow-[3px_3px_0px_0px_#000000]"
+                            title="Buka Overview & Manajemen PointKu"
+                        >
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="square" stroke-width="2.5" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                            </svg>
+                            <span>Overview PointKu</span>
+                        </a>
+                    @endif
+                </div>
+
                 <!-- Navigation Links -->
                 <nav class="p-3.5 space-y-2 text-xs font-bold uppercase tracking-wider flex-1">
-                    <!-- Menu 1: Data Pendaftar -->
-                    <a 
-                        href="{{ route('admin.dashboard') }}" 
-                        class="flex items-center gap-3 px-3.5 py-3 border-2 transition {{ request()->routeIs('admin.dashboard') || request()->routeIs('admin.pendaftar.*') ? 'bg-[#2A82C6] border-white text-white shadow-[3px_3px_0px_0px_#000000]' : 'border-transparent text-gray-200 hover:bg-[#0F2A4A] hover:text-white' }}"
-                    >
-                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="square" stroke-width="2.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-                        </svg>
-                        <span>Data Pendaftar</span>
-                    </a>
+                    @if ($isPointKuMode)
+                        <!-- MENU KHUSUS POINTKU PANEL -->
+                        <div class="px-1 pb-1 text-[10px] font-black uppercase tracking-widest text-amber-300">
+                            Menu PointKu
+                        </div>
 
-                    <!-- Menu 2: Presensi Kelas 7 Pertemuan -->
-                    <a 
-                        href="{{ route('admin.presensi.index') }}" 
-                        class="flex items-center gap-3 px-3.5 py-3 border-2 transition {{ request()->routeIs('admin.presensi.*') ? 'bg-[#2A82C6] border-white text-white shadow-[3px_3px_0px_0px_#000000]' : 'border-transparent text-gray-200 hover:bg-[#0F2A4A] hover:text-white' }}"
-                    >
-                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="square" stroke-width="2.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-                        </svg>
-                        <span>Presensi Kelas</span>
-                    </a>
+                        <!-- PointKu 1: Overview & Kelola Point -->
+                        <a 
+                            href="{{ route('admin.poin.index') }}" 
+                            class="flex items-center gap-3 px-3.5 py-3 border-2 transition {{ request()->routeIs('admin.poin.index') ? 'bg-[#2A82C6] border-white text-white shadow-[3px_3px_0px_0px_#000000]' : 'border-transparent text-gray-200 hover:bg-[#0F2A4A] hover:text-white' }}"
+                        >
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="square" stroke-width="2.5" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                            </svg>
+                            <span>Overview Point</span>
+                        </a>
 
-                    <!-- Menu 3: Kelola Point Keaktifan -->
-                    <a 
-                        href="{{ route('admin.poin.index') }}" 
-                        class="flex items-center gap-3 px-3.5 py-3 border-2 transition {{ request()->routeIs('admin.poin.*') ? 'bg-[#2A82C6] border-white text-white shadow-[3px_3px_0px_0px_#000000]' : 'border-transparent text-gray-200 hover:bg-[#0F2A4A] hover:text-white' }}"
-                    >
-                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="square" stroke-width="2.5" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                        </svg>
-                        <span>Kelola Point</span>
-                    </a>
+                        <!-- PointKu 2: Leaderboard Peringkat -->
+                        <a 
+                            href="{{ route('admin.poin.leaderboard') }}" 
+                            class="flex items-center gap-3 px-3.5 py-3 border-2 transition {{ request()->routeIs('admin.poin.leaderboard') ? 'bg-[#2A82C6] border-white text-white shadow-[3px_3px_0px_0px_#000000]' : 'border-transparent text-gray-200 hover:bg-[#0F2A4A] hover:text-white' }}"
+                        >
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="square" stroke-width="2.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                            </svg>
+                            <span>Leaderboard</span>
+                        </a>
 
-                    <!-- Menu 3: Kelola Kelas -->
-                    <a 
-                        href="{{ route('admin.kelas.index') }}" 
-                        class="flex items-center gap-3 px-3.5 py-3 border-2 transition {{ request()->routeIs('admin.kelas.*') ? 'bg-[#2A82C6] border-white text-white shadow-[3px_3px_0px_0px_#000000]' : 'border-transparent text-gray-200 hover:bg-[#0F2A4A] hover:text-white' }}"
-                    >
-                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="square" stroke-width="2.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                        </svg>
-                        <span>Kelola Kelas</span>
-                    </a>
+                        <!-- PointKu 3: Log Aktivitas Point -->
+                        <a 
+                            href="{{ route('admin.poin.aktivitas') }}" 
+                            class="flex items-center gap-3 px-3.5 py-3 border-2 transition {{ request()->routeIs('admin.poin.aktivitas') ? 'bg-[#2A82C6] border-white text-white shadow-[3px_3px_0px_0px_#000000]' : 'border-transparent text-gray-200 hover:bg-[#0F2A4A] hover:text-white' }}"
+                        >
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="square" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span>Log Aktivitas</span>
+                        </a>
+                    @else
+                        <!-- MENU PANEL UTAMA POKJA -->
+                        <!-- Menu 1: Data Pendaftar -->
+                        <a 
+                            href="{{ route('admin.dashboard') }}" 
+                            class="flex items-center gap-3 px-3.5 py-3 border-2 transition {{ request()->routeIs('admin.dashboard') || request()->routeIs('admin.pendaftar.*') ? 'bg-[#2A82C6] border-white text-white shadow-[3px_3px_0px_0px_#000000]' : 'border-transparent text-gray-200 hover:bg-[#0F2A4A] hover:text-white' }}"
+                        >
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="square" stroke-width="2.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                            </svg>
+                            <span>Data Pendaftar</span>
+                        </a>
 
-                    <!-- Menu 4: Kelola Admin -->
-                    <a 
-                        href="{{ route('admin.users.index') }}" 
-                        class="flex items-center gap-3 px-3.5 py-3 border-2 transition {{ request()->routeIs('admin.users.*') ? 'bg-[#2A82C6] border-white text-white shadow-[3px_3px_0px_0px_#000000]' : 'border-transparent text-gray-200 hover:bg-[#0F2A4A] hover:text-white' }}"
-                    >
-                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="square" stroke-width="2.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                        </svg>
-                        <span>Kelola Admin</span>
-                    </a>
+                        <!-- Menu 2: Presensi Kelas 7 Pertemuan -->
+                        <a 
+                            href="{{ route('admin.presensi.index') }}" 
+                            class="flex items-center gap-3 px-3.5 py-3 border-2 transition {{ request()->routeIs('admin.presensi.*') ? 'bg-[#2A82C6] border-white text-white shadow-[3px_3px_0px_0px_#000000]' : 'border-transparent text-gray-200 hover:bg-[#0F2A4A] hover:text-white' }}"
+                        >
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="square" stroke-width="2.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                            </svg>
+                            <span>Presensi Kelas</span>
+                        </a>
 
-                    <!-- Menu 5: Pengaturan Acara -->
-                    <a 
-                        href="{{ route('admin.pengaturan.index') }}" 
-                        class="flex items-center gap-3 px-3.5 py-3 border-2 transition {{ request()->routeIs('admin.pengaturan.*') ? 'bg-[#2A82C6] border-white text-white shadow-[3px_3px_0px_0px_#000000]' : 'border-transparent text-gray-200 hover:bg-[#0F2A4A] hover:text-white' }}"
-                    >
-                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="square" stroke-width="2.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                        <span>Pengaturan Acara</span>
-                    </a>
+                        <!-- Menu 3: Kelola Kelas -->
+                        <a 
+                            href="{{ route('admin.kelas.index') }}" 
+                            class="flex items-center gap-3 px-3.5 py-3 border-2 transition {{ request()->routeIs('admin.kelas.*') ? 'bg-[#2A82C6] border-white text-white shadow-[3px_3px_0px_0px_#000000]' : 'border-transparent text-gray-200 hover:bg-[#0F2A4A] hover:text-white' }}"
+                        >
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="square" stroke-width="2.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                            </svg>
+                            <span>Kelola Kelas</span>
+                        </a>
+
+                        <!-- Menu 4: Kelola Admin -->
+                        <a 
+                            href="{{ route('admin.users.index') }}" 
+                            class="flex items-center gap-3 px-3.5 py-3 border-2 transition {{ request()->routeIs('admin.users.*') ? 'bg-[#2A82C6] border-white text-white shadow-[3px_3px_0px_0px_#000000]' : 'border-transparent text-gray-200 hover:bg-[#0F2A4A] hover:text-white' }}"
+                        >
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="square" stroke-width="2.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                            </svg>
+                            <span>Kelola Admin</span>
+                        </a>
+
+                        <!-- Menu 5: Pengaturan Acara -->
+                        <a 
+                            href="{{ route('admin.pengaturan.index') }}" 
+                            class="flex items-center gap-3 px-3.5 py-3 border-2 transition {{ request()->routeIs('admin.pengaturan.*') ? 'bg-[#2A82C6] border-white text-white shadow-[3px_3px_0px_0px_#000000]' : 'border-transparent text-gray-200 hover:bg-[#0F2A4A] hover:text-white' }}"
+                        >
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="square" stroke-width="2.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            <span>Pengaturan Acara</span>
+                        </a>
+                    @endif
                 </nav>
             </div>
 
@@ -414,95 +477,157 @@
         aria-label="Mobile Navigation Toolbar" 
         class="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t-2 border-[#1A467C] shadow-[0px_-4px_12px_rgba(26,70,124,0.15)] px-1 pt-1.5 pb-2 flex items-center justify-around"
     >
-        <!-- Tab 1: Data Pendaftar -->
-        <a 
-            href="{{ route('admin.dashboard') }}" 
-            class="flex-1 flex flex-col items-center justify-center py-1 transition-all active:scale-95 {{ request()->routeIs('admin.dashboard') || request()->routeIs('admin.pendaftar.*') ? 'text-[#1A467C]' : 'text-gray-500 hover:text-[#1A467C]' }}"
-        >
-            <div class="p-1 border-2 transition-all {{ request()->routeIs('admin.dashboard') || request()->routeIs('admin.pendaftar.*') ? 'bg-[#2A82C6] text-white border-[#1A467C] shadow-[2px_2px_0px_0px_#1A467C]' : 'border-transparent text-gray-500' }}">
-                <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="square" stroke-width="2.2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-                </svg>
-            </div>
-            <span class="text-[9px] uppercase tracking-tight mt-0.5 font-bold {{ request()->routeIs('admin.dashboard') || request()->routeIs('admin.pendaftar.*') ? 'font-black text-[#1A467C]' : '' }}">
-                Pendaftar
-            </span>
-        </a>
+        @if ($isPointKuMode)
+            <!-- Mobile PointKu Tab 1: Overview -->
+            <a 
+                href="{{ route('admin.poin.index') }}" 
+                class="flex-1 flex flex-col items-center justify-center py-1 transition-all active:scale-95 {{ request()->routeIs('admin.poin.index') ? 'text-[#1A467C]' : 'text-gray-500 hover:text-[#1A467C]' }}"
+            >
+                <div class="p-1 border-2 transition-all {{ request()->routeIs('admin.poin.index') ? 'bg-[#2A82C6] text-white border-[#1A467C] shadow-[2px_2px_0px_0px_#1A467C]' : 'border-transparent text-gray-500' }}">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="square" stroke-width="2.2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                    </svg>
+                </div>
+                <span class="text-[9px] uppercase tracking-tight mt-0.5 font-bold {{ request()->routeIs('admin.poin.index') ? 'font-black text-[#1A467C]' : '' }}">
+                    Overview
+                </span>
+            </a>
 
-        <!-- Tab 2: Presensi Kelas -->
-        <a 
-            href="{{ route('admin.presensi.index') }}" 
-            class="flex-1 flex flex-col items-center justify-center py-1 transition-all active:scale-95 {{ request()->routeIs('admin.presensi.*') ? 'text-[#1A467C]' : 'text-gray-500 hover:text-[#1A467C]' }}"
-        >
-            <div class="p-1 border-2 transition-all {{ request()->routeIs('admin.presensi.*') ? 'bg-[#2A82C6] text-white border-[#1A467C] shadow-[2px_2px_0px_0px_#1A467C]' : 'border-transparent text-gray-500' }}">
-                <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="square" stroke-width="2.2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-                </svg>
-            </div>
-            <span class="text-[9px] uppercase tracking-tight mt-0.5 font-bold {{ request()->routeIs('admin.presensi.*') ? 'font-black text-[#1A467C]' : '' }}">
-                Presensi
-            </span>
-        </a>
+            <!-- Mobile PointKu Tab 2: Leaderboard -->
+            <a 
+                href="{{ route('admin.poin.leaderboard') }}" 
+                class="flex-1 flex flex-col items-center justify-center py-1 transition-all active:scale-95 {{ request()->routeIs('admin.poin.leaderboard') ? 'text-[#1A467C]' : 'text-gray-500 hover:text-[#1A467C]' }}"
+            >
+                <div class="p-1 border-2 transition-all {{ request()->routeIs('admin.poin.leaderboard') ? 'bg-[#2A82C6] text-white border-[#1A467C] shadow-[2px_2px_0px_0px_#1A467C]' : 'border-transparent text-gray-500' }}">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="square" stroke-width="2.2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                </div>
+                <span class="text-[9px] uppercase tracking-tight mt-0.5 font-bold {{ request()->routeIs('admin.poin.leaderboard') ? 'font-black text-[#1A467C]' : '' }}">
+                    Leaderboard
+                </span>
+            </a>
 
-        <!-- Tab 3: Kelola Point -->
-        <a 
-            href="{{ route('admin.poin.index') }}" 
-            class="flex-1 flex flex-col items-center justify-center py-1 transition-all active:scale-95 {{ request()->routeIs('admin.poin.*') ? 'text-[#1A467C]' : 'text-gray-500 hover:text-[#1A467C]' }}"
-        >
-            <div class="p-1 border-2 transition-all {{ request()->routeIs('admin.poin.*') ? 'bg-[#2A82C6] text-white border-[#1A467C] shadow-[2px_2px_0px_0px_#1A467C]' : 'border-transparent text-gray-500' }}">
-                <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="square" stroke-width="2.2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                </svg>
-            </div>
-            <span class="text-[9px] uppercase tracking-tight mt-0.5 font-bold {{ request()->routeIs('admin.poin.*') ? 'font-black text-[#1A467C]' : '' }}">
-                Point
-            </span>
-        </a>
+            <!-- Mobile PointKu Tab 3: Log Aktivitas -->
+            <a 
+                href="{{ route('admin.poin.aktivitas') }}" 
+                class="flex-1 flex flex-col items-center justify-center py-1 transition-all active:scale-95 {{ request()->routeIs('admin.poin.aktivitas') ? 'text-[#1A467C]' : 'text-gray-500 hover:text-[#1A467C]' }}"
+            >
+                <div class="p-1 border-2 transition-all {{ request()->routeIs('admin.poin.aktivitas') ? 'bg-[#2A82C6] text-white border-[#1A467C] shadow-[2px_2px_0px_0px_#1A467C]' : 'border-transparent text-gray-500' }}">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="square" stroke-width="2.2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <span class="text-[9px] uppercase tracking-tight mt-0.5 font-bold {{ request()->routeIs('admin.poin.aktivitas') ? 'font-black text-[#1A467C]' : '' }}">
+                    Aktivitas
+                </span>
+            </a>
 
-        <!-- Tab 2: Kelola Kelas -->
-        <a 
-            href="{{ route('admin.kelas.index') }}" 
-            class="flex-1 flex flex-col items-center justify-center py-1 transition-all active:scale-95 {{ request()->routeIs('admin.kelas.*') ? 'text-[#1A467C]' : 'text-gray-500 hover:text-[#1A467C]' }}"
-        >
-            <div class="p-1 border-2 transition-all {{ request()->routeIs('admin.kelas.*') ? 'bg-[#2A82C6] text-white border-[#1A467C] shadow-[2px_2px_0px_0px_#1A467C]' : 'border-transparent text-gray-500' }}">
-                <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="square" stroke-width="2.2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                </svg>
-            </div>
-            <span class="text-[9px] uppercase tracking-tight mt-0.5 font-bold {{ request()->routeIs('admin.kelas.*') ? 'font-black text-[#1A467C]' : '' }}">
-                Kelas
-            </span>
-        </a>
+            <!-- Mobile PointKu Tab 4: Kembali ke Panel Pendaftaran -->
+            <a 
+                href="{{ route('admin.dashboard') }}" 
+                class="flex-1 flex flex-col items-center justify-center py-1 transition-all active:scale-95 text-[#1A467C]"
+            >
+                <div class="p-1 border-2 bg-amber-400 text-black border-black shadow-[2px_2px_0px_0px_#000000]">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="square" stroke-width="2.2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                </div>
+                <span class="text-[9px] uppercase tracking-tight mt-0.5 font-black text-[#1A467C]">
+                    Panel Utama
+                </span>
+            </a>
+        @else
+            <!-- Tab 1: Data Pendaftar -->
+            <a 
+                href="{{ route('admin.dashboard') }}" 
+                class="flex-1 flex flex-col items-center justify-center py-1 transition-all active:scale-95 {{ request()->routeIs('admin.dashboard') || request()->routeIs('admin.pendaftar.*') ? 'text-[#1A467C]' : 'text-gray-500 hover:text-[#1A467C]' }}"
+            >
+                <div class="p-1 border-2 transition-all {{ request()->routeIs('admin.dashboard') || request()->routeIs('admin.pendaftar.*') ? 'bg-[#2A82C6] text-white border-[#1A467C] shadow-[2px_2px_0px_0px_#1A467C]' : 'border-transparent text-gray-500' }}">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="square" stroke-width="2.2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                    </svg>
+                </div>
+                <span class="text-[9px] uppercase tracking-tight mt-0.5 font-bold {{ request()->routeIs('admin.dashboard') || request()->routeIs('admin.pendaftar.*') ? 'font-black text-[#1A467C]' : '' }}">
+                    Pendaftar
+                </span>
+            </a>
 
-        <!-- Tab 3: Kelola Admin -->
-        <a 
-            href="{{ route('admin.users.index') }}" 
-            class="flex-1 flex flex-col items-center justify-center py-1 transition-all active:scale-95 {{ request()->routeIs('admin.users.*') ? 'text-[#1A467C]' : 'text-gray-500 hover:text-[#1A467C]' }}"
-        >
-            <div class="p-1 border-2 transition-all {{ request()->routeIs('admin.users.*') ? 'bg-[#2A82C6] text-white border-[#1A467C] shadow-[2px_2px_0px_0px_#1A467C]' : 'border-transparent text-gray-500' }}">
-                <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="square" stroke-width="2.2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                </svg>
-            </div>
-            <span class="text-[9px] uppercase tracking-tight mt-0.5 font-bold {{ request()->routeIs('admin.users.*') ? 'font-black text-[#1A467C]' : '' }}">
-                Admin
-            </span>
-        </a>
+            <!-- Tab 2: Presensi Kelas -->
+            <a 
+                href="{{ route('admin.presensi.index') }}" 
+                class="flex-1 flex flex-col items-center justify-center py-1 transition-all active:scale-95 {{ request()->routeIs('admin.presensi.*') ? 'text-[#1A467C]' : 'text-gray-500 hover:text-[#1A467C]' }}"
+            >
+                <div class="p-1 border-2 transition-all {{ request()->routeIs('admin.presensi.*') ? 'bg-[#2A82C6] text-white border-[#1A467C] shadow-[2px_2px_0px_0px_#1A467C]' : 'border-transparent text-gray-500' }}">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="square" stroke-width="2.2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                    </svg>
+                </div>
+                <span class="text-[9px] uppercase tracking-tight mt-0.5 font-bold {{ request()->routeIs('admin.presensi.*') ? 'font-black text-[#1A467C]' : '' }}">
+                    Presensi
+                </span>
+            </a>
 
-        <!-- Tab 4: Pengaturan Acara -->
-        <a 
-            href="{{ route('admin.pengaturan.index') }}" 
-            class="flex-1 flex flex-col items-center justify-center py-1 transition-all active:scale-95 {{ request()->routeIs('admin.pengaturan.*') ? 'text-[#1A467C]' : 'text-gray-500 hover:text-[#1A467C]' }}"
-        >
-            <div class="p-1 border-2 transition-all {{ request()->routeIs('admin.pengaturan.*') ? 'bg-[#2A82C6] text-white border-[#1A467C] shadow-[2px_2px_0px_0px_#1A467C]' : 'border-transparent text-gray-500' }}">
-                <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="square" stroke-width="2.2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-            </div>
-            <span class="text-[9px] uppercase tracking-tight mt-0.5 font-bold {{ request()->routeIs('admin.pengaturan.*') ? 'font-black text-[#1A467C]' : '' }}">
-                Acara
-            </span>
-        </a>
+            <!-- Tab 3: Switch ke Overview PointKu -->
+            <a 
+                href="{{ route('admin.poin.index') }}" 
+                class="flex-1 flex flex-col items-center justify-center py-1 transition-all active:scale-95 text-[#1A467C]"
+            >
+                <div class="p-1 border-2 bg-amber-400 text-black border-black shadow-[2px_2px_0px_0px_#000000]">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="square" stroke-width="2.2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                    </svg>
+                </div>
+                <span class="text-[9px] uppercase tracking-tight mt-0.5 font-black text-[#1A467C]">
+                    PointKu
+                </span>
+            </a>
+
+            <!-- Tab 4: Kelola Kelas -->
+            <a 
+                href="{{ route('admin.kelas.index') }}" 
+                class="flex-1 flex flex-col items-center justify-center py-1 transition-all active:scale-95 {{ request()->routeIs('admin.kelas.*') ? 'text-[#1A467C]' : 'text-gray-500 hover:text-[#1A467C]' }}"
+            >
+                <div class="p-1 border-2 transition-all {{ request()->routeIs('admin.kelas.*') ? 'bg-[#2A82C6] text-white border-[#1A467C] shadow-[2px_2px_0px_0px_#1A467C]' : 'border-transparent text-gray-500' }}">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="square" stroke-width="2.2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                    </svg>
+                </div>
+                <span class="text-[9px] uppercase tracking-tight mt-0.5 font-bold {{ request()->routeIs('admin.kelas.*') ? 'font-black text-[#1A467C]' : '' }}">
+                    Kelas
+                </span>
+            </a>
+
+            <!-- Tab 5: Kelola Admin -->
+            <a 
+                href="{{ route('admin.users.index') }}" 
+                class="flex-1 flex flex-col items-center justify-center py-1 transition-all active:scale-95 {{ request()->routeIs('admin.users.*') ? 'text-[#1A467C]' : 'text-gray-500 hover:text-[#1A467C]' }}"
+            >
+                <div class="p-1 border-2 transition-all {{ request()->routeIs('admin.users.*') ? 'bg-[#2A82C6] text-white border-[#1A467C] shadow-[2px_2px_0px_0px_#1A467C]' : 'border-transparent text-gray-500' }}">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="square" stroke-width="2.2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                </div>
+                <span class="text-[9px] uppercase tracking-tight mt-0.5 font-bold {{ request()->routeIs('admin.users.*') ? 'font-black text-[#1A467C]' : '' }}">
+                    Admin
+                </span>
+            </a>
+
+            <!-- Tab 6: Pengaturan Acara -->
+            <a 
+                href="{{ route('admin.pengaturan.index') }}" 
+                class="flex-1 flex flex-col items-center justify-center py-1 transition-all active:scale-95 {{ request()->routeIs('admin.pengaturan.*') ? 'text-[#1A467C]' : 'text-gray-500 hover:text-[#1A467C]' }}"
+            >
+                <div class="p-1 border-2 transition-all {{ request()->routeIs('admin.pengaturan.*') ? 'bg-[#2A82C6] text-white border-[#1A467C] shadow-[2px_2px_0px_0px_#1A467C]' : 'border-transparent text-gray-500' }}">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="square" stroke-width="2.2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                </div>
+                <span class="text-[9px] uppercase tracking-tight mt-0.5 font-bold {{ request()->routeIs('admin.pengaturan.*') ? 'font-black text-[#1A467C]' : '' }}">
+                    Acara
+                </span>
+            </a>
+        @endif
     </nav>
 
     <!-- ============================================================== -->

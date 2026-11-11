@@ -115,6 +115,76 @@ class PointAdminController extends Controller
     }
 
     /**
+     * Tampilkan halaman Leaderboard Peringkat Point Mahasiswa (Podium Top 3 + Peringkat Lengkap).
+     */
+    public function leaderboard(Request $request)
+    {
+        $kelasFilter = trim((string) $request->input('kelas', ''));
+
+        $query = Pendaftaran::withCount('pointHistories');
+
+        if ($kelasFilter !== '') {
+            $query->where('kelas', $kelasFilter);
+        }
+
+        $rankedMahasiswa = $query
+            ->orderBy('total_point', 'desc')
+            ->orderBy('nama', 'asc')
+            ->get();
+
+        $topThree = $rankedMahasiswa->take(3)->values();
+        $kelasList = Kelas::orderBy('nama_kelas')->get();
+
+        return view('admin.poin.leaderboard', compact(
+            'rankedMahasiswa',
+            'topThree',
+            'kelasList',
+            'kelasFilter'
+        ));
+    }
+
+    /**
+     * Tampilkan halaman Log Aktivitas Point seluruh mahasiswa.
+     */
+    public function aktivitas(Request $request)
+    {
+        $search = trim((string) $request->input('search', ''));
+        $tipeFilter = trim((string) $request->input('tipe', ''));
+
+        $query = PointHistory::with('pendaftaran')->orderBy('created_at', 'desc')->orderBy('id', 'desc');
+
+        if ($tipeFilter !== '' && in_array($tipeFilter, ['tambah', 'kurang'], true)) {
+            $query->where('tipe', $tipeFilter);
+        }
+
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('kategori', 'like', "%{$search}%")
+                  ->orWhere('keterangan', 'like', "%{$search}%")
+                  ->orWhere('created_by', 'like', "%{$search}%")
+                  ->orWhereHas('pendaftaran', function ($sub) use ($search) {
+                      $sub->where('nama', 'like', "%{$search}%")
+                          ->orWhere('nim', 'like', "%{$search}%")
+                          ->orWhere('kelas', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        $histories = $query->paginate(25)->withQueryString();
+
+        $totalTambah = PointHistory::where('tipe', 'tambah')->count();
+        $totalKurang = PointHistory::where('tipe', 'kurang')->count();
+
+        return view('admin.poin.aktivitas', compact(
+            'histories',
+            'totalTambah',
+            'totalKurang',
+            'search',
+            'tipeFilter'
+        ));
+    }
+
+    /**
      * Simpan transaksi Tambah Point (+) atau Kurangi Point (-).
      */
     public function store(Request $request)

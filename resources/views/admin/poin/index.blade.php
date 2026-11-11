@@ -90,15 +90,15 @@
             </div>
         </div>
 
-        <!-- Stat 3: Transaksi Hari Ini -->
+        <!-- Stat 3: Aktivitas Hari Ini -->
         <div class="snap-in-4 card-interactive bg-white border-2 border-black p-4 shadow-[4px_4px_0px_0px_#000000] flex items-center justify-between">
             <div>
-                <span class="text-[11px] font-black uppercase tracking-wider text-[#1A467C] block">Transaksi Hari Ini</span>
+                <span class="text-[11px] font-black uppercase tracking-wider text-[#1A467C] block">Aktivitas Hari Ini</span>
                 <span class="text-2xl sm:text-3xl font-black text-gray-950 font-mono mt-1 block">{{ number_format($transaksiHariIni) }}</span>
             </div>
             <div class="w-10 h-10 bg-[#1A467C] text-white border-2 border-black flex items-center justify-center shadow-[2px_2px_0px_0px_#000000]">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="square" stroke-width="2.5" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                    <path stroke-linecap="square" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
             </div>
         </div>
@@ -616,7 +616,7 @@
                 </svg>
             </div>
             <div class="min-w-0 pr-6">
-                <span class="bg-[#1A467C] text-white text-[10px] font-black uppercase px-1.5 py-0.5 border border-black">HISTORI TRANSAKSI</span>
+                <span class="bg-[#1A467C] text-white text-[10px] font-black uppercase px-1.5 py-0.5 border border-black">RIWAYAT POINT</span>
                 <h3 id="history-modal-title" class="text-sm sm:text-base font-black uppercase text-gray-950 truncate mt-0.5">Riwayat Point</h3>
             </div>
         </div>
@@ -742,7 +742,7 @@
             if (!data.success || !data.histories || data.histories.length === 0) {
                 body.innerHTML = `
                     <div class="p-6 text-center bg-gray-50 border-2 border-dashed border-gray-300">
-                        <p class="text-xs font-bold text-gray-500">Belum ada riwayat transaksi point untuk <strong>${nama}</strong>.</p>
+                        <p class="text-xs font-bold text-gray-500">Belum ada riwayat point untuk <strong>${nama}</strong>.</p>
                     </div>
                 `;
                 return;
@@ -772,7 +772,7 @@
                             <button 
                                 type="submit" 
                                 class="btn-smooth w-7 h-7 bg-white hover:bg-[#CA2C2A] text-gray-700 hover:text-white border border-black flex items-center justify-center text-xs font-black cursor-pointer shrink-0"
-                                title="Batalkan / Hapus transaksi ini"
+                                title="Hapus riwayat point ini"
                             >
                                 ✕
                             </button>
