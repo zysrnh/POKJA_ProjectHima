@@ -92,3 +92,4 @@ class KelompokNotificationMail extends Mailable
         return [];
     }
 }
+

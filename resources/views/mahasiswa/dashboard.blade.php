@@ -109,6 +109,62 @@
         .tab-snap-in {
             animation: tabSnapIn 0.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
         }
+
+        /* Podium Vertical Grow & Avatar Lift (Selaras Admin Leaderboard) */
+        @keyframes podiumGrow {
+            0% { transform: scaleY(0); }
+            100% { transform: scaleY(1); }
+        }
+        .podium-bar {
+            transform-origin: bottom;
+            animation: podiumGrow 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+        .podium-bar-1 { animation-delay: 0.05s; }
+        .podium-bar-2 { animation-delay: 0.14s; }
+        .podium-bar-3 { animation-delay: 0.22s; }
+
+        .podium-avatar {
+            transition: transform 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .podium-col:hover .podium-avatar {
+            transform: translateY(-4px) scale(1.06);
+        }
+
+        /* Leaderboard FLIP Row & Progress Bar Transitions */
+        .lb-bar-fill {
+            transition: width 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .lb-row {
+            will-change: transform;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+
+        /* Realtime Update Highlight & Stat Pop */
+        @keyframes dataFlashPop {
+            0% { background-color: #fef08a; }
+            100% { background-color: transparent; }
+        }
+        .realtime-flash {
+            animation: dataFlashPop 0.9s ease-out;
+        }
+
+        @keyframes statPop {
+            0% { transform: scale(1); }
+            40% { transform: scale(1.08); }
+            100% { transform: scale(1); }
+        }
+        .stat-pop {
+            display: inline-block;
+            animation: statPop 0.32s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+        }
+
+        @keyframes livePulseRing {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.45; transform: scale(1.25); }
+        }
+        .live-dot {
+            animation: livePulseRing 2s ease-in-out infinite;
+        }
     </style>
 </head>
 <body class="min-h-screen text-[#000000] flex flex-col md:flex-row antialiased selection:bg-[#2A82C6] selection:text-white overflow-x-hidden">
@@ -133,7 +189,7 @@
             </div>
 
             <!-- Student Profile Badge (Tanpa Label Mahasiswa) -->
-            <div class="bg-gray-50 border-2 border-black p-3.5 shadow-[3px_3px_0px_0px_#000000] space-y-2">
+            <div class="card-tactile bg-gray-50 border-2 border-black p-3.5 shadow-[3px_3px_0px_0px_#000000] space-y-2">
                 <div class="flex items-center gap-2.5">
                     <div class="w-10 h-10 bg-[#2A82C6] text-white border-2 border-black flex items-center justify-center font-black text-xs shadow-[1px_1px_0px_0px_#000000] shrink-0 overflow-hidden">
                         @if (!empty($mahasiswa->foto) && file_exists(public_path('uploads/avatars/' . $mahasiswa->foto)))
@@ -152,8 +208,15 @@
                     <span>NIM: <strong class="text-gray-950">{{ $mahasiswa->nim }}</strong></span>
                     <div class="flex items-center gap-1">
                         <span class="bg-blue-50 border border-black text-[#1A467C] px-1.5 py-0.2 font-black text-[10px]">{{ $mahasiswa->kelas }}</span>
-                        <span class="bg-green-100 border border-black text-[#15803d] px-1.5 py-0.2 font-black text-[10px]">★ {{ (int) $mahasiswa->total_point }} PTS</span>
+                        <span id="rt-sidebar-point" class="bg-green-100 border border-black text-[#15803d] px-1.5 py-0.2 font-black text-[10px]">★ {{ (int) $mahasiswa->total_point }} PTS</span>
                     </div>
+                </div>
+                <div class="flex items-center justify-between pt-1 border-t border-dashed border-gray-300 text-[9px] font-mono font-black uppercase text-gray-500">
+                    <span class="inline-flex items-center gap-1 text-[#15803d]">
+                        <span class="live-dot w-1.5 h-1.5 bg-[#15803d] border border-black inline-block"></span>
+                        LIVE SYNC
+                    </span>
+                    <span id="rt-sync-clock">3s</span>
                 </div>
             </div>
 
@@ -218,11 +281,9 @@
                         <path stroke-linecap="square" stroke-width="2.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                     <span class="flex-1">Kelompok</span>
-                    @if (isset($kelompokInbox) && $kelompokInbox->count() > 0)
-                        <span class="bg-amber-300 text-black border border-black px-1.5 py-0.2 text-[10px] font-mono font-black leading-tight">
-                            {{ $kelompokInbox->count() }}
-                        </span>
-                    @endif
+                    <span id="rt-side-inbox-badge" class="{{ (isset($kelompokInbox) && $kelompokInbox->count() > 0) ? '' : 'hidden ' }}bg-amber-300 text-black border border-black px-1.5 py-0.2 text-[10px] font-mono font-black leading-tight">
+                        {{ isset($kelompokInbox) ? $kelompokInbox->count() : 0 }}
+                    </span>
                 </button>
 
                 <button 
@@ -283,6 +344,11 @@
                     <span class="text-[9px] font-bold text-gray-500 uppercase mt-0.5 block">Portal Mahasiswa</span>
                 </div>
             </div>
+
+            <span class="inline-flex items-center gap-1 bg-green-100 border border-black px-2 py-0.5 text-[9px] font-mono font-black uppercase text-[#15803d]">
+                <span class="live-dot w-1.5 h-1.5 bg-[#15803d] border border-black inline-block"></span>
+                LIVE
+            </span>
         </header>
 
         <!-- Main Content Area -->
@@ -290,21 +356,21 @@
 
             <!-- Flash Alert Success -->
             @if (session('success'))
-                <div class="p-3 bg-green-50 border-2 border-black text-xs font-bold text-green-900 shadow-[3px_3px_0px_0px_#15803d]">
+                <div class="tab-snap-in p-3 bg-green-50 border-2 border-black text-xs font-bold text-green-900 shadow-[3px_3px_0px_0px_#15803d]">
                     {{ session('success') }}
                 </div>
             @endif
 
             <!-- Flash Alert Error -->
             @if (session('error'))
-                <div class="p-3 bg-red-50 border-2 border-black text-xs font-bold text-red-900 shadow-[3px_3px_0px_0px_#CA2C2A]">
+                <div class="tab-snap-in p-3 bg-red-50 border-2 border-black text-xs font-bold text-red-900 shadow-[3px_3px_0px_0px_#CA2C2A]">
                     {{ session('error') }}
                 </div>
             @endif
 
             <!-- Validation Errors -->
             @if ($errors->any())
-                <div class="p-3 bg-red-50 border-2 border-black text-xs font-bold text-red-900 shadow-[3px_3px_0px_0px_#CA2C2A]">
+                <div class="tab-snap-in p-3 bg-red-50 border-2 border-black text-xs font-bold text-red-900 shadow-[3px_3px_0px_0px_#CA2C2A]">
                     <ul class="list-disc list-inside space-y-0.5">
                         @foreach ($errors->all() as $err)
                             <li>{{ $err }}</li>
@@ -361,18 +427,18 @@
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-4">
                     <div class="card-tactile bg-white border-2 border-black p-3 sm:p-4 shadow-[2px_2px_0px_0px_#000000] sm:shadow-[4px_4px_0px_0px_#000000]">
                         <span class="text-[9px] sm:text-xs font-black uppercase tracking-wider text-[#1A467C] block truncate">Total Hadir</span>
-                        <h3 class="text-xl sm:text-3xl font-black text-gray-950 font-mono mt-1 leading-none">{{ $totalHadir }}<span class="text-xs sm:text-lg text-gray-500 font-bold">/7</span></h3>
+                        <h3 class="text-xl sm:text-3xl font-black text-gray-950 font-mono mt-1 leading-none"><span id="rt-beranda-hadir">{{ $totalHadir }}</span><span class="text-xs sm:text-lg text-gray-500 font-bold">/7</span></h3>
                     </div>
 
                     <div class="card-tactile bg-white border-2 border-black p-3 sm:p-4 shadow-[2px_2px_0px_0px_#000000] sm:shadow-[4px_4px_0px_0px_#000000]">
                         <span class="text-[9px] sm:text-xs font-black uppercase tracking-wider text-green-800 block truncate">Persentase</span>
-                        <h3 class="text-xl sm:text-3xl font-black text-green-700 font-mono mt-1 leading-none">{{ $persenHadir }}%</h3>
+                        <h3 id="rt-beranda-persen" class="text-xl sm:text-3xl font-black text-green-700 font-mono mt-1 leading-none">{{ $persenHadir }}%</h3>
                     </div>
 
                     <div onclick="switchTab('poin')" class="card-tactile bg-amber-50 hover:bg-amber-100 border-2 border-black p-3 sm:p-4 shadow-[2px_2px_0px_0px_#000000] sm:shadow-[4px_4px_0px_0px_#000000] cursor-pointer">
                         <span class="text-[9px] sm:text-xs font-black uppercase tracking-wider text-[#15803d] block truncate">Point Saya</span>
                         <div class="flex items-baseline gap-1 mt-1">
-                            <h3 class="text-xl sm:text-3xl font-black text-[#15803d] font-mono leading-none">{{ (int) $mahasiswa->total_point }}</h3>
+                            <h3 id="rt-beranda-point" class="text-xl sm:text-3xl font-black text-[#15803d] font-mono leading-none">{{ (int) $mahasiswa->total_point }}</h3>
                             <span class="text-[10px] sm:text-xs font-black uppercase text-[#15803d]">Pts</span>
                         </div>
                     </div>
@@ -380,8 +446,8 @@
                     <div onclick="switchTab('leaderboard')" class="card-tactile bg-white hover:bg-blue-50 border-2 border-black p-3 sm:p-4 shadow-[2px_2px_0px_0px_#000000] sm:shadow-[4px_4px_0px_0px_#000000] cursor-pointer">
                         <span class="text-[9px] sm:text-xs font-black uppercase tracking-wider text-[#1A467C] block truncate">Peringkat</span>
                         <div class="flex items-baseline gap-1 mt-1">
-                            <h3 class="text-xl sm:text-3xl font-black text-[#1A467C] font-mono leading-none">#{{ $myRank }}</h3>
-                            <span class="text-[10px] sm:text-xs font-bold text-gray-500 font-mono">/{{ $totalPeserta }}</span>
+                            <h3 id="rt-beranda-rank" class="text-xl sm:text-3xl font-black text-[#1A467C] font-mono leading-none">#{{ $myRank }}</h3>
+                            <span id="rt-beranda-total-peserta" class="text-[10px] sm:text-xs font-bold text-gray-500 font-mono">/{{ $totalPeserta }}</span>
                         </div>
                     </div>
                 </div>
@@ -403,7 +469,7 @@
                                 Arahkan kamera ke QR Code di layar proyektor kelas.
                             </p>
                         </div>
-                        <span class="text-xs font-black bg-[#1A467C] text-white border border-black px-2.5 py-1">
+                        <span id="rt-scan-sesi" class="text-xs font-black bg-[#1A467C] text-white border border-black px-2.5 py-1">
                             Sesi {{ $pengaturan->pertemuan_aktif ?? 1 }}
                         </span>
                     </div>
@@ -469,7 +535,7 @@
                     <div class="card-tactile bg-white border-2 border-black p-3 sm:p-4 shadow-[2px_2px_0px_0px_#000000] sm:shadow-[4px_4px_0px_0px_#000000]">
                         <span class="text-[9px] sm:text-xs font-black uppercase tracking-wider text-[#15803d] block truncate">Total Point</span>
                         <div class="flex items-baseline gap-1 mt-1">
-                            <h3 class="text-xl sm:text-3xl font-black text-[#15803d] font-mono leading-none">{{ (int) $mahasiswa->total_point }}</h3>
+                            <h3 id="rt-poin-total" class="text-xl sm:text-3xl font-black text-[#15803d] font-mono leading-none">{{ (int) $mahasiswa->total_point }}</h3>
                             <span class="text-[10px] sm:text-xs font-black uppercase text-[#15803d]">Pts</span>
                         </div>
                     </div>
@@ -477,26 +543,26 @@
                     <div class="card-tactile bg-white border-2 border-black p-3 sm:p-4 shadow-[2px_2px_0px_0px_#000000] sm:shadow-[4px_4px_0px_0px_#000000]">
                         <span class="text-[9px] sm:text-xs font-black uppercase tracking-wider text-[#1A467C] block truncate">Peringkat</span>
                         <div class="flex items-baseline gap-1 mt-1">
-                            <h3 class="text-xl sm:text-3xl font-black text-[#1A467C] font-mono leading-none">#{{ $myRank }}</h3>
-                            <span class="text-[10px] sm:text-xs font-bold text-gray-500 font-mono">/{{ $totalPeserta }}</span>
+                            <h3 id="rt-poin-rank" class="text-xl sm:text-3xl font-black text-[#1A467C] font-mono leading-none">#{{ $myRank }}</h3>
+                            <span id="rt-poin-total-peserta" class="text-[10px] sm:text-xs font-bold text-gray-500 font-mono">/{{ $totalPeserta }}</span>
                         </div>
                     </div>
 
                     <div class="card-tactile bg-white border-2 border-black p-3 sm:p-4 shadow-[2px_2px_0px_0px_#000000] sm:shadow-[4px_4px_0px_0px_#000000]">
                         <span class="text-[9px] sm:text-xs font-black uppercase tracking-wider text-gray-700 block truncate">Riwayat</span>
-                        <h3 class="text-xl sm:text-3xl font-black text-gray-950 font-mono mt-1 leading-none">{{ $mahasiswa->pointHistories->count() }}<span class="text-xs sm:text-base text-gray-500 font-bold">x</span></h3>
+                        <h3 class="text-xl sm:text-3xl font-black text-gray-950 font-mono mt-1 leading-none"><span id="rt-poin-history-count">{{ $mahasiswa->pointHistories->count() }}</span><span class="text-xs sm:text-base text-gray-500 font-bold">x</span></h3>
                     </div>
                 </div>
 
                 <!-- 2. Daftar Riwayat Point Saya -->
-                <div class="bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] overflow-hidden">
+                <div class="card-tactile bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] overflow-hidden">
                     <div class="px-4 sm:px-5 py-3 border-b-2 border-black bg-blue-50/70 flex items-center justify-between">
                         <h4 class="text-xs sm:text-sm font-black uppercase tracking-wider text-[#1A467C]">
                             Riwayat Point
                         </h4>
                     </div>
 
-                    <div class="divide-y divide-gray-200">
+                    <div id="rt-poin-history-list" class="divide-y divide-gray-200">
                         @forelse ($mahasiswa->pointHistories as $hist)
                             @php $isAdd = $hist->tipe === 'tambah'; @endphp
                             <div class="px-4 sm:px-5 py-3.5 hover:bg-blue-50/30 transition flex items-start justify-between gap-3">
@@ -532,7 +598,7 @@
             <section id="tab-panel-leaderboard" class="tab-snap-in hidden space-y-5 sm:space-y-6">
 
                 <!-- Switcher Mode Leaderboard: Individu vs Kelompok -->
-                <div class="bg-white border-2 border-black p-2 shadow-[4px_4px_0px_0px_#000000] flex items-center justify-between gap-2">
+                <div class="card-tactile bg-white border-2 border-black p-2 shadow-[4px_4px_0px_0px_#000000] flex items-center justify-between gap-2">
                     <div class="grid grid-cols-2 gap-2 w-full sm:w-auto sm:min-w-[300px]">
                         <button
                             type="button"
@@ -560,102 +626,107 @@
                 <div id="lb-view-individu" class="space-y-5 sm:space-y-6">
 
                 <!-- Podium Top 3 (Grafik Batang Podium Vertikal Ke Atas) -->
-                @if ($topThree->count() > 0)
-                    @php
-                        $first = $topThree->get(0);
-                        $second = $topThree->get(1);
-                        $third = $topThree->get(2);
-                        $podiumBars = [
-                            [
-                                'rank' => 2,
-                                'barBg' => 'bg-sky-200',
-                                'barHeight' => 'h-28 sm:h-36',
-                                'mhs' => $second,
-                            ],
-                            [
-                                'rank' => 1,
-                                'barBg' => 'bg-amber-300',
-                                'barHeight' => 'h-40 sm:h-48',
-                                'mhs' => $first,
-                            ],
-                            [
-                                'rank' => 3,
-                                'barBg' => 'bg-orange-200',
-                                'barHeight' => 'h-20 sm:h-28',
-                                'mhs' => $third,
-                            ],
-                        ];
-                    @endphp
+                @php
+                    $first = $topThree->get(0);
+                    $second = $topThree->get(1);
+                    $third = $topThree->get(2);
+                    $podiumBars = [
+                        [
+                            'rank' => 2,
+                            'barBg' => 'bg-sky-200',
+                            'barHeight' => 'h-28 sm:h-36',
+                            'emptyHeight' => 'h-24 sm:h-32',
+                            'mhs' => $second,
+                        ],
+                        [
+                            'rank' => 1,
+                            'barBg' => 'bg-amber-300',
+                            'barHeight' => 'h-40 sm:h-48',
+                            'emptyHeight' => 'h-32 sm:h-40',
+                            'mhs' => $first,
+                        ],
+                        [
+                            'rank' => 3,
+                            'barBg' => 'bg-orange-200',
+                            'barHeight' => 'h-20 sm:h-28',
+                            'emptyHeight' => 'h-16 sm:h-24',
+                            'mhs' => $third,
+                        ],
+                    ];
+                @endphp
 
-                    <div class="bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] p-4 sm:p-6">
-                        <div class="border-b-2 border-black pb-3 mb-5">
-                            <h4 class="text-xs sm:text-sm font-black uppercase tracking-wider text-[#1A467C]">
-                                Podium Peringkat Teratas
-                            </h4>
-                        </div>
+                <div id="lb-individu-podium-card" class="card-tactile {{ $topThree->count() > 0 ? '' : 'hidden ' }}bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] p-4 sm:p-6">
+                    <div class="border-b-2 border-black pb-3 mb-5">
+                        <h4 class="text-xs sm:text-sm font-black uppercase tracking-wider text-[#1A467C]">
+                            Podium Peringkat Teratas
+                        </h4>
+                    </div>
 
-                        <div class="grid grid-cols-3 gap-2.5 sm:gap-5 items-end max-w-2xl mx-auto pt-2 px-1">
-                            @foreach ($podiumBars as $pod)
-                                @php $mhs = $pod['mhs']; @endphp
-                                <div class="flex flex-col items-center">
-                                    @if ($mhs)
-                                        @php $isMe = (int) $mhs->id === (int) $mahasiswa->id; @endphp
-                                        <!-- Info Mahasiswa di Atas Batang -->
-                                        <div class="flex flex-col items-center text-center mb-2.5 w-full">
-                                            <div class="relative">
-                                                <div class="{{ $pod['rank'] === 1 ? 'w-11 h-11 sm:w-14 sm:h-14 text-sm sm:text-base' : 'w-9 h-9 sm:w-12 sm:h-12 text-xs sm:text-sm' }} bg-white text-[#1A467C] border-2 border-black flex items-center justify-center font-black overflow-hidden shadow-[2px_2px_0px_0px_#000000]">
-                                                    @if ($mhs->avatarUrl())
-                                                        <img src="{{ $mhs->avatarUrl() }}" alt="Avatar {{ $mhs->nama }}" class="w-full h-full object-cover">
-                                                    @else
-                                                        {{ $mhs->initials() }}
-                                                    @endif
-                                                </div>
-                                                @if ($isMe)
-                                                    <span class="absolute -top-2 -right-2 bg-[#15803d] text-white text-[8px] font-black uppercase px-1 py-0.2 border border-black">
-                                                        KAMU
-                                                    </span>
+                    <div id="lb-individu-podium" class="grid grid-cols-3 gap-2.5 sm:gap-5 items-end max-w-2xl mx-auto pt-2 px-1">
+                        @foreach ($podiumBars as $pod)
+                            @php $mhs = $pod['mhs']; @endphp
+                            <div class="flex flex-col items-center {{ $mhs ? 'podium-col' : '' }}">
+                                @if ($mhs)
+                                    @php $isMe = (int) $mhs->id === (int) $mahasiswa->id; @endphp
+                                    <!-- Info Mahasiswa di Atas Batang -->
+                                    <div class="flex flex-col items-center text-center mb-2.5 w-full">
+                                        <div class="relative podium-avatar">
+                                            <div class="{{ $pod['rank'] === 1 ? 'w-11 h-11 sm:w-14 sm:h-14 text-sm sm:text-base' : 'w-9 h-9 sm:w-12 sm:h-12 text-xs sm:text-sm' }} bg-white text-[#1A467C] border-2 border-black flex items-center justify-center font-black overflow-hidden shadow-[2px_2px_0px_0px_#000000]">
+                                                @if ($mhs->avatarUrl())
+                                                    <img src="{{ $mhs->avatarUrl() }}" alt="Avatar {{ $mhs->nama }}" class="w-full h-full object-cover">
+                                                @else
+                                                    {{ $mhs->initials() }}
                                                 @endif
                                             </div>
-
-                                            <h5 class="font-black text-[10px] sm:text-xs text-gray-950 uppercase truncate max-w-full mt-1.5 px-0.5" title="{{ $mhs->nama }}">
-                                                {{ $mhs->nama }}
-                                            </h5>
-                                            <span class="font-mono text-[9px] sm:text-[10px] font-bold text-[#1A467C]">
-                                                {{ $mhs->kelas }}
-                                            </span>
-
-                                            <div class="mt-1.5 bg-white border-2 border-black px-2 py-0.5 shadow-[2px_2px_0px_0px_#000000] inline-flex items-baseline gap-1">
-                                                <span class="font-mono font-black text-xs sm:text-sm text-gray-950 leading-none">{{ (int) $mhs->total_point }}</span>
-                                                <span class="text-[8px] sm:text-[9px] font-black uppercase text-[#15803d] leading-none">PTS</span>
-                                            </div>
+                                            @if ($isMe)
+                                                <span class="absolute -top-2 -right-2 bg-[#15803d] text-white text-[8px] font-black uppercase px-1 py-0.2 border border-black">
+                                                    KAMU
+                                                </span>
+                                            @endif
                                         </div>
 
-                                        <!-- Batang Vertikal Podium -->
-                                        <div class="w-full {{ $pod['barHeight'] }} {{ $pod['barBg'] }} border-t-2 border-x-2 border-black shadow-[3px_0px_0px_0px_#000000] flex flex-col items-center justify-center p-2 relative">
-                                            <span class="font-mono font-black text-xl sm:text-3xl text-black/85 leading-none">
-                                                #{{ $pod['rank'] }}
-                                            </span>
+                                        <h5 class="font-black text-[10px] sm:text-xs text-gray-950 uppercase truncate max-w-full mt-1.5 px-0.5" title="{{ $mhs->nama }}">
+                                            {{ $mhs->nama }}
+                                        </h5>
+                                        <span class="font-mono text-[9px] sm:text-[10px] font-bold text-[#1A467C]">
+                                            {{ $mhs->kelas }}
+                                        </span>
+
+                                        <div class="mt-1.5 bg-white border-2 border-black px-2 py-0.5 shadow-[2px_2px_0px_0px_#000000] inline-flex items-baseline gap-1">
+                                            <span class="font-mono font-black text-xs sm:text-sm text-gray-950 leading-none">{{ (int) $mhs->total_point }}</span>
+                                            <span class="text-[8px] sm:text-[9px] font-black uppercase text-[#15803d] leading-none">PTS</span>
                                         </div>
-                                    @endif
-                                </div>
-                            @endforeach
-                        </div>
-                        <div class="h-1.5 bg-black w-full max-w-2xl mx-auto"></div>
+                                    </div>
+
+                                    <!-- Batang Vertikal Podium -->
+                                    <div class="podium-bar podium-bar-{{ $pod['rank'] }} w-full {{ $pod['barHeight'] }} {{ $pod['barBg'] }} border-t-2 border-x-2 border-black shadow-[3px_0px_0px_0px_#000000] flex flex-col items-center justify-center p-2 relative">
+                                        <span class="font-mono font-black text-xl sm:text-3xl text-black/85 leading-none">
+                                            #{{ $pod['rank'] }}
+                                        </span>
+                                    </div>
+                                @else
+                                    <div class="w-full {{ $pod['emptyHeight'] }} bg-gray-100/70 border-t-2 border-x-2 border-dashed border-gray-300 flex items-center justify-center">
+                                        <span class="font-mono font-black text-base text-gray-400">#{{ $pod['rank'] }}</span>
+                                    </div>
+                                @endif
+                            </div>
+                        @endforeach
                     </div>
-                @endif
+                    <div class="h-1.5 bg-black w-full max-w-2xl mx-auto"></div>
+                </div>
 
                 <!-- Klasemen Lengkap Peserta -->
-                <div class="bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] overflow-hidden">
+                <div class="card-tactile bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] overflow-hidden">
                     <div class="px-4 sm:px-5 py-3 border-b-2 border-black bg-blue-50/70 flex items-center justify-between">
                         <h4 class="text-xs sm:text-sm font-black uppercase tracking-wider text-[#1A467C]">
                             Peringkat Peserta
                         </h4>
-                        <span class="bg-white border border-black px-2 py-0.5 font-mono font-black text-[10px] text-[#1A467C]">
+                        <span id="lb-individu-total-badge" class="bg-white border border-black px-2 py-0.5 font-mono font-black text-[10px] text-[#1A467C]">
                             {{ $totalPeserta }} Mahasiswa
                         </span>
                     </div>
 
-                    <div class="divide-y divide-gray-200">
+                    <div id="lb-individu-list" class="divide-y divide-gray-200">
                         @foreach ($leaderboardList as $idx => $item)
                             @php
                                 $rankNum = $idx + 1;
@@ -668,9 +739,9 @@
                                         ? 'bg-[#2A82C6]'
                                         : ($rankNum === 3 ? 'bg-orange-400' : 'bg-[#15803d]'));
                             @endphp
-                            <div class="px-4 sm:px-5 py-3.5 {{ $isCurrentUser ? 'bg-amber-50/90 border-l-4 border-l-[#1A467C]' : 'hover:bg-blue-50/40' }} transition flex items-center justify-between gap-3">
+                            <div data-lb-key="mhs-{{ $item->id }}" data-rank="{{ $rankNum }}" data-pts="{{ $pts }}" class="lb-row px-4 sm:px-5 py-3.5 {{ $isCurrentUser ? 'bg-amber-50/90 border-l-4 border-l-[#1A467C]' : 'hover:bg-blue-50/40' }} flex items-center justify-between gap-3">
                                 <div class="flex items-center gap-3 min-w-0 flex-1">
-                                    <span class="w-8 h-8 border-2 border-black font-mono font-black text-xs flex items-center justify-center shrink-0 {{ $rankNum === 1 ? 'bg-amber-300 text-black' : ($rankNum === 2 ? 'bg-sky-200 text-black' : ($rankNum === 3 ? 'bg-orange-200 text-black' : 'bg-gray-100 text-gray-800')) }}">
+                                    <span data-role="rank-badge" class="w-8 h-8 border-2 border-black font-mono font-black text-xs flex items-center justify-center shrink-0 {{ $rankNum === 1 ? 'bg-amber-300 text-black' : ($rankNum === 2 ? 'bg-sky-200 text-black' : ($rankNum === 3 ? 'bg-orange-200 text-black' : 'bg-gray-100 text-gray-800')) }}">
                                         #{{ $rankNum }}
                                     </span>
 
@@ -693,13 +764,13 @@
                                         </div>
                                         <p class="font-mono text-[10px] sm:text-[11px] font-bold text-[#1A467C]">{{ $item->kelas }}</p>
                                         <div class="mt-1.5 w-full max-w-md h-2.5 bg-gray-100 border border-black overflow-hidden">
-                                            <div class="h-full {{ $barColor }}" style="width: {{ $pctWidth }}%"></div>
+                                            <div data-role="bar-fill" class="lb-bar-fill h-full {{ $barColor }}" style="width: {{ $pctWidth }}%"></div>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="bg-green-100 border-2 border-black px-3 py-1 shadow-[2px_2px_0px_0px_#000000] inline-flex items-baseline gap-1 shrink-0">
-                                    <span class="font-mono font-black text-xs sm:text-sm text-[#15803d] leading-none">{{ $pts }}</span>
+                                    <span data-role="pts-text" class="font-mono font-black text-xs sm:text-sm text-[#15803d] leading-none">{{ $pts }}</span>
                                     <span class="text-[9px] sm:text-[10px] font-black uppercase text-[#15803d] leading-none">PTS</span>
                                 </div>
                             </div>
@@ -713,110 +784,112 @@
                 <div id="lb-view-kelompok" class="hidden space-y-5 sm:space-y-6">
                     @php
                         $maxKelompokPoint = max(1, (int) ($kelompokLeaderboardList->max('total_point') ?? 1));
+                        $grpFirst = $kelompokTopThree->get(0);
+                        $grpSecond = $kelompokTopThree->get(1);
+                        $grpThird = $kelompokTopThree->get(2);
+                        $kelompokPodiumBars = [
+                            [
+                                'rank' => 2,
+                                'barBg' => 'bg-sky-200',
+                                'barHeight' => 'h-28 sm:h-36',
+                                'emptyHeight' => 'h-24 sm:h-32',
+                                'grp' => $grpSecond,
+                            ],
+                            [
+                                'rank' => 1,
+                                'barBg' => 'bg-amber-300',
+                                'barHeight' => 'h-40 sm:h-48',
+                                'emptyHeight' => 'h-32 sm:h-40',
+                                'grp' => $grpFirst,
+                            ],
+                            [
+                                'rank' => 3,
+                                'barBg' => 'bg-orange-200',
+                                'barHeight' => 'h-20 sm:h-28',
+                                'emptyHeight' => 'h-16 sm:h-24',
+                                'grp' => $grpThird,
+                            ],
+                        ];
                     @endphp
 
-                    @if ($kelompokLeaderboardList->isEmpty())
-                        <div class="bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] p-8 text-center">
-                            <p class="text-xs sm:text-sm font-black uppercase text-[#1A467C]">Belum Ada Kelompok</p>
-                            <p class="text-xs font-semibold text-gray-600 mt-1">
-                                Klasemen kelompok akan muncul otomatis setelah ada kelompok yang terbentuk.
-                            </p>
-                        </div>
-                    @else
+                    <div id="lb-kelompok-empty" class="card-tactile {{ $kelompokLeaderboardList->isEmpty() ? '' : 'hidden ' }}bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] p-8 text-center">
+                        <p class="text-xs sm:text-sm font-black uppercase text-[#1A467C]">Belum Ada Kelompok</p>
+                        <p class="text-xs font-semibold text-gray-600 mt-1">
+                            Klasemen kelompok akan muncul otomatis setelah ada kelompok yang terbentuk.
+                        </p>
+                    </div>
+
+                    <div id="lb-kelompok-content" class="{{ $kelompokLeaderboardList->isEmpty() ? 'hidden ' : '' }}space-y-5 sm:space-y-6">
                         <!-- Podium Top 3 Kelompok -->
-                        @if ($kelompokTopThree->count() > 0)
-                            @php
-                                $grpFirst = $kelompokTopThree->get(0);
-                                $grpSecond = $kelompokTopThree->get(1);
-                                $grpThird = $kelompokTopThree->get(2);
-                                $kelompokPodiumBars = [
-                                    [
-                                        'rank' => 2,
-                                        'barBg' => 'bg-sky-200',
-                                        'barHeight' => 'h-28 sm:h-36',
-                                        'grp' => $grpSecond,
-                                    ],
-                                    [
-                                        'rank' => 1,
-                                        'barBg' => 'bg-amber-300',
-                                        'barHeight' => 'h-40 sm:h-48',
-                                        'grp' => $grpFirst,
-                                    ],
-                                    [
-                                        'rank' => 3,
-                                        'barBg' => 'bg-orange-200',
-                                        'barHeight' => 'h-20 sm:h-28',
-                                        'grp' => $grpThird,
-                                    ],
-                                ];
-                            @endphp
-
-                            <div class="bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] p-4 sm:p-6">
-                                <div class="border-b-2 border-black pb-3 mb-5 flex items-center justify-between">
-                                    <h4 class="text-xs sm:text-sm font-black uppercase tracking-wider text-[#1A467C]">
-                                        Podium Kelompok Teratas
-                                    </h4>
-                                    <span class="font-mono text-[10px] font-black uppercase text-gray-500">
-                                        Total Point Tim
-                                    </span>
-                                </div>
-
-                                <div class="grid grid-cols-3 gap-2.5 sm:gap-5 items-end max-w-2xl mx-auto pt-2 px-1">
-                                    @foreach ($kelompokPodiumBars as $pod)
-                                        @php $grp = $pod['grp']; @endphp
-                                        <div class="flex flex-col items-center">
-                                            @if ($grp)
-                                                @php $isMyGroup = $myKelompok && (int) $grp->id === (int) $myKelompok->id; @endphp
-                                                <div class="flex flex-col items-center text-center mb-2.5 w-full">
-                                                    <div class="relative">
-                                                        <div class="{{ $pod['rank'] === 1 ? 'w-11 h-11 sm:w-14 sm:h-14 text-sm sm:text-base' : 'w-9 h-9 sm:w-12 sm:h-12 text-xs sm:text-sm' }} bg-[#1A467C] text-white border-2 border-black flex items-center justify-center font-black shadow-[2px_2px_0px_0px_#000000]">
-                                                            {{ $grp->initials }}
-                                                        </div>
-                                                        @if ($isMyGroup)
-                                                            <span class="absolute -top-2 -right-3 bg-[#15803d] text-white text-[8px] font-black uppercase px-1 py-0.2 border border-black">
-                                                                TIMMU
-                                                            </span>
-                                                        @endif
-                                                    </div>
-
-                                                    <h5 class="font-black text-[10px] sm:text-xs text-gray-950 uppercase truncate max-w-full mt-1.5 px-0.5" title="{{ $grp->nama_kelompok }}">
-                                                        {{ $grp->nama_kelompok }}
-                                                    </h5>
-                                                    <span class="font-mono text-[9px] sm:text-[10px] font-bold text-[#1A467C]">
-                                                        {{ $grp->jumlah_anggota }} Anggota
-                                                    </span>
-
-                                                    <div class="mt-1.5 bg-white border-2 border-black px-2 py-0.5 shadow-[2px_2px_0px_0px_#000000] inline-flex items-baseline gap-1">
-                                                        <span class="font-mono font-black text-xs sm:text-sm text-gray-950 leading-none">{{ $grp->total_point }}</span>
-                                                        <span class="text-[8px] sm:text-[9px] font-black uppercase text-[#15803d] leading-none">PTS</span>
-                                                    </div>
-                                                </div>
-
-                                                <div class="w-full {{ $pod['barHeight'] }} {{ $pod['barBg'] }} border-t-2 border-x-2 border-black shadow-[3px_0px_0px_0px_#000000] flex flex-col items-center justify-center p-2">
-                                                    <span class="font-mono font-black text-xl sm:text-3xl text-black/85 leading-none">
-                                                        #{{ $pod['rank'] }}
-                                                    </span>
-                                                </div>
-                                            @endif
-                                        </div>
-                                    @endforeach
-                                </div>
-                                <div class="h-1.5 bg-black w-full max-w-2xl mx-auto"></div>
+                        <div class="card-tactile bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] p-4 sm:p-6">
+                            <div class="border-b-2 border-black pb-3 mb-5 flex items-center justify-between">
+                                <h4 class="text-xs sm:text-sm font-black uppercase tracking-wider text-[#1A467C]">
+                                    Podium Kelompok Teratas
+                                </h4>
+                                <span class="font-mono text-[10px] font-black uppercase text-gray-500">
+                                    Total Point Tim
+                                </span>
                             </div>
-                        @endif
+
+                            <div id="lb-kelompok-podium" class="grid grid-cols-3 gap-2.5 sm:gap-5 items-end max-w-2xl mx-auto pt-2 px-1">
+                                @foreach ($kelompokPodiumBars as $pod)
+                                    @php $grp = $pod['grp']; @endphp
+                                    <div class="flex flex-col items-center {{ $grp ? 'podium-col' : '' }}">
+                                        @if ($grp)
+                                            @php $isMyGroup = $myKelompok && (int) $grp->id === (int) $myKelompok->id; @endphp
+                                            <div class="flex flex-col items-center text-center mb-2.5 w-full">
+                                                <div class="relative podium-avatar">
+                                                    <div class="{{ $pod['rank'] === 1 ? 'w-11 h-11 sm:w-14 sm:h-14 text-sm sm:text-base' : 'w-9 h-9 sm:w-12 sm:h-12 text-xs sm:text-sm' }} bg-[#1A467C] text-white border-2 border-black flex items-center justify-center font-black shadow-[2px_2px_0px_0px_#000000]">
+                                                        {{ $grp->initials }}
+                                                    </div>
+                                                    @if ($isMyGroup)
+                                                        <span class="absolute -top-2 -right-3 bg-[#15803d] text-white text-[8px] font-black uppercase px-1 py-0.2 border border-black">
+                                                            TIMMU
+                                                        </span>
+                                                    @endif
+                                                </div>
+
+                                                <h5 class="font-black text-[10px] sm:text-xs text-gray-950 uppercase truncate max-w-full mt-1.5 px-0.5" title="{{ $grp->nama_kelompok }}">
+                                                    {{ $grp->nama_kelompok }}
+                                                </h5>
+                                                <span class="font-mono text-[9px] sm:text-[10px] font-bold text-[#1A467C]">
+                                                    {{ $grp->jumlah_anggota }} Anggota
+                                                </span>
+
+                                                <div class="mt-1.5 bg-white border-2 border-black px-2 py-0.5 shadow-[2px_2px_0px_0px_#000000] inline-flex items-baseline gap-1">
+                                                    <span class="font-mono font-black text-xs sm:text-sm text-gray-950 leading-none">{{ $grp->total_point }}</span>
+                                                    <span class="text-[8px] sm:text-[9px] font-black uppercase text-[#15803d] leading-none">PTS</span>
+                                                </div>
+                                            </div>
+
+                                            <div class="podium-bar podium-bar-{{ $pod['rank'] }} w-full {{ $pod['barHeight'] }} {{ $pod['barBg'] }} border-t-2 border-x-2 border-black shadow-[3px_0px_0px_0px_#000000] flex flex-col items-center justify-center p-2">
+                                                <span class="font-mono font-black text-xl sm:text-3xl text-black/85 leading-none">
+                                                    #{{ $pod['rank'] }}
+                                                </span>
+                                            </div>
+                                        @else
+                                            <div class="w-full {{ $pod['emptyHeight'] }} bg-gray-100/70 border-t-2 border-x-2 border-dashed border-gray-300 flex items-center justify-center">
+                                                <span class="font-mono font-black text-base text-gray-400">#{{ $pod['rank'] }}</span>
+                                            </div>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </div>
+                            <div class="h-1.5 bg-black w-full max-w-2xl mx-auto"></div>
+                        </div>
 
                         <!-- Klasemen Lengkap Kelompok -->
-                        <div class="bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] overflow-hidden">
+                        <div class="card-tactile bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] overflow-hidden">
                             <div class="px-4 sm:px-5 py-3 border-b-2 border-black bg-blue-50/70 flex items-center justify-between">
                                 <h4 class="text-xs sm:text-sm font-black uppercase tracking-wider text-[#1A467C]">
                                     Peringkat Kelompok
                                 </h4>
-                                <span class="bg-white border border-black px-2 py-0.5 font-mono font-black text-[10px] text-[#1A467C]">
+                                <span id="lb-kelompok-total-badge" class="bg-white border border-black px-2 py-0.5 font-mono font-black text-[10px] text-[#1A467C]">
                                     {{ $totalKelompok }} Kelompok
                                 </span>
                             </div>
 
-                            <div class="divide-y divide-gray-200">
+                            <div id="lb-kelompok-list" class="divide-y divide-gray-200">
                                 @foreach ($kelompokLeaderboardList as $idx => $grp)
                                     @php
                                         $rankNum = $idx + 1;
@@ -829,9 +902,9 @@
                                                 ? 'bg-[#2A82C6]'
                                                 : ($rankNum === 3 ? 'bg-orange-400' : 'bg-[#15803d]'));
                                     @endphp
-                                    <div class="px-4 sm:px-5 py-3.5 {{ $isMyTeam ? 'bg-amber-50/90 border-l-4 border-l-[#1A467C]' : 'hover:bg-blue-50/40' }} transition flex items-center justify-between gap-3">
+                                    <div data-lb-key="grp-{{ $grp->id }}" data-rank="{{ $rankNum }}" data-pts="{{ $pts }}" class="lb-row px-4 sm:px-5 py-3.5 {{ $isMyTeam ? 'bg-amber-50/90 border-l-4 border-l-[#1A467C]' : 'hover:bg-blue-50/40' }} flex items-center justify-between gap-3">
                                         <div class="flex items-center gap-3 min-w-0 flex-1">
-                                            <span class="w-8 h-8 border-2 border-black font-mono font-black text-xs flex items-center justify-center shrink-0 {{ $rankNum === 1 ? 'bg-amber-300 text-black' : ($rankNum === 2 ? 'bg-sky-200 text-black' : ($rankNum === 3 ? 'bg-orange-200 text-black' : 'bg-gray-100 text-gray-800')) }}">
+                                            <span data-role="rank-badge" class="w-8 h-8 border-2 border-black font-mono font-black text-xs flex items-center justify-center shrink-0 {{ $rankNum === 1 ? 'bg-amber-300 text-black' : ($rankNum === 2 ? 'bg-sky-200 text-black' : ($rankNum === 3 ? 'bg-orange-200 text-black' : 'bg-gray-100 text-gray-800')) }}">
                                                 #{{ $rankNum }}
                                             </span>
 
@@ -843,7 +916,7 @@
                                                 <div class="flex items-center gap-1.5">
                                                     <p class="font-black text-xs sm:text-sm text-gray-950 truncate">{{ $grp->nama_kelompok }}</p>
                                                     @if ($isMyTeam)
-                                                        <span class="bg-[#15803d] text-white text-[9px] font-black uppercase px-1.5 py-0.2 border border-black shrink-0">
+                                                        <span data-role="my-badge" class="bg-[#15803d] text-white text-[9px] font-black uppercase px-1.5 py-0.2 border border-black shrink-0">
                                                             TIM KAMU
                                                         </span>
                                                     @endif
@@ -852,20 +925,20 @@
                                                     Ketua: <span class="text-[#1A467C]">{{ $grp->ketua_nama }}</span> • {{ $grp->jumlah_anggota }} Anggota
                                                 </p>
                                                 <div class="mt-1.5 w-full max-w-md h-2.5 bg-gray-100 border border-black overflow-hidden">
-                                                    <div class="h-full {{ $barColor }}" style="width: {{ $pctWidth }}%"></div>
+                                                    <div data-role="bar-fill" class="lb-bar-fill h-full {{ $barColor }}" style="width: {{ $pctWidth }}%"></div>
                                                 </div>
                                             </div>
                                         </div>
 
                                         <div class="bg-green-100 border-2 border-black px-3 py-1 shadow-[2px_2px_0px_0px_#000000] inline-flex items-baseline gap-1 shrink-0">
-                                            <span class="font-mono font-black text-xs sm:text-sm text-[#15803d] leading-none">{{ $pts }}</span>
+                                            <span data-role="pts-text" class="font-mono font-black text-xs sm:text-sm text-[#15803d] leading-none">{{ $pts }}</span>
                                             <span class="text-[9px] sm:text-[10px] font-black uppercase text-[#15803d] leading-none">PTS</span>
                                         </div>
                                     </div>
                                 @endforeach
                             </div>
                         </div>
-                    @endif
+                    </div>
                 </div> <!-- End #lb-view-kelompok -->
 
             </section>
@@ -874,564 +947,7 @@
             <!-- TAB 4.5: KELOMPOK & INBOX UNDANGAN MAHASISWA               -->
             <!-- ========================================================== -->
             <section id="tab-panel-kelompok" class="tab-snap-in hidden space-y-4 sm:space-y-6">
-
-                @if (!$myKelompok)
-                    <!-- Header Overview (Belum Punya Kelompok) -->
-                    <div class="card-tactile bg-white border-2 border-black p-4 sm:p-5 shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000] flex flex-wrap items-center justify-between gap-3">
-                        <div class="flex items-center gap-2.5">
-                            <span class="bg-[#15803d] text-white border border-black px-2 py-0.5 text-[10px] font-black uppercase shadow-[1px_1px_0px_0px_#000000]">
-                                KELOMPOK
-                            </span>
-                            <h3 class="text-sm sm:text-base font-black uppercase text-[#1A467C]">
-                                Overview Kelompok
-                            </h3>
-                        </div>
-
-                        @if ($kelompokInbox->count() > 0)
-                            <span class="bg-amber-300 text-black border-2 border-black px-2.5 py-1 text-[10px] font-black uppercase shadow-[2px_2px_0px_0px_#000000]">
-                                {{ $kelompokInbox->count() }} Undangan Masuk
-                            </span>
-                        @else
-                            <span class="bg-gray-100 text-gray-800 border-2 border-black px-2.5 py-1 text-[10px] font-black uppercase">
-                                Belum Bergabung
-                            </span>
-                        @endif
-                    </div>
-
-                    <!-- Inbox Undangan Kelompok -->
-                    <div class="card-tactile bg-white border-2 border-black shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000] overflow-hidden">
-                        <div class="px-4 sm:px-5 py-3 border-b-2 border-black {{ $kelompokInbox->count() > 0 ? 'bg-amber-50' : 'bg-blue-50/70' }} flex items-center justify-between">
-                            <h4 class="text-xs sm:text-sm font-black uppercase tracking-wider text-[#1A467C]">
-                                Inbox Undangan Kelompok
-                            </h4>
-                            <span class="bg-white border border-black px-2 py-0.5 font-mono font-black text-[10px] text-[#1A467C]">
-                                {{ $kelompokInbox->count() }} Masuk
-                            </span>
-                        </div>
-
-                        @if ($kelompokInbox->isEmpty())
-                            <div class="p-6 text-center text-xs font-bold text-gray-500">
-                                Belum ada undangan kelompok di inbox kamu. Kamu bisa tunggu undangan dari Ketua tim, buat kelompok baru, atau gabung lewat kode/QR.
-                            </div>
-                        @else
-                            <div class="divide-y-2 divide-black">
-                                @foreach ($kelompokInbox as $inv)
-                                    @if ($inv->kelompok)
-                                        <div class="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white hover:bg-amber-50/40 transition">
-                                            <div class="min-w-0 flex-1 space-y-1">
-                                                <div class="flex flex-wrap items-center gap-1.5">
-                                                    <span class="font-black text-sm text-gray-950 uppercase">
-                                                        {{ $inv->kelompok->nama_kelompok }}
-                                                    </span>
-                                                    <span class="bg-blue-50 border border-black text-[#1A467C] px-1.5 py-0.2 text-[10px] font-mono font-black">
-                                                        {{ $inv->kelompok->members->count() }} Anggota
-                                                    </span>
-                                                </div>
-                                                <p class="text-xs font-semibold text-gray-700">
-                                                    Ketua: <strong class="text-gray-950">{{ $inv->kelompok->ketua->nama ?? '-' }}</strong>
-                                                    @if (!empty($inv->kelompok->ketua?->kelas))
-                                                        <span class="font-mono text-[11px] text-[#1A467C]">({{ $inv->kelompok->ketua->kelas }})</span>
-                                                    @endif
-                                                </p>
-                                                @if (!empty($inv->kelompok->judul_proposal))
-                                                    <p class="text-[11px] font-medium text-gray-600 truncate">
-                                                        Ide Proposal: {{ $inv->kelompok->judul_proposal }}
-                                                    </p>
-                                                @endif
-                                            </div>
-
-                                            <div class="flex items-center gap-2 shrink-0">
-                                                <form action="{{ route('mahasiswa.kelompok.respondInvite', $inv->id) }}" method="POST">
-                                                    @csrf
-                                                    <input type="hidden" name="action" value="accept">
-                                                    <button
-                                                        type="submit"
-                                                        class="btn-tactile px-3.5 py-2 bg-[#15803d] hover:bg-[#166534] text-white border-2 border-black text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
-                                                    >
-                                                        Terima
-                                                    </button>
-                                                </form>
-                                                <form action="{{ route('mahasiswa.kelompok.respondInvite', $inv->id) }}" method="POST">
-                                                    @csrf
-                                                    <input type="hidden" name="action" value="decline">
-                                                    <button
-                                                        type="submit"
-                                                        class="btn-tactile px-3.5 py-2 bg-white hover:bg-red-50 text-[#CA2C2A] border-2 border-black text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
-                                                    >
-                                                        Tolak
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    @endif
-                                @endforeach
-                            </div>
-                        @endif
-                    </div>
-
-                    <!-- Buat Kelompok Sendiri & Gabung via Kode / Link / QR -->
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-                        <!-- Form Buat Kelompok Sendiri (Auto Ketua) -->
-                        <div class="card-tactile bg-white border-2 border-black shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000] overflow-hidden">
-                            <div class="px-4 sm:px-5 py-3 border-b-2 border-black bg-blue-50/70 flex items-center justify-between">
-                                <h4 class="text-xs sm:text-sm font-black uppercase tracking-wider text-[#1A467C]">
-                                    Buat Kelompok Sendiri
-                                </h4>
-                                <span class="bg-amber-300 border border-black px-2 py-0.5 text-[10px] font-black uppercase">
-                                    Jadi Ketua
-                                </span>
-                            </div>
-
-                            <form action="{{ route('mahasiswa.kelompok.store') }}" method="POST" class="p-4 sm:p-5 space-y-3.5">
-                                @csrf
-                                <div>
-                                    <label for="create-nama-kelompok" class="block text-[11px] font-black uppercase tracking-wider text-gray-800 mb-1">
-                                        Nama Kelompok <span class="text-[#CA2C2A]">*</span>
-                                    </label>
-                                    <input
-                                        type="text"
-                                        id="create-nama-kelompok"
-                                        name="nama_kelompok"
-                                        value="{{ old('nama_kelompok') }}"
-                                        required
-                                        maxlength="80"
-                                        placeholder="Contoh: Tim Garuda IF"
-                                        class="w-full px-3 py-2 bg-white border-2 border-black text-xs sm:text-sm font-bold text-gray-950 focus:outline-none focus:bg-blue-50/40"
-                                    >
-                                </div>
-
-                                <div>
-                                    <label for="create-judul-proposal" class="block text-[11px] font-black uppercase tracking-wider text-gray-800 mb-1">
-                                        Ide Judul Proposal <span class="text-gray-400 font-semibold">(Opsional)</span>
-                                    </label>
-                                    <input
-                                        type="text"
-                                        id="create-judul-proposal"
-                                        name="judul_proposal"
-                                        value="{{ old('judul_proposal') }}"
-                                        maxlength="200"
-                                        placeholder="Bisa diisi atau diubah nanti"
-                                        class="w-full px-3 py-2 bg-white border-2 border-black text-xs sm:text-sm font-semibold text-gray-900 focus:outline-none focus:bg-blue-50/40"
-                                    >
-                                </div>
-
-                                <button
-                                    type="submit"
-                                    class="btn-tactile w-full py-2.5 bg-[#1A467C] hover:bg-[#123259] text-white border-2 border-black text-xs font-black uppercase tracking-wider shadow-[3px_3px_0px_0px_#000000] cursor-pointer"
-                                >
-                                    Buat Kelompok &amp; Jadi Ketua
-                                </button>
-                            </form>
-                        </div>
-
-                        <!-- Form Gabung via Kode, Link, atau Scan QR -->
-                        <div class="card-tactile bg-white border-2 border-black shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000] overflow-hidden">
-                            <div class="px-4 sm:px-5 py-3 border-b-2 border-black bg-green-50/80 flex items-center justify-between">
-                                <h4 class="text-xs sm:text-sm font-black uppercase tracking-wider text-[#15803d]">
-                                    Gabung via Link / Kode QR
-                                </h4>
-                                <span class="bg-white border border-black px-2 py-0.5 text-[10px] font-black uppercase text-[#15803d]">
-                                    Anggota
-                                </span>
-                            </div>
-
-                            <div class="p-4 sm:p-5 space-y-4">
-                                <form id="kelompok-join-form" action="{{ route('mahasiswa.kelompok.joinCode') }}" method="POST" class="space-y-2.5">
-                                    @csrf
-                                    <label for="kelompok-join-input" class="block text-[11px] font-black uppercase tracking-wider text-gray-800">
-                                        Kode atau Link Undangan
-                                    </label>
-                                    <div class="flex gap-2">
-                                        <input
-                                            type="text"
-                                            id="kelompok-join-input"
-                                            name="kode_invite"
-                                            value="{{ old('kode_invite') }}"
-                                            required
-                                            placeholder="PKJ-XXXXXX atau tempel link..."
-                                            class="flex-1 min-w-0 px-3 py-2 bg-white border-2 border-black text-xs sm:text-sm font-mono font-bold text-gray-950 focus:outline-none focus:bg-green-50/40"
-                                        >
-                                        <button
-                                            type="submit"
-                                            class="btn-tactile px-4 py-2 bg-[#15803d] hover:bg-[#166534] text-white border-2 border-black text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] shrink-0 cursor-pointer"
-                                        >
-                                            Gabung
-                                        </button>
-                                    </div>
-                                </form>
-
-                                <div class="border-t-2 border-dashed border-gray-300 pt-3.5 space-y-3">
-                                    <button
-                                        type="button"
-                                        id="kelompok-camera-trigger"
-                                        onclick="startKelompokQrScanner()"
-                                        class="btn-tactile w-full py-2.5 bg-amber-300 hover:bg-amber-400 text-black border-2 border-black text-xs font-black uppercase tracking-wider shadow-[3px_3px_0px_0px_#000000] flex items-center justify-center gap-2 cursor-pointer"
-                                    >
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="square" stroke-width="2.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                                            <path stroke-linecap="square" stroke-width="2.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        </svg>
-                                        <span>Scan Kode QR Ketua</span>
-                                    </button>
-
-                                    <div id="kelompok-camera-box" class="hidden space-y-2.5">
-                                        <div id="kelompok-qr-reader" class="w-full max-w-xs mx-auto border-2 border-black bg-black overflow-hidden"></div>
-                                        <button
-                                            type="button"
-                                            onclick="stopKelompokQrScanner()"
-                                            class="btn-tactile w-full py-2 bg-gray-100 hover:bg-gray-200 text-gray-900 border-2 border-black text-xs font-black uppercase tracking-wider cursor-pointer"
-                                        >
-                                            Tutup Kamera
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                @else
-                    @php
-                        $joinUrl = route('mahasiswa.kelompok.joinLink', ['kode' => $myKelompok->kode_invite]);
-                        $showEditFormOnLoad = $errors->has('nama_kelompok') || $errors->has('judul_proposal');
-                    @endphp
-
-                    <!-- Header Ringkasan Kelompok Saya -->
-                    <div class="card-tactile bg-white border-2 border-black p-4 sm:p-6 shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000] space-y-4">
-                        <div class="flex flex-wrap items-start justify-between gap-3">
-                            <div class="min-w-0 flex-1 space-y-1">
-                                <div class="flex flex-wrap items-center gap-1.5">
-                                    <span class="bg-[#1A467C] text-white border border-black px-2 py-0.5 text-[10px] font-black uppercase">
-                                        KELOMPOK SAYA
-                                    </span>
-                                    <span class="{{ $isKetua ? 'bg-amber-300 text-black' : 'bg-sky-200 text-black' }} border border-black px-2 py-0.5 text-[10px] font-black uppercase">
-                                        {{ $isKetua ? 'Ketua Kelompok' : 'Anggota' }}
-                                    </span>
-                                    <span class="bg-gray-100 text-gray-900 border border-black px-2 py-0.5 text-[10px] font-mono font-black">
-                                        {{ $myKelompok->kode_invite }}
-                                    </span>
-                                </div>
-
-                                <h3 class="text-base sm:text-xl font-black uppercase text-gray-950 tracking-tight break-words">
-                                    {{ $myKelompok->nama_kelompok }}
-                                </h3>
-
-                                @if (!empty($myKelompok->judul_proposal))
-                                    <p class="text-xs font-semibold text-gray-700">
-                                        Judul Proposal: <span class="text-gray-950 font-bold">{{ $myKelompok->judul_proposal }}</span>
-                                    </p>
-                                @elseif ($isKetua)
-                                    <p class="text-xs font-medium text-gray-500">
-                                        Belum ada judul proposal. Klik Edit Info untuk menambahkan.
-                                    </p>
-                                @endif
-                            </div>
-
-                            @if ($isKetua)
-                                <button
-                                    type="button"
-                                    onclick="toggleEditKelompok()"
-                                    class="btn-tactile px-3 py-1.5 bg-white hover:bg-gray-100 text-gray-950 border-2 border-black text-xs font-black uppercase shadow-[2px_2px_0px_0px_#000000] shrink-0 cursor-pointer"
-                                >
-                                    Edit Info
-                                </button>
-                            @endif
-                        </div>
-
-                        @if ($isKetua)
-                            <div id="kelompok-edit-box" class="{{ $showEditFormOnLoad ? '' : 'hidden' }} border-t-2 border-black pt-4">
-                                <form action="{{ route('mahasiswa.kelompok.update') }}" method="POST" class="space-y-3 bg-gray-50 border-2 border-black p-3.5">
-                                    @csrf
-                                    @method('PUT')
-                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                        <div>
-                                            <label for="edit-nama-kelompok" class="block text-[10px] font-black uppercase tracking-wider text-gray-700 mb-1">
-                                                Nama Kelompok
-                                            </label>
-                                            <input
-                                                type="text"
-                                                id="edit-nama-kelompok"
-                                                name="nama_kelompok"
-                                                value="{{ old('nama_kelompok', $myKelompok->nama_kelompok) }}"
-                                                required
-                                                maxlength="80"
-                                                class="w-full px-3 py-2 bg-white border-2 border-black text-xs font-bold text-gray-950"
-                                            >
-                                        </div>
-                                        <div>
-                                            <label for="edit-judul-proposal" class="block text-[10px] font-black uppercase tracking-wider text-gray-700 mb-1">
-                                                Ide Judul Proposal
-                                            </label>
-                                            <input
-                                                type="text"
-                                                id="edit-judul-proposal"
-                                                name="judul_proposal"
-                                                value="{{ old('judul_proposal', $myKelompok->judul_proposal) }}"
-                                                maxlength="200"
-                                                placeholder="Opsional"
-                                                class="w-full px-3 py-2 bg-white border-2 border-black text-xs font-semibold text-gray-900"
-                                            >
-                                        </div>
-                                    </div>
-                                    <div class="flex items-center justify-end gap-2">
-                                        <button
-                                            type="button"
-                                            onclick="toggleEditKelompok()"
-                                            class="btn-tactile px-3 py-1.5 bg-white border-2 border-black text-xs font-black uppercase cursor-pointer"
-                                        >
-                                            Batal
-                                        </button>
-                                        <button
-                                            type="submit"
-                                            class="btn-tactile px-4 py-1.5 bg-[#1A467C] text-white border-2 border-black text-xs font-black uppercase shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
-                                        >
-                                            Simpan
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-                        @endif
-
-                        <!-- Metrik Ringkas Kelompok -->
-                        <div class="grid grid-cols-3 gap-2.5 sm:gap-4 border-t-2 border-black pt-4">
-                            <div class="bg-blue-50 border-2 border-black p-3 text-center">
-                                <span class="block text-[10px] font-black uppercase text-[#1A467C]">Total Anggota</span>
-                                <span class="block font-mono text-base sm:text-xl font-black text-gray-950 mt-0.5">{{ $kelompokStats['jumlah_anggota'] }}</span>
-                            </div>
-                            <div class="bg-green-50 border-2 border-black p-3 text-center">
-                                <span class="block text-[10px] font-black uppercase text-[#15803d]">Total Point Tim</span>
-                                <span class="block font-mono text-base sm:text-xl font-black text-[#15803d] mt-0.5">{{ $kelompokStats['total_point'] }} PTS</span>
-                            </div>
-                            <div class="bg-amber-50 border-2 border-black p-3 text-center">
-                                <span class="block text-[10px] font-black uppercase text-amber-800">Kehadiran Tim</span>
-                                <span class="block font-mono text-base sm:text-xl font-black text-gray-950 mt-0.5">{{ $kelompokStats['persen_hadir'] }}%</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    @if ($isKetua)
-                        <!-- Panel Khusus Ketua: Share Link/QR & Undang ke Inbox Teman -->
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-                            <!-- Card Link & Kode QR Undangan -->
-                            <div class="card-tactile bg-white border-2 border-black shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000] overflow-hidden">
-                                <div class="px-4 sm:px-5 py-3 border-b-2 border-black bg-green-50/80 flex items-center justify-between">
-                                    <h4 class="text-xs sm:text-sm font-black uppercase tracking-wider text-[#15803d]">
-                                        Undang via Link &amp; Kode QR
-                                    </h4>
-                                    <span class="bg-white border border-black px-2 py-0.5 font-mono font-black text-[10px] text-[#15803d]">
-                                        {{ $myKelompok->kode_invite }}
-                                    </span>
-                                </div>
-
-                                <div class="p-4 sm:p-5 space-y-4">
-                                    <div class="flex flex-col items-center justify-center bg-gray-50 border-2 border-black p-4">
-                                        <div id="kelompok-qr-canvas" class="bg-white p-2.5 border-2 border-black shadow-[3px_3px_0px_0px_#000000]"></div>
-                                        <span class="mt-2 font-mono text-xs font-black tracking-widest text-gray-950">
-                                            {{ $myKelompok->kode_invite }}
-                                        </span>
-                                    </div>
-
-                                    <div class="space-y-2">
-                                        <label class="block text-[10px] font-black uppercase tracking-wider text-gray-700">
-                                            Link Gabung Otomatis
-                                        </label>
-                                        <div class="flex gap-2">
-                                            <input
-                                                type="text"
-                                                id="kelompok-share-link"
-                                                value="{{ $joinUrl }}"
-                                                readonly
-                                                class="flex-1 min-w-0 px-2.5 py-2 bg-gray-50 border-2 border-black text-[11px] font-mono font-bold text-gray-800 select-all"
-                                            >
-                                            <button
-                                                type="button"
-                                                id="btn-copy-kelompok-link"
-                                                onclick="copyKelompokText('kelompok-share-link', 'btn-copy-kelompok-link')"
-                                                class="btn-tactile px-3.5 py-2 bg-[#1A467C] hover:bg-[#123259] text-white border-2 border-black text-xs font-black uppercase shadow-[2px_2px_0px_0px_#000000] shrink-0 cursor-pointer"
-                                            >
-                                                Salin Link
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Card Undang Langsung ke Inbox Teman -->
-                            <div class="card-tactile bg-white border-2 border-black shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000] overflow-hidden flex flex-col">
-                                <div class="px-4 sm:px-5 py-3 border-b-2 border-black bg-amber-50/80 flex items-center justify-between">
-                                    <h4 class="text-xs sm:text-sm font-black uppercase tracking-wider text-[#1A467C]">
-                                        Undang ke Inbox Teman
-                                    </h4>
-                                    <span class="bg-white border border-black px-2 py-0.5 font-mono font-black text-[10px] text-[#1A467C]">
-                                        {{ $kandidatAnggotaList->where('already_invited', false)->count() }} Tersedia
-                                    </span>
-                                </div>
-
-                                <div class="p-4 sm:p-5 space-y-4 flex-1">
-                                    <div>
-                                        <input
-                                            type="text"
-                                            id="invite-search-input"
-                                            oninput="filterKelompokKandidat()"
-                                            placeholder="Cari nama, NIM, atau kelas teman..."
-                                            class="w-full px-3 py-2 bg-white border-2 border-black text-xs font-bold text-gray-950 focus:outline-none focus:bg-amber-50/40"
-                                        >
-                                    </div>
-
-                                    <div id="invite-candidate-list" class="max-h-56 overflow-y-auto divide-y divide-gray-200 border-2 border-black bg-white"></div>
-
-                                    @if ($myKelompok->invitations->isNotEmpty())
-                                        <div class="border-t-2 border-black pt-3.5 space-y-2">
-                                            <span class="block text-[10px] font-black uppercase tracking-wider text-gray-700">
-                                                Menunggu Konfirmasi ({{ $myKelompok->invitations->count() }})
-                                            </span>
-                                            <div class="divide-y divide-gray-200 border-2 border-black bg-gray-50 max-h-36 overflow-y-auto">
-                                                @foreach ($myKelompok->invitations as $sentInv)
-                                                    @if ($sentInv->pendaftaran)
-                                                        <div class="px-3 py-2 flex items-center justify-between gap-2 text-xs">
-                                                            <div class="min-w-0">
-                                                                <p class="font-bold text-gray-950 truncate">{{ $sentInv->pendaftaran->nama }}</p>
-                                                                <p class="font-mono text-[10px] text-gray-600">{{ $sentInv->pendaftaran->nim }} • {{ $sentInv->pendaftaran->kelas }}</p>
-                                                            </div>
-                                                            <form action="{{ route('mahasiswa.kelompok.cancelInvite', $sentInv->id) }}" method="POST" class="shrink-0">
-                                                                @csrf
-                                                                @method('DELETE')
-                                                                <button
-                                                                    type="submit"
-                                                                    class="btn-tactile px-2.5 py-1 bg-white hover:bg-red-50 text-[#CA2C2A] border border-black text-[10px] font-black uppercase cursor-pointer"
-                                                                >
-                                                                    Batalkan
-                                                                </button>
-                                                            </form>
-                                                        </div>
-                                                    @endif
-                                                @endforeach
-                                            </div>
-                                        </div>
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
-                    @endif
-
-                    <!-- Card Daftar Anggota Kelompok -->
-                    <div class="card-tactile bg-white border-2 border-black shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000] overflow-hidden">
-                        <div class="px-4 sm:px-5 py-3 border-b-2 border-black bg-blue-50/70 flex items-center justify-between">
-                            <h4 class="text-xs sm:text-sm font-black uppercase tracking-wider text-[#1A467C]">
-                                Daftar Anggota Kelompok
-                            </h4>
-                            <span class="bg-white border border-black px-2 py-0.5 font-mono font-black text-[10px] text-[#1A467C]">
-                                {{ $kelompokStats['jumlah_anggota'] }} Orang
-                            </span>
-                        </div>
-
-                        <div class="divide-y divide-gray-200">
-                            @foreach ($myKelompok->members as $member)
-                                @php
-                                    $mhs = $member->pendaftaran;
-                                    $isSelf = (int) $member->pendaftaran_id === (int) $mahasiswa->id;
-                                    $isMemberKetua = (int) $member->pendaftaran_id === (int) $myKelompok->ketua_id;
-                                @endphp
-                                @if ($mhs)
-                                    <div class="px-4 sm:px-5 py-3.5 {{ $isSelf ? 'bg-amber-50/70' : 'bg-white' }} flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                                        <div class="flex items-center gap-3 min-w-0 flex-1">
-                                            <div class="w-10 h-10 bg-[#2A82C6] text-white border-2 border-black flex items-center justify-center font-black text-xs shrink-0 overflow-hidden">
-                                                @if ($mhs->avatarUrl())
-                                                    <img src="{{ $mhs->avatarUrl() }}" alt="Foto {{ $mhs->nama }}" class="w-full h-full object-cover">
-                                                @else
-                                                    {{ $mhs->initials() }}
-                                                @endif
-                                            </div>
-
-                                            <div class="min-w-0 flex-1">
-                                                <div class="flex flex-wrap items-center gap-1.5">
-                                                    <p class="font-black text-xs sm:text-sm text-gray-950 truncate">{{ $mhs->nama }}</p>
-                                                    <span class="{{ $isMemberKetua ? 'bg-amber-300 text-black' : 'bg-gray-100 text-gray-800' }} border border-black text-[9px] font-black uppercase px-1.5 py-0.2 shrink-0">
-                                                        {{ $isMemberKetua ? 'KETUA' : 'ANGGOTA' }}
-                                                    </span>
-                                                    @if ($isSelf)
-                                                        <span class="bg-[#1A467C] text-white border border-black text-[9px] font-black uppercase px-1.5 py-0.2 shrink-0">
-                                                            KAMU
-                                                        </span>
-                                                    @endif
-                                                </div>
-                                                <p class="font-mono text-[10px] sm:text-[11px] font-bold text-gray-600 mt-0.5">
-                                                    {{ $mhs->nim }} • <span class="text-[#1A467C]">{{ $mhs->kelas }}</span>
-                                                </p>
-                                            </div>
-                                        </div>
-
-                                        <div class="flex flex-wrap items-center justify-between sm:justify-end gap-2 shrink-0">
-                                            <span class="bg-green-100 border-2 border-black px-2.5 py-1 font-mono font-black text-xs text-[#15803d]">
-                                                ★ {{ (int) ($mhs->total_point ?? 0) }} PTS
-                                            </span>
-
-                                            @if ($isKetua && !$isSelf)
-                                                <form id="transfer-ketua-form-{{ $member->id }}" action="{{ route('mahasiswa.kelompok.transferKetua', $member->id) }}" method="POST" class="inline">
-                                                    @csrf
-                                                    <button
-                                                        type="button"
-                                                        data-form="transfer-ketua-form-{{ $member->id }}"
-                                                        data-title="Serahkan Jabatan Ketua?"
-                                                        data-message="Jabatan Ketua kelompok akan dipindahkan ke {{ $mhs->nama }}."
-                                                        data-confirm="Ya, Serahkan"
-                                                        data-danger="0"
-                                                        onclick="openKelompokConfirmFromEl(this)"
-                                                        class="btn-tactile px-2.5 py-1.5 bg-amber-300 hover:bg-amber-400 text-black border-2 border-black text-[10px] font-black uppercase cursor-pointer"
-                                                    >
-                                                        Jadikan Ketua
-                                                    </button>
-                                                </form>
-
-                                                <form id="remove-member-form-{{ $member->id }}" action="{{ route('mahasiswa.kelompok.removeMember', $member->id) }}" method="POST" class="inline">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button
-                                                        type="button"
-                                                        data-form="remove-member-form-{{ $member->id }}"
-                                                        data-title="Keluarkan Anggota?"
-                                                        data-message="{{ $mhs->nama }} akan dikeluarkan dari kelompok ini."
-                                                        data-confirm="Ya, Keluarkan"
-                                                        data-danger="1"
-                                                        onclick="openKelompokConfirmFromEl(this)"
-                                                        class="btn-tactile px-2.5 py-1.5 bg-white hover:bg-red-50 text-[#CA2C2A] border-2 border-black text-[10px] font-black uppercase cursor-pointer"
-                                                    >
-                                                        Keluarkan
-                                                    </button>
-                                                </form>
-                                            @endif
-                                        </div>
-                                    </div>
-                                @endif
-                            @endforeach
-                        </div>
-
-                        <div class="px-4 sm:px-5 py-3.5 bg-gray-50 border-t-2 border-black flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                            <p class="text-[11px] font-semibold text-gray-600">
-                                @if ($isKetua)
-                                    Serahkan jabatan ke anggota lain terlebih dahulu jika hanya ingin keluar tanpa membubarkan kelompok.
-                                @else
-                                    Keluar akan melepas keanggotaanmu dari kelompok ini.
-                                @endif
-                            </p>
-
-                            <form id="leave-disband-form" action="{{ route('mahasiswa.kelompok.leave') }}" method="POST" class="shrink-0">
-                                @csrf
-                                <button
-                                    type="button"
-                                    data-form="leave-disband-form"
-                                    data-title="{{ $isKetua ? 'Bubarkan Kelompok?' : 'Keluar dari Kelompok?' }}"
-                                    data-message="{{ $isKetua ? 'Seluruh anggota akan otomatis dikeluarkan dan kode undangan kelompok tidak berlaku lagi.' : 'Kamu tidak akan lagi tergabung di kelompok ' . $myKelompok->nama_kelompok . '.' }}"
-                                    data-confirm="{{ $isKetua ? 'Ya, Bubarkan' : 'Ya, Keluar' }}"
-                                    data-danger="1"
-                                    onclick="openKelompokConfirmFromEl(this)"
-                                    class="btn-tactile px-4 py-2 bg-[#CA2C2A] hover:bg-[#901C1A] text-white border-2 border-black text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
-                                >
-                                    {{ $isKetua ? 'Bubarkan Kelompok' : 'Keluar Kelompok' }}
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                @endif
-
+                @include('mahasiswa.partials.kelompok_panel')
             </section>
 
             <!-- ========================================================== -->
@@ -1652,11 +1168,9 @@
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="square" stroke-width="2.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
-                @if (isset($kelompokInbox) && $kelompokInbox->count() > 0)
-                    <span class="absolute -top-1.5 -right-1.5 min-w-[14px] h-[14px] px-0.5 bg-amber-300 text-black border border-black text-[8px] font-mono font-black flex items-center justify-center leading-none">
-                        {{ $kelompokInbox->count() }}
-                    </span>
-                @endif
+                <span id="rt-bot-inbox-badge" class="{{ (isset($kelompokInbox) && $kelompokInbox->count() > 0) ? '' : 'hidden ' }}absolute -top-1.5 -right-1.5 min-w-[14px] h-[14px] px-0.5 bg-amber-300 text-black border border-black text-[8px] font-mono font-black flex items-center justify-center leading-none">
+                    {{ isset($kelompokInbox) ? $kelompokInbox->count() : 0 }}
+                </span>
             </div>
             <span class="text-[8px] sm:text-[9px] font-black uppercase tracking-tight">Kelompok</span>
         </button>
@@ -1730,7 +1244,7 @@
                 onclick="closeDashResultModal()"
                 class="btn-tactile w-full py-2.5 bg-[#2A82C6] hover:bg-[#1A467C] text-white text-xs font-black uppercase tracking-wider border-2 border-black shadow-[3px_3px_0px_0px_#000000] cursor-pointer"
             >
-                Selesai & Muat Ulang
+                Selesai
             </button>
         </div>
     </div>
@@ -1829,10 +1343,20 @@
         let isKelompokQrSubmitted = false;
         let pendingKelompokConfirmFormId = null;
 
-        const kelompokInviteUrl = @json($myKelompok ? route('mahasiswa.kelompok.joinLink', ['kode' => $myKelompok->kode_invite]) : '');
-        const kelompokCandidates = @json($kandidatAnggotaList ?? []);
+        let kelompokInviteUrl = @json($myKelompok ? route('mahasiswa.kelompok.joinLink', ['kode' => $myKelompok->kode_invite]) : '');
+        let kelompokCandidates = @json($kandidatAnggotaList ?? []);
         const kelompokInviteAction = @json(route('mahasiswa.kelompok.invite'));
         const hasKelompokValidationError = @json($hasKelompokValidationError);
+        const dashboardSyncUrl = @json(route('mahasiswa.dashboard.sync'));
+        const myStudentId = {{ (int) $mahasiswa->id }};
+
+        let currentRealtimeSig = @json($realtimeSignature ?? '');
+        let pendingKelompokPayload = null;
+        let currentLeaderboardMode = 'individu';
+        let isRealtimeSyncInFlight = false;
+        let realtimePollTimer = null;
+        let lastIndPodiumSig = '';
+        let lastGrpPodiumSig = '';
 
         // Open & Close Logout Confirmation Modal
         function openLogoutModal() {
@@ -1866,6 +1390,7 @@
         function closeKelompokConfirmModal() {
             pendingKelompokConfirmFormId = null;
             document.getElementById('kelompok-confirm-modal')?.classList.add('hidden');
+            flushPendingKelompokUpdate();
         }
 
         function submitKelompokConfirmModal() {
@@ -1930,13 +1455,23 @@
                 renderKelompokQr();
             }
 
+            // Replay animasi tactile snap & podium ketika berpindah tab
+            const activeSection = document.getElementById(`tab-panel-${tabId}`);
+            replaySnapIn(activeSection);
+            if (tabId === 'leaderboard') {
+                replayPodiumAnimations(document.getElementById(
+                    currentLeaderboardMode === 'kelompok' ? 'lb-kelompok-podium' : 'lb-individu-podium'
+                ));
+            }
+
             // Update URL hash
             window.location.hash = tabId;
         }
 
         // Switch Mode di Tab Leaderboard (Individu vs Kelompok)
         function switchLeaderboardMode(mode) {
-            const isKelompok = mode === 'kelompok';
+            currentLeaderboardMode = mode === 'kelompok' ? 'kelompok' : 'individu';
+            const isKelompok = currentLeaderboardMode === 'kelompok';
             const indView = document.getElementById('lb-view-individu');
             const grpView = document.getElementById('lb-view-kelompok');
             const indBtn = document.getElementById('lb-btn-individu');
@@ -1948,6 +1483,11 @@
             if (indView && grpView) {
                 indView.classList.toggle('hidden', isKelompok);
                 grpView.classList.toggle('hidden', !isKelompok);
+                const visibleView = isKelompok ? grpView : indView;
+                replaySnapIn(visibleView);
+                replayPodiumAnimations(document.getElementById(
+                    isKelompok ? 'lb-kelompok-podium' : 'lb-individu-podium'
+                ));
             }
             if (indBtn && grpBtn) {
                 indBtn.className = isKelompok ? inactiveCls : activeCls;
@@ -1999,6 +1539,7 @@
         // Toggle Inline Form Edit Info Kelompok
         function toggleEditKelompok() {
             document.getElementById('kelompok-edit-box')?.classList.toggle('hidden');
+            flushPendingKelompokUpdate();
         }
 
         // Salin Link / Kode Undangan Kelompok
@@ -2154,6 +1695,7 @@
             }
             document.getElementById('kelompok-camera-box')?.classList.add('hidden');
             document.getElementById('kelompok-camera-trigger')?.classList.remove('hidden');
+            flushPendingKelompokUpdate();
         }
 
         async function onKelompokQrSuccess(decodedText) {
@@ -2187,6 +1729,13 @@
             } else if (hasKelompokValidationError) {
                 switchTab('kelompok');
             }
+
+            const kelompokSection = document.getElementById('tab-panel-kelompok');
+            kelompokSection?.addEventListener('focusout', () => {
+                setTimeout(flushPendingKelompokUpdate, 150);
+            });
+
+            startRealtimePolling();
         });
 
         // Buka Kamera Scanner di Tab Scan
@@ -2350,7 +1899,673 @@
 
         function closeDashResultModal() {
             document.getElementById('dash-result-modal').classList.add('hidden');
-            window.location.reload();
+            syncDashboardNow();
+        }
+
+        // Replay animasi tab snap-in secara halus saat pindah tab/mode
+        function replaySnapIn(el) {
+            if (!el) return;
+            el.classList.remove('tab-snap-in');
+            void el.offsetWidth;
+            el.classList.add('tab-snap-in');
+        }
+
+        // Replay animasi batang podium tumbuh dari bawah
+        function replayPodiumAnimations(containerEl) {
+            if (!containerEl) return;
+            const bars = containerEl.querySelectorAll('.podium-bar');
+            bars.forEach(bar => {
+                bar.style.animation = 'none';
+                void bar.offsetHeight;
+                bar.style.animation = '';
+            });
+        }
+
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>"']/g, ch => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;',
+            }[ch]));
+        }
+
+        function updateStatText(id, nextText, flashElSelector = null) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            const target = String(nextText);
+            if (el.textContent.trim() !== target.trim()) {
+                el.textContent = target;
+                el.classList.remove('stat-pop');
+                void el.offsetWidth;
+                el.classList.add('stat-pop');
+
+                const flashTarget = flashElSelector ? el.closest(flashElSelector) : el.closest('.card-tactile');
+                if (flashTarget) {
+                    flashTarget.classList.remove('realtime-flash');
+                    void flashTarget.offsetWidth;
+                    flashTarget.classList.add('realtime-flash');
+                }
+            }
+        }
+
+        function updateInboxBadges(count) {
+            const num = Number(count) || 0;
+            const sideBadge = document.getElementById('rt-side-inbox-badge');
+            const botBadge = document.getElementById('rt-bot-inbox-badge');
+            [sideBadge, botBadge].forEach(badge => {
+                if (!badge) return;
+                badge.textContent = String(num);
+                badge.classList.toggle('hidden', num <= 0);
+            });
+        }
+
+        function renderPointHistories(histories) {
+            const container = document.getElementById('rt-poin-history-list');
+            if (!container) return;
+
+            const items = Array.isArray(histories) ? histories : [];
+            const nextSig = items.map(h => `${h.id}:${h.jumlah}`).join('|');
+            if (container.dataset.histSig === nextSig) {
+                return;
+            }
+            const hadInitial = container.dataset.histSig !== undefined;
+            container.dataset.histSig = nextSig;
+
+            if (items.length === 0) {
+                container.innerHTML = '<div class="p-8 text-center text-xs font-bold text-gray-500">Belum ada riwayat point.</div>';
+                return;
+            }
+
+            container.innerHTML = items.map(h => {
+                const isAdd = h.tipe === 'tambah';
+                const badgeCls = isAdd ? 'bg-[#15803d] text-white' : 'bg-[#CA2C2A] text-white';
+                const prefix = isAdd ? '+' : '-';
+                const keteranganHtml = h.keterangan
+                    ? `<p class="text-xs font-semibold text-gray-600 mt-0.5 break-words">${escapeHtml(h.keterangan)}</p>`
+                    : '';
+
+                return `
+                    <div class="px-4 sm:px-5 py-3.5 hover:bg-blue-50/30 transition flex items-start justify-between gap-3 ${hadInitial ? 'realtime-flash' : ''}">
+                        <div class="flex items-start gap-3 min-w-0">
+                            <span class="w-8 h-8 border-2 border-black font-mono font-black text-xs flex items-center justify-center shrink-0 shadow-[2px_2px_0px_0px_#000000] ${badgeCls}">
+                                ${prefix}${Number(h.jumlah) || 0}
+                            </span>
+                            <div class="min-w-0">
+                                <p class="font-black text-xs sm:text-sm uppercase text-gray-950 leading-tight">${escapeHtml(h.kategori)}</p>
+                                ${keteranganHtml}
+                            </div>
+                        </div>
+                        <span class="shrink-0 font-mono text-[10px] font-bold text-gray-400 pt-0.5">${escapeHtml(h.waktu || '-')}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getRankBadgeCls(rankNum) {
+            if (rankNum === 1) return 'w-8 h-8 border-2 border-black font-mono font-black text-xs flex items-center justify-center shrink-0 bg-amber-300 text-black';
+            if (rankNum === 2) return 'w-8 h-8 border-2 border-black font-mono font-black text-xs flex items-center justify-center shrink-0 bg-sky-200 text-black';
+            if (rankNum === 3) return 'w-8 h-8 border-2 border-black font-mono font-black text-xs flex items-center justify-center shrink-0 bg-orange-200 text-black';
+            return 'w-8 h-8 border-2 border-black font-mono font-black text-xs flex items-center justify-center shrink-0 bg-gray-100 text-gray-800';
+        }
+
+        function getBarColorCls(rankNum) {
+            if (rankNum === 1) return 'lb-bar-fill h-full bg-amber-400';
+            if (rankNum === 2) return 'lb-bar-fill h-full bg-[#2A82C6]';
+            if (rankNum === 3) return 'lb-bar-fill h-full bg-orange-400';
+            return 'lb-bar-fill h-full bg-[#15803d]';
+        }
+
+        function getDomTopThreeSig(listId) {
+            const list = document.getElementById(listId);
+            if (!list) return '';
+            return Array.from(list.querySelectorAll('[data-lb-key]')).slice(0, 3)
+                .map(el => `${el.dataset.lbKey}:${el.dataset.pts || 0}`)
+                .join('|');
+        }
+
+        function getJsonTopThreeSig(items, prefix) {
+            return (items || []).slice(0, 3)
+                .map(item => `${prefix}-${item.id}:${Number(item.total_point) || 0}`)
+                .join('|');
+        }
+
+        function renderPodiumSlots(containerId, items, type, forceAnimate = false) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            const list = Array.isArray(items) ? items : [];
+            const slots = [
+                { rank: 2, barBg: 'bg-sky-200', barHeight: 'h-28 sm:h-36', emptyHeight: 'h-24 sm:h-32', entry: list[1] || null },
+                { rank: 1, barBg: 'bg-amber-300', barHeight: 'h-40 sm:h-48', emptyHeight: 'h-32 sm:h-40', entry: list[0] || null },
+                { rank: 3, barBg: 'bg-orange-200', barHeight: 'h-20 sm:h-28', emptyHeight: 'h-16 sm:h-24', entry: list[2] || null },
+            ];
+
+            container.innerHTML = slots.map(pod => {
+                const entry = pod.entry;
+                if (!entry) {
+                    return `
+                        <div class="flex flex-col items-center">
+                            <div class="w-full ${pod.emptyHeight} bg-gray-100/70 border-t-2 border-x-2 border-dashed border-gray-300 flex items-center justify-center">
+                                <span class="font-mono font-black text-base text-gray-400">#${pod.rank}</span>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                const avatarSizeCls = pod.rank === 1
+                    ? 'w-11 h-11 sm:w-14 sm:h-14 text-sm sm:text-base'
+                    : 'w-9 h-9 sm:w-12 sm:h-12 text-xs sm:text-sm';
+
+                if (type === 'individu') {
+                    const avatarInner = entry.avatar_url
+                        ? `<img src="${escapeHtml(entry.avatar_url)}" alt="Avatar ${escapeHtml(entry.nama)}" class="w-full h-full object-cover">`
+                        : escapeHtml(entry.initials || 'IF');
+                    const meBadge = entry.is_me
+                        ? '<span class="absolute -top-2 -right-2 bg-[#15803d] text-white text-[8px] font-black uppercase px-1 py-0.2 border border-black">KAMU</span>'
+                        : '';
+
+                    return `
+                        <div class="flex flex-col items-center podium-col">
+                            <div class="flex flex-col items-center text-center mb-2.5 w-full">
+                                <div class="relative podium-avatar">
+                                    <div class="${avatarSizeCls} bg-white text-[#1A467C] border-2 border-black flex items-center justify-center font-black overflow-hidden shadow-[2px_2px_0px_0px_#000000]">
+                                        ${avatarInner}
+                                    </div>
+                                    ${meBadge}
+                                </div>
+                                <h5 class="font-black text-[10px] sm:text-xs text-gray-950 uppercase truncate max-w-full mt-1.5 px-0.5" title="${escapeHtml(entry.nama)}">
+                                    ${escapeHtml(entry.nama)}
+                                </h5>
+                                <span class="font-mono text-[9px] sm:text-[10px] font-bold text-[#1A467C]">
+                                    ${escapeHtml(entry.kelas)}
+                                </span>
+                                <div class="mt-1.5 bg-white border-2 border-black px-2 py-0.5 shadow-[2px_2px_0px_0px_#000000] inline-flex items-baseline gap-1">
+                                    <span class="font-mono font-black text-xs sm:text-sm text-gray-950 leading-none">${Number(entry.total_point) || 0}</span>
+                                    <span class="text-[8px] sm:text-[9px] font-black uppercase text-[#15803d] leading-none">PTS</span>
+                                </div>
+                            </div>
+                            <div class="podium-bar podium-bar-${pod.rank} w-full ${pod.barHeight} ${pod.barBg} border-t-2 border-x-2 border-black shadow-[3px_0px_0px_0px_#000000] flex flex-col items-center justify-center p-2 relative">
+                                <span class="font-mono font-black text-xl sm:text-3xl text-black/85 leading-none">#${pod.rank}</span>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                const myTeamBadge = entry.is_my_team
+                    ? '<span class="absolute -top-2 -right-3 bg-[#15803d] text-white text-[8px] font-black uppercase px-1 py-0.2 border border-black">TIMMU</span>'
+                    : '';
+
+                return `
+                    <div class="flex flex-col items-center podium-col">
+                        <div class="flex flex-col items-center text-center mb-2.5 w-full">
+                            <div class="relative podium-avatar">
+                                <div class="${avatarSizeCls} bg-[#1A467C] text-white border-2 border-black flex items-center justify-center font-black shadow-[2px_2px_0px_0px_#000000]">
+                                    ${escapeHtml(entry.initials || 'KL')}
+                                </div>
+                                ${myTeamBadge}
+                            </div>
+                            <h5 class="font-black text-[10px] sm:text-xs text-gray-950 uppercase truncate max-w-full mt-1.5 px-0.5" title="${escapeHtml(entry.nama_kelompok)}">
+                                ${escapeHtml(entry.nama_kelompok)}
+                            </h5>
+                            <span class="font-mono text-[9px] sm:text-[10px] font-bold text-[#1A467C]">
+                                ${Number(entry.jumlah_anggota) || 0} Anggota
+                            </span>
+                            <div class="mt-1.5 bg-white border-2 border-black px-2 py-0.5 shadow-[2px_2px_0px_0px_#000000] inline-flex items-baseline gap-1">
+                                <span class="font-mono font-black text-xs sm:text-sm text-gray-950 leading-none">${Number(entry.total_point) || 0}</span>
+                                <span class="text-[8px] sm:text-[9px] font-black uppercase text-[#15803d] leading-none">PTS</span>
+                            </div>
+                        </div>
+                        <div class="podium-bar podium-bar-${pod.rank} w-full ${pod.barHeight} ${pod.barBg} border-t-2 border-x-2 border-black shadow-[3px_0px_0px_0px_#000000] flex flex-col items-center justify-center p-2">
+                            <span class="font-mono font-black text-xl sm:text-3xl text-black/85 leading-none">#${pod.rank}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            if (forceAnimate) {
+                replayPodiumAnimations(container);
+            }
+        }
+
+        function createLeaderboardRowEl(item, type, maxPoint) {
+            const rankNum = Number(item.rank) || 1;
+            const pts = Number(item.total_point) || 0;
+            const pctWidth = pts > 0 ? Math.max(8, Math.round((pts / maxPoint) * 100)) : 0;
+            const key = type === 'individu' ? `mhs-${item.id}` : `grp-${item.id}`;
+            const highlightCls = (type === 'individu' ? item.is_me : item.is_my_team)
+                ? 'bg-amber-50/90 border-l-4 border-l-[#1A467C]'
+                : 'hover:bg-blue-50/40';
+
+            const row = document.createElement('div');
+            row.dataset.lbKey = key;
+            row.dataset.rank = String(rankNum);
+            row.dataset.pts = String(pts);
+            row.className = `lb-row px-4 sm:px-5 py-3.5 ${highlightCls} flex items-center justify-between gap-3 tab-snap-in`;
+
+            if (type === 'individu') {
+                const avatarHtml = item.avatar_url
+                    ? `<img src="${escapeHtml(item.avatar_url)}" alt="Avatar ${escapeHtml(item.nama)}" class="w-full h-full object-cover">`
+                    : escapeHtml(item.initials || 'IF');
+                const meBadgeHtml = item.is_me
+                    ? '<span data-role="my-badge" class="bg-[#1A467C] text-white text-[9px] font-black uppercase px-1.5 py-0.2 border border-black shrink-0">KAMU</span>'
+                    : '';
+
+                row.innerHTML = `
+                    <div class="flex items-center gap-3 min-w-0 flex-1">
+                        <span data-role="rank-badge" class="${getRankBadgeCls(rankNum)}">#${rankNum}</span>
+                        <div data-role="avatar" class="w-9 h-9 bg-[#2A82C6] text-white border-2 border-black flex items-center justify-center font-black text-xs shrink-0 overflow-hidden">
+                            ${avatarHtml}
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <div data-role="title-wrap" class="flex items-center gap-1.5">
+                                <p data-role="name" class="font-black text-xs sm:text-sm text-gray-950 truncate">${escapeHtml(item.nama)}</p>
+                                ${meBadgeHtml}
+                            </div>
+                            <p data-role="submeta" class="font-mono text-[10px] sm:text-[11px] font-bold text-[#1A467C]">${escapeHtml(item.kelas)}</p>
+                            <div class="mt-1.5 w-full max-w-md h-2.5 bg-gray-100 border border-black overflow-hidden">
+                                <div data-role="bar-fill" class="${getBarColorCls(rankNum)}" style="width: ${pctWidth}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-green-100 border-2 border-black px-3 py-1 shadow-[2px_2px_0px_0px_#000000] inline-flex items-baseline gap-1 shrink-0">
+                        <span data-role="pts-text" class="font-mono font-black text-xs sm:text-sm text-[#15803d] leading-none">${pts}</span>
+                        <span class="text-[9px] sm:text-[10px] font-black uppercase text-[#15803d] leading-none">PTS</span>
+                    </div>
+                `;
+            } else {
+                const teamBadgeHtml = item.is_my_team
+                    ? '<span data-role="my-badge" class="bg-[#15803d] text-white text-[9px] font-black uppercase px-1.5 py-0.2 border border-black shrink-0">TIM KAMU</span>'
+                    : '';
+
+                row.innerHTML = `
+                    <div class="flex items-center gap-3 min-w-0 flex-1">
+                        <span data-role="rank-badge" class="${getRankBadgeCls(rankNum)}">#${rankNum}</span>
+                        <div data-role="avatar" class="w-9 h-9 bg-[#1A467C] text-white border-2 border-black flex items-center justify-center font-black text-xs shrink-0">
+                            ${escapeHtml(item.initials || 'KL')}
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <div data-role="title-wrap" class="flex items-center gap-1.5">
+                                <p data-role="name" class="font-black text-xs sm:text-sm text-gray-950 truncate">${escapeHtml(item.nama_kelompok)}</p>
+                                ${teamBadgeHtml}
+                            </div>
+                            <p data-role="submeta" class="font-mono text-[10px] sm:text-[11px] font-bold text-gray-600">
+                                Ketua: <span class="text-[#1A467C]">${escapeHtml(item.ketua_nama)}</span> • ${Number(item.jumlah_anggota) || 0} Anggota
+                            </p>
+                            <div class="mt-1.5 w-full max-w-md h-2.5 bg-gray-100 border border-black overflow-hidden">
+                                <div data-role="bar-fill" class="${getBarColorCls(rankNum)}" style="width: ${pctWidth}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-green-100 border-2 border-black px-3 py-1 shadow-[2px_2px_0px_0px_#000000] inline-flex items-baseline gap-1 shrink-0">
+                        <span data-role="pts-text" class="font-mono font-black text-xs sm:text-sm text-[#15803d] leading-none">${pts}</span>
+                        <span class="text-[9px] sm:text-[10px] font-black uppercase text-[#15803d] leading-none">PTS</span>
+                    </div>
+                `;
+            }
+
+            return row;
+        }
+
+        function patchLeaderboardRowEl(row, item, type, maxPoint) {
+            const rankNum = Number(item.rank) || 1;
+            const pts = Number(item.total_point) || 0;
+            const pctWidth = pts > 0 ? Math.max(8, Math.round((pts / maxPoint) * 100)) : 0;
+            const prevRank = Number(row.dataset.rank || 0);
+            const prevPts = Number(row.dataset.pts || 0);
+            const changed = prevRank !== rankNum || prevPts !== pts;
+
+            row.dataset.rank = String(rankNum);
+            row.dataset.pts = String(pts);
+
+            const isHighlighted = type === 'individu' ? Boolean(item.is_me) : Boolean(item.is_my_team);
+            row.className = `lb-row px-4 sm:px-5 py-3.5 ${isHighlighted ? 'bg-amber-50/90 border-l-4 border-l-[#1A467C]' : 'hover:bg-blue-50/40'} flex items-center justify-between gap-3`;
+
+            const rankBadge = row.querySelector('[data-role="rank-badge"]');
+            if (rankBadge) {
+                rankBadge.className = getRankBadgeCls(rankNum);
+                rankBadge.textContent = `#${rankNum}`;
+            }
+
+            const barFill = row.querySelector('[data-role="bar-fill"]');
+            if (barFill) {
+                barFill.className = getBarColorCls(rankNum);
+                barFill.style.width = `${pctWidth}%`;
+            }
+
+            const ptsText = row.querySelector('[data-role="pts-text"]');
+            if (ptsText && ptsText.textContent.trim() !== String(pts)) {
+                ptsText.textContent = String(pts);
+            }
+
+            if (type === 'kelompok') {
+                const avatarEl = row.querySelector('[data-role="avatar"]');
+                if (avatarEl) avatarEl.textContent = item.initials || 'KL';
+
+                const nameEl = row.querySelector('[data-role="name"]');
+                if (nameEl) nameEl.textContent = item.nama_kelompok || '';
+
+                const subEl = row.querySelector('[data-role="submeta"]');
+                if (subEl) {
+                    subEl.innerHTML = `Ketua: <span class="text-[#1A467C]">${escapeHtml(item.ketua_nama)}</span> • ${Number(item.jumlah_anggota) || 0} Anggota`;
+                }
+
+                const titleWrap = row.querySelector('[data-role="title-wrap"]');
+                if (titleWrap) {
+                    let badge = titleWrap.querySelector('[data-role="my-badge"]');
+                    if (isHighlighted && !badge) {
+                        badge = document.createElement('span');
+                        badge.dataset.role = 'my-badge';
+                        badge.className = 'bg-[#15803d] text-white text-[9px] font-black uppercase px-1.5 py-0.2 border border-black shrink-0';
+                        badge.textContent = 'TIM KAMU';
+                        titleWrap.appendChild(badge);
+                    } else if (!isHighlighted && badge) {
+                        badge.remove();
+                    }
+                }
+            } else {
+                const nameEl = row.querySelector('[data-role="name"]');
+                if (nameEl) nameEl.textContent = item.nama || '';
+
+                const subEl = row.querySelector('[data-role="submeta"]');
+                if (subEl) subEl.textContent = item.kelas || '';
+
+                const avatarEl = row.querySelector('[data-role="avatar"]');
+                if (avatarEl) {
+                    const wantImg = Boolean(item.avatar_url);
+                    const hasImg = Boolean(avatarEl.querySelector('img'));
+                    if (wantImg) {
+                        if (!hasImg || avatarEl.querySelector('img')?.getAttribute('src') !== item.avatar_url) {
+                            avatarEl.innerHTML = `<img src="${escapeHtml(item.avatar_url)}" alt="Avatar ${escapeHtml(item.nama)}" class="w-full h-full object-cover">`;
+                        }
+                    } else if (hasImg || avatarEl.textContent.trim() !== (item.initials || 'IF')) {
+                        avatarEl.textContent = item.initials || 'IF';
+                    }
+                }
+            }
+
+            if (changed) {
+                row.classList.remove('realtime-flash');
+                void row.offsetWidth;
+                row.classList.add('realtime-flash');
+            }
+        }
+
+        // Animasi FLIP (First, Last, Invert, Play) saat urutan ranking leaderboard berubah
+        function updateLeaderboardWithFlip(containerId, items, type) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            const list = Array.isArray(items) ? items : [];
+            const isVisible = container.offsetParent !== null;
+            const firstPositions = new Map();
+            const existingMap = new Map();
+
+            container.querySelectorAll('[data-lb-key]').forEach(el => {
+                const key = el.dataset.lbKey;
+                existingMap.set(key, el);
+                if (isVisible) {
+                    firstPositions.set(key, el.getBoundingClientRect().top);
+                }
+            });
+
+            if (list.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+
+            const maxPoint = Math.max(1, ...list.map(i => Number(i.total_point) || 0));
+            const nextKeys = new Set();
+            const movedOrChanged = [];
+
+            list.forEach(item => {
+                const key = type === 'individu' ? `mhs-${item.id}` : `grp-${item.id}`;
+                nextKeys.add(key);
+
+                let rowEl = existingMap.get(key);
+                if (rowEl) {
+                    patchLeaderboardRowEl(rowEl, item, type, maxPoint);
+                } else {
+                    rowEl = createLeaderboardRowEl(item, type, maxPoint);
+                }
+
+                container.appendChild(rowEl);
+                movedOrChanged.push({ key, rowEl });
+            });
+
+            existingMap.forEach((el, key) => {
+                if (!nextKeys.has(key)) {
+                    el.remove();
+                }
+            });
+
+            if (!isVisible) return;
+
+            const toAnimate = [];
+            movedOrChanged.forEach(({ key, rowEl }) => {
+                const firstTop = firstPositions.get(key);
+                if (firstTop === undefined) return;
+                const lastTop = rowEl.getBoundingClientRect().top;
+                const deltaY = firstTop - lastTop;
+                if (Math.abs(deltaY) > 1) {
+                    rowEl.style.transition = 'none';
+                    rowEl.style.transform = `translateY(${deltaY}px)`;
+                    toAnimate.push(rowEl);
+                }
+            });
+
+            if (toAnimate.length > 0) {
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        toAnimate.forEach(rowEl => {
+                            rowEl.style.transition = 'transform 0.48s cubic-bezier(0.22, 1, 0.36, 1)';
+                            rowEl.style.transform = '';
+                            rowEl.addEventListener('transitionend', function cleanup() {
+                                rowEl.style.transition = '';
+                                rowEl.removeEventListener('transitionend', cleanup);
+                            }, { once: true });
+                        });
+                    });
+                });
+            }
+        }
+
+        function isKelompokUiBusy() {
+            const editBox = document.getElementById('kelompok-edit-box');
+            if (editBox && !editBox.classList.contains('hidden')) {
+                return true;
+            }
+
+            const cameraBox = document.getElementById('kelompok-camera-box');
+            if (cameraBox && !cameraBox.classList.contains('hidden')) {
+                return true;
+            }
+
+            const confirmModal = document.getElementById('kelompok-confirm-modal');
+            if (confirmModal && !confirmModal.classList.contains('hidden')) {
+                return true;
+            }
+
+            const section = document.getElementById('tab-panel-kelompok');
+            const active = document.activeElement;
+            if (section && active && section.contains(active) && ['INPUT', 'TEXTAREA', 'SELECT'].includes(active.tagName)) {
+                return true;
+            }
+
+            return false;
+        }
+
+        function applyKelompokPayload(payload) {
+            const section = document.getElementById('tab-panel-kelompok');
+            if (!section || !payload || typeof payload.html !== 'string') return;
+
+            const prevSearch = document.getElementById('invite-search-input')?.value || '';
+            section.innerHTML = payload.html;
+
+            kelompokInviteUrl = payload.invite_url || '';
+            kelompokCandidates = Array.isArray(payload.candidates) ? payload.candidates : [];
+
+            const nextSearchInput = document.getElementById('invite-search-input');
+            if (nextSearchInput && prevSearch) {
+                nextSearchInput.value = prevSearch;
+            }
+
+            filterKelompokKandidat();
+            renderKelompokQr();
+
+            if (!section.classList.contains('hidden')) {
+                replaySnapIn(section);
+            }
+        }
+
+        function flushPendingKelompokUpdate() {
+            if (pendingKelompokPayload && !isKelompokUiBusy()) {
+                const payload = pendingKelompokPayload;
+                pendingKelompokPayload = null;
+                applyKelompokPayload(payload);
+            }
+        }
+
+        function applySyncPayload(data) {
+            const stats = data.stats || {};
+
+            updateStatText('rt-sidebar-point', `★ ${stats.total_point ?? 0} PTS`, '.card-tactile');
+            updateStatText('rt-beranda-hadir', stats.total_hadir ?? 0);
+            updateStatText('rt-beranda-persen', `${stats.persen_hadir ?? 0}%`);
+            updateStatText('rt-beranda-point', stats.total_point ?? 0);
+            updateStatText('rt-beranda-rank', `#${stats.my_rank ?? '-'}`);
+            updateStatText('rt-beranda-total-peserta', `/${stats.total_peserta ?? 0}`);
+            updateStatText('rt-scan-sesi', `Sesi ${stats.pertemuan_aktif ?? 1}`);
+            updateStatText('rt-poin-total', stats.total_point ?? 0);
+            updateStatText('rt-poin-rank', `#${stats.my_rank ?? '-'}`);
+            updateStatText('rt-poin-total-peserta', `/${stats.total_peserta ?? 0}`);
+            updateStatText('rt-poin-history-count', stats.history_count ?? 0);
+
+            updateInboxBadges(stats.inbox_count ?? 0);
+
+            const indBtn = document.getElementById('lb-btn-individu');
+            const grpBtn = document.getElementById('lb-btn-kelompok');
+            if (indBtn) indBtn.textContent = `Peserta (${stats.total_peserta ?? 0})`;
+            if (grpBtn) grpBtn.textContent = `Kelompok (${stats.total_kelompok ?? 0})`;
+
+            const indBadge = document.getElementById('lb-individu-total-badge');
+            const grpBadge = document.getElementById('lb-kelompok-total-badge');
+            if (indBadge) indBadge.textContent = `${stats.total_peserta ?? 0} Mahasiswa`;
+            if (grpBadge) grpBadge.textContent = `${stats.total_kelompok ?? 0} Kelompok`;
+
+            renderPointHistories(data.point_histories);
+
+            // Update Leaderboard Individu (Podium + FLIP List)
+            const indList = Array.isArray(data.individu_leaderboard) ? data.individu_leaderboard : [];
+            const indPodiumCard = document.getElementById('lb-individu-podium-card');
+            if (indPodiumCard) {
+                indPodiumCard.classList.toggle('hidden', indList.length === 0);
+            }
+            const nextIndPodiumSig = getJsonTopThreeSig(indList, 'mhs');
+            if (nextIndPodiumSig !== lastIndPodiumSig) {
+                lastIndPodiumSig = nextIndPodiumSig;
+                renderPodiumSlots('lb-individu-podium', indList, 'individu', true);
+            }
+            updateLeaderboardWithFlip('lb-individu-list', indList, 'individu');
+
+            // Update Leaderboard Kelompok (Empty State + Podium + FLIP List)
+            const grpList = Array.isArray(data.kelompok_leaderboard) ? data.kelompok_leaderboard : [];
+            const grpEmpty = document.getElementById('lb-kelompok-empty');
+            const grpContent = document.getElementById('lb-kelompok-content');
+            if (grpEmpty && grpContent) {
+                grpEmpty.classList.toggle('hidden', grpList.length > 0);
+                grpContent.classList.toggle('hidden', grpList.length === 0);
+            }
+            const nextGrpPodiumSig = getJsonTopThreeSig(grpList, 'grp');
+            if (nextGrpPodiumSig !== lastGrpPodiumSig) {
+                lastGrpPodiumSig = nextGrpPodiumSig;
+                renderPodiumSlots('lb-kelompok-podium', grpList, 'kelompok', true);
+            }
+            updateLeaderboardWithFlip('lb-kelompok-list', grpList, 'kelompok');
+
+            // Update Tab Kelompok secara aman (antri jika sedang edit/ketik)
+            if (data.kelompok) {
+                if (isKelompokUiBusy()) {
+                    pendingKelompokPayload = data.kelompok;
+                } else {
+                    pendingKelompokPayload = null;
+                    applyKelompokPayload(data.kelompok);
+                }
+            }
+        }
+
+        async function syncDashboardNow() {
+            if (isRealtimeSyncInFlight || isSubmittingScan) {
+                return;
+            }
+            isRealtimeSyncInFlight = true;
+
+            try {
+                const url = `${dashboardSyncUrl}?sig=${encodeURIComponent(currentRealtimeSig)}`;
+                const res = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    cache: 'no-store',
+                });
+
+                if (res.status === 401) {
+                    const authErr = await res.json().catch(() => ({}));
+                    if (realtimePollTimer) {
+                        clearInterval(realtimePollTimer);
+                    }
+                    if (authErr.redirect) {
+                        window.location.href = authErr.redirect;
+                    }
+                    return;
+                }
+
+                if (!res.ok) return;
+
+                const payload = await res.json();
+                const clockEl = document.getElementById('rt-sync-clock');
+                if (clockEl) {
+                    const now = new Date();
+                    clockEl.textContent = now.toLocaleTimeString('id-ID', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        hour12: false,
+                    });
+                }
+
+                if (payload && payload.changed) {
+                    currentRealtimeSig = payload.signature || currentRealtimeSig;
+                    applySyncPayload(payload);
+                }
+            } catch (e) {
+                // Abaikan error jaringan sementara agar polling berikutnya tetap berjalan
+            } finally {
+                isRealtimeSyncInFlight = false;
+            }
+        }
+
+        function startRealtimePolling() {
+            lastIndPodiumSig = getDomTopThreeSig('lb-individu-list');
+            lastGrpPodiumSig = getDomTopThreeSig('lb-kelompok-list');
+
+            if (realtimePollTimer) {
+                clearInterval(realtimePollTimer);
+            }
+            realtimePollTimer = setInterval(() => {
+                if (!document.hidden) {
+                    syncDashboardNow();
+                }
+            }, 3000);
+
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden) {
+                    syncDashboardNow();
+                }
+            });
         }
     </script>
 

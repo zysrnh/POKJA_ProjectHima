@@ -93,6 +93,7 @@ Route::middleware('throttle:120,1')->group(function () {
             ->name('savePassword');
 
         Route::get('/dashboard', [MahasiswaController::class, 'dashboard'])->name('dashboard');
+        Route::get('/dashboard/sync', [MahasiswaController::class, 'sync'])->name('dashboard.sync');
         Route::post('/profile', [MahasiswaController::class, 'updateProfile'])
             ->middleware('throttle:15,1')
             ->name('profile.update');

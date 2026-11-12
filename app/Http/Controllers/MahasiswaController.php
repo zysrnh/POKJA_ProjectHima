@@ -425,30 +425,76 @@ class MahasiswaController extends Controller
     }
 
     /**
-     * Menampilkan dashboard pribadi mahasiswa.
+     * Hitung hash signature ringan untuk mendeteksi perubahan data portal secara realtime tiap 3 detik.
      */
-    public function dashboard(Request $request)
+    private function computeRealtimeSignature(Pendaftaran $mahasiswa): string
     {
-        if (!session()->has('mahasiswa_id')) {
-            return redirect()->route('mahasiswa.login')->with('error', 'Silakan masuk ke akun Anda terlebih dahulu.');
-        }
+        $pendaftarAgg = DB::table('pendaftarans')
+            ->selectRaw('COUNT(*) as c, COALESCE(SUM(total_point), 0) as s, MAX(updated_at) as m')
+            ->first();
 
-        if (!self::validateActiveDeviceSession($request)) {
-            return redirect()->route('mahasiswa.login')->with('error', 'Sesi Anda telah berakhir karena akun ini baru saja login di perangkat lain.');
-        }
+        $presensiAgg = DB::table('presensis')
+            ->selectRaw("COUNT(*) as c, COALESCE(SUM(CASE WHEN status = 'hadir' THEN 1 ELSE 0 END), 0) as h, MAX(updated_at) as m")
+            ->first();
 
-        $mahasiswa = Pendaftaran::with([
-            'presensis',
-            'pointHistories' => function ($q) {
-                $q->orderBy('created_at', 'desc')->orderBy('id', 'desc');
-            },
-        ])->find(session('mahasiswa_id'));
+        $historyAgg = DB::table('point_histories')
+            ->selectRaw('COUNT(*) as c, MAX(id) as m')
+            ->first();
 
-        if (!$mahasiswa) {
-            session()->forget(['mahasiswa_id', 'mahasiswa_nim', 'mahasiswa_nama', 'mahasiswa_device_token']);
-            return redirect()->route('mahasiswa.login')->with('error', 'Data mahasiswa tidak ditemukan.');
-        }
+        $kelompokAgg = DB::table('kelompoks')
+            ->selectRaw('COUNT(*) as c, COALESCE(SUM(id), 0) as s, MAX(updated_at) as m')
+            ->first();
 
+        $memberAgg = DB::table('kelompok_members')
+            ->selectRaw('COUNT(*) as c, COALESCE(SUM(id), 0) as s, MAX(updated_at) as m')
+            ->first();
+
+        $inviteAgg = DB::table('kelompok_invitations')
+            ->selectRaw("COUNT(*) as c, SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as p, MAX(updated_at) as m")
+            ->first();
+
+        $pengaturanAgg = DB::table('pengaturan')
+            ->select('pertemuan_aktif', 'link_grup_wa', 'updated_at')
+            ->first();
+
+        $raw = implode('|', [
+            $mahasiswa->id,
+            $mahasiswa->nama,
+            $mahasiswa->kelas,
+            $mahasiswa->email,
+            $mahasiswa->foto,
+            (int) $mahasiswa->total_point,
+            (string) $mahasiswa->updated_at,
+            $pendaftarAgg->c ?? 0,
+            $pendaftarAgg->s ?? 0,
+            $pendaftarAgg->m ?? '',
+            $presensiAgg->c ?? 0,
+            $presensiAgg->h ?? 0,
+            $presensiAgg->m ?? '',
+            $historyAgg->c ?? 0,
+            $historyAgg->m ?? 0,
+            $kelompokAgg->c ?? 0,
+            $kelompokAgg->s ?? 0,
+            $kelompokAgg->m ?? '',
+            $memberAgg->c ?? 0,
+            $memberAgg->s ?? 0,
+            $memberAgg->m ?? '',
+            $inviteAgg->c ?? 0,
+            $inviteAgg->p ?? 0,
+            $inviteAgg->m ?? '',
+            $pengaturanAgg->pertemuan_aktif ?? 1,
+            $pengaturanAgg->link_grup_wa ?? '',
+            $pengaturanAgg->updated_at ?? '',
+        ]);
+
+        return md5($raw);
+    }
+
+    /**
+     * Kumpulkan seluruh data terstruktur untuk tampilan & sync Portal Mahasiswa.
+     */
+    private function buildDashboardData(Pendaftaran $mahasiswa): array
+    {
         $pengaturan = Pengaturan::first();
         $presensiMap = $mahasiswa->presensis->keyBy('pertemuan');
         $totalHadir = $mahasiswa->presensis->where('status', 'hadir')->count();
@@ -575,7 +621,7 @@ class MahasiswaController extends Controller
                 ->get();
         }
 
-        return view('mahasiswa.dashboard', compact(
+        return compact(
             'mahasiswa',
             'pengaturan',
             'presensiMap',
@@ -593,7 +639,134 @@ class MahasiswaController extends Controller
             'kelompokStats',
             'kelompokInbox',
             'kandidatAnggotaList'
-        ));
+        );
+    }
+
+    /**
+     * Menampilkan dashboard pribadi mahasiswa.
+     */
+    public function dashboard(Request $request)
+    {
+        if (!session()->has('mahasiswa_id')) {
+            return redirect()->route('mahasiswa.login')->with('error', 'Silakan masuk ke akun Anda terlebih dahulu.');
+        }
+
+        if (!self::validateActiveDeviceSession($request)) {
+            return redirect()->route('mahasiswa.login')->with('error', 'Sesi Anda telah berakhir karena akun ini baru saja login di perangkat lain.');
+        }
+
+        $mahasiswa = Pendaftaran::with([
+            'presensis',
+            'pointHistories' => function ($q) {
+                $q->orderBy('created_at', 'desc')->orderBy('id', 'desc');
+            },
+        ])->find(session('mahasiswa_id'));
+
+        if (!$mahasiswa) {
+            session()->forget(['mahasiswa_id', 'mahasiswa_nim', 'mahasiswa_nama', 'mahasiswa_device_token']);
+            return redirect()->route('mahasiswa.login')->with('error', 'Data mahasiswa tidak ditemukan.');
+        }
+
+        $data = $this->buildDashboardData($mahasiswa);
+        $data['realtimeSignature'] = $this->computeRealtimeSignature($mahasiswa);
+
+        return view('mahasiswa.dashboard', $data);
+    }
+
+    /**
+     * Endpoint polling realtime (setiap 3 detik) untuk sinkronisasi Portal Mahasiswa tanpa reload browser.
+     */
+    public function sync(Request $request)
+    {
+        if (!session()->has('mahasiswa_id') || !self::validateActiveDeviceSession($request)) {
+            return response()->json([
+                'authenticated' => false,
+                'redirect' => route('mahasiswa.login'),
+            ], 401);
+        }
+
+        $mahasiswa = Pendaftaran::find(session('mahasiswa_id'));
+        if (!$mahasiswa) {
+            return response()->json([
+                'authenticated' => false,
+                'redirect' => route('mahasiswa.login'),
+            ], 401);
+        }
+
+        $signature = $this->computeRealtimeSignature($mahasiswa);
+        if ((string) $request->query('sig', '') === $signature) {
+            return response()->json([
+                'authenticated' => true,
+                'changed' => false,
+                'signature' => $signature,
+            ]);
+        }
+
+        $mahasiswa->load([
+            'presensis',
+            'pointHistories' => function ($q) {
+                $q->orderBy('created_at', 'desc')->orderBy('id', 'desc');
+            },
+        ]);
+
+        $data = $this->buildDashboardData($mahasiswa);
+
+        return response()->json([
+            'authenticated' => true,
+            'changed' => true,
+            'signature' => $signature,
+            'stats' => [
+                'nama' => $mahasiswa->nama,
+                'nim' => $mahasiswa->nim,
+                'kelas' => $mahasiswa->kelas,
+                'avatar_url' => $mahasiswa->avatarUrl(),
+                'initials' => $mahasiswa->initials(),
+                'total_point' => (int) $mahasiswa->total_point,
+                'total_hadir' => (int) $data['totalHadir'],
+                'persen_hadir' => (int) $data['persenHadir'],
+                'my_rank' => $data['myRank'],
+                'total_peserta' => (int) $data['totalPeserta'],
+                'total_kelompok' => (int) $data['totalKelompok'],
+                'pertemuan_aktif' => (int) ($data['pengaturan']->pertemuan_aktif ?? 1),
+                'inbox_count' => $data['kelompokInbox']->count(),
+                'history_count' => $mahasiswa->pointHistories->count(),
+            ],
+            'point_histories' => $mahasiswa->pointHistories->map(fn ($h) => [
+                'id' => (int) $h->id,
+                'tipe' => $h->tipe,
+                'jumlah' => (int) $h->jumlah,
+                'kategori' => $h->kategori,
+                'keterangan' => $h->keterangan,
+                'waktu' => $h->created_at ? $h->created_at->timezone('Asia/Jakarta')->format('d/m H:i') : '-',
+            ])->values(),
+            'individu_leaderboard' => $data['leaderboardList']->values()->map(fn ($m, $idx) => [
+                'id' => (int) $m->id,
+                'rank' => $idx + 1,
+                'nama' => $m->nama,
+                'kelas' => $m->kelas,
+                'total_point' => (int) $m->total_point,
+                'avatar_url' => $m->avatarUrl(),
+                'initials' => $m->initials(),
+                'is_me' => (int) $m->id === (int) $mahasiswa->id,
+            ])->values(),
+            'kelompok_leaderboard' => $data['kelompokLeaderboardList']->values()->map(fn ($k, $idx) => [
+                'id' => (int) $k->id,
+                'rank' => $idx + 1,
+                'nama_kelompok' => $k->nama_kelompok,
+                'initials' => $k->initials,
+                'ketua_nama' => $k->ketua_nama,
+                'jumlah_anggota' => (int) $k->jumlah_anggota,
+                'total_point' => (int) $k->total_point,
+                'is_my_team' => $data['myKelompok'] && (int) $k->id === (int) $data['myKelompok']->id,
+            ])->values(),
+            'kelompok' => [
+                'html' => view('mahasiswa.partials.kelompok_panel', $data)->render(),
+                'invite_url' => $data['myKelompok'] ? route('mahasiswa.kelompok.joinLink', ['kode' => $data['myKelompok']->kode_invite]) : '',
+                'candidates' => $data['kandidatAnggotaList'],
+                'has_group' => (bool) $data['myKelompok'],
+                'is_ketua' => (bool) $data['isKetua'],
+            ],
+        ]);
     }
 
     /**
