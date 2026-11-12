@@ -31,25 +31,34 @@ Route::middleware('throttle:120,1')->group(function () {
         ->middleware('throttle:10,1')
         ->name('pendaftaran.store');
 
-    // Stream Avatar Image Directly via Laravel (Kompatibel penuh dengan Subfolder cPanel tanpa perlu symlink)
-    $serveAvatar = function (string $filename) {
-        $safeName = basename($filename);
-        $path = public_path('uploads/avatars/' . $safeName);
+    // Stream Gambar Upload Langsung via Laravel (Kompatibel penuh dengan Subfolder cPanel tanpa perlu symlink)
+    $servePublicUpload = function (string $folder) {
+        return function (string $filename) use ($folder) {
+            $safeName = basename($filename);
+            $path = public_path($folder . '/' . $safeName);
 
-        if (!is_file($path)) {
-            abort(404);
-        }
+            if (!is_file($path)) {
+                abort(404);
+            }
 
-        return response()->file($path, [
-            'Cache-Control' => 'public, max-age=86400',
-        ]);
+            return response()->file($path, [
+                'Cache-Control' => 'public, max-age=86400',
+            ]);
+        };
     };
 
-    Route::get('/avatar-file/{filename}', $serveAvatar)
+    Route::get('/avatar-file/{filename}', $servePublicUpload('uploads/avatars'))
         ->where('filename', '[A-Za-z0-9_\-\.]+')
         ->name('avatar.serve');
 
-    Route::get('/uploads/avatars/{filename}', $serveAvatar)
+    Route::get('/uploads/avatars/{filename}', $servePublicUpload('uploads/avatars'))
+        ->where('filename', '[A-Za-z0-9_\-\.]+');
+
+    Route::get('/kelompok-file/{filename}', $servePublicUpload('uploads/kelompok'))
+        ->where('filename', '[A-Za-z0-9_\-\.]+')
+        ->name('kelompok.foto.serve');
+
+    Route::get('/uploads/kelompok/{filename}', $servePublicUpload('uploads/kelompok'))
         ->where('filename', '[A-Za-z0-9_\-\.]+');
 
     // Scanner Absensi Mahasiswa di HP

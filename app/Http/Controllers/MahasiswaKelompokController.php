@@ -9,6 +9,7 @@ use App\Models\KelompokMember;
 use App\Models\Pendaftaran;
 use App\Models\Pengaturan;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -229,7 +230,52 @@ class MahasiswaKelompokController extends Controller
     }
 
     /**
-     * Memperbarui nama kelompok atau ide judul proposal (khusus Ketua).
+     * Hapus file foto kelompok dari disk secara aman (pencegahan path traversal via basename).
+     */
+    private function deleteKelompokFotoFile(?string $fotoFilename): void
+    {
+        if (empty($fotoFilename)) {
+            return;
+        }
+
+        $oldPath = public_path('uploads/kelompok/' . basename($fotoFilename));
+        if (is_file($oldPath)) {
+            @unlink($oldPath);
+        }
+    }
+
+    /**
+     * Validasi binary gambar asli (Anti-Webshell) & simpan foto profil kelompok.
+     */
+    private function storeValidatedKelompokFoto(UploadedFile $file, Kelompok $kelompok): ?string
+    {
+        $imageInfo = @getimagesize($file->getRealPath());
+        $allowedMimeMap = [
+            'image/jpeg' => 'jpg',
+            'image/png' => 'png',
+            'image/webp' => 'webp',
+        ];
+
+        if ($imageInfo === false || !isset($imageInfo['mime']) || !array_key_exists($imageInfo['mime'], $allowedMimeMap)) {
+            return null;
+        }
+
+        $safeExtension = $allowedMimeMap[$imageInfo['mime']];
+        $filename = 'kelompok_' . $kelompok->id . '_' . Str::random(12) . '_' . time() . '.' . $safeExtension;
+        $destinationPath = public_path('uploads/kelompok');
+
+        if (!file_exists($destinationPath)) {
+            mkdir($destinationPath, 0755, true);
+        }
+
+        $this->deleteKelompokFotoFile($kelompok->foto);
+        $file->move($destinationPath, $filename);
+
+        return $filename;
+    }
+
+    /**
+     * Memperbarui nama kelompok, ide judul proposal, dan foto profil kelompok (khusus Ketua).
      */
     public function update(Request $request)
     {
@@ -254,10 +300,38 @@ class MahasiswaKelompokController extends Controller
         $request->validate([
             'nama_kelompok' => ['required', 'string', 'min:2', 'max:80', 'unique:kelompoks,nama_kelompok,' . $kelompok->id],
             'judul_proposal' => ['nullable', 'string', 'max:200'],
+            'hapus_foto' => ['nullable', 'boolean'],
+            'foto' => [
+                'nullable',
+                'file',
+                'image',
+                'mimes:jpeg,png,jpg,webp',
+                'mimetypes:image/jpeg,image/png,image/webp',
+                'max:2048',
+                'dimensions:min_width=50,min_height=50,max_width=4096,max_height=4096',
+            ],
         ], [
             'nama_kelompok.required' => 'Nama kelompok wajib diisi.',
             'nama_kelompok.unique' => 'Nama kelompok tersebut sudah dipakai kelompok lain.',
+            'foto.image' => 'File foto kelompok harus berupa gambar asli.',
+            'foto.mimes' => 'Format foto kelompok harus JPG, JPEG, PNG, atau WEBP.',
+            'foto.mimetypes' => 'Konten file foto kelompok bukan gambar yang valid.',
+            'foto.max' => 'Ukuran file foto kelompok maksimal 2 MB.',
+            'foto.dimensions' => 'Resolusi foto kelompok minimal 50x50 piksel dan maksimal 4096x4096 piksel.',
         ]);
+
+        if ($request->boolean('hapus_foto') && !$request->hasFile('foto')) {
+            $this->deleteKelompokFotoFile($kelompok->foto);
+            $kelompok->foto = null;
+        }
+
+        if ($request->hasFile('foto')) {
+            $savedFilename = $this->storeValidatedKelompokFoto($request->file('foto'), $kelompok);
+            if (!$savedFilename) {
+                return back()->withErrors(['foto' => 'File gambar rusak atau terdeteksi tidak aman.'])->withInput();
+            }
+            $kelompok->foto = $savedFilename;
+        }
 
         $kelompok->nama_kelompok = $request->nama_kelompok;
         $kelompok->judul_proposal = $request->judul_proposal ?: null;
@@ -628,12 +702,14 @@ class MahasiswaKelompokController extends Controller
 
         if ((int) $kelompok->ketua_id === (int) $mahasiswa->id) {
             $namaKelompok = $kelompok->nama_kelompok;
+            $oldFoto = $kelompok->foto;
             $formerMembers = $kelompok->members
                 ->filter(fn ($m) => (int) $m->pendaftaran_id !== (int) $mahasiswa->id)
                 ->pluck('pendaftaran')
                 ->filter();
 
             $kelompok->delete();
+            $this->deleteKelompokFotoFile($oldFoto);
 
             foreach ($formerMembers as $exMember) {
                 $this->notifyByEmail(

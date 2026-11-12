@@ -16,6 +16,7 @@ class Kelompok extends Model
         'kode_invite',
         'ketua_id',
         'judul_proposal',
+        'foto',
         'nilai_proposal',
         'status_proposal',
         'revisi_terakhir_at',
@@ -25,6 +26,32 @@ class Kelompok extends Model
         'nilai_proposal' => 'integer',
         'revisi_terakhir_at' => 'datetime',
     ];
+
+    /**
+     * Ambil URL foto profil kelompok jika tersedia di disk.
+     */
+    public function fotoUrl(): ?string
+    {
+        $filename = basename((string) $this->foto);
+        if (!empty($filename) && is_file(public_path('uploads/kelompok/' . $filename))) {
+            return route('kelompok.foto.serve', ['filename' => $filename]);
+        }
+
+        return null;
+    }
+
+    /**
+     * Ambil 2 huruf inisial kelompok untuk avatar fallback.
+     */
+    public function initials(): string
+    {
+        $cleanWords = preg_split('/\s+/', trim((string) $this->nama_kelompok)) ?: [];
+        if (count($cleanWords) >= 2) {
+            return strtoupper(substr($cleanWords[0], 0, 1) . substr($cleanWords[1], 0, 1));
+        }
+
+        return strtoupper(substr(trim((string) $this->nama_kelompok), 0, 2)) ?: 'KL';
+    }
 
     /**
      * Mahasiswa yang menjadi ketua kelompok.

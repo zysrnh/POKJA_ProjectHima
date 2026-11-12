@@ -40,27 +40,38 @@
                             <div class="divide-y-2 divide-black">
                                 @foreach ($kelompokInbox as $inv)
                                     @if ($inv->kelompok)
+                                        @php $invFotoUrl = $inv->kelompok->fotoUrl(); @endphp
                                         <div class="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white hover:bg-amber-50/40 transition">
-                                            <div class="min-w-0 flex-1 space-y-1">
-                                                <div class="flex flex-wrap items-center gap-1.5">
-                                                    <span class="font-black text-sm text-gray-950 uppercase">
-                                                        {{ $inv->kelompok->nama_kelompok }}
-                                                    </span>
-                                                    <span class="bg-blue-50 border border-black text-[#1A467C] px-1.5 py-0.2 text-[10px] font-mono font-black">
-                                                        {{ $inv->kelompok->members->count() }} Anggota
-                                                    </span>
-                                                </div>
-                                                <p class="text-xs font-semibold text-gray-700">
-                                                    Ketua: <strong class="text-gray-950">{{ $inv->kelompok->ketua->nama ?? '-' }}</strong>
-                                                    @if (!empty($inv->kelompok->ketua?->kelas))
-                                                        <span class="font-mono text-[11px] text-[#1A467C]">({{ $inv->kelompok->ketua->kelas }})</span>
+                                            <div class="flex items-start gap-3 min-w-0 flex-1">
+                                                <div class="w-11 h-11 bg-[#1A467C] text-white border-2 border-black flex items-center justify-center font-black text-xs shrink-0 overflow-hidden shadow-[2px_2px_0px_0px_#000000]">
+                                                    @if ($invFotoUrl)
+                                                        <img src="{{ $invFotoUrl }}" alt="Foto {{ $inv->kelompok->nama_kelompok }}" class="w-full h-full object-cover">
+                                                    @else
+                                                        {{ $inv->kelompok->initials() }}
                                                     @endif
-                                                </p>
-                                                @if (!empty($inv->kelompok->judul_proposal))
-                                                    <p class="text-[11px] font-medium text-gray-600 truncate">
-                                                        Ide Proposal: {{ $inv->kelompok->judul_proposal }}
+                                                </div>
+
+                                                <div class="min-w-0 flex-1 space-y-1">
+                                                    <div class="flex flex-wrap items-center gap-1.5">
+                                                        <span class="font-black text-sm text-gray-950 uppercase">
+                                                            {{ $inv->kelompok->nama_kelompok }}
+                                                        </span>
+                                                        <span class="bg-blue-50 border border-black text-[#1A467C] px-1.5 py-0.2 text-[10px] font-mono font-black">
+                                                            {{ $inv->kelompok->members->count() }} Anggota
+                                                        </span>
+                                                    </div>
+                                                    <p class="text-xs font-semibold text-gray-700">
+                                                        Ketua: <strong class="text-gray-950">{{ $inv->kelompok->ketua->nama ?? '-' }}</strong>
+                                                        @if (!empty($inv->kelompok->ketua?->kelas))
+                                                            <span class="font-mono text-[11px] text-[#1A467C]">({{ $inv->kelompok->ketua->kelas }})</span>
+                                                        @endif
                                                     </p>
-                                                @endif
+                                                    @if (!empty($inv->kelompok->judul_proposal))
+                                                        <p class="text-[11px] font-medium text-gray-600 truncate">
+                                                            Ide Proposal: {{ $inv->kelompok->judul_proposal }}
+                                                        </p>
+                                                    @endif
+                                                </div>
                                             </div>
 
                                             <div class="flex items-center gap-2 shrink-0">
@@ -214,38 +225,50 @@
                 @else
                     @php
                         $joinUrl = route('mahasiswa.kelompok.joinLink', ['kode' => $myKelompok->kode_invite]);
-                        $showEditFormOnLoad = isset($errors) && ($errors->has('nama_kelompok') || $errors->has('judul_proposal'));
+                        $kelompokFotoUrl = $myKelompok->fotoUrl();
+                        $kelompokInitials = $myKelompok->initials();
+                        $showEditFormOnLoad = isset($errors) && ($errors->has('nama_kelompok') || $errors->has('judul_proposal') || $errors->has('foto'));
                     @endphp
 
                     <!-- Header Ringkasan Kelompok Saya -->
                     <div class="card-tactile bg-white border-2 border-black p-4 sm:p-6 shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000] space-y-4">
                         <div class="flex flex-wrap items-start justify-between gap-3">
-                            <div class="min-w-0 flex-1 space-y-1">
-                                <div class="flex flex-wrap items-center gap-1.5">
-                                    <span class="bg-[#1A467C] text-white border border-black px-2 py-0.5 text-[10px] font-black uppercase">
-                                        KELOMPOK SAYA
-                                    </span>
-                                    <span class="{{ $isKetua ? 'bg-amber-300 text-black' : 'bg-sky-200 text-black' }} border border-black px-2 py-0.5 text-[10px] font-black uppercase">
-                                        {{ $isKetua ? 'Ketua Kelompok' : 'Anggota' }}
-                                    </span>
-                                    <span class="bg-gray-100 text-gray-900 border border-black px-2 py-0.5 text-[10px] font-mono font-black">
-                                        {{ $myKelompok->kode_invite }}
-                                    </span>
+                            <div class="flex items-start gap-3 sm:gap-4 min-w-0 flex-1">
+                                <div class="w-14 h-14 sm:w-16 sm:h-16 bg-[#1A467C] text-white border-2 border-black flex items-center justify-center font-black text-base sm:text-lg shadow-[3px_3px_0px_0px_#000000] shrink-0 overflow-hidden">
+                                    @if ($kelompokFotoUrl)
+                                        <img src="{{ $kelompokFotoUrl }}" alt="Foto {{ $myKelompok->nama_kelompok }}" class="w-full h-full object-cover">
+                                    @else
+                                        {{ $kelompokInitials }}
+                                    @endif
                                 </div>
 
-                                <h3 class="text-base sm:text-xl font-black uppercase text-gray-950 tracking-tight break-words">
-                                    {{ $myKelompok->nama_kelompok }}
-                                </h3>
+                                <div class="min-w-0 flex-1 space-y-1">
+                                    <div class="flex flex-wrap items-center gap-1.5">
+                                        <span class="bg-[#1A467C] text-white border border-black px-2 py-0.5 text-[10px] font-black uppercase">
+                                            KELOMPOK SAYA
+                                        </span>
+                                        <span class="{{ $isKetua ? 'bg-amber-300 text-black' : 'bg-sky-200 text-black' }} border border-black px-2 py-0.5 text-[10px] font-black uppercase">
+                                            {{ $isKetua ? 'Ketua Kelompok' : 'Anggota' }}
+                                        </span>
+                                        <span class="bg-gray-100 text-gray-900 border border-black px-2 py-0.5 text-[10px] font-mono font-black">
+                                            {{ $myKelompok->kode_invite }}
+                                        </span>
+                                    </div>
 
-                                @if (!empty($myKelompok->judul_proposal))
-                                    <p class="text-xs font-semibold text-gray-700">
-                                        Judul Proposal: <span class="text-gray-950 font-bold">{{ $myKelompok->judul_proposal }}</span>
-                                    </p>
-                                @elseif ($isKetua)
-                                    <p class="text-xs font-medium text-gray-500">
-                                        Belum ada judul proposal. Klik Edit Info untuk menambahkan.
-                                    </p>
-                                @endif
+                                    <h3 class="text-base sm:text-xl font-black uppercase text-gray-950 tracking-tight break-words">
+                                        {{ $myKelompok->nama_kelompok }}
+                                    </h3>
+
+                                    @if (!empty($myKelompok->judul_proposal))
+                                        <p class="text-xs font-semibold text-gray-700">
+                                            Judul Proposal: <span class="text-gray-950 font-bold">{{ $myKelompok->judul_proposal }}</span>
+                                        </p>
+                                    @elseif ($isKetua)
+                                        <p class="text-xs font-medium text-gray-500">
+                                            Belum ada judul proposal. Klik Edit Info untuk menambahkan.
+                                        </p>
+                                    @endif
+                                </div>
                             </div>
 
                             @if ($isKetua)
@@ -261,9 +284,50 @@
 
                         @if ($isKetua)
                             <div id="kelompok-edit-box" class="{{ $showEditFormOnLoad ? '' : 'hidden' }} border-t-2 border-black pt-4">
-                                <form action="{{ route('mahasiswa.kelompok.update') }}" method="POST" class="space-y-3 bg-gray-50 border-2 border-black p-3.5">
+                                <form action="{{ route('mahasiswa.kelompok.update') }}" method="POST" enctype="multipart/form-data" class="space-y-4 bg-gray-50 border-2 border-black p-3.5 sm:p-4">
                                     @csrf
                                     @method('PUT')
+
+                                    <!-- Upload Foto Profil Kelompok -->
+                                    <div class="flex flex-col sm:flex-row sm:items-center gap-3 pb-3 border-b-2 border-dashed border-gray-300">
+                                        <div class="w-16 h-16 bg-[#1A467C] text-white border-2 border-black flex items-center justify-center font-black text-base shadow-[2px_2px_0px_0px_#000000] shrink-0 overflow-hidden">
+                                            <img
+                                                id="kelompok-foto-preview"
+                                                src="{{ $kelompokFotoUrl ?? '' }}"
+                                                alt="Preview Foto Kelompok"
+                                                class="{{ $kelompokFotoUrl ? '' : 'hidden ' }}w-full h-full object-cover"
+                                            >
+                                            <span id="kelompok-foto-placeholder" class="{{ $kelompokFotoUrl ? 'hidden' : '' }}">
+                                                {{ $kelompokInitials }}
+                                            </span>
+                                        </div>
+
+                                        <div class="min-w-0 flex-1 space-y-1.5">
+                                            <label for="edit-foto-kelompok" class="block text-[10px] font-black uppercase tracking-wider text-gray-700">
+                                                Foto Profil Kelompok <span class="text-gray-400 font-semibold">(Opsional)</span>
+                                            </label>
+                                            <input
+                                                type="file"
+                                                id="edit-foto-kelompok"
+                                                name="foto"
+                                                accept="image/jpeg,image/png,image/webp"
+                                                onchange="previewKelompokFoto(this)"
+                                                class="block w-full text-xs font-bold text-gray-800 file:mr-2.5 file:py-1.5 file:px-3 file:border-2 file:border-black file:bg-amber-300 file:hover:bg-amber-400 file:text-black file:text-[10px] file:font-black file:uppercase file:cursor-pointer cursor-pointer"
+                                            >
+                                            <div class="flex flex-wrap items-center justify-between gap-2">
+                                                <span class="text-[10px] font-semibold text-gray-500">
+                                                    JPG, PNG, WEBP • Maks. 2 MB (Min. 50x50 px)
+                                                </span>
+                                                @if ($kelompokFotoUrl)
+                                                    <label class="inline-flex items-center gap-1.5 text-[10px] font-black uppercase text-[#CA2C2A] cursor-pointer">
+                                                        <input type="checkbox" id="edit-hapus-foto" name="hapus_foto" value="1" class="w-3.5 h-3.5 border border-black accent-[#CA2C2A]">
+                                                        Hapus foto saat ini
+                                                    </label>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                         <div>
                                             <label for="edit-nama-kelompok" class="block text-[10px] font-black uppercase tracking-wider text-gray-700 mb-1">
@@ -554,3 +618,4 @@
                         </div>
                     </div>
                 @endif
+

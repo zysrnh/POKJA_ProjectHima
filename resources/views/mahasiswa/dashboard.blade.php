@@ -739,13 +739,13 @@
                                         ? 'bg-[#2A82C6]'
                                         : ($rankNum === 3 ? 'bg-orange-400' : 'bg-[#15803d]'));
                             @endphp
-                            <div data-lb-key="mhs-{{ $item->id }}" data-rank="{{ $rankNum }}" data-pts="{{ $pts }}" class="lb-row px-4 sm:px-5 py-3.5 {{ $isCurrentUser ? 'bg-amber-50/90 border-l-4 border-l-[#1A467C]' : 'hover:bg-blue-50/40' }} flex items-center justify-between gap-3">
+                            <div data-lb-key="mhs-{{ $item->id }}" data-rank="{{ $rankNum }}" data-pts="{{ $pts }}" data-foto-url="{{ $item->avatarUrl() ?? '' }}" class="lb-row px-4 sm:px-5 py-3.5 {{ $isCurrentUser ? 'bg-amber-50/90 border-l-4 border-l-[#1A467C]' : 'hover:bg-blue-50/40' }} flex items-center justify-between gap-3">
                                 <div class="flex items-center gap-3 min-w-0 flex-1">
                                     <span data-role="rank-badge" class="w-8 h-8 border-2 border-black font-mono font-black text-xs flex items-center justify-center shrink-0 {{ $rankNum === 1 ? 'bg-amber-300 text-black' : ($rankNum === 2 ? 'bg-sky-200 text-black' : ($rankNum === 3 ? 'bg-orange-200 text-black' : 'bg-gray-100 text-gray-800')) }}">
                                         #{{ $rankNum }}
                                     </span>
 
-                                    <div class="w-9 h-9 bg-[#2A82C6] text-white border-2 border-black flex items-center justify-center font-black text-xs shrink-0 overflow-hidden">
+                                    <div data-role="avatar" class="w-9 h-9 bg-[#2A82C6] text-white border-2 border-black flex items-center justify-center font-black text-xs shrink-0 overflow-hidden">
                                         @if ($item->avatarUrl())
                                             <img src="{{ $item->avatarUrl() }}" alt="Avatar {{ $item->nama }}" class="w-full h-full object-cover">
                                         @else
@@ -754,15 +754,15 @@
                                     </div>
 
                                     <div class="min-w-0 flex-1">
-                                        <div class="flex items-center gap-1.5">
-                                            <p class="font-black text-xs sm:text-sm text-gray-950 truncate">{{ $item->nama }}</p>
+                                        <div data-role="title-wrap" class="flex items-center gap-1.5">
+                                            <p data-role="name" class="font-black text-xs sm:text-sm text-gray-950 truncate">{{ $item->nama }}</p>
                                             @if ($isCurrentUser)
-                                                <span class="bg-[#1A467C] text-white text-[9px] font-black uppercase px-1.5 py-0.2 border border-black shrink-0">
+                                                <span data-role="my-badge" class="bg-[#1A467C] text-white text-[9px] font-black uppercase px-1.5 py-0.2 border border-black shrink-0">
                                                     KAMU
                                                 </span>
                                             @endif
                                         </div>
-                                        <p class="font-mono text-[10px] sm:text-[11px] font-bold text-[#1A467C]">{{ $item->kelas }}</p>
+                                        <p data-role="submeta" class="font-mono text-[10px] sm:text-[11px] font-bold text-[#1A467C]">{{ $item->kelas }}</p>
                                         <div class="mt-1.5 w-full max-w-md h-2.5 bg-gray-100 border border-black overflow-hidden">
                                             <div data-role="bar-fill" class="lb-bar-fill h-full {{ $barColor }}" style="width: {{ $pctWidth }}%"></div>
                                         </div>
@@ -839,8 +839,12 @@
                                             @php $isMyGroup = $myKelompok && (int) $grp->id === (int) $myKelompok->id; @endphp
                                             <div class="flex flex-col items-center text-center mb-2.5 w-full">
                                                 <div class="relative podium-avatar">
-                                                    <div class="{{ $pod['rank'] === 1 ? 'w-11 h-11 sm:w-14 sm:h-14 text-sm sm:text-base' : 'w-9 h-9 sm:w-12 sm:h-12 text-xs sm:text-sm' }} bg-[#1A467C] text-white border-2 border-black flex items-center justify-center font-black shadow-[2px_2px_0px_0px_#000000]">
-                                                        {{ $grp->initials }}
+                                                    <div class="{{ $pod['rank'] === 1 ? 'w-11 h-11 sm:w-14 sm:h-14 text-sm sm:text-base' : 'w-9 h-9 sm:w-12 sm:h-12 text-xs sm:text-sm' }} bg-[#1A467C] text-white border-2 border-black flex items-center justify-center font-black overflow-hidden shadow-[2px_2px_0px_0px_#000000]">
+                                                        @if (!empty($grp->foto_url))
+                                                            <img src="{{ $grp->foto_url }}" alt="Foto {{ $grp->nama_kelompok }}" class="w-full h-full object-cover">
+                                                        @else
+                                                            {{ $grp->initials }}
+                                                        @endif
                                                     </div>
                                                     @if ($isMyGroup)
                                                         <span class="absolute -top-2 -right-3 bg-[#15803d] text-white text-[8px] font-black uppercase px-1 py-0.2 border border-black">
@@ -902,26 +906,30 @@
                                                 ? 'bg-[#2A82C6]'
                                                 : ($rankNum === 3 ? 'bg-orange-400' : 'bg-[#15803d]'));
                                     @endphp
-                                    <div data-lb-key="grp-{{ $grp->id }}" data-rank="{{ $rankNum }}" data-pts="{{ $pts }}" class="lb-row px-4 sm:px-5 py-3.5 {{ $isMyTeam ? 'bg-amber-50/90 border-l-4 border-l-[#1A467C]' : 'hover:bg-blue-50/40' }} flex items-center justify-between gap-3">
+                                    <div data-lb-key="grp-{{ $grp->id }}" data-rank="{{ $rankNum }}" data-pts="{{ $pts }}" data-foto-url="{{ $grp->foto_url ?? '' }}" class="lb-row px-4 sm:px-5 py-3.5 {{ $isMyTeam ? 'bg-amber-50/90 border-l-4 border-l-[#1A467C]' : 'hover:bg-blue-50/40' }} flex items-center justify-between gap-3">
                                         <div class="flex items-center gap-3 min-w-0 flex-1">
                                             <span data-role="rank-badge" class="w-8 h-8 border-2 border-black font-mono font-black text-xs flex items-center justify-center shrink-0 {{ $rankNum === 1 ? 'bg-amber-300 text-black' : ($rankNum === 2 ? 'bg-sky-200 text-black' : ($rankNum === 3 ? 'bg-orange-200 text-black' : 'bg-gray-100 text-gray-800')) }}">
                                                 #{{ $rankNum }}
                                             </span>
 
-                                            <div class="w-9 h-9 bg-[#1A467C] text-white border-2 border-black flex items-center justify-center font-black text-xs shrink-0">
-                                                {{ $grp->initials }}
+                                            <div data-role="avatar" class="w-9 h-9 bg-[#1A467C] text-white border-2 border-black flex items-center justify-center font-black text-xs shrink-0 overflow-hidden">
+                                                @if (!empty($grp->foto_url))
+                                                    <img src="{{ $grp->foto_url }}" alt="Foto {{ $grp->nama_kelompok }}" class="w-full h-full object-cover">
+                                                @else
+                                                    {{ $grp->initials }}
+                                                @endif
                                             </div>
 
                                             <div class="min-w-0 flex-1">
-                                                <div class="flex items-center gap-1.5">
-                                                    <p class="font-black text-xs sm:text-sm text-gray-950 truncate">{{ $grp->nama_kelompok }}</p>
+                                                <div data-role="title-wrap" class="flex items-center gap-1.5">
+                                                    <p data-role="name" class="font-black text-xs sm:text-sm text-gray-950 truncate">{{ $grp->nama_kelompok }}</p>
                                                     @if ($isMyTeam)
                                                         <span data-role="my-badge" class="bg-[#15803d] text-white text-[9px] font-black uppercase px-1.5 py-0.2 border border-black shrink-0">
                                                             TIM KAMU
                                                         </span>
                                                     @endif
                                                 </div>
-                                                <p class="font-mono text-[10px] sm:text-[11px] font-bold text-gray-600">
+                                                <p data-role="submeta" class="font-mono text-[10px] sm:text-[11px] font-bold text-gray-600">
                                                     Ketua: <span class="text-[#1A467C]">{{ $grp->ketua_nama }}</span> • {{ $grp->jumlah_anggota }} Anggota
                                                 </p>
                                                 <div class="mt-1.5 w-full max-w-md h-2.5 bg-gray-100 border border-black overflow-hidden">
@@ -1331,6 +1339,7 @@
     @php
         $hasKelompokValidationError = $errors->has('nama_kelompok')
             || $errors->has('judul_proposal')
+            || $errors->has('foto')
             || $errors->has('kode_invite')
             || $errors->has('pendaftaran_id');
     @endphp
@@ -1495,14 +1504,13 @@
             }
         }
 
-        // Live Preview Foto Profil saat dipilih
-        function previewAvatar(input) {
+        // Live Preview Gambar Upload Bersama (Profil Mahasiswa & Profil Kelompok)
+        function previewImageFile(input, previewId, placeholderId) {
             if (input.files && input.files[0]) {
-                const file = input.files[0];
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    const preview = document.getElementById('avatar-preview');
-                    const placeholder = document.getElementById('avatar-placeholder');
+                    const preview = document.getElementById(previewId);
+                    const placeholder = document.getElementById(placeholderId);
                     if (preview) {
                         preview.src = e.target.result;
                         preview.classList.remove('hidden');
@@ -1511,7 +1519,19 @@
                         placeholder.classList.add('hidden');
                     }
                 };
-                reader.readAsDataURL(file);
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function previewAvatar(input) {
+            previewImageFile(input, 'avatar-preview', 'avatar-placeholder');
+        }
+
+        function previewKelompokFoto(input) {
+            previewImageFile(input, 'kelompok-foto-preview', 'kelompok-foto-placeholder');
+            const hapusCb = document.getElementById('edit-hapus-foto');
+            if (hapusCb && input.files && input.files[0]) {
+                hapusCb.checked = false;
             }
         }
 
@@ -2017,17 +2037,30 @@
             return 'lb-bar-fill h-full bg-[#15803d]';
         }
 
+        function updateAvatarBox(avatarEl, imgUrl, altLabel, fallbackInitials) {
+            if (!avatarEl) return;
+            const wantImg = Boolean(imgUrl);
+            const curImg = avatarEl.querySelector('img');
+            if (wantImg) {
+                if (!curImg || curImg.getAttribute('src') !== imgUrl) {
+                    avatarEl.innerHTML = `<img src="${escapeHtml(imgUrl)}" alt="${escapeHtml(altLabel)}" class="w-full h-full object-cover">`;
+                }
+            } else if (curImg || avatarEl.textContent.trim() !== fallbackInitials) {
+                avatarEl.textContent = fallbackInitials;
+            }
+        }
+
         function getDomTopThreeSig(listId) {
             const list = document.getElementById(listId);
             if (!list) return '';
             return Array.from(list.querySelectorAll('[data-lb-key]')).slice(0, 3)
-                .map(el => `${el.dataset.lbKey}:${el.dataset.pts || 0}`)
+                .map(el => `${el.dataset.lbKey}:${el.dataset.pts || 0}:${el.dataset.fotoUrl || ''}`)
                 .join('|');
         }
 
         function getJsonTopThreeSig(items, prefix) {
             return (items || []).slice(0, 3)
-                .map(item => `${prefix}-${item.id}:${Number(item.total_point) || 0}`)
+                .map(item => `${prefix}-${item.id}:${Number(item.total_point) || 0}:${(prefix === 'mhs' ? item.avatar_url : item.foto_url) || ''}`)
                 .join('|');
         }
 
@@ -2096,13 +2129,16 @@
                 const myTeamBadge = entry.is_my_team
                     ? '<span class="absolute -top-2 -right-3 bg-[#15803d] text-white text-[8px] font-black uppercase px-1 py-0.2 border border-black">TIMMU</span>'
                     : '';
+                const grpAvatarInner = entry.foto_url
+                    ? `<img src="${escapeHtml(entry.foto_url)}" alt="Foto ${escapeHtml(entry.nama_kelompok)}" class="w-full h-full object-cover">`
+                    : escapeHtml(entry.initials || 'KL');
 
                 return `
                     <div class="flex flex-col items-center podium-col">
                         <div class="flex flex-col items-center text-center mb-2.5 w-full">
                             <div class="relative podium-avatar">
-                                <div class="${avatarSizeCls} bg-[#1A467C] text-white border-2 border-black flex items-center justify-center font-black shadow-[2px_2px_0px_0px_#000000]">
-                                    ${escapeHtml(entry.initials || 'KL')}
+                                <div class="${avatarSizeCls} bg-[#1A467C] text-white border-2 border-black flex items-center justify-center font-black overflow-hidden shadow-[2px_2px_0px_0px_#000000]">
+                                    ${grpAvatarInner}
                                 </div>
                                 ${myTeamBadge}
                             </div>
@@ -2142,6 +2178,7 @@
             row.dataset.lbKey = key;
             row.dataset.rank = String(rankNum);
             row.dataset.pts = String(pts);
+            row.dataset.fotoUrl = (type === 'individu' ? item.avatar_url : item.foto_url) || '';
             row.className = `lb-row px-4 sm:px-5 py-3.5 ${highlightCls} flex items-center justify-between gap-3 tab-snap-in`;
 
             if (type === 'individu') {
@@ -2178,12 +2215,15 @@
                 const teamBadgeHtml = item.is_my_team
                     ? '<span data-role="my-badge" class="bg-[#15803d] text-white text-[9px] font-black uppercase px-1.5 py-0.2 border border-black shrink-0">TIM KAMU</span>'
                     : '';
+                const grpAvatarHtml = item.foto_url
+                    ? `<img src="${escapeHtml(item.foto_url)}" alt="Foto ${escapeHtml(item.nama_kelompok)}" class="w-full h-full object-cover">`
+                    : escapeHtml(item.initials || 'KL');
 
                 row.innerHTML = `
                     <div class="flex items-center gap-3 min-w-0 flex-1">
                         <span data-role="rank-badge" class="${getRankBadgeCls(rankNum)}">#${rankNum}</span>
-                        <div data-role="avatar" class="w-9 h-9 bg-[#1A467C] text-white border-2 border-black flex items-center justify-center font-black text-xs shrink-0">
-                            ${escapeHtml(item.initials || 'KL')}
+                        <div data-role="avatar" class="w-9 h-9 bg-[#1A467C] text-white border-2 border-black flex items-center justify-center font-black text-xs shrink-0 overflow-hidden">
+                            ${grpAvatarHtml}
                         </div>
                         <div class="min-w-0 flex-1">
                             <div data-role="title-wrap" class="flex items-center gap-1.5">
@@ -2212,12 +2252,14 @@
             const rankNum = Number(item.rank) || 1;
             const pts = Number(item.total_point) || 0;
             const pctWidth = pts > 0 ? Math.max(8, Math.round((pts / maxPoint) * 100)) : 0;
+            const nextFotoUrl = (type === 'individu' ? item.avatar_url : item.foto_url) || '';
             const prevRank = Number(row.dataset.rank || 0);
             const prevPts = Number(row.dataset.pts || 0);
-            const changed = prevRank !== rankNum || prevPts !== pts;
+            const changed = prevRank !== rankNum || prevPts !== pts || (row.dataset.fotoUrl || '') !== nextFotoUrl;
 
             row.dataset.rank = String(rankNum);
             row.dataset.pts = String(pts);
+            row.dataset.fotoUrl = nextFotoUrl;
 
             const isHighlighted = type === 'individu' ? Boolean(item.is_me) : Boolean(item.is_my_team);
             row.className = `lb-row px-4 sm:px-5 py-3.5 ${isHighlighted ? 'bg-amber-50/90 border-l-4 border-l-[#1A467C]' : 'hover:bg-blue-50/40'} flex items-center justify-between gap-3`;
@@ -2240,8 +2282,12 @@
             }
 
             if (type === 'kelompok') {
-                const avatarEl = row.querySelector('[data-role="avatar"]');
-                if (avatarEl) avatarEl.textContent = item.initials || 'KL';
+                updateAvatarBox(
+                    row.querySelector('[data-role="avatar"]'),
+                    item.foto_url,
+                    `Foto ${item.nama_kelompok || ''}`,
+                    item.initials || 'KL'
+                );
 
                 const nameEl = row.querySelector('[data-role="name"]');
                 if (nameEl) nameEl.textContent = item.nama_kelompok || '';
@@ -2271,18 +2317,12 @@
                 const subEl = row.querySelector('[data-role="submeta"]');
                 if (subEl) subEl.textContent = item.kelas || '';
 
-                const avatarEl = row.querySelector('[data-role="avatar"]');
-                if (avatarEl) {
-                    const wantImg = Boolean(item.avatar_url);
-                    const hasImg = Boolean(avatarEl.querySelector('img'));
-                    if (wantImg) {
-                        if (!hasImg || avatarEl.querySelector('img')?.getAttribute('src') !== item.avatar_url) {
-                            avatarEl.innerHTML = `<img src="${escapeHtml(item.avatar_url)}" alt="Avatar ${escapeHtml(item.nama)}" class="w-full h-full object-cover">`;
-                        }
-                    } else if (hasImg || avatarEl.textContent.trim() !== (item.initials || 'IF')) {
-                        avatarEl.textContent = item.initials || 'IF';
-                    }
-                }
+                updateAvatarBox(
+                    row.querySelector('[data-role="avatar"]'),
+                    item.avatar_url,
+                    `Avatar ${item.nama || ''}`,
+                    item.initials || 'IF'
+                );
             }
 
             if (changed) {

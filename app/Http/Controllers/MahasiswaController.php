@@ -442,7 +442,7 @@ class MahasiswaController extends Controller
             ->first();
 
         $kelompokAgg = DB::table('kelompoks')
-            ->selectRaw('COUNT(*) as c, COALESCE(SUM(id), 0) as s, MAX(updated_at) as m')
+            ->selectRaw('COUNT(*) as c, COALESCE(SUM(id), 0) as s, COALESCE(SUM(CASE WHEN foto IS NOT NULL THEN 1 ELSE 0 END), 0) as fc, MAX(updated_at) as m')
             ->first();
 
         $memberAgg = DB::table('kelompok_members')
@@ -475,6 +475,7 @@ class MahasiswaController extends Controller
             $historyAgg->m ?? 0,
             $kelompokAgg->c ?? 0,
             $kelompokAgg->s ?? 0,
+            $kelompokAgg->fc ?? 0,
             $kelompokAgg->m ?? '',
             $memberAgg->c ?? 0,
             $memberAgg->s ?? 0,
@@ -516,17 +517,12 @@ class MahasiswaController extends Controller
             ->map(function ($k) {
                 $totalPoint = $k->members->sum(fn ($m) => (int) ($m->pendaftaran->total_point ?? 0));
                 $jumlahAnggota = $k->members->count();
-                $cleanWords = preg_split('/\s+/', trim($k->nama_kelompok)) ?: [];
-                if (count($cleanWords) >= 2) {
-                    $initials = strtoupper(substr($cleanWords[0], 0, 1) . substr($cleanWords[1], 0, 1));
-                } else {
-                    $initials = strtoupper(substr(trim($k->nama_kelompok), 0, 2));
-                }
 
                 return (object) [
                     'id' => (int) $k->id,
                     'nama_kelompok' => $k->nama_kelompok,
-                    'initials' => $initials ?: 'KL',
+                    'initials' => $k->initials(),
+                    'foto_url' => $k->fotoUrl(),
                     'ketua_nama' => $k->ketua->nama ?? '-',
                     'ketua_kelas' => $k->ketua->kelas ?? '-',
                     'jumlah_anggota' => $jumlahAnggota,
@@ -754,6 +750,7 @@ class MahasiswaController extends Controller
                 'rank' => $idx + 1,
                 'nama_kelompok' => $k->nama_kelompok,
                 'initials' => $k->initials,
+                'foto_url' => $k->foto_url,
                 'ketua_nama' => $k->ketua_nama,
                 'jumlah_anggota' => (int) $k->jumlah_anggota,
                 'total_point' => (int) $k->total_point,
