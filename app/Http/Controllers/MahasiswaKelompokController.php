@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\KelompokNotificationMail;
 use App\Models\Kelompok;
 use App\Models\KelompokInvitation;
 use App\Models\KelompokMember;
 use App\Models\Pendaftaran;
+use App\Models\Pengaturan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 class MahasiswaKelompokController extends Controller
@@ -26,6 +30,51 @@ class MahasiswaKelompokController extends Controller
         }
 
         return Pendaftaran::find(session('mahasiswa_id'));
+    }
+
+    /**
+     * Kirim email notifikasi aktivitas kelompok tanpa menggagalkan proses utama bila SMTP bermasalah.
+     */
+    private function notifyByEmail(
+        ?Pendaftaran $penerima,
+        string $subjectLine,
+        string $badgeText,
+        string $badgeColor,
+        string $heading,
+        string $messageText,
+        string $namaKelompok,
+        ?string $namaAktor = null,
+        ?string $ctaUrl = null,
+        string $ctaText = 'Buka Menu Kelompok'
+    ): void {
+        if (!$penerima || empty($penerima->email) || !filter_var($penerima->email, FILTER_VALIDATE_EMAIL)) {
+            return;
+        }
+
+        static $pengaturanCache = false;
+        if ($pengaturanCache === false) {
+            $pengaturanCache = Pengaturan::first();
+        }
+
+        $targetUrl = $ctaUrl ?: route('mahasiswa.dashboard', ['tab' => 'kelompok']);
+
+        try {
+            Mail::to($penerima->email)->send(new KelompokNotificationMail(
+                penerima: $penerima,
+                pengaturan: $pengaturanCache,
+                subjectLine: $subjectLine,
+                badgeText: $badgeText,
+                badgeColor: $badgeColor,
+                heading: $heading,
+                messageText: $messageText,
+                namaKelompok: $namaKelompok,
+                namaAktor: $namaAktor,
+                ctaUrl: $targetUrl,
+                ctaText: $ctaText,
+            ));
+        } catch (\Throwable $e) {
+            Log::warning("Gagal mengirim email notifikasi kelompok ke {$penerima->email}: " . $e->getMessage());
+        }
     }
 
     /**
@@ -64,7 +113,7 @@ class MahasiswaKelompokController extends Controller
             return ['ok' => false, 'message' => 'Kode atau link undangan kelompok tidak valid.'];
         }
 
-        $kelompok = Kelompok::where('kode_invite', $kode)->first();
+        $kelompok = Kelompok::with('ketua')->where('kode_invite', $kode)->first();
         if (!$kelompok) {
             return ['ok' => false, 'message' => "Kelompok dengan kode {$kode} tidak ditemukan."];
         }
@@ -101,6 +150,20 @@ class MahasiswaKelompokController extends Controller
                     'responded_at' => now(),
                 ]);
         });
+
+        if ($kelompok->ketua && (int) $kelompok->ketua->id !== (int) $mahasiswa->id) {
+            $this->notifyByEmail(
+                penerima: $kelompok->ketua,
+                subjectLine: "Anggota Baru Bergabung: {$mahasiswa->nama}",
+                badgeText: 'ANGGOTA BARU',
+                badgeColor: '#15803d',
+                heading: 'Anggota Baru Gabung via Link / QR',
+                messageText: "{$mahasiswa->nama} ({$mahasiswa->nim} - {$mahasiswa->kelas}) baru saja bergabung ke kelompok \"{$kelompok->nama_kelompok}\" melalui link atau kode undangan.",
+                namaKelompok: $kelompok->nama_kelompok,
+                namaAktor: "Anggota Baru: {$mahasiswa->nama} ({$mahasiswa->nim})",
+                ctaText: 'Lihat Anggota Tim',
+            );
+        }
 
         return ['ok' => true, 'message' => "Berhasil bergabung ke kelompok {$kelompok->nama_kelompok}!"];
     }
@@ -299,6 +362,18 @@ class MahasiswaKelompokController extends Controller
             'status' => 'pending',
         ]);
 
+        $this->notifyByEmail(
+            penerima: $target,
+            subjectLine: "Undangan Kelompok: {$membership->kelompok->nama_kelompok}",
+            badgeText: 'UNDANGAN KELOMPOK',
+            badgeColor: '#1A467C',
+            heading: 'Kamu Diundang Bergabung ke Kelompok',
+            messageText: "{$mahasiswa->nama} ({$mahasiswa->kelas}) mengundang kamu untuk bergabung ke kelompok \"{$membership->kelompok->nama_kelompok}\". Silakan buka Inbox Kelompok di Portal Mahasiswa untuk menerima atau menolak undangan ini.",
+            namaKelompok: $membership->kelompok->nama_kelompok,
+            namaAktor: "Ketua: {$mahasiswa->nama}",
+            ctaText: 'Buka Inbox Undangan',
+        );
+
         return redirect()->route('mahasiswa.dashboard', ['tab' => 'kelompok'])
             ->with('success', "Undangan berhasil dikirim ke Inbox {$target->nama} ({$target->nim}).");
     }
@@ -346,7 +421,7 @@ class MahasiswaKelompokController extends Controller
             'action' => ['required', 'in:accept,decline'],
         ]);
 
-        $invitation = KelompokInvitation::with('kelompok')
+        $invitation = KelompokInvitation::with('kelompok.ketua')
             ->where('id', $invitationId)
             ->where('pendaftaran_id', $mahasiswa->id)
             ->where('status', 'pending')
@@ -361,6 +436,19 @@ class MahasiswaKelompokController extends Controller
             $invitation->status = 'declined';
             $invitation->responded_at = now();
             $invitation->save();
+
+            if ($invitation->kelompok->ketua && (int) $invitation->kelompok->ketua->id !== (int) $mahasiswa->id) {
+                $this->notifyByEmail(
+                    penerima: $invitation->kelompok->ketua,
+                    subjectLine: "Undangan Ditolak: {$mahasiswa->nama}",
+                    badgeText: 'UNDANGAN DITOLAK',
+                    badgeColor: '#CA2C2A',
+                    heading: 'Undangan Kelompok Ditolak',
+                    messageText: "{$mahasiswa->nama} ({$mahasiswa->nim} - {$mahasiswa->kelas}) menolak undangan untuk bergabung ke kelompok \"{$invitation->kelompok->nama_kelompok}\".",
+                    namaKelompok: $invitation->kelompok->nama_kelompok,
+                    namaAktor: "Ditolak oleh: {$mahasiswa->nama}",
+                );
+            }
 
             return redirect()->route('mahasiswa.dashboard', ['tab' => 'kelompok'])
                 ->with('success', "Undangan dari kelompok \"{$invitation->kelompok->nama_kelompok}\" telah ditolak.");
@@ -391,6 +479,20 @@ class MahasiswaKelompokController extends Controller
                     'responded_at' => now(),
                 ]);
         });
+
+        if ($invitation->kelompok->ketua && (int) $invitation->kelompok->ketua->id !== (int) $mahasiswa->id) {
+            $this->notifyByEmail(
+                penerima: $invitation->kelompok->ketua,
+                subjectLine: "Undangan Diterima: {$mahasiswa->nama}",
+                badgeText: 'UNDANGAN DITERIMA',
+                badgeColor: '#15803d',
+                heading: 'Undangan Kelompok Diterima',
+                messageText: "{$mahasiswa->nama} ({$mahasiswa->nim} - {$mahasiswa->kelas}) telah menerima undangan dan resmi bergabung ke kelompok \"{$invitation->kelompok->nama_kelompok}\".",
+                namaKelompok: $invitation->kelompok->nama_kelompok,
+                namaAktor: "Anggota Baru: {$mahasiswa->nama}",
+                ctaText: 'Lihat Anggota Tim',
+            );
+        }
 
         return redirect()->route('mahasiswa.dashboard', ['tab' => 'kelompok'])
             ->with('success', "Selamat! Kamu resmi bergabung di kelompok \"{$invitation->kelompok->nama_kelompok}\".");
@@ -427,8 +529,21 @@ class MahasiswaKelompokController extends Controller
                 ->with('error', 'Ketua tidak dapat mengeluarkan diri sendiri.');
         }
 
-        $namaAnggota = $targetMember->pendaftaran->nama ?? 'Anggota';
+        $targetPendaftaran = $targetMember->pendaftaran;
+        $namaAnggota = $targetPendaftaran->nama ?? 'Anggota';
+        $namaKelompok = $myMembership->kelompok->nama_kelompok;
         $targetMember->delete();
+
+        $this->notifyByEmail(
+            penerima: $targetPendaftaran,
+            subjectLine: "Pemberitahuan Keanggotaan Kelompok: {$namaKelompok}",
+            badgeText: 'DIKELUARKAN',
+            badgeColor: '#CA2C2A',
+            heading: 'Kamu Dikeluarkan dari Kelompok',
+            messageText: "Ketua kelompok ({$mahasiswa->nama}) telah mengeluarkan kamu dari kelompok \"{$namaKelompok}\". Kamu dapat bergabung atau membuat kelompok lain melalui Portal Mahasiswa.",
+            namaKelompok: $namaKelompok,
+            namaAktor: "Ketua: {$mahasiswa->nama}",
+        );
 
         return redirect()->route('mahasiswa.dashboard', ['tab' => 'kelompok'])
             ->with('success', "{$namaAnggota} berhasil dikeluarkan dari kelompok.");
@@ -474,6 +589,18 @@ class MahasiswaKelompokController extends Controller
 
         $namaBaru = $targetMember->pendaftaran->nama ?? 'Anggota';
 
+        $this->notifyByEmail(
+            penerima: $targetMember->pendaftaran,
+            subjectLine: "Penunjukan Ketua Kelompok Baru: {$myMembership->kelompok->nama_kelompok}",
+            badgeText: 'KETUA BARU',
+            badgeColor: '#D97706',
+            heading: 'Kamu Resmi Menjadi Ketua Kelompok',
+            messageText: "{$mahasiswa->nama} telah menyerahkan jabatan Ketua kelompok \"{$myMembership->kelompok->nama_kelompok}\" kepada kamu. Kamu kini memiliki akses penuh untuk mengelola anggota & undangan tim.",
+            namaKelompok: $myMembership->kelompok->nama_kelompok,
+            namaAktor: "Ketua Sebelumnya: {$mahasiswa->nama}",
+            ctaText: 'Kelola Kelompok Sekarang',
+        );
+
         return redirect()->route('mahasiswa.dashboard', ['tab' => 'kelompok'])
             ->with('success', "Jabatan Ketua berhasil diserahkan kepada {$namaBaru}.");
     }
@@ -488,7 +615,10 @@ class MahasiswaKelompokController extends Controller
             return redirect()->route('mahasiswa.login')->with('error', 'Silakan masuk ke akun Anda terlebih dahulu.');
         }
 
-        $membership = KelompokMember::with(['kelompok.members'])->where('pendaftaran_id', $mahasiswa->id)->first();
+        $membership = KelompokMember::with(['kelompok.ketua', 'kelompok.members.pendaftaran'])
+            ->where('pendaftaran_id', $mahasiswa->id)
+            ->first();
+
         if (!$membership || !$membership->kelompok) {
             return redirect()->route('mahasiswa.dashboard', ['tab' => 'kelompok'])
                 ->with('error', 'Kamu belum tergabung di kelompok mana pun.');
@@ -498,14 +628,47 @@ class MahasiswaKelompokController extends Controller
 
         if ((int) $kelompok->ketua_id === (int) $mahasiswa->id) {
             $namaKelompok = $kelompok->nama_kelompok;
+            $formerMembers = $kelompok->members
+                ->filter(fn ($m) => (int) $m->pendaftaran_id !== (int) $mahasiswa->id)
+                ->pluck('pendaftaran')
+                ->filter();
+
             $kelompok->delete();
+
+            foreach ($formerMembers as $exMember) {
+                $this->notifyByEmail(
+                    penerima: $exMember,
+                    subjectLine: "Kelompok Dibubarkan: {$namaKelompok}",
+                    badgeText: 'KELOMPOK BUBAR',
+                    badgeColor: '#CA2C2A',
+                    heading: 'Kelompok Telah Dibubarkan',
+                    messageText: "Ketua kelompok ({$mahasiswa->nama}) telah membubarkan kelompok \"{$namaKelompok}\". Silakan buat kelompok baru atau gabung ke kelompok lain di Portal Mahasiswa.",
+                    namaKelompok: $namaKelompok,
+                    namaAktor: "Ketua: {$mahasiswa->nama}",
+                );
+            }
 
             return redirect()->route('mahasiswa.dashboard', ['tab' => 'kelompok'])
                 ->with('success', "Kelompok \"{$namaKelompok}\" telah dibubarkan.");
         }
 
         $namaKelompok = $kelompok->nama_kelompok;
+        $ketua = $kelompok->ketua;
         $membership->delete();
+
+        if ($ketua && (int) $ketua->id !== (int) $mahasiswa->id) {
+            $this->notifyByEmail(
+                penerima: $ketua,
+                subjectLine: "Anggota Keluar: {$mahasiswa->nama}",
+                badgeText: 'ANGGOTA KELUAR',
+                badgeColor: '#D97706',
+                heading: 'Anggota Meninggalkan Kelompok',
+                messageText: "{$mahasiswa->nama} ({$mahasiswa->nim} - {$mahasiswa->kelas}) telah keluar dari kelompok \"{$namaKelompok}\".",
+                namaKelompok: $namaKelompok,
+                namaAktor: "Mantan Anggota: {$mahasiswa->nama}",
+                ctaText: 'Lihat Daftar Anggota',
+            );
+        }
 
         return redirect()->route('mahasiswa.dashboard', ['tab' => 'kelompok'])
             ->with('success', "Kamu telah keluar dari kelompok \"{$namaKelompok}\".");
