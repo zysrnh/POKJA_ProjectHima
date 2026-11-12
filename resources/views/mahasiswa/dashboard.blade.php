@@ -621,18 +621,19 @@
             </section>
 
             <!-- ========================================================== -->
-            <!-- TAB 4: LEADERBOARD PESERTA POKJA                           -->
+            <!-- TAB 4: LEADERBOARD KELOMPOK POKJA (Individu di-hide)       -->
             <!-- ========================================================== -->
             <section id="tab-panel-leaderboard" class="tab-snap-in hidden space-y-5 sm:space-y-6">
 
-                <!-- Switcher Mode Leaderboard: Individu vs Kelompok -->
-                <div class="mhs-snap-1 card-tactile bg-white border-2 border-black p-2 shadow-[4px_4px_0px_0px_#000000] flex items-center justify-between gap-2">
-                    <div class="grid grid-cols-2 gap-2 w-full sm:w-auto sm:min-w-[300px]">
+                <!-- Header Mode Leaderboard (Fokus Kelompok; Peserta di-hide) -->
+                <div class="mhs-snap-1 card-tactile bg-white border-2 border-black p-2.5 shadow-[4px_4px_0px_0px_#000000] flex items-center justify-between gap-2">
+                    <div class="flex items-center gap-2">
                         <button
                             type="button"
                             id="lb-btn-individu"
                             onclick="switchLeaderboardMode('individu')"
-                            class="btn-tactile px-4 py-2 bg-[#1A467C] text-white border-2 border-black text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
+                            class="hidden"
+                            aria-hidden="true"
                         >
                             Peserta ({{ $totalPeserta }})
                         </button>
@@ -640,18 +641,18 @@
                             type="button"
                             id="lb-btn-kelompok"
                             onclick="switchLeaderboardMode('kelompok')"
-                            class="btn-tactile px-4 py-2 bg-white hover:bg-gray-100 text-gray-900 border-2 border-black text-xs font-black uppercase tracking-wider cursor-pointer"
+                            class="btn-tactile px-4 py-2 bg-[#1A467C] text-white border-2 border-black text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
                         >
                             Kelompok ({{ $totalKelompok }})
                         </button>
                     </div>
-                    <span class="hidden sm:inline-block font-mono text-[10px] font-black uppercase text-gray-500 px-2">
-                        Klasemen Point Keaktifan
+                    <span class="font-mono text-[10px] font-black uppercase text-gray-500 px-2">
+                        Klasemen Point Kelompok
                     </span>
                 </div>
 
-                <!-- MODE 1: LEADERBOARD INDIVIDU -->
-                <div id="lb-view-individu" class="space-y-5 sm:space-y-6">
+                <!-- MODE 1: LEADERBOARD INDIVIDU (Disembunyikan di Portal Mahasiswa) -->
+                <div id="lb-view-individu" class="hidden space-y-5 sm:space-y-6">
 
                 <!-- Podium Top 3 (Grafik Batang Podium Vertikal Ke Atas) -->
                 @php
@@ -809,7 +810,7 @@
                 </div> <!-- End #lb-view-individu -->
 
                 <!-- MODE 2: LEADERBOARD KELOMPOK -->
-                <div id="lb-view-kelompok" class="hidden space-y-5 sm:space-y-6">
+                <div id="lb-view-kelompok" class="space-y-5 sm:space-y-6">
                     @php
                         $maxKelompokPoint = max(1, (int) ($kelompokLeaderboardList->max('total_point') ?? 1));
                         $grpFirst = $kelompokTopThree->get(0);
@@ -1389,7 +1390,7 @@
 
         let currentRealtimeSig = @json($realtimeSignature ?? '');
         let pendingKelompokPayload = null;
-        let currentLeaderboardMode = 'individu';
+        let currentLeaderboardMode = 'kelompok';
         let isRealtimeSyncInFlight = false;
         let realtimePollTimer = null;
         let lastIndPodiumSig = '';
@@ -1557,30 +1558,23 @@
             window.location.hash = tabId;
         }
 
-        // Switch Mode di Tab Leaderboard (Individu vs Kelompok)
+        // Mode Leaderboard Mahasiswa dikunci ke Kelompok (perorangan di-hide)
         function switchLeaderboardMode(mode) {
-            currentLeaderboardMode = mode === 'kelompok' ? 'kelompok' : 'individu';
-            const isKelompok = currentLeaderboardMode === 'kelompok';
+            currentLeaderboardMode = 'kelompok';
             const indView = document.getElementById('lb-view-individu');
             const grpView = document.getElementById('lb-view-kelompok');
-            const indBtn = document.getElementById('lb-btn-individu');
             const grpBtn = document.getElementById('lb-btn-kelompok');
 
             const activeCls = 'btn-tactile px-4 py-2 bg-[#1A467C] text-white border-2 border-black text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] cursor-pointer';
-            const inactiveCls = 'btn-tactile px-4 py-2 bg-white hover:bg-gray-100 text-gray-900 border-2 border-black text-xs font-black uppercase tracking-wider cursor-pointer';
 
             if (indView && grpView) {
-                indView.classList.toggle('hidden', isKelompok);
-                grpView.classList.toggle('hidden', !isKelompok);
-                const visibleView = isKelompok ? grpView : indView;
-                replaySnapIn(visibleView);
-                replayPodiumAnimations(document.getElementById(
-                    isKelompok ? 'lb-kelompok-podium' : 'lb-individu-podium'
-                ));
+                indView.classList.add('hidden');
+                grpView.classList.remove('hidden');
+                replaySnapIn(grpView);
+                replayPodiumAnimations(document.getElementById('lb-kelompok-podium'));
             }
-            if (indBtn && grpBtn) {
-                indBtn.className = isKelompok ? inactiveCls : activeCls;
-                grpBtn.className = isKelompok ? activeCls : inactiveCls;
+            if (grpBtn) {
+                grpBtn.className = activeCls;
             }
         }
 
