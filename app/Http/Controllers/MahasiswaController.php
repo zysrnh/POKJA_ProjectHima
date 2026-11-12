@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Mail\ResetPasswordMahasiswaMail;
+use App\Models\KelompokInvitation;
+use App\Models\KelompokMember;
 use App\Models\Pendaftaran;
 use App\Models\Pengaturan;
 use Illuminate\Http\Request;
@@ -174,6 +176,12 @@ class MahasiswaController extends Controller
 
         // Kunci 1 Akun = 1 Perangkat Aktif & hapus sesi perangkat lama
         self::bindSingleDeviceSession($request, $mahasiswa);
+
+        if (session()->has('pending_kelompok_kode')) {
+            return redirect()->route('mahasiswa.kelompok.joinLink', [
+                'kode' => session()->pull('pending_kelompok_kode'),
+            ]);
+        }
 
         return redirect()->route('mahasiswa.dashboard')->with('success', 'Selamat datang kembali, ' . $mahasiswa->nama . '!');
     }
@@ -406,6 +414,12 @@ class MahasiswaController extends Controller
         session()->forget('aktivasi_mahasiswa_id');
         self::bindSingleDeviceSession($request, $mahasiswa);
 
+        if (session()->has('pending_kelompok_kode')) {
+            return redirect()->route('mahasiswa.kelompok.joinLink', [
+                'kode' => session()->pull('pending_kelompok_kode'),
+            ]);
+        }
+
         return redirect()->route('mahasiswa.dashboard')->with('success', 'Password berhasil dibuat! Akun Anda kini telah aktif.');
     }
 
@@ -449,6 +463,79 @@ class MahasiswaController extends Controller
         $myRank = $myRankIndex !== false ? ($myRankIndex + 1) : '-';
         $totalPeserta = $leaderboardList->count();
 
+        // Data Kelompok & Inbox Undangan Mahasiswa
+        $myMembership = KelompokMember::with([
+            'kelompok.ketua',
+            'kelompok.members' => function ($q) {
+                $q->orderByRaw("CASE WHEN role = 'ketua' THEN 0 ELSE 1 END")
+                    ->orderBy('joined_at', 'asc')
+                    ->with(['pendaftaran.presensis']);
+            },
+            'kelompok.invitations' => function ($q) {
+                $q->where('status', 'pending')
+                    ->orderBy('created_at', 'desc')
+                    ->with('pendaftaran');
+            },
+        ])->where('pendaftaran_id', $mahasiswa->id)->first();
+
+        $myKelompok = $myMembership?->kelompok;
+        $isKetua = $myKelompok && (int) $myKelompok->ketua_id === (int) $mahasiswa->id;
+
+        $kelompokStats = [
+            'jumlah_anggota' => 0,
+            'total_point' => 0,
+            'total_hadir' => 0,
+            'persen_hadir' => 0,
+        ];
+
+        $kelompokInbox = collect();
+        $kandidatAnggotaList = collect();
+
+        if ($myKelompok) {
+            $members = $myKelompok->members;
+            $memberCount = $members->count();
+            $totalGroupPoints = $members->sum(fn ($m) => (int) ($m->pendaftaran->total_point ?? 0));
+            $totalGroupHadir = $members->sum(function ($m) {
+                return $m->pendaftaran?->presensis?->where('status', 'hadir')->count() ?? 0;
+            });
+            $persenGroupHadir = $memberCount > 0 ? round(($totalGroupHadir / ($memberCount * 7)) * 100) : 0;
+
+            $kelompokStats = [
+                'jumlah_anggota' => $memberCount,
+                'total_point' => $totalGroupPoints,
+                'total_hadir' => $totalGroupHadir,
+                'persen_hadir' => $persenGroupHadir,
+            ];
+
+            if ($isKetua) {
+                $pendingInvitedIds = $myKelompok->invitations
+                    ->where('status', 'pending')
+                    ->pluck('pendaftaran_id')
+                    ->map(fn ($id) => (int) $id)
+                    ->all();
+
+                $kandidatAnggotaList = Pendaftaran::whereDoesntHave('kelompokMember')
+                    ->where('id', '!=', $mahasiswa->id)
+                    ->orderBy('nama', 'asc')
+                    ->get()
+                    ->map(function ($mhs) use ($pendingInvitedIds) {
+                        return [
+                            'id' => (int) $mhs->id,
+                            'nama' => $mhs->nama,
+                            'nim' => $mhs->nim,
+                            'kelas' => $mhs->kelas,
+                            'already_invited' => in_array((int) $mhs->id, $pendingInvitedIds, true),
+                        ];
+                    })->values();
+            }
+        } else {
+            $kelompokInbox = KelompokInvitation::with(['kelompok.ketua', 'kelompok.members', 'inviter'])
+                ->where('pendaftaran_id', $mahasiswa->id)
+                ->where('status', 'pending')
+                ->orderBy('created_at', 'desc')
+                ->get();
+        }
+
         return view('mahasiswa.dashboard', compact(
             'mahasiswa',
             'pengaturan',
@@ -458,7 +545,12 @@ class MahasiswaController extends Controller
             'leaderboardList',
             'topThree',
             'myRank',
-            'totalPeserta'
+            'totalPeserta',
+            'myKelompok',
+            'isKetua',
+            'kelompokStats',
+            'kelompokInbox',
+            'kandidatAnggotaList'
         ));
     }
 

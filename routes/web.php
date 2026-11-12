@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\PengaturanAcaraController;
 use App\Http\Controllers\Admin\PointAdminController;
 use App\Http\Controllers\Admin\PresensiAdminController;
 use App\Http\Controllers\MahasiswaController;
+use App\Http\Controllers\MahasiswaKelompokController;
 use App\Http\Controllers\PendaftaranController;
 use App\Http\Controllers\PresensiMahasiswaController;
 use Illuminate\Support\Facades\Route;
@@ -96,6 +97,26 @@ Route::middleware('throttle:120,1')->group(function () {
             ->middleware('throttle:15,1')
             ->name('profile.update');
         Route::post('/logout', [MahasiswaController::class, 'logout'])->name('logout');
+
+        // Kelompok & Inbox Undangan Mahasiswa
+        Route::post('/kelompok', [MahasiswaKelompokController::class, 'store'])->name('kelompok.store');
+        Route::put('/kelompok', [MahasiswaKelompokController::class, 'update'])->name('kelompok.update');
+        Route::get('/kelompok/join/{kode}', [MahasiswaKelompokController::class, 'joinByLink'])->name('kelompok.joinLink');
+        Route::post('/kelompok/join', [MahasiswaKelompokController::class, 'joinByCode'])->name('kelompok.joinCode');
+        Route::post('/kelompok/invite', [MahasiswaKelompokController::class, 'sendInvite'])->name('kelompok.invite');
+        Route::delete('/kelompok/invitations/{invitationId}', [MahasiswaKelompokController::class, 'cancelInvite'])
+            ->whereNumber('invitationId')
+            ->name('kelompok.cancelInvite');
+        Route::post('/kelompok/invitations/{invitationId}/respond', [MahasiswaKelompokController::class, 'respondInvite'])
+            ->whereNumber('invitationId')
+            ->name('kelompok.respondInvite');
+        Route::delete('/kelompok/members/{memberId}', [MahasiswaKelompokController::class, 'removeMember'])
+            ->whereNumber('memberId')
+            ->name('kelompok.removeMember');
+        Route::post('/kelompok/members/{memberId}/transfer', [MahasiswaKelompokController::class, 'transferKetua'])
+            ->whereNumber('memberId')
+            ->name('kelompok.transferKetua');
+        Route::post('/kelompok/leave', [MahasiswaKelompokController::class, 'leaveOrDisband'])->name('kelompok.leave');
     });
 
     /*

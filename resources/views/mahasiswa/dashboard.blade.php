@@ -33,6 +33,8 @@
 
     <!-- HTML5-QRCode Library for In-Browser Camera Scanner -->
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <!-- QRCode.js Library for Generating Group Join QR -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
         body {
@@ -208,6 +210,23 @@
 
                 <button 
                     type="button" 
+                    id="side-nav-kelompok"
+                    onclick="switchTab('kelompok')" 
+                    class="btn-tactile w-full text-left px-3.5 py-2.5 bg-white hover:bg-gray-100 text-gray-900 border-2 border-black font-black text-xs uppercase tracking-wider flex items-center gap-2.5 shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
+                >
+                    <svg class="w-4 h-4 text-[#15803d] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="square" stroke-width="2.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <span class="flex-1">Kelompok</span>
+                    @if (isset($kelompokInbox) && $kelompokInbox->count() > 0)
+                        <span class="bg-amber-300 text-black border border-black px-1.5 py-0.2 text-[10px] font-mono font-black leading-tight">
+                            {{ $kelompokInbox->count() }}
+                        </span>
+                    @endif
+                </button>
+
+                <button 
+                    type="button" 
                     id="side-nav-profil"
                     onclick="switchTab('profil')" 
                     class="btn-tactile w-full text-left px-3.5 py-2.5 bg-white hover:bg-gray-100 text-gray-900 border-2 border-black font-black text-xs uppercase tracking-wider flex items-center gap-2.5 shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
@@ -277,6 +296,13 @@
             @endif
 
             <!-- Flash Alert Error -->
+            @if (session('error'))
+                <div class="p-3 bg-red-50 border-2 border-black text-xs font-bold text-red-900 shadow-[3px_3px_0px_0px_#CA2C2A]">
+                    {{ session('error') }}
+                </div>
+            @endif
+
+            <!-- Validation Errors -->
             @if ($errors->any())
                 <div class="p-3 bg-red-50 border-2 border-black text-xs font-bold text-red-900 shadow-[3px_3px_0px_0px_#CA2C2A]">
                     <ul class="list-disc list-inside space-y-0.5">
@@ -656,6 +682,570 @@
             </section>
 
             <!-- ========================================================== -->
+            <!-- TAB 4.5: KELOMPOK & INBOX UNDANGAN MAHASISWA               -->
+            <!-- ========================================================== -->
+            <section id="tab-panel-kelompok" class="tab-snap-in hidden space-y-4 sm:space-y-6">
+
+                @if (!$myKelompok)
+                    <!-- Header Overview (Belum Punya Kelompok) -->
+                    <div class="card-tactile bg-white border-2 border-black p-4 sm:p-5 shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000] flex flex-wrap items-center justify-between gap-3">
+                        <div class="flex items-center gap-2.5">
+                            <span class="bg-[#15803d] text-white border border-black px-2 py-0.5 text-[10px] font-black uppercase shadow-[1px_1px_0px_0px_#000000]">
+                                KELOMPOK
+                            </span>
+                            <h3 class="text-sm sm:text-base font-black uppercase text-[#1A467C]">
+                                Overview Kelompok
+                            </h3>
+                        </div>
+
+                        @if ($kelompokInbox->count() > 0)
+                            <span class="bg-amber-300 text-black border-2 border-black px-2.5 py-1 text-[10px] font-black uppercase shadow-[2px_2px_0px_0px_#000000]">
+                                {{ $kelompokInbox->count() }} Undangan Masuk
+                            </span>
+                        @else
+                            <span class="bg-gray-100 text-gray-800 border-2 border-black px-2.5 py-1 text-[10px] font-black uppercase">
+                                Belum Bergabung
+                            </span>
+                        @endif
+                    </div>
+
+                    <!-- Inbox Undangan Kelompok -->
+                    <div class="card-tactile bg-white border-2 border-black shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000] overflow-hidden">
+                        <div class="px-4 sm:px-5 py-3 border-b-2 border-black {{ $kelompokInbox->count() > 0 ? 'bg-amber-50' : 'bg-blue-50/70' }} flex items-center justify-between">
+                            <h4 class="text-xs sm:text-sm font-black uppercase tracking-wider text-[#1A467C]">
+                                Inbox Undangan Kelompok
+                            </h4>
+                            <span class="bg-white border border-black px-2 py-0.5 font-mono font-black text-[10px] text-[#1A467C]">
+                                {{ $kelompokInbox->count() }} Masuk
+                            </span>
+                        </div>
+
+                        @if ($kelompokInbox->isEmpty())
+                            <div class="p-6 text-center text-xs font-bold text-gray-500">
+                                Belum ada undangan kelompok di inbox kamu. Kamu bisa tunggu undangan dari Ketua tim, buat kelompok baru, atau gabung lewat kode/QR.
+                            </div>
+                        @else
+                            <div class="divide-y-2 divide-black">
+                                @foreach ($kelompokInbox as $inv)
+                                    @if ($inv->kelompok)
+                                        <div class="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white hover:bg-amber-50/40 transition">
+                                            <div class="min-w-0 flex-1 space-y-1">
+                                                <div class="flex flex-wrap items-center gap-1.5">
+                                                    <span class="font-black text-sm text-gray-950 uppercase">
+                                                        {{ $inv->kelompok->nama_kelompok }}
+                                                    </span>
+                                                    <span class="bg-blue-50 border border-black text-[#1A467C] px-1.5 py-0.2 text-[10px] font-mono font-black">
+                                                        {{ $inv->kelompok->members->count() }} Anggota
+                                                    </span>
+                                                </div>
+                                                <p class="text-xs font-semibold text-gray-700">
+                                                    Ketua: <strong class="text-gray-950">{{ $inv->kelompok->ketua->nama ?? '-' }}</strong>
+                                                    @if (!empty($inv->kelompok->ketua?->kelas))
+                                                        <span class="font-mono text-[11px] text-[#1A467C]">({{ $inv->kelompok->ketua->kelas }})</span>
+                                                    @endif
+                                                </p>
+                                                @if (!empty($inv->kelompok->judul_proposal))
+                                                    <p class="text-[11px] font-medium text-gray-600 truncate">
+                                                        Ide Proposal: {{ $inv->kelompok->judul_proposal }}
+                                                    </p>
+                                                @endif
+                                            </div>
+
+                                            <div class="flex items-center gap-2 shrink-0">
+                                                <form action="{{ route('mahasiswa.kelompok.respondInvite', $inv->id) }}" method="POST">
+                                                    @csrf
+                                                    <input type="hidden" name="action" value="accept">
+                                                    <button
+                                                        type="submit"
+                                                        class="btn-tactile px-3.5 py-2 bg-[#15803d] hover:bg-[#166534] text-white border-2 border-black text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
+                                                    >
+                                                        Terima
+                                                    </button>
+                                                </form>
+                                                <form action="{{ route('mahasiswa.kelompok.respondInvite', $inv->id) }}" method="POST">
+                                                    @csrf
+                                                    <input type="hidden" name="action" value="decline">
+                                                    <button
+                                                        type="submit"
+                                                        class="btn-tactile px-3.5 py-2 bg-white hover:bg-red-50 text-[#CA2C2A] border-2 border-black text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
+                                                    >
+                                                        Tolak
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    @endif
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+
+                    <!-- Buat Kelompok Sendiri & Gabung via Kode / Link / QR -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                        <!-- Form Buat Kelompok Sendiri (Auto Ketua) -->
+                        <div class="card-tactile bg-white border-2 border-black shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000] overflow-hidden">
+                            <div class="px-4 sm:px-5 py-3 border-b-2 border-black bg-blue-50/70 flex items-center justify-between">
+                                <h4 class="text-xs sm:text-sm font-black uppercase tracking-wider text-[#1A467C]">
+                                    Buat Kelompok Sendiri
+                                </h4>
+                                <span class="bg-amber-300 border border-black px-2 py-0.5 text-[10px] font-black uppercase">
+                                    Jadi Ketua
+                                </span>
+                            </div>
+
+                            <form action="{{ route('mahasiswa.kelompok.store') }}" method="POST" class="p-4 sm:p-5 space-y-3.5">
+                                @csrf
+                                <div>
+                                    <label for="create-nama-kelompok" class="block text-[11px] font-black uppercase tracking-wider text-gray-800 mb-1">
+                                        Nama Kelompok <span class="text-[#CA2C2A]">*</span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="create-nama-kelompok"
+                                        name="nama_kelompok"
+                                        value="{{ old('nama_kelompok') }}"
+                                        required
+                                        maxlength="80"
+                                        placeholder="Contoh: Tim Garuda IF"
+                                        class="w-full px-3 py-2 bg-white border-2 border-black text-xs sm:text-sm font-bold text-gray-950 focus:outline-none focus:bg-blue-50/40"
+                                    >
+                                </div>
+
+                                <div>
+                                    <label for="create-judul-proposal" class="block text-[11px] font-black uppercase tracking-wider text-gray-800 mb-1">
+                                        Ide Judul Proposal <span class="text-gray-400 font-semibold">(Opsional)</span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="create-judul-proposal"
+                                        name="judul_proposal"
+                                        value="{{ old('judul_proposal') }}"
+                                        maxlength="200"
+                                        placeholder="Bisa diisi atau diubah nanti"
+                                        class="w-full px-3 py-2 bg-white border-2 border-black text-xs sm:text-sm font-semibold text-gray-900 focus:outline-none focus:bg-blue-50/40"
+                                    >
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    class="btn-tactile w-full py-2.5 bg-[#1A467C] hover:bg-[#123259] text-white border-2 border-black text-xs font-black uppercase tracking-wider shadow-[3px_3px_0px_0px_#000000] cursor-pointer"
+                                >
+                                    Buat Kelompok &amp; Jadi Ketua
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Form Gabung via Kode, Link, atau Scan QR -->
+                        <div class="card-tactile bg-white border-2 border-black shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000] overflow-hidden">
+                            <div class="px-4 sm:px-5 py-3 border-b-2 border-black bg-green-50/80 flex items-center justify-between">
+                                <h4 class="text-xs sm:text-sm font-black uppercase tracking-wider text-[#15803d]">
+                                    Gabung via Link / Kode QR
+                                </h4>
+                                <span class="bg-white border border-black px-2 py-0.5 text-[10px] font-black uppercase text-[#15803d]">
+                                    Anggota
+                                </span>
+                            </div>
+
+                            <div class="p-4 sm:p-5 space-y-4">
+                                <form id="kelompok-join-form" action="{{ route('mahasiswa.kelompok.joinCode') }}" method="POST" class="space-y-2.5">
+                                    @csrf
+                                    <label for="kelompok-join-input" class="block text-[11px] font-black uppercase tracking-wider text-gray-800">
+                                        Kode atau Link Undangan
+                                    </label>
+                                    <div class="flex gap-2">
+                                        <input
+                                            type="text"
+                                            id="kelompok-join-input"
+                                            name="kode_invite"
+                                            value="{{ old('kode_invite') }}"
+                                            required
+                                            placeholder="PKJ-XXXXXX atau tempel link..."
+                                            class="flex-1 min-w-0 px-3 py-2 bg-white border-2 border-black text-xs sm:text-sm font-mono font-bold text-gray-950 focus:outline-none focus:bg-green-50/40"
+                                        >
+                                        <button
+                                            type="submit"
+                                            class="btn-tactile px-4 py-2 bg-[#15803d] hover:bg-[#166534] text-white border-2 border-black text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] shrink-0 cursor-pointer"
+                                        >
+                                            Gabung
+                                        </button>
+                                    </div>
+                                </form>
+
+                                <div class="border-t-2 border-dashed border-gray-300 pt-3.5 space-y-3">
+                                    <button
+                                        type="button"
+                                        id="kelompok-camera-trigger"
+                                        onclick="startKelompokQrScanner()"
+                                        class="btn-tactile w-full py-2.5 bg-amber-300 hover:bg-amber-400 text-black border-2 border-black text-xs font-black uppercase tracking-wider shadow-[3px_3px_0px_0px_#000000] flex items-center justify-center gap-2 cursor-pointer"
+                                    >
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="square" stroke-width="2.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                            <path stroke-linecap="square" stroke-width="2.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        </svg>
+                                        <span>Scan Kode QR Ketua</span>
+                                    </button>
+
+                                    <div id="kelompok-camera-box" class="hidden space-y-2.5">
+                                        <div id="kelompok-qr-reader" class="w-full max-w-xs mx-auto border-2 border-black bg-black overflow-hidden"></div>
+                                        <button
+                                            type="button"
+                                            onclick="stopKelompokQrScanner()"
+                                            class="btn-tactile w-full py-2 bg-gray-100 hover:bg-gray-200 text-gray-900 border-2 border-black text-xs font-black uppercase tracking-wider cursor-pointer"
+                                        >
+                                            Tutup Kamera
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @else
+                    @php
+                        $joinUrl = route('mahasiswa.kelompok.joinLink', ['kode' => $myKelompok->kode_invite]);
+                        $showEditFormOnLoad = $errors->has('nama_kelompok') || $errors->has('judul_proposal');
+                    @endphp
+
+                    <!-- Header Ringkasan Kelompok Saya -->
+                    <div class="card-tactile bg-white border-2 border-black p-4 sm:p-6 shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000] space-y-4">
+                        <div class="flex flex-wrap items-start justify-between gap-3">
+                            <div class="min-w-0 flex-1 space-y-1">
+                                <div class="flex flex-wrap items-center gap-1.5">
+                                    <span class="bg-[#1A467C] text-white border border-black px-2 py-0.5 text-[10px] font-black uppercase">
+                                        KELOMPOK SAYA
+                                    </span>
+                                    <span class="{{ $isKetua ? 'bg-amber-300 text-black' : 'bg-sky-200 text-black' }} border border-black px-2 py-0.5 text-[10px] font-black uppercase">
+                                        {{ $isKetua ? 'Ketua Kelompok' : 'Anggota' }}
+                                    </span>
+                                    <span class="bg-gray-100 text-gray-900 border border-black px-2 py-0.5 text-[10px] font-mono font-black">
+                                        {{ $myKelompok->kode_invite }}
+                                    </span>
+                                </div>
+
+                                <h3 class="text-base sm:text-xl font-black uppercase text-gray-950 tracking-tight break-words">
+                                    {{ $myKelompok->nama_kelompok }}
+                                </h3>
+
+                                @if (!empty($myKelompok->judul_proposal))
+                                    <p class="text-xs font-semibold text-gray-700">
+                                        Judul Proposal: <span class="text-gray-950 font-bold">{{ $myKelompok->judul_proposal }}</span>
+                                    </p>
+                                @elseif ($isKetua)
+                                    <p class="text-xs font-medium text-gray-500">
+                                        Belum ada judul proposal. Klik Edit Info untuk menambahkan.
+                                    </p>
+                                @endif
+                            </div>
+
+                            @if ($isKetua)
+                                <button
+                                    type="button"
+                                    onclick="toggleEditKelompok()"
+                                    class="btn-tactile px-3 py-1.5 bg-white hover:bg-gray-100 text-gray-950 border-2 border-black text-xs font-black uppercase shadow-[2px_2px_0px_0px_#000000] shrink-0 cursor-pointer"
+                                >
+                                    Edit Info
+                                </button>
+                            @endif
+                        </div>
+
+                        @if ($isKetua)
+                            <div id="kelompok-edit-box" class="{{ $showEditFormOnLoad ? '' : 'hidden' }} border-t-2 border-black pt-4">
+                                <form action="{{ route('mahasiswa.kelompok.update') }}" method="POST" class="space-y-3 bg-gray-50 border-2 border-black p-3.5">
+                                    @csrf
+                                    @method('PUT')
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        <div>
+                                            <label for="edit-nama-kelompok" class="block text-[10px] font-black uppercase tracking-wider text-gray-700 mb-1">
+                                                Nama Kelompok
+                                            </label>
+                                            <input
+                                                type="text"
+                                                id="edit-nama-kelompok"
+                                                name="nama_kelompok"
+                                                value="{{ old('nama_kelompok', $myKelompok->nama_kelompok) }}"
+                                                required
+                                                maxlength="80"
+                                                class="w-full px-3 py-2 bg-white border-2 border-black text-xs font-bold text-gray-950"
+                                            >
+                                        </div>
+                                        <div>
+                                            <label for="edit-judul-proposal" class="block text-[10px] font-black uppercase tracking-wider text-gray-700 mb-1">
+                                                Ide Judul Proposal
+                                            </label>
+                                            <input
+                                                type="text"
+                                                id="edit-judul-proposal"
+                                                name="judul_proposal"
+                                                value="{{ old('judul_proposal', $myKelompok->judul_proposal) }}"
+                                                maxlength="200"
+                                                placeholder="Opsional"
+                                                class="w-full px-3 py-2 bg-white border-2 border-black text-xs font-semibold text-gray-900"
+                                            >
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-end gap-2">
+                                        <button
+                                            type="button"
+                                            onclick="toggleEditKelompok()"
+                                            class="btn-tactile px-3 py-1.5 bg-white border-2 border-black text-xs font-black uppercase cursor-pointer"
+                                        >
+                                            Batal
+                                        </button>
+                                        <button
+                                            type="submit"
+                                            class="btn-tactile px-4 py-1.5 bg-[#1A467C] text-white border-2 border-black text-xs font-black uppercase shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
+                                        >
+                                            Simpan
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        @endif
+
+                        <!-- Metrik Ringkas Kelompok -->
+                        <div class="grid grid-cols-3 gap-2.5 sm:gap-4 border-t-2 border-black pt-4">
+                            <div class="bg-blue-50 border-2 border-black p-3 text-center">
+                                <span class="block text-[10px] font-black uppercase text-[#1A467C]">Total Anggota</span>
+                                <span class="block font-mono text-base sm:text-xl font-black text-gray-950 mt-0.5">{{ $kelompokStats['jumlah_anggota'] }}</span>
+                            </div>
+                            <div class="bg-green-50 border-2 border-black p-3 text-center">
+                                <span class="block text-[10px] font-black uppercase text-[#15803d]">Total Point Tim</span>
+                                <span class="block font-mono text-base sm:text-xl font-black text-[#15803d] mt-0.5">{{ $kelompokStats['total_point'] }} PTS</span>
+                            </div>
+                            <div class="bg-amber-50 border-2 border-black p-3 text-center">
+                                <span class="block text-[10px] font-black uppercase text-amber-800">Kehadiran Tim</span>
+                                <span class="block font-mono text-base sm:text-xl font-black text-gray-950 mt-0.5">{{ $kelompokStats['persen_hadir'] }}%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if ($isKetua)
+                        <!-- Panel Khusus Ketua: Share Link/QR & Undang ke Inbox Teman -->
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                            <!-- Card Link & Kode QR Undangan -->
+                            <div class="card-tactile bg-white border-2 border-black shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000] overflow-hidden">
+                                <div class="px-4 sm:px-5 py-3 border-b-2 border-black bg-green-50/80 flex items-center justify-between">
+                                    <h4 class="text-xs sm:text-sm font-black uppercase tracking-wider text-[#15803d]">
+                                        Undang via Link &amp; Kode QR
+                                    </h4>
+                                    <span class="bg-white border border-black px-2 py-0.5 font-mono font-black text-[10px] text-[#15803d]">
+                                        {{ $myKelompok->kode_invite }}
+                                    </span>
+                                </div>
+
+                                <div class="p-4 sm:p-5 space-y-4">
+                                    <div class="flex flex-col items-center justify-center bg-gray-50 border-2 border-black p-4">
+                                        <div id="kelompok-qr-canvas" class="bg-white p-2.5 border-2 border-black shadow-[3px_3px_0px_0px_#000000]"></div>
+                                        <span class="mt-2 font-mono text-xs font-black tracking-widest text-gray-950">
+                                            {{ $myKelompok->kode_invite }}
+                                        </span>
+                                    </div>
+
+                                    <div class="space-y-2">
+                                        <label class="block text-[10px] font-black uppercase tracking-wider text-gray-700">
+                                            Link Gabung Otomatis
+                                        </label>
+                                        <div class="flex gap-2">
+                                            <input
+                                                type="text"
+                                                id="kelompok-share-link"
+                                                value="{{ $joinUrl }}"
+                                                readonly
+                                                class="flex-1 min-w-0 px-2.5 py-2 bg-gray-50 border-2 border-black text-[11px] font-mono font-bold text-gray-800 select-all"
+                                            >
+                                            <button
+                                                type="button"
+                                                id="btn-copy-kelompok-link"
+                                                onclick="copyKelompokText('kelompok-share-link', 'btn-copy-kelompok-link')"
+                                                class="btn-tactile px-3.5 py-2 bg-[#1A467C] hover:bg-[#123259] text-white border-2 border-black text-xs font-black uppercase shadow-[2px_2px_0px_0px_#000000] shrink-0 cursor-pointer"
+                                            >
+                                                Salin Link
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Card Undang Langsung ke Inbox Teman -->
+                            <div class="card-tactile bg-white border-2 border-black shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000] overflow-hidden flex flex-col">
+                                <div class="px-4 sm:px-5 py-3 border-b-2 border-black bg-amber-50/80 flex items-center justify-between">
+                                    <h4 class="text-xs sm:text-sm font-black uppercase tracking-wider text-[#1A467C]">
+                                        Undang ke Inbox Teman
+                                    </h4>
+                                    <span class="bg-white border border-black px-2 py-0.5 font-mono font-black text-[10px] text-[#1A467C]">
+                                        {{ $kandidatAnggotaList->where('already_invited', false)->count() }} Tersedia
+                                    </span>
+                                </div>
+
+                                <div class="p-4 sm:p-5 space-y-4 flex-1">
+                                    <div>
+                                        <input
+                                            type="text"
+                                            id="invite-search-input"
+                                            oninput="filterKelompokKandidat()"
+                                            placeholder="Cari nama, NIM, atau kelas teman..."
+                                            class="w-full px-3 py-2 bg-white border-2 border-black text-xs font-bold text-gray-950 focus:outline-none focus:bg-amber-50/40"
+                                        >
+                                    </div>
+
+                                    <div id="invite-candidate-list" class="max-h-56 overflow-y-auto divide-y divide-gray-200 border-2 border-black bg-white"></div>
+
+                                    @if ($myKelompok->invitations->isNotEmpty())
+                                        <div class="border-t-2 border-black pt-3.5 space-y-2">
+                                            <span class="block text-[10px] font-black uppercase tracking-wider text-gray-700">
+                                                Menunggu Konfirmasi ({{ $myKelompok->invitations->count() }})
+                                            </span>
+                                            <div class="divide-y divide-gray-200 border-2 border-black bg-gray-50 max-h-36 overflow-y-auto">
+                                                @foreach ($myKelompok->invitations as $sentInv)
+                                                    @if ($sentInv->pendaftaran)
+                                                        <div class="px-3 py-2 flex items-center justify-between gap-2 text-xs">
+                                                            <div class="min-w-0">
+                                                                <p class="font-bold text-gray-950 truncate">{{ $sentInv->pendaftaran->nama }}</p>
+                                                                <p class="font-mono text-[10px] text-gray-600">{{ $sentInv->pendaftaran->nim }} • {{ $sentInv->pendaftaran->kelas }}</p>
+                                                            </div>
+                                                            <form action="{{ route('mahasiswa.kelompok.cancelInvite', $sentInv->id) }}" method="POST" class="shrink-0">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button
+                                                                    type="submit"
+                                                                    class="btn-tactile px-2.5 py-1 bg-white hover:bg-red-50 text-[#CA2C2A] border border-black text-[10px] font-black uppercase cursor-pointer"
+                                                                >
+                                                                    Batalkan
+                                                                </button>
+                                                            </form>
+                                                        </div>
+                                                    @endif
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
+                    <!-- Card Daftar Anggota Kelompok -->
+                    <div class="card-tactile bg-white border-2 border-black shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000] overflow-hidden">
+                        <div class="px-4 sm:px-5 py-3 border-b-2 border-black bg-blue-50/70 flex items-center justify-between">
+                            <h4 class="text-xs sm:text-sm font-black uppercase tracking-wider text-[#1A467C]">
+                                Daftar Anggota Kelompok
+                            </h4>
+                            <span class="bg-white border border-black px-2 py-0.5 font-mono font-black text-[10px] text-[#1A467C]">
+                                {{ $kelompokStats['jumlah_anggota'] }} Orang
+                            </span>
+                        </div>
+
+                        <div class="divide-y divide-gray-200">
+                            @foreach ($myKelompok->members as $member)
+                                @php
+                                    $mhs = $member->pendaftaran;
+                                    $isSelf = (int) $member->pendaftaran_id === (int) $mahasiswa->id;
+                                    $isMemberKetua = (int) $member->pendaftaran_id === (int) $myKelompok->ketua_id;
+                                @endphp
+                                @if ($mhs)
+                                    <div class="px-4 sm:px-5 py-3.5 {{ $isSelf ? 'bg-amber-50/70' : 'bg-white' }} flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                        <div class="flex items-center gap-3 min-w-0 flex-1">
+                                            <div class="w-10 h-10 bg-[#2A82C6] text-white border-2 border-black flex items-center justify-center font-black text-xs shrink-0 overflow-hidden">
+                                                @if ($mhs->avatarUrl())
+                                                    <img src="{{ $mhs->avatarUrl() }}" alt="Foto {{ $mhs->nama }}" class="w-full h-full object-cover">
+                                                @else
+                                                    {{ $mhs->initials() }}
+                                                @endif
+                                            </div>
+
+                                            <div class="min-w-0 flex-1">
+                                                <div class="flex flex-wrap items-center gap-1.5">
+                                                    <p class="font-black text-xs sm:text-sm text-gray-950 truncate">{{ $mhs->nama }}</p>
+                                                    <span class="{{ $isMemberKetua ? 'bg-amber-300 text-black' : 'bg-gray-100 text-gray-800' }} border border-black text-[9px] font-black uppercase px-1.5 py-0.2 shrink-0">
+                                                        {{ $isMemberKetua ? 'KETUA' : 'ANGGOTA' }}
+                                                    </span>
+                                                    @if ($isSelf)
+                                                        <span class="bg-[#1A467C] text-white border border-black text-[9px] font-black uppercase px-1.5 py-0.2 shrink-0">
+                                                            KAMU
+                                                        </span>
+                                                    @endif
+                                                </div>
+                                                <p class="font-mono text-[10px] sm:text-[11px] font-bold text-gray-600 mt-0.5">
+                                                    {{ $mhs->nim }} • <span class="text-[#1A467C]">{{ $mhs->kelas }}</span>
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <div class="flex flex-wrap items-center justify-between sm:justify-end gap-2 shrink-0">
+                                            <span class="bg-green-100 border-2 border-black px-2.5 py-1 font-mono font-black text-xs text-[#15803d]">
+                                                ★ {{ (int) ($mhs->total_point ?? 0) }} PTS
+                                            </span>
+
+                                            @if ($isKetua && !$isSelf)
+                                                <form id="transfer-ketua-form-{{ $member->id }}" action="{{ route('mahasiswa.kelompok.transferKetua', $member->id) }}" method="POST" class="inline">
+                                                    @csrf
+                                                    <button
+                                                        type="button"
+                                                        data-form="transfer-ketua-form-{{ $member->id }}"
+                                                        data-title="Serahkan Jabatan Ketua?"
+                                                        data-message="Jabatan Ketua kelompok akan dipindahkan ke {{ $mhs->nama }}."
+                                                        data-confirm="Ya, Serahkan"
+                                                        data-danger="0"
+                                                        onclick="openKelompokConfirmFromEl(this)"
+                                                        class="btn-tactile px-2.5 py-1.5 bg-amber-300 hover:bg-amber-400 text-black border-2 border-black text-[10px] font-black uppercase cursor-pointer"
+                                                    >
+                                                        Jadikan Ketua
+                                                    </button>
+                                                </form>
+
+                                                <form id="remove-member-form-{{ $member->id }}" action="{{ route('mahasiswa.kelompok.removeMember', $member->id) }}" method="POST" class="inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button
+                                                        type="button"
+                                                        data-form="remove-member-form-{{ $member->id }}"
+                                                        data-title="Keluarkan Anggota?"
+                                                        data-message="{{ $mhs->nama }} akan dikeluarkan dari kelompok ini."
+                                                        data-confirm="Ya, Keluarkan"
+                                                        data-danger="1"
+                                                        onclick="openKelompokConfirmFromEl(this)"
+                                                        class="btn-tactile px-2.5 py-1.5 bg-white hover:bg-red-50 text-[#CA2C2A] border-2 border-black text-[10px] font-black uppercase cursor-pointer"
+                                                    >
+                                                        Keluarkan
+                                                    </button>
+                                                </form>
+                                            @endif
+                                        </div>
+                                    </div>
+                                @endif
+                            @endforeach
+                        </div>
+
+                        <div class="px-4 sm:px-5 py-3.5 bg-gray-50 border-t-2 border-black flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <p class="text-[11px] font-semibold text-gray-600">
+                                @if ($isKetua)
+                                    Serahkan jabatan ke anggota lain terlebih dahulu jika hanya ingin keluar tanpa membubarkan kelompok.
+                                @else
+                                    Keluar akan melepas keanggotaanmu dari kelompok ini.
+                                @endif
+                            </p>
+
+                            <form id="leave-disband-form" action="{{ route('mahasiswa.kelompok.leave') }}" method="POST" class="shrink-0">
+                                @csrf
+                                <button
+                                    type="button"
+                                    data-form="leave-disband-form"
+                                    data-title="{{ $isKetua ? 'Bubarkan Kelompok?' : 'Keluar dari Kelompok?' }}"
+                                    data-message="{{ $isKetua ? 'Seluruh anggota akan otomatis dikeluarkan dan kode undangan kelompok tidak berlaku lagi.' : 'Kamu tidak akan lagi tergabung di kelompok ' . $myKelompok->nama_kelompok . '.' }}"
+                                    data-confirm="{{ $isKetua ? 'Ya, Bubarkan' : 'Ya, Keluar' }}"
+                                    data-danger="1"
+                                    onclick="openKelompokConfirmFromEl(this)"
+                                    class="btn-tactile px-4 py-2 bg-[#CA2C2A] hover:bg-[#901C1A] text-white border-2 border-black text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
+                                >
+                                    {{ $isKetua ? 'Bubarkan Kelompok' : 'Keluar Kelompok' }}
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                @endif
+
+            </section>
+
+            <!-- ========================================================== -->
             <!-- TAB 3: PROFIL & PENGATURAN AKUN MAHASISWA                  -->
             <!-- ========================================================== -->
             <section id="tab-panel-profil" class="tab-snap-in hidden space-y-4 sm:space-y-6">
@@ -799,21 +1389,21 @@
     <!-- ============================================================== -->
     <!-- MOBILE BOTTOM NAVIGATION TOOLBAR (Khas Mobile Apps)            -->
     <!-- ============================================================== -->
-    <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t-[3px] border-black flex justify-around items-center py-2 px-1 shadow-[0_-3px_0px_0px_#000000]">
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t-[3px] border-black flex justify-around items-center py-2 px-0.5 shadow-[0_-3px_0px_0px_#000000]">
         
         <!-- Tab 1: Beranda -->
         <button 
             type="button" 
             id="bot-nav-beranda"
             onclick="switchTab('beranda')" 
-            class="bottom-nav-active btn-tactile flex flex-col items-center gap-1 py-1 px-3 text-gray-600 cursor-pointer"
+            class="bottom-nav-active btn-tactile flex flex-col items-center gap-1 py-1 px-1 text-gray-600 cursor-pointer"
         >
-            <div class="bottom-nav-icon w-8 h-8 rounded-none border border-black flex items-center justify-center">
+            <div class="bottom-nav-icon w-7 h-7 sm:w-8 sm:h-8 rounded-none border border-black flex items-center justify-center">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="square" stroke-width="2.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                 </svg>
             </div>
-            <span class="text-[10px] font-black uppercase tracking-wider">Beranda</span>
+            <span class="text-[8px] sm:text-[9px] font-black uppercase tracking-tight">Beranda</span>
         </button>
 
         <!-- Tab 2: Scan Presensi -->
@@ -821,15 +1411,15 @@
             type="button" 
             id="bot-nav-scan"
             onclick="switchTab('scan')" 
-            class="btn-tactile flex flex-col items-center gap-1 py-1 px-2.5 text-gray-600 cursor-pointer"
+            class="btn-tactile flex flex-col items-center gap-1 py-1 px-1 text-gray-600 cursor-pointer"
         >
-            <div class="bottom-nav-icon w-8 h-8 rounded-none border border-black flex items-center justify-center">
+            <div class="bottom-nav-icon w-7 h-7 sm:w-8 sm:h-8 rounded-none border border-black flex items-center justify-center">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="square" stroke-width="2.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                     <path stroke-linecap="square" stroke-width="2.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
             </div>
-            <span class="text-[10px] font-black uppercase tracking-wider">Scan</span>
+            <span class="text-[8px] sm:text-[9px] font-black uppercase tracking-tight">Scan</span>
         </button>
 
         <!-- Tab 3: PointKu -->
@@ -837,14 +1427,14 @@
             type="button" 
             id="bot-nav-poin"
             onclick="switchTab('poin')" 
-            class="btn-tactile flex flex-col items-center gap-1 py-1 px-2 text-gray-600 cursor-pointer"
+            class="btn-tactile flex flex-col items-center gap-1 py-1 px-1 text-gray-600 cursor-pointer"
         >
-            <div class="bottom-nav-icon w-8 h-8 rounded-none border border-black flex items-center justify-center">
+            <div class="bottom-nav-icon w-7 h-7 sm:w-8 sm:h-8 rounded-none border border-black flex items-center justify-center">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="square" stroke-width="2.5" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
                 </svg>
             </div>
-            <span class="text-[9px] font-black uppercase tracking-wider">PointKu</span>
+            <span class="text-[8px] sm:text-[9px] font-black uppercase tracking-tight">PointKu</span>
         </button>
 
         <!-- Tab 4: Leaderboard -->
@@ -852,43 +1442,63 @@
             type="button" 
             id="bot-nav-leaderboard"
             onclick="switchTab('leaderboard')" 
-            class="btn-tactile flex flex-col items-center gap-1 py-1 px-2 text-gray-600 cursor-pointer"
+            class="btn-tactile flex flex-col items-center gap-1 py-1 px-1 text-gray-600 cursor-pointer"
         >
-            <div class="bottom-nav-icon w-8 h-8 rounded-none border border-black flex items-center justify-center">
+            <div class="bottom-nav-icon w-7 h-7 sm:w-8 sm:h-8 rounded-none border border-black flex items-center justify-center">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="square" stroke-width="2.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
             </div>
-            <span class="text-[9px] font-black uppercase tracking-wider">Rank</span>
+            <span class="text-[8px] sm:text-[9px] font-black uppercase tracking-tight">Rank</span>
         </button>
 
-        <!-- Tab 5: Profil -->
+        <!-- Tab 5: Kelompok -->
+        <button 
+            type="button" 
+            id="bot-nav-kelompok"
+            onclick="switchTab('kelompok')" 
+            class="btn-tactile flex flex-col items-center gap-1 py-1 px-1 text-gray-600 cursor-pointer"
+        >
+            <div class="bottom-nav-icon relative w-7 h-7 sm:w-8 sm:h-8 rounded-none border border-black flex items-center justify-center">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="square" stroke-width="2.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                @if (isset($kelompokInbox) && $kelompokInbox->count() > 0)
+                    <span class="absolute -top-1.5 -right-1.5 min-w-[14px] h-[14px] px-0.5 bg-amber-300 text-black border border-black text-[8px] font-mono font-black flex items-center justify-center leading-none">
+                        {{ $kelompokInbox->count() }}
+                    </span>
+                @endif
+            </div>
+            <span class="text-[8px] sm:text-[9px] font-black uppercase tracking-tight">Kelompok</span>
+        </button>
+
+        <!-- Tab 6: Profil -->
         <button 
             type="button" 
             id="bot-nav-profil"
             onclick="switchTab('profil')" 
-            class="btn-tactile flex flex-col items-center gap-1 py-1 px-2 text-gray-600 cursor-pointer"
+            class="btn-tactile flex flex-col items-center gap-1 py-1 px-1 text-gray-600 cursor-pointer"
         >
-            <div class="bottom-nav-icon w-8 h-8 rounded-none border border-black flex items-center justify-center">
+            <div class="bottom-nav-icon w-7 h-7 sm:w-8 sm:h-8 rounded-none border border-black flex items-center justify-center">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="square" stroke-width="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
             </div>
-            <span class="text-[10px] font-black uppercase tracking-wider">Profil</span>
+            <span class="text-[8px] sm:text-[9px] font-black uppercase tracking-tight">Profil</span>
         </button>
 
-        <!-- Tab 4: Keluar dengan Konfirmasi -->
+        <!-- Tab 7: Keluar dengan Konfirmasi -->
         <button 
             type="button" 
             onclick="openLogoutModal()"
-            class="btn-tactile flex flex-col items-center gap-1 py-1 px-3 text-[#CA2C2A] cursor-pointer"
+            class="btn-tactile flex flex-col items-center gap-1 py-1 px-1 text-[#CA2C2A] cursor-pointer"
         >
-            <div class="w-8 h-8 rounded-none border border-black flex items-center justify-center bg-red-50 text-red-700">
+            <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-none border border-black flex items-center justify-center bg-red-50 text-red-700">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="square" stroke-width="2.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>
             </div>
-            <span class="text-[10px] font-black uppercase tracking-wider">Keluar</span>
+            <span class="text-[8px] sm:text-[9px] font-black uppercase tracking-tight">Keluar</span>
         </button>
 
     </nav>
@@ -981,12 +1591,59 @@
         </div>
     </div>
 
-    <!-- JavaScript: Multi-Tab Controller, Avatar Preview, Scanner, and Logout Modal -->
+    <!-- ============================================================== -->
+    <!-- KELOMPOK CONFIRMATION MODAL POP-UP (Neubrutalism)              -->
+    <!-- ============================================================== -->
+    <div id="kelompok-confirm-modal" class="hidden fixed inset-0 z-50 bg-black/60 p-4 flex items-center justify-center">
+        <div class="modal-spring-slam w-full max-w-sm bg-white border-[3px] border-black p-5 sm:p-6 shadow-[8px_8px_0px_0px_#000000] space-y-4 text-center">
+            <div>
+                <span class="inline-block text-[10px] font-black uppercase px-2 py-0.5 border border-black bg-amber-100 text-gray-950 shadow-[1px_1px_0px_0px_#000000] mb-1">
+                    KONFIRMASI KELOMPOK
+                </span>
+                <h3 id="kelompok-confirm-title" class="text-base sm:text-lg font-black uppercase text-gray-950"></h3>
+                <p id="kelompok-confirm-desc" class="text-xs font-semibold text-gray-600 mt-1"></p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2.5 pt-1">
+                <button
+                    type="button"
+                    onclick="closeKelompokConfirmModal()"
+                    class="btn-tactile py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-900 text-xs font-black uppercase tracking-wider border-2 border-black shadow-[3px_3px_0px_0px_#000000] cursor-pointer"
+                >
+                    Batal
+                </button>
+                <button
+                    type="button"
+                    id="kelompok-confirm-btn"
+                    onclick="submitKelompokConfirmModal()"
+                    class="btn-tactile w-full py-2.5 bg-[#CA2C2A] text-white text-xs font-black uppercase tracking-wider border-2 border-black shadow-[3px_3px_0px_0px_#000000] cursor-pointer"
+                >
+                    Ya, Lanjutkan
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript: Multi-Tab Controller, Avatar Preview, Scanner, Kelompok & Logout Modal -->
+    @php
+        $hasKelompokValidationError = $errors->has('nama_kelompok')
+            || $errors->has('judul_proposal')
+            || $errors->has('kode_invite')
+            || $errors->has('pendaftaran_id');
+    @endphp
     <script>
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
         let dashQrScanner = null;
         let isDashScanning = false;
         let isSubmittingScan = false;
+        let kelompokQrScanner = null;
+        let isKelompokQrSubmitted = false;
+        let pendingKelompokConfirmFormId = null;
+
+        const kelompokInviteUrl = @json($myKelompok ? route('mahasiswa.kelompok.joinLink', ['kode' => $myKelompok->kode_invite]) : '');
+        const kelompokCandidates = @json($kandidatAnggotaList ?? []);
+        const kelompokInviteAction = @json(route('mahasiswa.kelompok.invite'));
+        const hasKelompokValidationError = @json($hasKelompokValidationError);
 
         // Open & Close Logout Confirmation Modal
         function openLogoutModal() {
@@ -997,9 +1654,43 @@
             document.getElementById('logout-confirm-modal').classList.add('hidden');
         }
 
-        // Switch Tab Active State (Beranda, Scan, PointKu, Leaderboard, Profil)
+        // Modal Konfirmasi Aksi Kelompok
+        function openKelompokConfirmFromEl(btn) {
+            pendingKelompokConfirmFormId = btn.dataset.form || null;
+            const titleEl = document.getElementById('kelompok-confirm-title');
+            const descEl = document.getElementById('kelompok-confirm-desc');
+            const confirmBtn = document.getElementById('kelompok-confirm-btn');
+            const isDanger = btn.dataset.danger !== '0';
+
+            if (titleEl) titleEl.textContent = btn.dataset.title || 'Konfirmasi Aksi?';
+            if (descEl) descEl.textContent = btn.dataset.message || '';
+            if (confirmBtn) {
+                confirmBtn.textContent = btn.dataset.confirm || 'Ya, Lanjutkan';
+                confirmBtn.className = isDanger
+                    ? 'btn-tactile w-full py-2.5 bg-[#CA2C2A] hover:bg-[#901C1A] text-white text-xs font-black uppercase tracking-wider border-2 border-black shadow-[3px_3px_0px_0px_#000000] cursor-pointer'
+                    : 'btn-tactile w-full py-2.5 bg-amber-300 hover:bg-amber-400 text-black text-xs font-black uppercase tracking-wider border-2 border-black shadow-[3px_3px_0px_0px_#000000] cursor-pointer';
+            }
+
+            document.getElementById('kelompok-confirm-modal')?.classList.remove('hidden');
+        }
+
+        function closeKelompokConfirmModal() {
+            pendingKelompokConfirmFormId = null;
+            document.getElementById('kelompok-confirm-modal')?.classList.add('hidden');
+        }
+
+        function submitKelompokConfirmModal() {
+            if (pendingKelompokConfirmFormId) {
+                const targetForm = document.getElementById(pendingKelompokConfirmFormId);
+                if (targetForm) {
+                    targetForm.submit();
+                }
+            }
+        }
+
+        // Switch Tab Active State (Beranda, Scan, PointKu, Leaderboard, Kelompok, Profil)
         function switchTab(tabId) {
-            const panels = ['beranda', 'scan', 'poin', 'leaderboard', 'profil'];
+            const panels = ['beranda', 'scan', 'poin', 'leaderboard', 'kelompok', 'profil'];
             if (!panels.includes(tabId)) {
                 tabId = 'beranda';
             }
@@ -1040,9 +1731,14 @@
                 }
             });
 
-            // Jika meninggalkan tab scan, matikan kamera
+            // Jika meninggalkan tab scan/kelompok, matikan kamera masing-masing
             if (tabId !== 'scan') {
                 stopDashScanner();
+            }
+            if (tabId !== 'kelompok') {
+                stopKelompokQrScanner();
+            } else {
+                renderKelompokQr();
             }
 
             // Update URL hash
@@ -1069,16 +1765,217 @@
             }
         }
 
-        // Cek URL Hash atau Query Param awal saat halaman dimuat
+        // Render QR Code Undangan Kelompok untuk Ketua
+        function renderKelompokQr() {
+            const qrContainer = document.getElementById('kelompok-qr-canvas');
+            if (!qrContainer || !kelompokInviteUrl || qrContainer.dataset.rendered === '1') {
+                return;
+            }
+            if (typeof QRCode === 'undefined') {
+                return;
+            }
+            qrContainer.innerHTML = '';
+            new QRCode(qrContainer, {
+                text: kelompokInviteUrl,
+                width: 164,
+                height: 164,
+                colorDark: '#000000',
+                colorLight: '#ffffff',
+                correctLevel: QRCode.CorrectLevel.M
+            });
+            qrContainer.dataset.rendered = '1';
+        }
+
+        // Toggle Inline Form Edit Info Kelompok
+        function toggleEditKelompok() {
+            document.getElementById('kelompok-edit-box')?.classList.toggle('hidden');
+        }
+
+        // Salin Link / Kode Undangan Kelompok
+        async function copyKelompokText(inputId, btnId) {
+            const input = document.getElementById(inputId);
+            const btn = document.getElementById(btnId);
+            if (!input) return;
+
+            try {
+                if (navigator.clipboard && window.isSecureContext) {
+                    await navigator.clipboard.writeText(input.value);
+                } else {
+                    input.select();
+                    document.execCommand('copy');
+                }
+            } catch (e) {
+                input.select();
+                document.execCommand('copy');
+            }
+
+            if (btn) {
+                const orig = btn.textContent;
+                btn.textContent = 'Tersalin!';
+                setTimeout(() => {
+                    btn.textContent = orig;
+                }, 1800);
+            }
+        }
+
+        // Filter & Render Kandidat Anggota untuk Diundang ke Inbox
+        function filterKelompokKandidat() {
+            const container = document.getElementById('invite-candidate-list');
+            if (!container) return;
+
+            const keyword = (document.getElementById('invite-search-input')?.value || '').trim().toLowerCase();
+            const filtered = kelompokCandidates.filter(item => {
+                if (!keyword) return true;
+                return (item.nama || '').toLowerCase().includes(keyword)
+                    || (item.nim || '').toLowerCase().includes(keyword)
+                    || (item.kelas || '').toLowerCase().includes(keyword);
+            }).slice(0, 25);
+
+            container.innerHTML = '';
+
+            if (filtered.length === 0) {
+                const empty = document.createElement('div');
+                empty.className = 'p-4 text-center text-xs font-bold text-gray-500';
+                empty.textContent = kelompokCandidates.length === 0
+                    ? 'Semua peserta sudah tergabung di kelompok.'
+                    : 'Tidak ada mahasiswa yang cocok dengan pencarian.';
+                container.appendChild(empty);
+                return;
+            }
+
+            filtered.forEach(item => {
+                const row = document.createElement('div');
+                row.className = 'px-3 py-2.5 flex items-center justify-between gap-2 bg-white hover:bg-blue-50/40';
+
+                const info = document.createElement('div');
+                info.className = 'min-w-0 flex-1';
+
+                const nameEl = document.createElement('p');
+                nameEl.className = 'text-xs font-black text-gray-950 truncate';
+                nameEl.textContent = item.nama;
+
+                const metaEl = document.createElement('p');
+                metaEl.className = 'text-[10px] font-mono font-bold text-gray-600';
+                metaEl.textContent = `${item.nim} • ${item.kelas}`;
+
+                info.appendChild(nameEl);
+                info.appendChild(metaEl);
+                row.appendChild(info);
+
+                if (item.already_invited) {
+                    const invitedBadge = document.createElement('span');
+                    invitedBadge.className = 'px-2 py-1 bg-amber-100 border border-black text-[10px] font-black uppercase text-amber-900 shrink-0';
+                    invitedBadge.textContent = 'Terundang';
+                    row.appendChild(invitedBadge);
+                } else {
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = kelompokInviteAction;
+                    form.className = 'shrink-0';
+
+                    const tokenInput = document.createElement('input');
+                    tokenInput.type = 'hidden';
+                    tokenInput.name = '_token';
+                    tokenInput.value = csrfToken;
+
+                    const idInput = document.createElement('input');
+                    idInput.type = 'hidden';
+                    idInput.name = 'pendaftaran_id';
+                    idInput.value = String(item.id);
+
+                    const submitBtn = document.createElement('button');
+                    submitBtn.type = 'submit';
+                    submitBtn.className = 'btn-tactile px-2.5 py-1 bg-[#1A467C] hover:bg-[#123259] text-white border border-black text-[10px] font-black uppercase cursor-pointer';
+                    submitBtn.textContent = 'Undang';
+
+                    form.appendChild(tokenInput);
+                    form.appendChild(idInput);
+                    form.appendChild(submitBtn);
+                    row.appendChild(form);
+                }
+
+                container.appendChild(row);
+            });
+        }
+
+        // Kamera Scanner Gabung Kelompok via QR Ketua
+        async function startKelompokQrScanner() {
+            isKelompokQrSubmitted = false;
+            document.getElementById('kelompok-camera-trigger')?.classList.add('hidden');
+            document.getElementById('kelompok-camera-box')?.classList.remove('hidden');
+
+            if (!kelompokQrScanner) {
+                kelompokQrScanner = new Html5Qrcode("kelompok-qr-reader");
+            }
+
+            const config = {
+                fps: 10,
+                qrbox: { width: 200, height: 200 },
+                aspectRatio: 1.0
+            };
+
+            try {
+                await kelompokQrScanner.start(
+                    { facingMode: "environment" },
+                    config,
+                    onKelompokQrSuccess,
+                    () => {}
+                );
+            } catch (envErr) {
+                try {
+                    await kelompokQrScanner.start(
+                        { facingMode: "user" },
+                        config,
+                        onKelompokQrSuccess,
+                        () => {}
+                    );
+                } catch (userErr) {
+                    alert("Tidak dapat mengakses kamera. Pastikan izin kamera telah diberikan di browser.");
+                    stopKelompokQrScanner();
+                }
+            }
+        }
+
+        async function stopKelompokQrScanner() {
+            if (kelompokQrScanner && kelompokQrScanner.isScanning) {
+                try {
+                    await kelompokQrScanner.stop();
+                } catch (e) {}
+            }
+            document.getElementById('kelompok-camera-box')?.classList.add('hidden');
+            document.getElementById('kelompok-camera-trigger')?.classList.remove('hidden');
+        }
+
+        async function onKelompokQrSuccess(decodedText) {
+            if (isKelompokQrSubmitted) return;
+            isKelompokQrSubmitted = true;
+
+            await stopKelompokQrScanner();
+
+            const joinInput = document.getElementById('kelompok-join-input');
+            const joinForm = document.getElementById('kelompok-join-form');
+            if (joinInput && joinForm) {
+                joinInput.value = (decodedText || '').trim();
+                joinForm.submit();
+            }
+        }
+
+        // Cek URL Hash, Query Param, atau Validation Error saat halaman dimuat
         document.addEventListener('DOMContentLoaded', () => {
+            renderKelompokQr();
+            filterKelompokKandidat();
+
             const urlParams = new URLSearchParams(window.location.search);
             const tabParam = urlParams.get('tab');
             const hash = window.location.hash.replace('#', '');
-            
-            if (['beranda', 'scan', 'poin', 'leaderboard', 'profil'].includes(tabParam)) {
+            const validTabs = ['beranda', 'scan', 'poin', 'leaderboard', 'kelompok', 'profil'];
+
+            if (validTabs.includes(tabParam)) {
                 switchTab(tabParam);
-            } else if (['beranda', 'scan', 'poin', 'leaderboard', 'profil'].includes(hash)) {
+            } else if (validTabs.includes(hash)) {
                 switchTab(hash);
+            } else if (hasKelompokValidationError) {
+                switchTab('kelompok');
             }
         });
 

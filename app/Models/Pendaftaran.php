@@ -51,6 +51,16 @@ class Pendaftaran extends Model
         return $this->hasMany(PointHistory::class, 'pendaftaran_id');
     }
 
+    public function kelompokMember()
+    {
+        return $this->hasOne(KelompokMember::class, 'pendaftaran_id');
+    }
+
+    public function kelompokInvitations()
+    {
+        return $this->hasMany(KelompokInvitation::class, 'pendaftaran_id');
+    }
+
     /**
      * Get full URL to student's uploaded avatar or null if not set.
      */
