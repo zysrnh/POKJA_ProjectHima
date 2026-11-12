@@ -165,6 +165,34 @@
         .live-dot {
             animation: livePulseRing 2s ease-in-out infinite;
         }
+
+        /* Modal Exit Snap Out (Kebalikan dari modalSpringSlam) */
+        @keyframes modalSpringOut {
+            0% { transform: scale(1) translateY(0); }
+            100% { transform: scale(0.92) translateY(14px); }
+        }
+        .modal-spring-out {
+            animation: modalSpringOut 0.16s cubic-bezier(0.4, 0, 1, 1) forwards;
+        }
+
+        /* Toggle Inline Box / Kamera Viewport Snap */
+        @keyframes boxSnapIn {
+            0% { opacity: 0; transform: translateY(-6px) scale(0.99); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .box-snap-in {
+            animation: boxSnapIn 0.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        /* Staggered Card Entrance Inside Active Tab */
+        @keyframes mhsSnapIn {
+            0% { opacity: 0; transform: translateY(10px) scale(0.985); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .mhs-snap-1 { animation: mhsSnapIn 0.24s cubic-bezier(0.22, 1, 0.36, 1) 0.02s both; }
+        .mhs-snap-2 { animation: mhsSnapIn 0.24s cubic-bezier(0.22, 1, 0.36, 1) 0.07s both; }
+        .mhs-snap-3 { animation: mhsSnapIn 0.24s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both; }
+        .mhs-snap-4 { animation: mhsSnapIn 0.24s cubic-bezier(0.22, 1, 0.36, 1) 0.17s both; }
     </style>
 </head>
 <body class="min-h-screen text-[#000000] flex flex-col md:flex-row antialiased selection:bg-[#2A82C6] selection:text-white overflow-x-hidden">
@@ -385,7 +413,7 @@
             <section id="tab-panel-beranda" class="tab-snap-in space-y-4 sm:space-y-6">
 
                 <!-- Greeting Banner with Avatar (Tanpa Label Mahasiswa) -->
-                <div class="card-tactile bg-white border-2 border-black p-4 sm:p-6 shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000]">
+                <div class="mhs-snap-1 card-tactile bg-white border-2 border-black p-4 sm:p-6 shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000]">
                     <div class="flex items-center justify-between gap-3">
                         <div class="flex items-center gap-3 min-w-0 flex-1">
                             <!-- Avatar Display -->
@@ -424,7 +452,7 @@
                 </div>
 
                 <!-- 4 Stat Cards Ringkas (Presensi + PointKu) -->
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-4">
+                <div class="mhs-snap-2 grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-4">
                     <div class="card-tactile bg-white border-2 border-black p-3 sm:p-4 shadow-[2px_2px_0px_0px_#000000] sm:shadow-[4px_4px_0px_0px_#000000]">
                         <span class="text-[9px] sm:text-xs font-black uppercase tracking-wider text-[#1A467C] block truncate">Total Hadir</span>
                         <h3 class="text-xl sm:text-3xl font-black text-gray-950 font-mono mt-1 leading-none"><span id="rt-beranda-hadir">{{ $totalHadir }}</span><span class="text-xs sm:text-lg text-gray-500 font-bold">/7</span></h3>
@@ -459,7 +487,7 @@
             <!-- ========================================================== -->
             <section id="tab-panel-scan" class="tab-snap-in hidden space-y-4 sm:space-y-6">
 
-                <div class="card-tactile bg-white border-2 border-black p-4 sm:p-6 shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000] space-y-4">
+                <div class="mhs-snap-1 card-tactile bg-white border-2 border-black p-4 sm:p-6 shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000] space-y-4">
                     <div class="border-b-2 border-black pb-3 flex items-center justify-between">
                         <div>
                             <h3 class="text-sm sm:text-base font-black uppercase text-[#1A467C]">
@@ -500,7 +528,7 @@
                     </div>
 
                     <!-- Live Scanner Camera Viewport Container -->
-                    <div id="dash-camera-box" class="hidden space-y-3">
+                    <div id="dash-camera-box" class="hidden box-snap-in space-y-3">
                         <div class="relative bg-black border-2 border-black overflow-hidden shadow-[4px_4px_0px_0px_#000000]">
                             <div id="dash-qr-reader" class="w-full"></div>
                         </div>
@@ -531,7 +559,7 @@
                 @endphp
 
                 <!-- 1. 3 Kartu Statistik Bersih -->
-                <div class="grid grid-cols-3 gap-2.5 sm:gap-4">
+                <div class="mhs-snap-1 grid grid-cols-3 gap-2.5 sm:gap-4">
                     <div class="card-tactile bg-white border-2 border-black p-3 sm:p-4 shadow-[2px_2px_0px_0px_#000000] sm:shadow-[4px_4px_0px_0px_#000000]">
                         <span class="text-[9px] sm:text-xs font-black uppercase tracking-wider text-[#15803d] block truncate">Total Point</span>
                         <div class="flex items-baseline gap-1 mt-1">
@@ -555,7 +583,7 @@
                 </div>
 
                 <!-- 2. Daftar Riwayat Point Saya -->
-                <div class="card-tactile bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] overflow-hidden">
+                <div class="mhs-snap-2 card-tactile bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] overflow-hidden">
                     <div class="px-4 sm:px-5 py-3 border-b-2 border-black bg-blue-50/70 flex items-center justify-between">
                         <h4 class="text-xs sm:text-sm font-black uppercase tracking-wider text-[#1A467C]">
                             Riwayat Point
@@ -598,7 +626,7 @@
             <section id="tab-panel-leaderboard" class="tab-snap-in hidden space-y-5 sm:space-y-6">
 
                 <!-- Switcher Mode Leaderboard: Individu vs Kelompok -->
-                <div class="card-tactile bg-white border-2 border-black p-2 shadow-[4px_4px_0px_0px_#000000] flex items-center justify-between gap-2">
+                <div class="mhs-snap-1 card-tactile bg-white border-2 border-black p-2 shadow-[4px_4px_0px_0px_#000000] flex items-center justify-between gap-2">
                     <div class="grid grid-cols-2 gap-2 w-full sm:w-auto sm:min-w-[300px]">
                         <button
                             type="button"
@@ -655,7 +683,7 @@
                     ];
                 @endphp
 
-                <div id="lb-individu-podium-card" class="card-tactile {{ $topThree->count() > 0 ? '' : 'hidden ' }}bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] p-4 sm:p-6">
+                <div id="lb-individu-podium-card" class="mhs-snap-2 card-tactile {{ $topThree->count() > 0 ? '' : 'hidden ' }}bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] p-4 sm:p-6">
                     <div class="border-b-2 border-black pb-3 mb-5">
                         <h4 class="text-xs sm:text-sm font-black uppercase tracking-wider text-[#1A467C]">
                             Podium Peringkat Teratas
@@ -716,7 +744,7 @@
                 </div>
 
                 <!-- Klasemen Lengkap Peserta -->
-                <div class="card-tactile bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] overflow-hidden">
+                <div class="mhs-snap-3 card-tactile bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] overflow-hidden">
                     <div class="px-4 sm:px-5 py-3 border-b-2 border-black bg-blue-50/70 flex items-center justify-between">
                         <h4 class="text-xs sm:text-sm font-black uppercase tracking-wider text-[#1A467C]">
                             Peringkat Peserta
@@ -812,7 +840,7 @@
                         ];
                     @endphp
 
-                    <div id="lb-kelompok-empty" class="card-tactile {{ $kelompokLeaderboardList->isEmpty() ? '' : 'hidden ' }}bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] p-8 text-center">
+                    <div id="lb-kelompok-empty" class="mhs-snap-2 card-tactile {{ $kelompokLeaderboardList->isEmpty() ? '' : 'hidden ' }}bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] p-8 text-center">
                         <p class="text-xs sm:text-sm font-black uppercase text-[#1A467C]">Belum Ada Kelompok</p>
                         <p class="text-xs font-semibold text-gray-600 mt-1">
                             Klasemen kelompok akan muncul otomatis setelah ada kelompok yang terbentuk.
@@ -821,7 +849,7 @@
 
                     <div id="lb-kelompok-content" class="{{ $kelompokLeaderboardList->isEmpty() ? 'hidden ' : '' }}space-y-5 sm:space-y-6">
                         <!-- Podium Top 3 Kelompok -->
-                        <div class="card-tactile bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] p-4 sm:p-6">
+                        <div class="mhs-snap-2 card-tactile bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] p-4 sm:p-6">
                             <div class="border-b-2 border-black pb-3 mb-5 flex items-center justify-between">
                                 <h4 class="text-xs sm:text-sm font-black uppercase tracking-wider text-[#1A467C]">
                                     Podium Kelompok Teratas
@@ -883,7 +911,7 @@
                         </div>
 
                         <!-- Klasemen Lengkap Kelompok -->
-                        <div class="card-tactile bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] overflow-hidden">
+                        <div class="mhs-snap-3 card-tactile bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] overflow-hidden">
                             <div class="px-4 sm:px-5 py-3 border-b-2 border-black bg-blue-50/70 flex items-center justify-between">
                                 <h4 class="text-xs sm:text-sm font-black uppercase tracking-wider text-[#1A467C]">
                                     Peringkat Kelompok
@@ -963,7 +991,7 @@
             <!-- ========================================================== -->
             <section id="tab-panel-profil" class="tab-snap-in hidden space-y-4 sm:space-y-6">
 
-                <div class="card-tactile bg-white border-2 border-black p-4 sm:p-6 shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000] space-y-5">
+                <div class="mhs-snap-1 card-tactile bg-white border-2 border-black p-4 sm:p-6 shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000] space-y-5">
                     
                     <div class="border-b-2 border-black pb-3 flex items-center justify-between">
                         <div>
@@ -1367,13 +1395,66 @@
         let lastIndPodiumSig = '';
         let lastGrpPodiumSig = '';
 
+        // Shared Tactile Modal Open/Close Animation (Spring Slam In & Snap Out)
+        function openModalAnimated(modalId) {
+            const modal = document.getElementById(modalId);
+            if (!modal) return;
+            if (modal.dataset.closeTimer) {
+                clearTimeout(Number(modal.dataset.closeTimer));
+                delete modal.dataset.closeTimer;
+            }
+            const box = modal.querySelector('.modal-spring-slam, .modal-spring-out');
+            modal.classList.remove('hidden');
+            if (box) {
+                box.classList.remove('modal-spring-out', 'modal-spring-slam');
+                void box.offsetWidth;
+                box.classList.add('modal-spring-slam');
+            }
+        }
+
+        function closeModalAnimated(modalId, onClosed) {
+            const modal = document.getElementById(modalId);
+            if (!modal || modal.classList.contains('hidden')) {
+                if (typeof onClosed === 'function') onClosed();
+                return;
+            }
+            if (modal.dataset.closeTimer) {
+                clearTimeout(Number(modal.dataset.closeTimer));
+                delete modal.dataset.closeTimer;
+            }
+            const box = modal.querySelector('.modal-spring-slam, .modal-spring-out');
+            if (!box) {
+                modal.classList.add('hidden');
+                if (typeof onClosed === 'function') onClosed();
+                return;
+            }
+            box.classList.remove('modal-spring-slam', 'modal-spring-out');
+            void box.offsetWidth;
+            box.classList.add('modal-spring-out');
+
+            modal.dataset.closeTimer = String(setTimeout(() => {
+                delete modal.dataset.closeTimer;
+                modal.classList.add('hidden');
+                box.classList.remove('modal-spring-out');
+                box.classList.add('modal-spring-slam');
+                if (typeof onClosed === 'function') onClosed();
+            }, 155));
+        }
+
+        function replayBoxSnap(el) {
+            if (!el) return;
+            el.classList.remove('box-snap-in');
+            void el.offsetWidth;
+            el.classList.add('box-snap-in');
+        }
+
         // Open & Close Logout Confirmation Modal
         function openLogoutModal() {
-            document.getElementById('logout-confirm-modal').classList.remove('hidden');
+            openModalAnimated('logout-confirm-modal');
         }
 
         function closeLogoutModal() {
-            document.getElementById('logout-confirm-modal').classList.add('hidden');
+            closeModalAnimated('logout-confirm-modal');
         }
 
         // Modal Konfirmasi Aksi Kelompok
@@ -1393,13 +1474,12 @@
                     : 'btn-tactile w-full py-2.5 bg-amber-300 hover:bg-amber-400 text-black text-xs font-black uppercase tracking-wider border-2 border-black shadow-[3px_3px_0px_0px_#000000] cursor-pointer';
             }
 
-            document.getElementById('kelompok-confirm-modal')?.classList.remove('hidden');
+            openModalAnimated('kelompok-confirm-modal');
         }
 
         function closeKelompokConfirmModal() {
             pendingKelompokConfirmFormId = null;
-            document.getElementById('kelompok-confirm-modal')?.classList.add('hidden');
-            flushPendingKelompokUpdate();
+            closeModalAnimated('kelompok-confirm-modal', flushPendingKelompokUpdate);
         }
 
         function submitKelompokConfirmModal() {
@@ -1558,7 +1638,13 @@
 
         // Toggle Inline Form Edit Info Kelompok
         function toggleEditKelompok() {
-            document.getElementById('kelompok-edit-box')?.classList.toggle('hidden');
+            const box = document.getElementById('kelompok-edit-box');
+            if (!box) return;
+            const opening = box.classList.contains('hidden');
+            box.classList.toggle('hidden');
+            if (opening) {
+                replayBoxSnap(box);
+            }
             flushPendingKelompokUpdate();
         }
 
@@ -1673,7 +1759,9 @@
         async function startKelompokQrScanner() {
             isKelompokQrSubmitted = false;
             document.getElementById('kelompok-camera-trigger')?.classList.add('hidden');
-            document.getElementById('kelompok-camera-box')?.classList.remove('hidden');
+            const camBox = document.getElementById('kelompok-camera-box');
+            camBox?.classList.remove('hidden');
+            replayBoxSnap(camBox);
 
             if (!kelompokQrScanner) {
                 kelompokQrScanner = new Html5Qrcode("kelompok-qr-reader");
@@ -1761,7 +1849,9 @@
         // Buka Kamera Scanner di Tab Scan
         async function startDashScanner() {
             document.getElementById('dash-camera-trigger').classList.add('hidden');
-            document.getElementById('dash-camera-box').classList.remove('hidden');
+            const dashCamBox = document.getElementById('dash-camera-box');
+            dashCamBox.classList.remove('hidden');
+            replayBoxSnap(dashCamBox);
 
             if (!dashQrScanner) {
                 dashQrScanner = new Html5Qrcode("dash-qr-reader");
@@ -1914,20 +2004,24 @@
                 studentBox?.classList.add('hidden');
             }
 
-            modal.classList.remove('hidden');
+            openModalAnimated('dash-result-modal');
         }
 
         function closeDashResultModal() {
-            document.getElementById('dash-result-modal').classList.add('hidden');
-            syncDashboardNow();
+            closeModalAnimated('dash-result-modal', syncDashboardNow);
         }
 
-        // Replay animasi tab snap-in secara halus saat pindah tab/mode
+        // Replay animasi tab snap-in + stagger kartu di dalam tab secara halus saat pindah tab/mode
         function replaySnapIn(el) {
             if (!el) return;
             el.classList.remove('tab-snap-in');
             void el.offsetWidth;
             el.classList.add('tab-snap-in');
+            el.querySelectorAll('.mhs-snap-1, .mhs-snap-2, .mhs-snap-3, .mhs-snap-4').forEach(node => {
+                node.style.animation = 'none';
+                void node.offsetWidth;
+                node.style.animation = '';
+            });
         }
 
         // Replay animasi batang podium tumbuh dari bawah

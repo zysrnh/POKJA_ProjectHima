@@ -171,6 +171,7 @@ Route::middleware('throttle:120,1')->group(function () {
             Route::get('/poin', [PointAdminController::class, 'index'])->name('poin.index');
             Route::get('/poin/mahasiswa', [PointAdminController::class, 'mahasiswa'])->name('poin.mahasiswa');
             Route::get('/poin/leaderboard', [PointAdminController::class, 'leaderboard'])->name('poin.leaderboard');
+            Route::get('/poin/leaderboard/sync', [PointAdminController::class, 'leaderboardSync'])->name('poin.leaderboard.sync');
             Route::get('/poin/aktivitas', [PointAdminController::class, 'aktivitas'])->name('poin.aktivitas');
             Route::post('/poin', [PointAdminController::class, 'store'])->name('poin.store');
             Route::get('/poin/{id}/riwayat', [PointAdminController::class, 'history'])->whereNumber('id')->name('poin.history');

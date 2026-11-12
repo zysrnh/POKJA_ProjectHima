@@ -55,6 +55,14 @@
         .btn-smooth:active {
             transform: translate(2px, 2px);
         }
+
+        @keyframes cardSnapIn {
+            0% { opacity: 0; transform: translateY(12px) scale(0.985); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .card-snap-in {
+            animation: cardSnapIn 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
     </style>
 </head>
 <body class="text-[#000000] min-h-screen flex items-center justify-center p-3.5 sm:p-6 antialiased selection:bg-[#2A82C6] selection:text-white relative overflow-x-hidden">
@@ -63,7 +71,7 @@
     <div class="hidden md:block absolute top-10 left-10 w-12 h-12 bg-[#2A82C6]/20 border-2 border-[#1A467C] shadow-[4px_4px_0px_0px_#1A467C] pointer-events-none"></div>
     <div class="hidden md:block absolute bottom-12 right-12 w-14 h-14 bg-[#CA2C2A]/15 border-2 border-[#901C1A] shadow-[4px_4px_0px_0px_#901C1A] pointer-events-none"></div>
 
-    <div class="w-full max-w-md bg-white border-2 border-[#1A467C] p-6 sm:p-8 shadow-[8px_8px_0px_0px_#1A467C] z-10 relative">
+    <div class="card-snap-in w-full max-w-md bg-white border-2 border-[#1A467C] p-6 sm:p-8 shadow-[8px_8px_0px_0px_#1A467C] z-10 relative">
         
         <!-- Header with Logo -->
         <div class="border-b-2 border-[#1A467C] pb-5 mb-6 text-center">

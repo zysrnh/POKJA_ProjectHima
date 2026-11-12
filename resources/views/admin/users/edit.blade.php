@@ -10,7 +10,7 @@
 @endphp
 <div class="max-w-xl mx-auto">
 
-    <div class="bg-white border-2 border-[#1A467C] p-6 sm:p-8 shadow-[6px_6px_0px_0px_#1A467C]">
+    <div class="snap-in-1 bg-white border-2 border-[#1A467C] p-6 sm:p-8 shadow-[6px_6px_0px_0px_#1A467C]">
         <div class="border-b-2 border-[#1A467C] pb-4 mb-6 flex items-center justify-between gap-2">
             <div>
                 <div class="flex items-center gap-1.5 mb-1">

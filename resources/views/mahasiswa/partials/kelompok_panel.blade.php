@@ -1,6 +1,6 @@
                 @if (!$myKelompok)
                     <!-- Header Overview (Belum Punya Kelompok) -->
-                    <div class="card-tactile bg-white border-2 border-black p-4 sm:p-5 shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000] flex flex-wrap items-center justify-between gap-3">
+                    <div class="mhs-snap-1 card-tactile bg-white border-2 border-black p-4 sm:p-5 shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000] flex flex-wrap items-center justify-between gap-3">
                         <div class="flex items-center gap-2.5">
                             <span class="bg-[#15803d] text-white border border-black px-2 py-0.5 text-[10px] font-black uppercase shadow-[1px_1px_0px_0px_#000000]">
                                 KELOMPOK
@@ -22,7 +22,7 @@
                     </div>
 
                     <!-- Inbox Undangan Kelompok -->
-                    <div class="card-tactile bg-white border-2 border-black shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000] overflow-hidden">
+                    <div class="mhs-snap-2 card-tactile bg-white border-2 border-black shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000] overflow-hidden">
                         <div class="px-4 sm:px-5 py-3 border-b-2 border-black {{ $kelompokInbox->count() > 0 ? 'bg-amber-50' : 'bg-blue-50/70' }} flex items-center justify-between">
                             <h4 class="text-xs sm:text-sm font-black uppercase tracking-wider text-[#1A467C]">
                                 Inbox Undangan Kelompok
@@ -106,7 +106,7 @@
                     <!-- Buat Kelompok Sendiri & Gabung via Kode / Link / QR -->
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                         <!-- Form Buat Kelompok Sendiri (Auto Ketua) -->
-                        <div class="card-tactile bg-white border-2 border-black shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000] overflow-hidden">
+                        <div class="mhs-snap-3 card-tactile bg-white border-2 border-black shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000] overflow-hidden">
                             <div class="px-4 sm:px-5 py-3 border-b-2 border-black bg-blue-50/70 flex items-center justify-between">
                                 <h4 class="text-xs sm:text-sm font-black uppercase tracking-wider text-[#1A467C]">
                                     Buat Kelompok Sendiri
@@ -159,7 +159,7 @@
                         </div>
 
                         <!-- Form Gabung via Kode, Link, atau Scan QR -->
-                        <div class="card-tactile bg-white border-2 border-black shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000] overflow-hidden">
+                        <div class="mhs-snap-4 card-tactile bg-white border-2 border-black shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000] overflow-hidden">
                             <div class="px-4 sm:px-5 py-3 border-b-2 border-black bg-green-50/80 flex items-center justify-between">
                                 <h4 class="text-xs sm:text-sm font-black uppercase tracking-wider text-[#15803d]">
                                     Gabung via Link / Kode QR
@@ -208,7 +208,7 @@
                                         <span>Scan Kode QR Ketua</span>
                                     </button>
 
-                                    <div id="kelompok-camera-box" class="hidden space-y-2.5">
+                                    <div id="kelompok-camera-box" class="hidden box-snap-in space-y-2.5">
                                         <div id="kelompok-qr-reader" class="w-full max-w-xs mx-auto border-2 border-black bg-black overflow-hidden"></div>
                                         <button
                                             type="button"
@@ -231,7 +231,7 @@
                     @endphp
 
                     <!-- Header Ringkasan Kelompok Saya -->
-                    <div class="card-tactile bg-white border-2 border-black p-4 sm:p-6 shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000] space-y-4">
+                    <div class="mhs-snap-1 card-tactile bg-white border-2 border-black p-4 sm:p-6 shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000] space-y-4">
                         <div class="flex flex-wrap items-start justify-between gap-3">
                             <div class="flex items-start gap-3 sm:gap-4 min-w-0 flex-1">
                                 <div class="w-14 h-14 sm:w-16 sm:h-16 bg-[#1A467C] text-white border-2 border-black flex items-center justify-center font-black text-base sm:text-lg shadow-[3px_3px_0px_0px_#000000] shrink-0 overflow-hidden">
@@ -283,7 +283,7 @@
                         </div>
 
                         @if ($isKetua)
-                            <div id="kelompok-edit-box" class="{{ $showEditFormOnLoad ? '' : 'hidden' }} border-t-2 border-black pt-4">
+                            <div id="kelompok-edit-box" class="{{ $showEditFormOnLoad ? '' : 'hidden' }} box-snap-in border-t-2 border-black pt-4">
                                 <form action="{{ route('mahasiswa.kelompok.update') }}" method="POST" enctype="multipart/form-data" class="space-y-4 bg-gray-50 border-2 border-black p-3.5 sm:p-4">
                                     @csrf
                                     @method('PUT')
@@ -398,7 +398,7 @@
                         <!-- Panel Khusus Ketua: Share Link/QR & Undang ke Inbox Teman -->
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                             <!-- Card Link & Kode QR Undangan -->
-                            <div class="card-tactile bg-white border-2 border-black shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000] overflow-hidden">
+                            <div class="mhs-snap-2 card-tactile bg-white border-2 border-black shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000] overflow-hidden">
                                 <div class="px-4 sm:px-5 py-3 border-b-2 border-black bg-green-50/80 flex items-center justify-between">
                                     <h4 class="text-xs sm:text-sm font-black uppercase tracking-wider text-[#15803d]">
                                         Undang via Link &amp; Kode QR
@@ -442,7 +442,7 @@
                             </div>
 
                             <!-- Card Undang Langsung ke Inbox Teman -->
-                            <div class="card-tactile bg-white border-2 border-black shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000] overflow-hidden flex flex-col">
+                            <div class="mhs-snap-3 card-tactile bg-white border-2 border-black shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000] overflow-hidden flex flex-col">
                                 <div class="px-4 sm:px-5 py-3 border-b-2 border-black bg-amber-50/80 flex items-center justify-between">
                                     <h4 class="text-xs sm:text-sm font-black uppercase tracking-wider text-[#1A467C]">
                                         Undang ke Inbox Teman
@@ -500,7 +500,7 @@
                     @endif
 
                     <!-- Card Daftar Anggota Kelompok -->
-                    <div class="card-tactile bg-white border-2 border-black shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000] overflow-hidden">
+                    <div class="mhs-snap-4 card-tactile bg-white border-2 border-black shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000] overflow-hidden">
                         <div class="px-4 sm:px-5 py-3 border-b-2 border-black bg-blue-50/70 flex items-center justify-between">
                             <h4 class="text-xs sm:text-sm font-black uppercase tracking-wider text-[#1A467C]">
                                 Daftar Anggota Kelompok

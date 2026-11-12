@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Kelas;
+use App\Models\Kelompok;
 use App\Models\Pendaftaran;
 use App\Models\PointHistory;
 use Illuminate\Http\Request;
@@ -149,12 +150,51 @@ class PointAdminController extends Controller
     }
 
     /**
-     * Tampilkan halaman Leaderboard Peringkat Point Mahasiswa (Podium Top 3 + Peringkat Lengkap).
+     * Hitung MD5 signature ringan untuk mendeteksi perubahan leaderboard admin tiap 3 detik.
      */
-    public function leaderboard(Request $request)
+    private function computeLeaderboardSignature(string $kelasFilter): string
     {
-        $kelasFilter = trim((string) $request->input('kelas', ''));
+        $pendaftarAgg = DB::table('pendaftarans')
+            ->selectRaw('COUNT(*) as c, COALESCE(SUM(total_point), 0) as s, COALESCE(SUM(CASE WHEN foto IS NOT NULL THEN 1 ELSE 0 END), 0) as fc, MAX(updated_at) as m')
+            ->first();
 
+        $historyAgg = DB::table('point_histories')
+            ->selectRaw('COUNT(*) as c, MAX(id) as m')
+            ->first();
+
+        $kelompokAgg = DB::table('kelompoks')
+            ->selectRaw('COUNT(*) as c, COALESCE(SUM(id), 0) as s, COALESCE(SUM(CASE WHEN foto IS NOT NULL THEN 1 ELSE 0 END), 0) as fc, MAX(updated_at) as m')
+            ->first();
+
+        $memberAgg = DB::table('kelompok_members')
+            ->selectRaw('COUNT(*) as c, COALESCE(SUM(id), 0) as s, MAX(updated_at) as m')
+            ->first();
+
+        $raw = implode('|', [
+            $kelasFilter,
+            (int) ($pendaftarAgg->c ?? 0),
+            (int) ($pendaftarAgg->s ?? 0),
+            (int) ($pendaftarAgg->fc ?? 0),
+            (string) ($pendaftarAgg->m ?? ''),
+            (int) ($historyAgg->c ?? 0),
+            (int) ($historyAgg->m ?? 0),
+            (int) ($kelompokAgg->c ?? 0),
+            (int) ($kelompokAgg->s ?? 0),
+            (int) ($kelompokAgg->fc ?? 0),
+            (string) ($kelompokAgg->m ?? ''),
+            (int) ($memberAgg->c ?? 0),
+            (int) ($memberAgg->s ?? 0),
+            (string) ($memberAgg->m ?? ''),
+        ]);
+
+        return md5($raw);
+    }
+
+    /**
+     * Bangun koleksi leaderboard Peserta & Kelompok untuk halaman dan sinkronisasi JSON.
+     */
+    private function buildLeaderboardData(string $kelasFilter): array
+    {
         $query = Pendaftaran::withCount('pointHistories');
 
         if ($kelasFilter !== '') {
@@ -167,6 +207,64 @@ class PointAdminController extends Controller
             ->get();
 
         $topThree = $rankedMahasiswa->take(3)->values();
+
+        $kelompokLeaderboardList = Kelompok::with(['ketua', 'members.pendaftaran'])
+            ->get()
+            ->map(function ($k) {
+                $totalPoint = $k->members->sum(fn ($m) => (int) ($m->pendaftaran->total_point ?? 0));
+                $jumlahAnggota = $k->members->count();
+
+                return (object) [
+                    'id' => (int) $k->id,
+                    'nama_kelompok' => $k->nama_kelompok,
+                    'initials' => $k->initials(),
+                    'foto_url' => $k->fotoUrl(),
+                    'ketua_nama' => $k->ketua->nama ?? '-',
+                    'ketua_kelas' => $k->ketua->kelas ?? '-',
+                    'jumlah_anggota' => $jumlahAnggota,
+                    'total_point' => (int) $totalPoint,
+                    'avg_point' => $jumlahAnggota > 0 ? round($totalPoint / $jumlahAnggota, 1) : 0,
+                ];
+            })
+            ->sort(function ($a, $b) {
+                if ($a->total_point !== $b->total_point) {
+                    return $b->total_point <=> $a->total_point;
+                }
+                if ($a->jumlah_anggota !== $b->jumlah_anggota) {
+                    return $b->jumlah_anggota <=> $a->jumlah_anggota;
+                }
+                return strcasecmp($a->nama_kelompok, $b->nama_kelompok);
+            })
+            ->values();
+
+        $kelompokTopThree = $kelompokLeaderboardList->take(3)->values();
+
+        return [
+            'rankedMahasiswa' => $rankedMahasiswa,
+            'topThree' => $topThree,
+            'totalPeserta' => $rankedMahasiswa->count(),
+            'kelompokLeaderboardList' => $kelompokLeaderboardList,
+            'kelompokTopThree' => $kelompokTopThree,
+            'totalKelompok' => $kelompokLeaderboardList->count(),
+        ];
+    }
+
+    /**
+     * Tampilkan halaman Leaderboard Peringkat Point Mahasiswa & Kelompok.
+     */
+    public function leaderboard(Request $request)
+    {
+        $kelasFilter = trim((string) $request->input('kelas', ''));
+        $data = $this->buildLeaderboardData($kelasFilter);
+
+        $rankedMahasiswa = $data['rankedMahasiswa'];
+        $topThree = $data['topThree'];
+        $totalPeserta = $data['totalPeserta'];
+        $kelompokLeaderboardList = $data['kelompokLeaderboardList'];
+        $kelompokTopThree = $data['kelompokTopThree'];
+        $totalKelompok = $data['totalKelompok'];
+        $realtimeSignature = $this->computeLeaderboardSignature($kelasFilter);
+
         $kelasList = Kelas::orderBy('nama_kelas')->get();
 
         // Statistik akumulasi point per kelas untuk grafik Leaderboard
@@ -188,10 +286,64 @@ class PointAdminController extends Controller
         return view('admin.poin.leaderboard', compact(
             'rankedMahasiswa',
             'topThree',
+            'totalPeserta',
+            'kelompokLeaderboardList',
+            'kelompokTopThree',
+            'totalKelompok',
+            'realtimeSignature',
             'kelasList',
             'kelasFilter',
             'kelasStats'
         ));
+    }
+
+    /**
+     * Endpoint sinkronisasi JSON realtime tiap 3 detik untuk Leaderboard Admin.
+     */
+    public function leaderboardSync(Request $request)
+    {
+        $kelasFilter = trim((string) $request->query('kelas', ''));
+        $signature = $this->computeLeaderboardSignature($kelasFilter);
+
+        if ((string) $request->query('sig', '') === $signature) {
+            return response()->json([
+                'changed' => false,
+                'signature' => $signature,
+            ]);
+        }
+
+        $data = $this->buildLeaderboardData($kelasFilter);
+
+        return response()->json([
+            'changed' => true,
+            'signature' => $signature,
+            'kelas_filter' => $kelasFilter,
+            'total_peserta' => $data['totalPeserta'],
+            'total_kelompok' => $data['totalKelompok'],
+            'individu_leaderboard' => $data['rankedMahasiswa']->values()->map(fn ($mhs, $idx) => [
+                'id' => (int) $mhs->id,
+                'rank' => $idx + 1,
+                'nama' => $mhs->nama,
+                'nim' => $mhs->nim,
+                'kelas' => $mhs->kelas,
+                'total_point' => (int) $mhs->total_point,
+                'point_histories_count' => (int) ($mhs->point_histories_count ?? 0),
+                'initials' => $mhs->initials(),
+                'avatar_url' => $mhs->avatarUrl(),
+            ])->values(),
+            'kelompok_leaderboard' => $data['kelompokLeaderboardList']->values()->map(fn ($grp, $idx) => [
+                'id' => (int) $grp->id,
+                'rank' => $idx + 1,
+                'nama_kelompok' => $grp->nama_kelompok,
+                'initials' => $grp->initials,
+                'foto_url' => $grp->foto_url,
+                'ketua_nama' => $grp->ketua_nama,
+                'ketua_kelas' => $grp->ketua_kelas,
+                'jumlah_anggota' => (int) $grp->jumlah_anggota,
+                'total_point' => (int) $grp->total_point,
+                'avg_point' => $grp->avg_point,
+            ])->values(),
+        ]);
     }
 
     /**
