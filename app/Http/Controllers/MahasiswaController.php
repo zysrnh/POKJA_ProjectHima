@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Mail\ResetPasswordMahasiswaMail;
+use App\Models\Kelompok;
 use App\Models\KelompokInvitation;
 use App\Models\KelompokMember;
 use App\Models\Pendaftaran;
@@ -463,6 +464,44 @@ class MahasiswaController extends Controller
         $myRank = $myRankIndex !== false ? ($myRankIndex + 1) : '-';
         $totalPeserta = $leaderboardList->count();
 
+        // Data Leaderboard Kelompok (akumulasi total point seluruh anggota kelompok)
+        $kelompokLeaderboardList = Kelompok::with(['ketua', 'members.pendaftaran'])
+            ->get()
+            ->map(function ($k) {
+                $totalPoint = $k->members->sum(fn ($m) => (int) ($m->pendaftaran->total_point ?? 0));
+                $jumlahAnggota = $k->members->count();
+                $cleanWords = preg_split('/\s+/', trim($k->nama_kelompok)) ?: [];
+                if (count($cleanWords) >= 2) {
+                    $initials = strtoupper(substr($cleanWords[0], 0, 1) . substr($cleanWords[1], 0, 1));
+                } else {
+                    $initials = strtoupper(substr(trim($k->nama_kelompok), 0, 2));
+                }
+
+                return (object) [
+                    'id' => (int) $k->id,
+                    'nama_kelompok' => $k->nama_kelompok,
+                    'initials' => $initials ?: 'KL',
+                    'ketua_nama' => $k->ketua->nama ?? '-',
+                    'ketua_kelas' => $k->ketua->kelas ?? '-',
+                    'jumlah_anggota' => $jumlahAnggota,
+                    'total_point' => (int) $totalPoint,
+                    'avg_point' => $jumlahAnggota > 0 ? round($totalPoint / $jumlahAnggota, 1) : 0,
+                ];
+            })
+            ->sort(function ($a, $b) {
+                if ($a->total_point !== $b->total_point) {
+                    return $b->total_point <=> $a->total_point;
+                }
+                if ($a->jumlah_anggota !== $b->jumlah_anggota) {
+                    return $b->jumlah_anggota <=> $a->jumlah_anggota;
+                }
+                return strcasecmp($a->nama_kelompok, $b->nama_kelompok);
+            })
+            ->values();
+
+        $kelompokTopThree = $kelompokLeaderboardList->take(3)->values();
+        $totalKelompok = $kelompokLeaderboardList->count();
+
         // Data Kelompok & Inbox Undangan Mahasiswa
         $myMembership = KelompokMember::with([
             'kelompok.ketua',
@@ -546,6 +585,9 @@ class MahasiswaController extends Controller
             'topThree',
             'myRank',
             'totalPeserta',
+            'kelompokLeaderboardList',
+            'kelompokTopThree',
+            'totalKelompok',
             'myKelompok',
             'isKetua',
             'kelompokStats',

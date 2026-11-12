@@ -531,6 +531,34 @@
             <!-- ========================================================== -->
             <section id="tab-panel-leaderboard" class="tab-snap-in hidden space-y-5 sm:space-y-6">
 
+                <!-- Switcher Mode Leaderboard: Individu vs Kelompok -->
+                <div class="bg-white border-2 border-black p-2 shadow-[4px_4px_0px_0px_#000000] flex items-center justify-between gap-2">
+                    <div class="grid grid-cols-2 gap-2 w-full sm:w-auto sm:min-w-[300px]">
+                        <button
+                            type="button"
+                            id="lb-btn-individu"
+                            onclick="switchLeaderboardMode('individu')"
+                            class="btn-tactile px-4 py-2 bg-[#1A467C] text-white border-2 border-black text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
+                        >
+                            Peserta ({{ $totalPeserta }})
+                        </button>
+                        <button
+                            type="button"
+                            id="lb-btn-kelompok"
+                            onclick="switchLeaderboardMode('kelompok')"
+                            class="btn-tactile px-4 py-2 bg-white hover:bg-gray-100 text-gray-900 border-2 border-black text-xs font-black uppercase tracking-wider cursor-pointer"
+                        >
+                            Kelompok ({{ $totalKelompok }})
+                        </button>
+                    </div>
+                    <span class="hidden sm:inline-block font-mono text-[10px] font-black uppercase text-gray-500 px-2">
+                        Klasemen Point Keaktifan
+                    </span>
+                </div>
+
+                <!-- MODE 1: LEADERBOARD INDIVIDU -->
+                <div id="lb-view-individu" class="space-y-5 sm:space-y-6">
+
                 <!-- Podium Top 3 (Grafik Batang Podium Vertikal Ke Atas) -->
                 @if ($topThree->count() > 0)
                     @php
@@ -678,6 +706,167 @@
                         @endforeach
                     </div>
                 </div>
+
+                </div> <!-- End #lb-view-individu -->
+
+                <!-- MODE 2: LEADERBOARD KELOMPOK -->
+                <div id="lb-view-kelompok" class="hidden space-y-5 sm:space-y-6">
+                    @php
+                        $maxKelompokPoint = max(1, (int) ($kelompokLeaderboardList->max('total_point') ?? 1));
+                    @endphp
+
+                    @if ($kelompokLeaderboardList->isEmpty())
+                        <div class="bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] p-8 text-center">
+                            <p class="text-xs sm:text-sm font-black uppercase text-[#1A467C]">Belum Ada Kelompok</p>
+                            <p class="text-xs font-semibold text-gray-600 mt-1">
+                                Klasemen kelompok akan muncul otomatis setelah ada kelompok yang terbentuk.
+                            </p>
+                        </div>
+                    @else
+                        <!-- Podium Top 3 Kelompok -->
+                        @if ($kelompokTopThree->count() > 0)
+                            @php
+                                $grpFirst = $kelompokTopThree->get(0);
+                                $grpSecond = $kelompokTopThree->get(1);
+                                $grpThird = $kelompokTopThree->get(2);
+                                $kelompokPodiumBars = [
+                                    [
+                                        'rank' => 2,
+                                        'barBg' => 'bg-sky-200',
+                                        'barHeight' => 'h-28 sm:h-36',
+                                        'grp' => $grpSecond,
+                                    ],
+                                    [
+                                        'rank' => 1,
+                                        'barBg' => 'bg-amber-300',
+                                        'barHeight' => 'h-40 sm:h-48',
+                                        'grp' => $grpFirst,
+                                    ],
+                                    [
+                                        'rank' => 3,
+                                        'barBg' => 'bg-orange-200',
+                                        'barHeight' => 'h-20 sm:h-28',
+                                        'grp' => $grpThird,
+                                    ],
+                                ];
+                            @endphp
+
+                            <div class="bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] p-4 sm:p-6">
+                                <div class="border-b-2 border-black pb-3 mb-5 flex items-center justify-between">
+                                    <h4 class="text-xs sm:text-sm font-black uppercase tracking-wider text-[#1A467C]">
+                                        Podium Kelompok Teratas
+                                    </h4>
+                                    <span class="font-mono text-[10px] font-black uppercase text-gray-500">
+                                        Total Point Tim
+                                    </span>
+                                </div>
+
+                                <div class="grid grid-cols-3 gap-2.5 sm:gap-5 items-end max-w-2xl mx-auto pt-2 px-1">
+                                    @foreach ($kelompokPodiumBars as $pod)
+                                        @php $grp = $pod['grp']; @endphp
+                                        <div class="flex flex-col items-center">
+                                            @if ($grp)
+                                                @php $isMyGroup = $myKelompok && (int) $grp->id === (int) $myKelompok->id; @endphp
+                                                <div class="flex flex-col items-center text-center mb-2.5 w-full">
+                                                    <div class="relative">
+                                                        <div class="{{ $pod['rank'] === 1 ? 'w-11 h-11 sm:w-14 sm:h-14 text-sm sm:text-base' : 'w-9 h-9 sm:w-12 sm:h-12 text-xs sm:text-sm' }} bg-[#1A467C] text-white border-2 border-black flex items-center justify-center font-black shadow-[2px_2px_0px_0px_#000000]">
+                                                            {{ $grp->initials }}
+                                                        </div>
+                                                        @if ($isMyGroup)
+                                                            <span class="absolute -top-2 -right-3 bg-[#15803d] text-white text-[8px] font-black uppercase px-1 py-0.2 border border-black">
+                                                                TIMMU
+                                                            </span>
+                                                        @endif
+                                                    </div>
+
+                                                    <h5 class="font-black text-[10px] sm:text-xs text-gray-950 uppercase truncate max-w-full mt-1.5 px-0.5" title="{{ $grp->nama_kelompok }}">
+                                                        {{ $grp->nama_kelompok }}
+                                                    </h5>
+                                                    <span class="font-mono text-[9px] sm:text-[10px] font-bold text-[#1A467C]">
+                                                        {{ $grp->jumlah_anggota }} Anggota
+                                                    </span>
+
+                                                    <div class="mt-1.5 bg-white border-2 border-black px-2 py-0.5 shadow-[2px_2px_0px_0px_#000000] inline-flex items-baseline gap-1">
+                                                        <span class="font-mono font-black text-xs sm:text-sm text-gray-950 leading-none">{{ $grp->total_point }}</span>
+                                                        <span class="text-[8px] sm:text-[9px] font-black uppercase text-[#15803d] leading-none">PTS</span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="w-full {{ $pod['barHeight'] }} {{ $pod['barBg'] }} border-t-2 border-x-2 border-black shadow-[3px_0px_0px_0px_#000000] flex flex-col items-center justify-center p-2">
+                                                    <span class="font-mono font-black text-xl sm:text-3xl text-black/85 leading-none">
+                                                        #{{ $pod['rank'] }}
+                                                    </span>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    @endforeach
+                                </div>
+                                <div class="h-1.5 bg-black w-full max-w-2xl mx-auto"></div>
+                            </div>
+                        @endif
+
+                        <!-- Klasemen Lengkap Kelompok -->
+                        <div class="bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] overflow-hidden">
+                            <div class="px-4 sm:px-5 py-3 border-b-2 border-black bg-blue-50/70 flex items-center justify-between">
+                                <h4 class="text-xs sm:text-sm font-black uppercase tracking-wider text-[#1A467C]">
+                                    Peringkat Kelompok
+                                </h4>
+                                <span class="bg-white border border-black px-2 py-0.5 font-mono font-black text-[10px] text-[#1A467C]">
+                                    {{ $totalKelompok }} Kelompok
+                                </span>
+                            </div>
+
+                            <div class="divide-y divide-gray-200">
+                                @foreach ($kelompokLeaderboardList as $idx => $grp)
+                                    @php
+                                        $rankNum = $idx + 1;
+                                        $pts = (int) $grp->total_point;
+                                        $pctWidth = $pts > 0 ? max(8, round(($pts / $maxKelompokPoint) * 100)) : 0;
+                                        $isMyTeam = $myKelompok && (int) $grp->id === (int) $myKelompok->id;
+                                        $barColor = $rankNum === 1
+                                            ? 'bg-amber-400'
+                                            : ($rankNum === 2
+                                                ? 'bg-[#2A82C6]'
+                                                : ($rankNum === 3 ? 'bg-orange-400' : 'bg-[#15803d]'));
+                                    @endphp
+                                    <div class="px-4 sm:px-5 py-3.5 {{ $isMyTeam ? 'bg-amber-50/90 border-l-4 border-l-[#1A467C]' : 'hover:bg-blue-50/40' }} transition flex items-center justify-between gap-3">
+                                        <div class="flex items-center gap-3 min-w-0 flex-1">
+                                            <span class="w-8 h-8 border-2 border-black font-mono font-black text-xs flex items-center justify-center shrink-0 {{ $rankNum === 1 ? 'bg-amber-300 text-black' : ($rankNum === 2 ? 'bg-sky-200 text-black' : ($rankNum === 3 ? 'bg-orange-200 text-black' : 'bg-gray-100 text-gray-800')) }}">
+                                                #{{ $rankNum }}
+                                            </span>
+
+                                            <div class="w-9 h-9 bg-[#1A467C] text-white border-2 border-black flex items-center justify-center font-black text-xs shrink-0">
+                                                {{ $grp->initials }}
+                                            </div>
+
+                                            <div class="min-w-0 flex-1">
+                                                <div class="flex items-center gap-1.5">
+                                                    <p class="font-black text-xs sm:text-sm text-gray-950 truncate">{{ $grp->nama_kelompok }}</p>
+                                                    @if ($isMyTeam)
+                                                        <span class="bg-[#15803d] text-white text-[9px] font-black uppercase px-1.5 py-0.2 border border-black shrink-0">
+                                                            TIM KAMU
+                                                        </span>
+                                                    @endif
+                                                </div>
+                                                <p class="font-mono text-[10px] sm:text-[11px] font-bold text-gray-600">
+                                                    Ketua: <span class="text-[#1A467C]">{{ $grp->ketua_nama }}</span> • {{ $grp->jumlah_anggota }} Anggota
+                                                </p>
+                                                <div class="mt-1.5 w-full max-w-md h-2.5 bg-gray-100 border border-black overflow-hidden">
+                                                    <div class="h-full {{ $barColor }}" style="width: {{ $pctWidth }}%"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="bg-green-100 border-2 border-black px-3 py-1 shadow-[2px_2px_0px_0px_#000000] inline-flex items-baseline gap-1 shrink-0">
+                                            <span class="font-mono font-black text-xs sm:text-sm text-[#15803d] leading-none">{{ $pts }}</span>
+                                            <span class="text-[9px] sm:text-[10px] font-black uppercase text-[#15803d] leading-none">PTS</span>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+                </div> <!-- End #lb-view-kelompok -->
 
             </section>
 
@@ -1743,6 +1932,27 @@
 
             // Update URL hash
             window.location.hash = tabId;
+        }
+
+        // Switch Mode di Tab Leaderboard (Individu vs Kelompok)
+        function switchLeaderboardMode(mode) {
+            const isKelompok = mode === 'kelompok';
+            const indView = document.getElementById('lb-view-individu');
+            const grpView = document.getElementById('lb-view-kelompok');
+            const indBtn = document.getElementById('lb-btn-individu');
+            const grpBtn = document.getElementById('lb-btn-kelompok');
+
+            const activeCls = 'btn-tactile px-4 py-2 bg-[#1A467C] text-white border-2 border-black text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] cursor-pointer';
+            const inactiveCls = 'btn-tactile px-4 py-2 bg-white hover:bg-gray-100 text-gray-900 border-2 border-black text-xs font-black uppercase tracking-wider cursor-pointer';
+
+            if (indView && grpView) {
+                indView.classList.toggle('hidden', isKelompok);
+                grpView.classList.toggle('hidden', !isKelompok);
+            }
+            if (indBtn && grpBtn) {
+                indBtn.className = isKelompok ? inactiveCls : activeCls;
+                grpBtn.className = isKelompok ? activeCls : inactiveCls;
+            }
         }
 
         // Live Preview Foto Profil saat dipilih

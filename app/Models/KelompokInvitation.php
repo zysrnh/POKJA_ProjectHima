@@ -38,3 +38,4 @@ class KelompokInvitation extends Model
         return $this->belongsTo(Pendaftaran::class, 'invited_by');
     }
 }
+

@@ -511,3 +511,4 @@ class MahasiswaKelompokController extends Controller
             ->with('success', "Kamu telah keluar dari kelompok \"{$namaKelompok}\".");
     }
 }
+

@@ -50,3 +50,4 @@ class Kelompok extends Model
         return $this->hasMany(KelompokInvitation::class, 'kelompok_id');
     }
 }
+
