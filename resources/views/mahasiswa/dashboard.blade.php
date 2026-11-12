@@ -192,11 +192,23 @@
                         <svg class="w-4 h-4 text-amber-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="square" stroke-width="2.5" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
                         </svg>
-                        <span>PointKu & Leaderboard</span>
+                        <span>PointKu</span>
                     </span>
-                    <span class="bg-amber-300 text-black border border-black px-1.5 py-0.5 font-mono font-black text-[10px] leading-none">
+                    <span class="bg-amber-300 text-black border border-black px-2 py-0.5 font-mono font-black text-[10px] leading-none whitespace-nowrap shrink-0">
                         {{ (int) $mahasiswa->total_point }} PTS
                     </span>
+                </button>
+
+                <button 
+                    type="button" 
+                    id="side-nav-leaderboard"
+                    onclick="switchTab('leaderboard')" 
+                    class="btn-tactile w-full text-left px-3.5 py-2.5 bg-white hover:bg-gray-100 text-gray-900 border-2 border-black font-black text-xs uppercase tracking-wider flex items-center gap-2.5 shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
+                >
+                    <svg class="w-4 h-4 text-[#2A82C6] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="square" stroke-width="2.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                    <span>Leaderboard</span>
                 </button>
 
                 <button 
@@ -344,7 +356,7 @@
                         </div>
                     </div>
 
-                    <div onclick="switchTab('poin')" class="card-tactile bg-white hover:bg-blue-50 border-2 border-black p-3 sm:p-4 shadow-[2px_2px_0px_0px_#000000] sm:shadow-[4px_4px_0px_0px_#000000] cursor-pointer">
+                    <div onclick="switchTab('leaderboard')" class="card-tactile bg-white hover:bg-blue-50 border-2 border-black p-3 sm:p-4 shadow-[2px_2px_0px_0px_#000000] sm:shadow-[4px_4px_0px_0px_#000000] cursor-pointer">
                         <span class="text-[9px] sm:text-xs font-black uppercase tracking-wider text-[#1A467C] block truncate">Peringkat</span>
                         <div class="flex items-baseline gap-1 mt-1">
                             <h3 class="text-xl sm:text-3xl font-black text-[#1A467C] font-mono leading-none">#{{ $myRank }}</h3>
@@ -362,20 +374,29 @@
                         <div>
                             <div class="flex items-center gap-1.5">
                                 <span class="bg-[#1A467C] text-white text-[9px] font-black uppercase px-1.5 py-0.5 border border-black">POINTKU</span>
-                                <h3 class="text-xs sm:text-sm font-black uppercase text-gray-950">Point Keaktifan & Leaderboard</h3>
+                                <h3 class="text-xs sm:text-sm font-black uppercase text-gray-950">Point Keaktifan & Peringkat</h3>
                             </div>
                             <p class="text-[11px] sm:text-xs text-gray-600 font-semibold mt-0.5">
-                                Kamu punya <strong class="text-[#15803d] font-mono">{{ (int) $mahasiswa->total_point }} Pts</strong> (Peringkat <strong class="text-[#1A467C] font-mono">#{{ $myRank }}</strong>). Cek posisi podium & riwayat point kamu!
+                                Kamu punya <strong class="text-[#15803d] font-mono">{{ (int) $mahasiswa->total_point }} Pts</strong> (Peringkat <strong class="text-[#1A467C] font-mono">#{{ $myRank }}</strong>).
                             </p>
                         </div>
                     </div>
-                    <button 
-                        type="button" 
-                        onclick="switchTab('poin')" 
-                        class="btn-tactile px-4 py-2 bg-[#1A467C] hover:bg-[#2A82C6] text-white text-xs font-black uppercase tracking-wider border-2 border-black shadow-[2px_2px_0px_0px_#000000] shrink-0 cursor-pointer"
-                    >
-                        Lihat Leaderboard →
-                    </button>
+                    <div class="flex items-center gap-2 shrink-0">
+                        <button 
+                            type="button" 
+                            onclick="switchTab('poin')" 
+                            class="btn-tactile px-3.5 py-2 bg-white hover:bg-gray-100 text-gray-900 text-xs font-black uppercase tracking-wider border-2 border-black shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
+                        >
+                            PointKu
+                        </button>
+                        <button 
+                            type="button" 
+                            onclick="switchTab('leaderboard')" 
+                            class="btn-tactile px-3.5 py-2 bg-[#1A467C] hover:bg-[#2A82C6] text-white text-xs font-black uppercase tracking-wider border-2 border-black shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
+                        >
+                            Leaderboard →
+                        </button>
+                    </div>
                 </div>
 
             </section>
@@ -448,7 +469,7 @@
             </section>
 
             <!-- ========================================================== -->
-            <!-- TAB 3: POINTKU & LEADERBOARD MAHASISWA                     -->
+            <!-- TAB 3: POINTKU (STATUS & RIWAYAT POINT SAYA)               -->
             <!-- ========================================================== -->
             <section id="tab-panel-poin" class="tab-snap-in hidden space-y-5 sm:space-y-6">
 
@@ -465,11 +486,11 @@
                             <div class="flex items-center gap-2">
                                 <span class="bg-amber-400 text-black text-[10px] font-black uppercase px-2 py-0.5 border border-black">POINTKU</span>
                                 <h3 class="text-sm sm:text-lg font-black uppercase text-[#1A467C]">
-                                    Status Point & Leaderboard
+                                    Point Keaktifan Saya
                                 </h3>
                             </div>
                             <p class="text-[11px] sm:text-xs text-gray-600 font-semibold mt-0.5">
-                                Pantau total point keaktifan, posisi peringkatmu, dan riwayat point.
+                                Rincian total perolehan point keaktifan dan riwayat aktivitasmu.
                             </p>
                         </div>
 
@@ -495,13 +516,88 @@
                             <span class="font-mono font-black text-base sm:text-xl text-[#CA2C2A] mt-0.5 block">{{ $totalKurangCount }}x</span>
                         </div>
                         <div class="bg-blue-50 border-2 border-black p-2.5 sm:p-3">
-                            <span class="text-[9px] sm:text-[10px] font-black uppercase text-[#1A467C] block">Total Peserta</span>
-                            <span class="font-mono font-black text-base sm:text-xl text-[#1A467C] mt-0.5 block">{{ $totalPeserta }}</span>
+                            <span class="text-[9px] sm:text-[10px] font-black uppercase text-[#1A467C] block">Total Aktivitas</span>
+                            <span class="font-mono font-black text-base sm:text-xl text-[#1A467C] mt-0.5 block">{{ $mahasiswa->pointHistories->count() }}</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- 2. Podium Top 3 (Grafik Batang Podium Vertikal Ke Atas) -->
+                <!-- 2. Daftar Lengkap Riwayat Point Saya -->
+                <div class="bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] overflow-hidden">
+                    <div class="px-4 sm:px-5 py-3.5 border-b-2 border-black bg-blue-50/70 flex items-center justify-between gap-2">
+                        <h4 class="text-xs sm:text-sm font-black uppercase tracking-wider text-[#1A467C]">
+                            Riwayat Aktivitas Point Saya
+                        </h4>
+                        <button 
+                            type="button" 
+                            onclick="switchTab('leaderboard')" 
+                            class="btn-tactile px-3 py-1 bg-[#1A467C] text-white border border-black font-black text-[10px] uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
+                        >
+                            Cek Leaderboard →
+                        </button>
+                    </div>
+
+                    <div class="divide-y divide-gray-200">
+                        @forelse ($mahasiswa->pointHistories as $hist)
+                            @php $isAdd = $hist->tipe === 'tambah'; @endphp
+                            <div class="p-4 hover:bg-blue-50/30 transition flex items-center justify-between gap-3">
+                                <div class="flex items-start gap-3 min-w-0">
+                                    <span class="w-9 h-9 border-2 border-black font-mono font-black text-xs flex items-center justify-center shrink-0 shadow-[2px_2px_0px_0px_#000000] {{ $isAdd ? 'bg-[#15803d] text-white' : 'bg-[#CA2C2A] text-white' }}">
+                                        {{ $isAdd ? '+' : '-' }}{{ (int) $hist->jumlah }}
+                                    </span>
+                                    <div class="min-w-0">
+                                        <p class="font-black text-xs sm:text-sm uppercase text-gray-950 leading-tight">{{ $hist->kategori }}</p>
+                                        @if ($hist->keterangan)
+                                            <p class="text-xs font-semibold text-gray-600 mt-0.5 break-words">{{ $hist->keterangan }}</p>
+                                        @endif
+                                        <p class="text-[10px] font-mono font-bold text-gray-400 mt-1">
+                                            {{ $hist->created_at ? $hist->created_at->timezone('Asia/Jakarta')->format('d M Y • H:i') : '-' }} WIB
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <span class="shrink-0 px-2.5 py-1 border-2 border-black font-mono font-black text-xs {{ $isAdd ? 'bg-green-100 text-[#15803d]' : 'bg-red-100 text-[#CA2C2A]' }}">
+                                    {{ $isAdd ? '+' : '-' }}{{ (int) $hist->jumlah }} PTS
+                                </span>
+                            </div>
+                        @empty
+                            <div class="p-8 text-center text-xs font-bold text-gray-500">
+                                Belum ada riwayat perubahan point untuk akunmu.
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- ========================================================== -->
+            <!-- TAB 4: LEADERBOARD PESERTA POKJA                           -->
+            <!-- ========================================================== -->
+            <section id="tab-panel-leaderboard" class="tab-snap-in hidden space-y-5 sm:space-y-6">
+
+                <!-- Header Banner Leaderboard -->
+                <div class="card-tactile bg-white border-2 border-black p-4 sm:p-5 shadow-[4px_4px_0px_0px_#000000] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="bg-amber-400 text-black text-[10px] font-black uppercase px-2 py-0.5 border border-black">LEADERBOARD</span>
+                            <h3 class="text-sm sm:text-lg font-black uppercase text-[#1A467C]">
+                                Klasemen Point Keaktifan
+                            </h3>
+                        </div>
+                        <p class="text-[11px] sm:text-xs text-gray-600 font-semibold mt-0.5">
+                            Posisi kamu saat ini: <strong class="text-[#1A467C] font-mono">Peringkat #{{ $myRank }}</strong> dari {{ $totalPeserta }} mahasiswa (<strong class="text-[#15803d] font-mono">{{ (int) $mahasiswa->total_point }} PTS</strong>).
+                        </p>
+                    </div>
+                    <button 
+                        type="button" 
+                        onclick="switchTab('poin')" 
+                        class="btn-tactile px-3.5 py-2 bg-white hover:bg-gray-100 text-gray-900 border-2 border-black text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] shrink-0 cursor-pointer"
+                    >
+                        Riwayat PointKu →
+                    </button>
+                </div>
+
+                <!-- Podium Top 3 (Grafik Batang Podium Vertikal Ke Atas) -->
                 @if ($topThree->count() > 0)
                     @php
                         $first = $topThree->get(0);
@@ -589,110 +685,67 @@
                     </div>
                 @endif
 
-                <!-- 3. Grid 2 Kolom: Riwayat Point Saya & Peringkat Lengkap -->
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-
-                    <!-- Kolom Kiri (5 cols): Riwayat Point Saya -->
-                    <div class="lg:col-span-5 bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] overflow-hidden">
-                        <div class="px-4 py-3 border-b-2 border-black bg-blue-50/70 flex items-center justify-between">
-                            <h4 class="text-xs font-black uppercase tracking-wider text-[#1A467C]">
-                                Riwayat Point Saya
-                            </h4>
-                            <span class="bg-white border border-black px-2 py-0.5 font-mono font-black text-[10px] text-[#1A467C]">
-                                {{ $mahasiswa->pointHistories->count() }} Aktivitas
-                            </span>
-                        </div>
-
-                        <div class="divide-y divide-gray-200 max-h-96 overflow-y-auto">
-                            @forelse ($mahasiswa->pointHistories as $hist)
-                                @php $isAdd = $hist->tipe === 'tambah'; @endphp
-                                <div class="p-3.5 hover:bg-blue-50/30 transition flex items-start justify-between gap-3">
-                                    <div class="flex items-start gap-2.5 min-w-0">
-                                        <span class="w-8 h-8 border-2 border-black font-mono font-black text-xs flex items-center justify-center shrink-0 shadow-[1px_1px_0px_0px_#000000] {{ $isAdd ? 'bg-[#15803d] text-white' : 'bg-[#CA2C2A] text-white' }}">
-                                            {{ $isAdd ? '+' : '-' }}{{ (int) $hist->jumlah }}
-                                        </span>
-                                        <div class="min-w-0">
-                                            <p class="font-black text-xs uppercase text-gray-950 leading-tight">{{ $hist->kategori }}</p>
-                                            @if ($hist->keterangan)
-                                                <p class="text-[11px] font-semibold text-gray-600 mt-0.5 break-words">{{ $hist->keterangan }}</p>
-                                            @endif
-                                            <p class="text-[10px] font-mono font-bold text-gray-400 mt-0.5">
-                                                {{ $hist->created_at ? $hist->created_at->timezone('Asia/Jakarta')->format('d M Y • H:i') : '-' }}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            @empty
-                                <div class="p-6 text-center text-xs font-bold text-gray-500">
-                                    Belum ada riwayat perubahan point untuk akunmu.
-                                </div>
-                            @endforelse
-                        </div>
+                <!-- Klasemen Lengkap Peserta -->
+                <div class="bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] overflow-hidden">
+                    <div class="px-4 sm:px-5 py-3 border-b-2 border-black bg-blue-50/70 flex items-center justify-between">
+                        <h4 class="text-xs sm:text-sm font-black uppercase tracking-wider text-[#1A467C]">
+                            Peringkat Lengkap Peserta
+                        </h4>
+                        <span class="bg-white border border-black px-2 py-0.5 font-mono font-black text-[10px] text-[#1A467C]">
+                            {{ $totalPeserta }} Mahasiswa
+                        </span>
                     </div>
 
-                    <!-- Kolom Kanan (7 cols): Peringkat Lengkap Peserta -->
-                    <div class="lg:col-span-7 bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] overflow-hidden">
-                        <div class="px-4 py-3 border-b-2 border-black bg-blue-50/70 flex items-center justify-between">
-                            <h4 class="text-xs font-black uppercase tracking-wider text-[#1A467C]">
-                                Klasemen Leaderboard Peserta
-                            </h4>
-                            <span class="bg-white border border-black px-2 py-0.5 font-mono font-black text-[10px] text-[#1A467C]">
-                                {{ $totalPeserta }} Mahasiswa
-                            </span>
-                        </div>
+                    <div class="divide-y divide-gray-200">
+                        @foreach ($leaderboardList as $idx => $item)
+                            @php
+                                $rankNum = $idx + 1;
+                                $pts = (int) $item->total_point;
+                                $pctWidth = $pts > 0 ? max(8, round(($pts / $maxPointAll) * 100)) : 0;
+                                $isCurrentUser = (int) $item->id === (int) $mahasiswa->id;
+                                $barColor = $rankNum === 1
+                                    ? 'bg-amber-400'
+                                    : ($rankNum === 2
+                                        ? 'bg-[#2A82C6]'
+                                        : ($rankNum === 3 ? 'bg-orange-400' : 'bg-[#15803d]'));
+                            @endphp
+                            <div class="px-4 sm:px-5 py-3.5 {{ $isCurrentUser ? 'bg-amber-50/90 border-l-4 border-l-[#1A467C]' : 'hover:bg-blue-50/40' }} transition flex items-center justify-between gap-3">
+                                <div class="flex items-center gap-3 min-w-0 flex-1">
+                                    <span class="w-8 h-8 border-2 border-black font-mono font-black text-xs flex items-center justify-center shrink-0 {{ $rankNum === 1 ? 'bg-amber-300 text-black' : ($rankNum === 2 ? 'bg-sky-200 text-black' : ($rankNum === 3 ? 'bg-orange-200 text-black' : 'bg-gray-100 text-gray-800')) }}">
+                                        #{{ $rankNum }}
+                                    </span>
 
-                        <div class="divide-y divide-gray-200 max-h-[28rem] overflow-y-auto">
-                            @foreach ($leaderboardList as $idx => $item)
-                                @php
-                                    $rankNum = $idx + 1;
-                                    $pts = (int) $item->total_point;
-                                    $pctWidth = $pts > 0 ? max(8, round(($pts / $maxPointAll) * 100)) : 0;
-                                    $isCurrentUser = (int) $item->id === (int) $mahasiswa->id;
-                                    $barColor = $rankNum === 1
-                                        ? 'bg-amber-400'
-                                        : ($rankNum === 2
-                                            ? 'bg-[#2A82C6]'
-                                            : ($rankNum === 3 ? 'bg-orange-400' : 'bg-[#15803d]'));
-                                @endphp
-                                <div class="px-4 py-3 {{ $isCurrentUser ? 'bg-amber-50/90 border-l-4 border-l-[#1A467C]' : 'hover:bg-blue-50/40' }} transition flex items-center justify-between gap-3">
-                                    <div class="flex items-center gap-3 min-w-0 flex-1">
-                                        <span class="w-7 h-7 border-2 border-black font-mono font-black text-[11px] flex items-center justify-center shrink-0 {{ $rankNum === 1 ? 'bg-amber-300 text-black' : ($rankNum === 2 ? 'bg-sky-200 text-black' : ($rankNum === 3 ? 'bg-orange-200 text-black' : 'bg-gray-100 text-gray-800')) }}">
-                                            #{{ $rankNum }}
-                                        </span>
+                                    <div class="w-9 h-9 bg-[#2A82C6] text-white border-2 border-black flex items-center justify-center font-black text-xs shrink-0 overflow-hidden">
+                                        @if ($item->avatarUrl())
+                                            <img src="{{ $item->avatarUrl() }}" alt="Avatar {{ $item->nama }}" class="w-full h-full object-cover">
+                                        @else
+                                            {{ $item->initials() }}
+                                        @endif
+                                    </div>
 
-                                        <div class="w-8 h-8 bg-[#2A82C6] text-white border-2 border-black flex items-center justify-center font-black text-[11px] shrink-0 overflow-hidden">
-                                            @if ($item->avatarUrl())
-                                                <img src="{{ $item->avatarUrl() }}" alt="Avatar {{ $item->nama }}" class="w-full h-full object-cover">
-                                            @else
-                                                {{ $item->initials() }}
+                                    <div class="min-w-0 flex-1">
+                                        <div class="flex items-center gap-1.5">
+                                            <p class="font-black text-xs sm:text-sm text-gray-950 truncate">{{ $item->nama }}</p>
+                                            @if ($isCurrentUser)
+                                                <span class="bg-[#1A467C] text-white text-[9px] font-black uppercase px-1.5 py-0.2 border border-black shrink-0">
+                                                    KAMU
+                                                </span>
                                             @endif
                                         </div>
-
-                                        <div class="min-w-0 flex-1">
-                                            <div class="flex items-center gap-1.5">
-                                                <p class="font-black text-xs text-gray-950 truncate">{{ $item->nama }}</p>
-                                                @if ($isCurrentUser)
-                                                    <span class="bg-[#1A467C] text-white text-[9px] font-black uppercase px-1.5 py-0.2 border border-black shrink-0">
-                                                        KAMU
-                                                    </span>
-                                                @endif
-                                            </div>
-                                            <p class="font-mono text-[10px] font-bold text-[#1A467C]">{{ $item->kelas }}</p>
-                                            <div class="mt-1 w-full max-w-xs h-2 bg-gray-100 border border-black overflow-hidden">
-                                                <div class="h-full {{ $barColor }}" style="width: {{ $pctWidth }}%"></div>
-                                            </div>
+                                        <p class="font-mono text-[10px] sm:text-[11px] font-bold text-[#1A467C]">{{ $item->kelas }}</p>
+                                        <div class="mt-1.5 w-full max-w-md h-2.5 bg-gray-100 border border-black overflow-hidden">
+                                            <div class="h-full {{ $barColor }}" style="width: {{ $pctWidth }}%"></div>
                                         </div>
                                     </div>
-
-                                    <div class="bg-green-100 border-2 border-black px-2.5 py-1 shadow-[1px_1px_0px_0px_#000000] inline-flex items-baseline gap-1 shrink-0">
-                                        <span class="font-mono font-black text-xs text-[#15803d] leading-none">{{ $pts }}</span>
-                                        <span class="text-[9px] font-black uppercase text-[#15803d] leading-none">PTS</span>
-                                    </div>
                                 </div>
-                            @endforeach
-                        </div>
-                    </div>
 
+                                <div class="bg-green-100 border-2 border-black px-3 py-1 shadow-[2px_2px_0px_0px_#000000] inline-flex items-baseline gap-1 shrink-0">
+                                    <span class="font-mono font-black text-xs sm:text-sm text-[#15803d] leading-none">{{ $pts }}</span>
+                                    <span class="text-[9px] sm:text-[10px] font-black uppercase text-[#15803d] leading-none">PTS</span>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
                 </div>
 
             </section>
@@ -874,27 +927,42 @@
             <span class="text-[10px] font-black uppercase tracking-wider">Scan</span>
         </button>
 
-        <!-- Tab 3: PointKu & Leaderboard -->
+        <!-- Tab 3: PointKu -->
         <button 
             type="button" 
             id="bot-nav-poin"
             onclick="switchTab('poin')" 
-            class="btn-tactile flex flex-col items-center gap-1 py-1 px-2.5 text-gray-600 cursor-pointer"
+            class="btn-tactile flex flex-col items-center gap-1 py-1 px-2 text-gray-600 cursor-pointer"
         >
             <div class="bottom-nav-icon w-8 h-8 rounded-none border border-black flex items-center justify-center">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="square" stroke-width="2.5" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
                 </svg>
             </div>
-            <span class="text-[10px] font-black uppercase tracking-wider">PointKu</span>
+            <span class="text-[9px] font-black uppercase tracking-wider">PointKu</span>
         </button>
 
-        <!-- Tab 4: Profil -->
+        <!-- Tab 4: Leaderboard -->
+        <button 
+            type="button" 
+            id="bot-nav-leaderboard"
+            onclick="switchTab('leaderboard')" 
+            class="btn-tactile flex flex-col items-center gap-1 py-1 px-2 text-gray-600 cursor-pointer"
+        >
+            <div class="bottom-nav-icon w-8 h-8 rounded-none border border-black flex items-center justify-center">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="square" stroke-width="2.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+            </div>
+            <span class="text-[9px] font-black uppercase tracking-wider">Rank</span>
+        </button>
+
+        <!-- Tab 5: Profil -->
         <button 
             type="button" 
             id="bot-nav-profil"
             onclick="switchTab('profil')" 
-            class="btn-tactile flex flex-col items-center gap-1 py-1 px-2.5 text-gray-600 cursor-pointer"
+            class="btn-tactile flex flex-col items-center gap-1 py-1 px-2 text-gray-600 cursor-pointer"
         >
             <div class="bottom-nav-icon w-8 h-8 rounded-none border border-black flex items-center justify-center">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1024,9 +1092,9 @@
             document.getElementById('logout-confirm-modal').classList.add('hidden');
         }
 
-        // Switch Tab Active State (Beranda, Scan, PointKu, Profil)
+        // Switch Tab Active State (Beranda, Scan, PointKu, Leaderboard, Profil)
         function switchTab(tabId) {
-            const panels = ['beranda', 'scan', 'poin', 'profil'];
+            const panels = ['beranda', 'scan', 'poin', 'leaderboard', 'profil'];
             if (!panels.includes(tabId)) {
                 tabId = 'beranda';
             }
@@ -1103,9 +1171,9 @@
             const tabParam = urlParams.get('tab');
             const hash = window.location.hash.replace('#', '');
             
-            if (['beranda', 'scan', 'poin', 'profil'].includes(tabParam)) {
+            if (['beranda', 'scan', 'poin', 'leaderboard', 'profil'].includes(tabParam)) {
                 switchTab(tabParam);
-            } else if (['beranda', 'scan', 'poin', 'profil'].includes(hash)) {
+            } else if (['beranda', 'scan', 'poin', 'leaderboard', 'profil'].includes(hash)) {
                 switchTab(hash);
             }
         });
