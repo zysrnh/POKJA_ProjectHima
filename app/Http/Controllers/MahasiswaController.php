@@ -422,7 +422,12 @@ class MahasiswaController extends Controller
             return redirect()->route('mahasiswa.login')->with('error', 'Sesi Anda telah berakhir karena akun ini baru saja login di perangkat lain.');
         }
 
-        $mahasiswa = Pendaftaran::with('presensis')->find(session('mahasiswa_id'));
+        $mahasiswa = Pendaftaran::with([
+            'presensis',
+            'pointHistories' => function ($q) {
+                $q->orderBy('created_at', 'desc')->orderBy('id', 'desc');
+            },
+        ])->find(session('mahasiswa_id'));
 
         if (!$mahasiswa) {
             session()->forget(['mahasiswa_id', 'mahasiswa_nim', 'mahasiswa_nama', 'mahasiswa_device_token']);
@@ -434,7 +439,27 @@ class MahasiswaController extends Controller
         $totalHadir = $mahasiswa->presensis->where('status', 'hadir')->count();
         $persenHadir = round(($totalHadir / 7) * 100);
 
-        return view('mahasiswa.dashboard', compact('mahasiswa', 'pengaturan', 'presensiMap', 'totalHadir', 'persenHadir'));
+        // Data PointKu & Leaderboard untuk Portal Mahasiswa
+        $leaderboardList = Pendaftaran::orderBy('total_point', 'desc')
+            ->orderBy('nama', 'asc')
+            ->get();
+
+        $topThree = $leaderboardList->take(3)->values();
+        $myRankIndex = $leaderboardList->search(fn ($m) => (int) $m->id === (int) $mahasiswa->id);
+        $myRank = $myRankIndex !== false ? ($myRankIndex + 1) : '-';
+        $totalPeserta = $leaderboardList->count();
+
+        return view('mahasiswa.dashboard', compact(
+            'mahasiswa',
+            'pengaturan',
+            'presensiMap',
+            'totalHadir',
+            'persenHadir',
+            'leaderboardList',
+            'topThree',
+            'myRank',
+            'totalPeserta'
+        ));
     }
 
     /**
