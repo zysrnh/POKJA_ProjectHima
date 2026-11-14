@@ -768,6 +768,16 @@
         }
     }
 
+    function escapeHtml(value) {
+        return String(value ?? '').replace(/[&<>"']/g, ch => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;',
+        }[ch]));
+    }
+
     function filterStudentAutocomplete(mode) {
         const input = document.getElementById(`${mode}-search-input`);
         const dropdown = document.getElementById(`${mode}-search-dropdown`);
@@ -786,24 +796,29 @@
             return;
         }
 
-        dropdown.innerHTML = matches.map(m => {
-            const safeNama = m.nama.replace(/'/g, "\\'");
-            const safeKelas = m.kelas.replace(/'/g, "\\'");
-            return `
-                <div 
-                    onclick="selectStudentForPoint('${mode}', ${m.id}, '${safeNama}', '${m.nim}', '${safeKelas}', ${m.total_point || 0})"
-                    class="px-3.5 py-2.5 hover:bg-blue-50 cursor-pointer flex items-center justify-between gap-2 transition"
-                >
-                    <div class="min-w-0">
-                        <p class="font-black text-xs text-gray-950 truncate">${m.nama}</p>
-                        <p class="font-mono text-[11px] font-bold text-[#1A467C]">${m.nim} • ${m.kelas}</p>
-                    </div>
-                    <span class="shrink-0 bg-green-100 border border-black px-2 py-0.5 font-mono font-black text-[11px] text-[#15803d]">
-                        ${m.total_point || 0} Pts
-                    </span>
+        dropdown.innerHTML = matches.map((m, idx) => `
+            <div 
+                data-student-idx="${idx}"
+                class="px-3.5 py-2.5 hover:bg-blue-50 cursor-pointer flex items-center justify-between gap-2 transition"
+            >
+                <div class="min-w-0">
+                    <p class="font-black text-xs text-gray-950 truncate">${escapeHtml(m.nama)}</p>
+                    <p class="font-mono text-[11px] font-bold text-[#1A467C]">${escapeHtml(m.nim)} • ${escapeHtml(m.kelas)}</p>
                 </div>
-            `;
-        }).join('');
+                <span class="shrink-0 bg-green-100 border border-black px-2 py-0.5 font-mono font-black text-[11px] text-[#15803d]">
+                    ${Number(m.total_point) || 0} Pts
+                </span>
+            </div>
+        `).join('');
+
+        dropdown.querySelectorAll('[data-student-idx]').forEach(el => {
+            el.addEventListener('click', () => {
+                const m = matches[Number(el.dataset.studentIdx)];
+                if (m) {
+                    selectStudentForPoint(mode, m.id, m.nama, m.nim, m.kelas, m.total_point || 0);
+                }
+            });
+        });
 
         dropdown.classList.remove('hidden');
     }
@@ -938,32 +953,33 @@
             if (!data.success || !data.histories || data.histories.length === 0) {
                 body.innerHTML = `
                     <div class="p-6 text-center bg-gray-50 border-2 border-dashed border-gray-300">
-                        <p class="text-xs font-bold text-gray-500">Belum ada riwayat point untuk <strong>${nama}</strong>.</p>
+                        <p class="text-xs font-bold text-gray-500">Belum ada riwayat point untuk <strong>${escapeHtml(nama)}</strong>.</p>
                     </div>
                 `;
                 return;
             }
 
-            body.innerHTML = data.histories.map(h => {
+            body.innerHTML = data.histories.map((h, idx) => {
                 const isAdd = h.tipe === 'tambah';
-                const deleteUrl = `{{ url('/admin/poin/riwayat') }}/${h.id}`;
+                const jumlah = Number(h.jumlah) || 0;
+                const deleteUrl = `{{ url('/admin/poin/riwayat') }}/${Number(h.id) || 0}`;
                 return `
                     <div class="p-3 border-2 border-black ${isAdd ? 'bg-green-50/70' : 'bg-red-50/70'} shadow-[2px_2px_0px_0px_#000000] flex items-center justify-between gap-3">
                         <div class="flex items-start gap-2.5 min-w-0">
                             <span class="w-8 h-8 border-2 border-black font-mono font-black text-xs flex items-center justify-center shrink-0 ${isAdd ? 'bg-[#15803d] text-white' : 'bg-[#CA2C2A] text-white'}">
-                                ${isAdd ? '+' : '-'}${h.jumlah}
+                                ${isAdd ? '+' : '-'}${jumlah}
                             </span>
                             <div class="min-w-0">
                                 <div class="flex flex-wrap items-center gap-1.5">
-                                    <span class="font-black text-xs uppercase text-gray-950">${h.kategori}</span>
-                                    <span class="text-[10px] font-mono font-semibold text-gray-500">• ${h.tanggal}</span>
+                                    <span class="font-black text-xs uppercase text-gray-950">${escapeHtml(h.kategori)}</span>
+                                    <span class="text-[10px] font-mono font-semibold text-gray-500">• ${escapeHtml(h.tanggal)}</span>
                                 </div>
-                                ${h.keterangan ? `<p class="text-xs font-semibold text-gray-700 mt-0.5 break-words">${h.keterangan}</p>` : ''}
-                                <p class="text-[10px] font-mono text-gray-500 mt-0.5">Oleh: ${h.created_by}</p>
+                                ${h.keterangan ? `<p class="text-xs font-semibold text-gray-700 mt-0.5 break-words">${escapeHtml(h.keterangan)}</p>` : ''}
+                                <p class="text-[10px] font-mono text-gray-500 mt-0.5">Oleh: ${escapeHtml(h.created_by)}</p>
                             </div>
                         </div>
-                        <form action="${deleteUrl}" method="POST" onsubmit="return confirm('Hapus riwayat ${h.kategori} (${isAdd ? '+' : '-'}${h.jumlah} Pts) ini? Total point mahasiswa akan otomatis disesuaikan.')">
-                            <input type="hidden" name="_token" value="${csrfToken}">
+                        <form action="${deleteUrl}" method="POST" data-history-idx="${idx}">
+                            <input type="hidden" name="_token" value="${escapeHtml(csrfToken)}">
                             <input type="hidden" name="_method" value="DELETE">
                             <button 
                                 type="submit" 
@@ -976,6 +992,18 @@
                     </div>
                 `;
             }).join('');
+
+            body.querySelectorAll('form[data-history-idx]').forEach(form => {
+                form.addEventListener('submit', (e) => {
+                    const h = data.histories[Number(form.dataset.historyIdx)];
+                    const isAdd = h && h.tipe === 'tambah';
+                    const jumlah = Number(h?.jumlah) || 0;
+                    const kategori = h?.kategori ?? '';
+                    if (!confirm(`Hapus riwayat ${kategori} (${isAdd ? '+' : '-'}${jumlah} Pts) ini? Total point mahasiswa akan otomatis disesuaikan.`)) {
+                        e.preventDefault();
+                    }
+                });
+            });
         } catch (err) {
             body.innerHTML = `<p class="text-center text-xs font-bold text-[#CA2C2A] py-6">Gagal memuat riwayat point.</p>`;
         }
