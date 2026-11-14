@@ -239,13 +239,6 @@
                         <span id="rt-sidebar-point" class="bg-green-100 border border-black text-[#15803d] px-1.5 py-0.2 font-black text-[10px]">★ {{ (int) $mahasiswa->total_point }} PTS</span>
                     </div>
                 </div>
-                <div class="flex items-center justify-between pt-1 border-t border-dashed border-gray-300 text-[9px] font-mono font-black uppercase text-gray-500">
-                    <span class="inline-flex items-center gap-1 text-[#15803d]">
-                        <span class="live-dot w-1.5 h-1.5 bg-[#15803d] border border-black inline-block"></span>
-                        LIVE SYNC
-                    </span>
-                    <span id="rt-sync-clock">3s</span>
-                </div>
             </div>
 
             <!-- Sidebar Navigation Links -->
@@ -389,11 +382,6 @@
                     <span class="text-[9px] font-bold text-gray-500 uppercase mt-0.5 block">Portal Mahasiswa</span>
                 </div>
             </div>
-
-            <span class="inline-flex items-center gap-1 bg-green-100 border border-black px-2 py-0.5 text-[9px] font-mono font-black uppercase text-[#15803d]">
-                <span class="live-dot w-1.5 h-1.5 bg-[#15803d] border border-black inline-block"></span>
-                LIVE
-            </span>
         </header>
 
         <!-- Main Content Area -->
@@ -638,19 +626,18 @@
             </section>
 
             <!-- ========================================================== -->
-            <!-- TAB 4: LEADERBOARD KELOMPOK POKJA (Individu di-hide)       -->
+            <!-- TAB 4: LEADERBOARD POINT POKJA (PERORANGAN & KELOMPOK)     -->
             <!-- ========================================================== -->
             <section id="tab-panel-leaderboard" class="tab-snap-in hidden space-y-5 sm:space-y-6">
 
-                <!-- Header Mode Leaderboard (Fokus Kelompok; Peserta di-hide) -->
-                <div class="mhs-snap-1 card-tactile bg-white border-2 border-black p-2.5 shadow-[4px_4px_0px_0px_#000000] flex items-center justify-between gap-2">
-                    <div class="flex items-center gap-2">
+                <!-- Header Mode Leaderboard (Peserta & Kelompok + Capture & Share) -->
+                <div class="mhs-snap-1 card-tactile bg-white border-2 border-black p-2.5 shadow-[4px_4px_0px_0px_#000000] flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div class="grid grid-cols-2 sm:flex items-center gap-2">
                         <button
                             type="button"
                             id="lb-btn-individu"
                             onclick="switchLeaderboardMode('individu')"
-                            class="hidden"
-                            aria-hidden="true"
+                            class="btn-tactile px-3 sm:px-4 py-2 bg-[#1A467C] text-white border-2 border-black text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
                         >
                             Peserta ({{ $totalPeserta }})
                         </button>
@@ -658,18 +645,26 @@
                             type="button"
                             id="lb-btn-kelompok"
                             onclick="switchLeaderboardMode('kelompok')"
-                            class="btn-tactile px-4 py-2 bg-[#1A467C] text-white border-2 border-black text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
+                            class="btn-tactile px-3 sm:px-4 py-2 bg-white hover:bg-gray-100 text-gray-900 border-2 border-black text-xs font-black uppercase tracking-wider cursor-pointer"
                         >
                             Kelompok ({{ $totalKelompok }})
                         </button>
                     </div>
-                    <span class="font-mono text-[10px] font-black uppercase text-gray-500 px-2">
-                        Klasemen Point Kelompok
-                    </span>
+                    <button
+                        type="button"
+                        onclick="openMahasiswaLeaderboardCapture()"
+                        class="btn-tactile w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2 bg-amber-300 hover:bg-amber-400 text-black border-2 border-black text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
+                    >
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="square" stroke-width="2.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                            <path stroke-linecap="square" stroke-width="2.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        <span>Capture &amp; Share</span>
+                    </button>
                 </div>
 
-                <!-- MODE 1: LEADERBOARD INDIVIDU (Disembunyikan di Portal Mahasiswa) -->
-                <div id="lb-view-individu" class="hidden space-y-5 sm:space-y-6">
+                <!-- MODE 1: LEADERBOARD INDIVIDU -->
+                <div id="lb-view-individu" class="space-y-5 sm:space-y-6">
 
                 <!-- Podium Top 3 (Grafik Batang Podium Vertikal Ke Atas) -->
                 @php
@@ -827,7 +822,7 @@
                 </div> <!-- End #lb-view-individu -->
 
                 <!-- MODE 2: LEADERBOARD KELOMPOK -->
-                <div id="lb-view-kelompok" class="space-y-5 sm:space-y-6">
+                <div id="lb-view-kelompok" class="hidden space-y-5 sm:space-y-6">
                     @php
                         $maxKelompokPoint = max(1, (int) ($kelompokLeaderboardList->max('total_point') ?? 1));
                         $grpFirst = $kelompokTopThree->get(0);
@@ -1368,21 +1363,21 @@
     <!-- ============================================================== -->
     <!-- MOBILE BOTTOM NAVIGATION TOOLBAR (Khas Mobile Apps)            -->
     <!-- ============================================================== -->
-    <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t-[3px] border-black flex justify-around items-center py-2 px-0.5 shadow-[0_-3px_0px_0px_#000000]">
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t-[3px] border-black grid grid-cols-8 items-center py-1.5 px-1 gap-0.5 shadow-[0_-3px_0px_0px_#000000]">
         
         <!-- Tab 1: Beranda -->
         <button 
             type="button" 
             id="bot-nav-beranda"
             onclick="switchTab('beranda')" 
-            class="bottom-nav-active btn-tactile flex flex-col items-center gap-1 py-1 px-1 text-gray-600 cursor-pointer"
+            class="bottom-nav-active btn-tactile min-w-0 w-full flex flex-col items-center justify-center gap-0.5 py-1 px-0.5 text-gray-600 cursor-pointer"
         >
-            <div class="bottom-nav-icon w-7 h-7 sm:w-8 sm:h-8 rounded-none border border-black flex items-center justify-center">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="bottom-nav-icon w-6 h-6 sm:w-8 sm:h-8 rounded-none border border-black flex items-center justify-center">
+                <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="square" stroke-width="2.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                 </svg>
             </div>
-            <span class="text-[8px] sm:text-[9px] font-black uppercase tracking-tight">Beranda</span>
+            <span class="text-[7px] sm:text-[9px] leading-none font-black uppercase tracking-tighter truncate max-w-full">Beranda</span>
         </button>
 
         <!-- Tab 2: Scan Presensi -->
@@ -1390,15 +1385,15 @@
             type="button" 
             id="bot-nav-scan"
             onclick="switchTab('scan')" 
-            class="btn-tactile flex flex-col items-center gap-1 py-1 px-1 text-gray-600 cursor-pointer"
+            class="btn-tactile min-w-0 w-full flex flex-col items-center justify-center gap-0.5 py-1 px-0.5 text-gray-600 cursor-pointer"
         >
-            <div class="bottom-nav-icon w-7 h-7 sm:w-8 sm:h-8 rounded-none border border-black flex items-center justify-center">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="bottom-nav-icon w-6 h-6 sm:w-8 sm:h-8 rounded-none border border-black flex items-center justify-center">
+                <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="square" stroke-width="2.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                     <path stroke-linecap="square" stroke-width="2.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
             </div>
-            <span class="text-[8px] sm:text-[9px] font-black uppercase tracking-tight">Scan</span>
+            <span class="text-[7px] sm:text-[9px] leading-none font-black uppercase tracking-tighter truncate max-w-full">Scan</span>
         </button>
 
         <!-- Tab 3: PointKu -->
@@ -1406,14 +1401,14 @@
             type="button" 
             id="bot-nav-poin"
             onclick="switchTab('poin')" 
-            class="btn-tactile flex flex-col items-center gap-1 py-1 px-1 text-gray-600 cursor-pointer"
+            class="btn-tactile min-w-0 w-full flex flex-col items-center justify-center gap-0.5 py-1 px-0.5 text-gray-600 cursor-pointer"
         >
-            <div class="bottom-nav-icon w-7 h-7 sm:w-8 sm:h-8 rounded-none border border-black flex items-center justify-center">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="bottom-nav-icon w-6 h-6 sm:w-8 sm:h-8 rounded-none border border-black flex items-center justify-center">
+                <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="square" stroke-width="2.5" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
                 </svg>
             </div>
-            <span class="text-[8px] sm:text-[9px] font-black uppercase tracking-tight">PointKu</span>
+            <span class="text-[7px] sm:text-[9px] leading-none font-black uppercase tracking-tighter truncate max-w-full">PointKu</span>
         </button>
 
         <!-- Tab 4: Leaderboard -->
@@ -1421,14 +1416,14 @@
             type="button" 
             id="bot-nav-leaderboard"
             onclick="switchTab('leaderboard')" 
-            class="btn-tactile flex flex-col items-center gap-1 py-1 px-1 text-gray-600 cursor-pointer"
+            class="btn-tactile min-w-0 w-full flex flex-col items-center justify-center gap-0.5 py-1 px-0.5 text-gray-600 cursor-pointer"
         >
-            <div class="bottom-nav-icon w-7 h-7 sm:w-8 sm:h-8 rounded-none border border-black flex items-center justify-center">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="bottom-nav-icon w-6 h-6 sm:w-8 sm:h-8 rounded-none border border-black flex items-center justify-center">
+                <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="square" stroke-width="2.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
             </div>
-            <span class="text-[8px] sm:text-[9px] font-black uppercase tracking-tight">Rank</span>
+            <span class="text-[7px] sm:text-[9px] leading-none font-black uppercase tracking-tighter truncate max-w-full">Rank</span>
         </button>
 
         <!-- Tab 5: Kelompok -->
@@ -1436,17 +1431,17 @@
             type="button" 
             id="bot-nav-kelompok"
             onclick="switchTab('kelompok')" 
-            class="btn-tactile flex flex-col items-center gap-1 py-1 px-1 text-gray-600 cursor-pointer"
+            class="btn-tactile min-w-0 w-full flex flex-col items-center justify-center gap-0.5 py-1 px-0.5 text-gray-600 cursor-pointer"
         >
-            <div class="bottom-nav-icon relative w-7 h-7 sm:w-8 sm:h-8 rounded-none border border-black flex items-center justify-center">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="bottom-nav-icon relative w-6 h-6 sm:w-8 sm:h-8 rounded-none border border-black flex items-center justify-center">
+                <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="square" stroke-width="2.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
-                <span id="rt-bot-inbox-badge" class="{{ (isset($kelompokInbox) && $kelompokInbox->count() > 0) ? '' : 'hidden ' }}absolute -top-1.5 -right-1.5 min-w-[14px] h-[14px] px-0.5 bg-amber-300 text-black border border-black text-[8px] font-mono font-black flex items-center justify-center leading-none">
+                <span id="rt-bot-inbox-badge" class="{{ (isset($kelompokInbox) && $kelompokInbox->count() > 0) ? '' : 'hidden ' }}absolute -top-1.5 -right-1.5 min-w-[13px] h-[13px] px-0.5 bg-amber-300 text-black border border-black text-[7px] font-mono font-black flex items-center justify-center leading-none">
                     {{ isset($kelompokInbox) ? $kelompokInbox->count() : 0 }}
                 </span>
             </div>
-            <span class="text-[8px] sm:text-[9px] font-black uppercase tracking-tight">Kelompok</span>
+            <span class="text-[7px] sm:text-[9px] leading-none font-black uppercase tracking-tighter truncate max-w-full">Kelompok</span>
         </button>
 
         <!-- Tab 6: Kuesioner -->
@@ -1454,15 +1449,17 @@
             type="button" 
             id="bot-nav-kuesioner"
             onclick="switchTab('kuesioner')" 
-            class="btn-tactile relative flex flex-col items-center gap-1 py-1 px-1 text-gray-600 cursor-pointer"
+            class="btn-tactile min-w-0 w-full flex flex-col items-center justify-center gap-0.5 py-1 px-0.5 text-gray-600 cursor-pointer"
         >
-            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="square" stroke-width="2.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-            </svg>
-            <span class="text-[8px] sm:text-[9px] font-black uppercase tracking-tight">Kuesioner</span>
-            @if(!empty($sudahIsiKuesioner))
-                <span class="absolute top-0.5 right-1 w-2 h-2 bg-green-500 border border-black rounded-full"></span>
-            @endif
+            <div class="bottom-nav-icon relative w-6 h-6 sm:w-8 sm:h-8 rounded-none border border-black flex items-center justify-center">
+                <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="square" stroke-width="2.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                </svg>
+                @if(!empty($sudahIsiKuesioner))
+                    <span class="absolute -top-1 -right-1 w-2 h-2 bg-green-500 border border-black"></span>
+                @endif
+            </div>
+            <span class="text-[7px] sm:text-[9px] leading-none font-black uppercase tracking-tighter truncate max-w-full">Kuesioner</span>
         </button>
 
         <!-- Tab 7: Profil -->
@@ -1470,28 +1467,28 @@
             type="button" 
             id="bot-nav-profil"
             onclick="switchTab('profil')" 
-            class="btn-tactile flex flex-col items-center gap-1 py-1 px-1 text-gray-600 cursor-pointer"
+            class="btn-tactile min-w-0 w-full flex flex-col items-center justify-center gap-0.5 py-1 px-0.5 text-gray-600 cursor-pointer"
         >
-            <div class="bottom-nav-icon w-7 h-7 sm:w-8 sm:h-8 rounded-none border border-black flex items-center justify-center">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="bottom-nav-icon w-6 h-6 sm:w-8 sm:h-8 rounded-none border border-black flex items-center justify-center">
+                <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="square" stroke-width="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
             </div>
-            <span class="text-[8px] sm:text-[9px] font-black uppercase tracking-tight">Profil</span>
+            <span class="text-[7px] sm:text-[9px] leading-none font-black uppercase tracking-tighter truncate max-w-full">Profil</span>
         </button>
 
-        <!-- Tab 7: Keluar dengan Konfirmasi -->
+        <!-- Tab 8: Keluar dengan Konfirmasi -->
         <button 
             type="button" 
             onclick="openLogoutModal()"
-            class="btn-tactile flex flex-col items-center gap-1 py-1 px-1 text-[#CA2C2A] cursor-pointer"
+            class="btn-tactile min-w-0 w-full flex flex-col items-center justify-center gap-0.5 py-1 px-0.5 text-[#CA2C2A] cursor-pointer"
         >
-            <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-none border border-black flex items-center justify-center bg-red-50 text-red-700">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="w-6 h-6 sm:w-8 sm:h-8 rounded-none border border-black flex items-center justify-center bg-red-50 text-red-700">
+                <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="square" stroke-width="2.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>
             </div>
-            <span class="text-[8px] sm:text-[9px] font-black uppercase tracking-tight">Keluar</span>
+            <span class="text-[7px] sm:text-[9px] leading-none font-black uppercase tracking-tighter truncate max-w-full">Keluar</span>
         </button>
 
     </nav>
@@ -1644,11 +1641,71 @@
 
         let currentRealtimeSig = @json($realtimeSignature ?? '');
         let pendingKelompokPayload = null;
-        let currentLeaderboardMode = 'kelompok';
+        let currentLeaderboardMode = 'individu';
         let isRealtimeSyncInFlight = false;
         let realtimePollTimer = null;
         let lastIndPodiumSig = '';
         let lastGrpPodiumSig = '';
+        let latestMyRank = @json($myRank ?? '-');
+        const myKelompokId = {{ $myKelompok ? (int) $myKelompok->id : 'null' }};
+        let latestIndLeaderboard = @json($leaderboardList->values()->map(function ($m, $idx) use ($mahasiswa) {
+            return [
+                'id' => (int) $m->id,
+                'rank' => $idx + 1,
+                'nama' => $m->nama,
+                'kelas' => $m->kelas,
+                'total_point' => (int) $m->total_point,
+                'initials' => $m->initials(),
+                'avatar_url' => $m->avatarUrl(),
+                'is_me' => (int) $m->id === (int) $mahasiswa->id,
+            ];
+        }));
+        let latestGrpLeaderboard = @json($kelompokLeaderboardList->values()->map(function ($g, $idx) use ($myKelompok) {
+            return [
+                'id' => (int) $g->id,
+                'rank' => $idx + 1,
+                'nama_kelompok' => $g->nama_kelompok,
+                'ketua_nama' => $g->ketua_nama,
+                'jumlah_anggota' => (int) $g->jumlah_anggota,
+                'total_point' => (int) $g->total_point,
+                'initials' => $g->initials,
+                'foto_url' => $g->foto_url,
+                'is_my_group' => $myKelompok && (int) $g->id === (int) $myKelompok->id,
+            ];
+        }));
+
+        function openMahasiswaLeaderboardCapture() {
+            if (!window.PokjaLeaderboardCapture) return;
+            const isGrp = currentLeaderboardMode === 'kelompok';
+            const items = isGrp
+                ? latestGrpLeaderboard.map((g, idx) => ({
+                    rank: g.rank || (idx + 1),
+                    title: g.nama_kelompok,
+                    subtitle: `Ketua: ${g.ketua_nama || '-'}`,
+                    barFooter: `${g.jumlah_anggota || 0} Anggota`,
+                    points: Number(g.total_point) || 0,
+                    initials: g.initials || 'KL',
+                    photoUrl: g.foto_url || null,
+                    isMine: !!g.is_my_group,
+                }))
+                : latestIndLeaderboard.map((m, idx) => ({
+                    rank: m.rank || (idx + 1),
+                    title: m.nama,
+                    subtitle: m.kelas || '-',
+                    barFooter: m.is_me ? 'KAMU' : '',
+                    points: Number(m.total_point) || 0,
+                    initials: m.initials || 'IF',
+                    photoUrl: m.avatar_url || null,
+                    isMine: !!m.is_me,
+                }));
+
+            window.PokjaLeaderboardCapture.open({
+                mode: currentLeaderboardMode,
+                kelas: '',
+                items,
+                myRank: isGrp ? null : latestMyRank,
+            });
+        }
 
         // Shared Tactile Modal Open/Close Animation (Spring Slam In & Snap Out)
         function openModalAnimated(modalId) {
@@ -1812,23 +1869,32 @@
             window.location.hash = tabId;
         }
 
-        // Mode Leaderboard Mahasiswa dikunci ke Kelompok (perorangan di-hide)
         function switchLeaderboardMode(mode) {
-            currentLeaderboardMode = 'kelompok';
+            currentLeaderboardMode = mode === 'kelompok' ? 'kelompok' : 'individu';
             const indView = document.getElementById('lb-view-individu');
             const grpView = document.getElementById('lb-view-kelompok');
+            const indBtn = document.getElementById('lb-btn-individu');
             const grpBtn = document.getElementById('lb-btn-kelompok');
 
-            const activeCls = 'btn-tactile px-4 py-2 bg-[#1A467C] text-white border-2 border-black text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] cursor-pointer';
+            const activeCls = 'btn-tactile px-3 sm:px-4 py-2 bg-[#1A467C] text-white border-2 border-black text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] cursor-pointer';
+            const inactiveCls = 'btn-tactile px-3 sm:px-4 py-2 bg-white hover:bg-gray-100 text-gray-900 border-2 border-black text-xs font-black uppercase tracking-wider cursor-pointer';
 
             if (indView && grpView) {
-                indView.classList.add('hidden');
-                grpView.classList.remove('hidden');
-                replaySnapIn(grpView);
-                replayPodiumAnimations(document.getElementById('lb-kelompok-podium'));
+                if (currentLeaderboardMode === 'kelompok') {
+                    indView.classList.add('hidden');
+                    grpView.classList.remove('hidden');
+                    replaySnapIn(grpView);
+                    replayPodiumAnimations(document.getElementById('lb-kelompok-podium'));
+                } else {
+                    grpView.classList.add('hidden');
+                    indView.classList.remove('hidden');
+                    replaySnapIn(indView);
+                    replayPodiumAnimations(document.getElementById('lb-individu-podium'));
+                }
             }
-            if (grpBtn) {
-                grpBtn.className = activeCls;
+            if (indBtn && grpBtn) {
+                indBtn.className = currentLeaderboardMode === 'individu' ? activeCls : inactiveCls;
+                grpBtn.className = currentLeaderboardMode === 'kelompok' ? activeCls : inactiveCls;
             }
         }
 
@@ -2874,6 +2940,8 @@
 
             // Update Leaderboard Individu (Podium + FLIP List)
             const indList = Array.isArray(data.individu_leaderboard) ? data.individu_leaderboard : [];
+            latestIndLeaderboard = indList;
+            latestMyRank = stats.my_rank ?? latestMyRank;
             const indPodiumCard = document.getElementById('lb-individu-podium-card');
             if (indPodiumCard) {
                 indPodiumCard.classList.toggle('hidden', indList.length === 0);
@@ -2887,6 +2955,7 @@
 
             // Update Leaderboard Kelompok (Empty State + Podium + FLIP List)
             const grpList = Array.isArray(data.kelompok_leaderboard) ? data.kelompok_leaderboard : [];
+            latestGrpLeaderboard = grpList;
             const grpEmpty = document.getElementById('lb-kelompok-empty');
             const grpContent = document.getElementById('lb-kelompok-content');
             if (grpEmpty && grpContent) {
@@ -2985,6 +3054,7 @@
             });
         }
     </script>
+    <script src="{{ asset('js/leaderboard-capture.js') }}"></script>
 
 </body>
 </html>

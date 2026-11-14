@@ -147,11 +147,6 @@
                     <h3 class="text-base sm:text-lg font-black uppercase tracking-tight text-[#1A467C]">
                         Leaderboard PointKu
                     </h3>
-                    <span class="inline-flex items-center gap-1.5 bg-green-100 border border-black px-2 py-0.5 text-[10px] font-mono font-black text-[#15803d]">
-                        <span class="live-dot w-2 h-2 bg-[#15803d] inline-block"></span>
-                        <span>LIVE 3S</span>
-                        <span id="adm-rt-clock" class="text-gray-700"></span>
-                    </span>
                 </div>
                 <p class="text-[11px] font-semibold text-gray-600 mt-0.5">
                     Podium peringkat teratas &amp; klasemen peserta serta kelompok secara realtime.
@@ -211,9 +206,22 @@
                 Kelompok (<span id="adm-lb-count-kelompok">{{ $totalKelompok }}</span>)
             </button>
         </div>
-        <span class="hidden sm:inline-block font-mono text-[10px] font-black uppercase text-gray-500 px-2">
-            Klasemen Point Keaktifan
-        </span>
+        <div class="flex items-center justify-between sm:justify-end gap-2 w-full sm:w-auto">
+            <span class="hidden sm:inline-block font-mono text-[10px] font-black uppercase text-gray-500 px-2">
+                Klasemen Point Keaktifan
+            </span>
+            <button
+                type="button"
+                onclick="openAdminLeaderboardCapture()"
+                class="btn-smooth w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2 bg-amber-300 hover:bg-amber-400 text-black border-2 border-black text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
+            >
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="square" stroke-width="2.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                    <path stroke-linecap="square" stroke-width="2.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <span>Capture &amp; Share</span>
+            </button>
+        </div>
     </div>
 
     <!-- ============================================================== -->
@@ -502,6 +510,7 @@
 
 </div>
 
+<script src="{{ asset('js/leaderboard-capture.js') }}"></script>
 <script>
     const adminLbSyncUrl = @json(route('admin.poin.leaderboard.sync'));
     const adminKelasFilter = @json($kelasFilter);
@@ -511,6 +520,59 @@
     let adminLbPollTimer = null;
     let lastAdminIndPodiumSig = '';
     let lastAdminGrpPodiumSig = '';
+
+    let latestAdminIndList = @json($rankedMahasiswa->values()->map(function ($m, $idx) {
+        return [
+            'rank' => $idx + 1,
+            'nama' => $m->nama,
+            'kelas' => $m->kelas,
+            'nim' => $m->nim,
+            'total_point' => (int) $m->total_point,
+            'initials' => $m->initials(),
+            'avatar_url' => $m->avatarUrl(),
+        ];
+    }));
+    let latestAdminGrpList = @json($kelompokLeaderboardList->values()->map(function ($g, $idx) {
+        return [
+            'rank' => $idx + 1,
+            'nama_kelompok' => $g->nama_kelompok,
+            'ketua_nama' => $g->ketua_nama,
+            'jumlah_anggota' => (int) $g->jumlah_anggota,
+            'total_point' => (int) $g->total_point,
+            'initials' => $g->initials,
+            'foto_url' => $g->foto_url,
+        ];
+    }));
+
+    function openAdminLeaderboardCapture() {
+        if (!window.PokjaLeaderboardCapture) return;
+        const isGrp = currentAdminLbMode === 'kelompok';
+        const items = isGrp
+            ? latestAdminGrpList.map((g, idx) => ({
+                rank: g.rank || (idx + 1),
+                title: g.nama_kelompok,
+                subtitle: `Ketua: ${g.ketua_nama || '-'}`,
+                barFooter: `${g.jumlah_anggota || 0} Anggota`,
+                points: Number(g.total_point) || 0,
+                initials: g.initials || 'KL',
+                photoUrl: g.foto_url || null,
+            }))
+            : latestAdminIndList.map((m, idx) => ({
+                rank: m.rank || (idx + 1),
+                title: m.nama,
+                subtitle: m.kelas || '-',
+                barFooter: m.nim || '',
+                points: Number(m.total_point) || 0,
+                initials: m.initials || '--',
+                photoUrl: m.avatar_url || null,
+            }));
+
+        window.PokjaLeaderboardCapture.open({
+            mode: currentAdminLbMode,
+            kelas: isGrp ? '' : (adminKelasFilter || ''),
+            items,
+        });
+    }
 
     const PODIUM_SLOTS_CFG = [
         { rank: 2, barBg: 'bg-sky-200', barHeight: 'h-32 sm:h-40', emptyHeight: 'h-28 sm:h-36', delay: '0.08s', listIdx: 1 },
@@ -825,6 +887,8 @@
     function applyAdminLbSyncPayload(payload) {
         const indList = Array.isArray(payload.individu_leaderboard) ? payload.individu_leaderboard : [];
         const grpList = Array.isArray(payload.kelompok_leaderboard) ? payload.kelompok_leaderboard : [];
+        latestAdminIndList = indList;
+        latestAdminGrpList = grpList;
 
         popStatCount('adm-lb-count-individu', payload.total_peserta ?? indList.length);
         popStatCount('adm-lb-count-kelompok', payload.total_kelompok ?? grpList.length);
