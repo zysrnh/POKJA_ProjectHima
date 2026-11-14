@@ -486,3 +486,4 @@
         open: openCaptureModal,
     };
 })();
+
