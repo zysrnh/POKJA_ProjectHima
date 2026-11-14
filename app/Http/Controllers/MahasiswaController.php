@@ -504,9 +504,31 @@ class MahasiswaController extends Controller
         $persenHadir = round(($totalHadir / 7) * 100);
 
         // Data PointKu & Leaderboard untuk Portal Mahasiswa
-        $leaderboardList = Pendaftaran::orderBy('total_point', 'desc')
-            ->orderBy('nama', 'asc')
-            ->get();
+        $leaderboardList = Pendaftaran::withMax('pointHistories', 'created_at')
+            ->withMax('pointHistories', 'id')
+            ->get()
+            ->sort(function ($a, $b) {
+                if ((int) $a->total_point !== (int) $b->total_point) {
+                    return (int) $b->total_point <=> (int) $a->total_point;
+                }
+                $aAt = $a->point_histories_max_created_at ?? null;
+                $bAt = $b->point_histories_max_created_at ?? null;
+                $aHas = $aAt !== null;
+                $bHas = $bAt !== null;
+                if ($aHas !== $bHas) {
+                    return $aHas ? -1 : 1;
+                }
+                if ($aHas && (string) $aAt !== (string) $bAt) {
+                    return strcmp((string) $aAt, (string) $bAt);
+                }
+                $aId = (int) ($a->point_histories_max_id ?? 0);
+                $bId = (int) ($b->point_histories_max_id ?? 0);
+                if ($aHas && $aId !== $bId) {
+                    return $aId <=> $bId;
+                }
+                return strcasecmp((string) $a->nama, (string) $b->nama);
+            })
+            ->values();
 
         $topThree = $leaderboardList->take(3)->values();
         $myRankIndex = $leaderboardList->search(fn ($m) => (int) $m->id === (int) $mahasiswa->id);
@@ -514,11 +536,24 @@ class MahasiswaController extends Controller
         $totalPeserta = $leaderboardList->count();
 
         // Data Leaderboard Kelompok (akumulasi total point seluruh anggota kelompok)
-        $kelompokLeaderboardList = Kelompok::with(['ketua', 'members.pendaftaran'])
+        $kelompokLeaderboardList = Kelompok::with([
+            'ketua',
+            'members.pendaftaran' => fn ($q) => $q
+                ->withMax('pointHistories', 'created_at')
+                ->withMax('pointHistories', 'id'),
+        ])
             ->get()
             ->map(function ($k) {
                 $totalPoint = $k->members->sum(fn ($m) => (int) ($m->pendaftaran->total_point ?? 0));
                 $jumlahAnggota = $k->members->count();
+                $lastPointAt = $k->members
+                    ->pluck('pendaftaran.point_histories_max_created_at')
+                    ->filter()
+                    ->max();
+                $lastPointId = (int) ($k->members
+                    ->pluck('pendaftaran.point_histories_max_id')
+                    ->filter()
+                    ->max() ?? 0);
 
                 return (object) [
                     'id' => (int) $k->id,
@@ -530,11 +565,24 @@ class MahasiswaController extends Controller
                     'jumlah_anggota' => $jumlahAnggota,
                     'total_point' => (int) $totalPoint,
                     'avg_point' => $jumlahAnggota > 0 ? round($totalPoint / $jumlahAnggota, 1) : 0,
+                    'last_point_at' => $lastPointAt ? (string) $lastPointAt : null,
+                    'last_point_id' => $lastPointId,
                 ];
             })
             ->sort(function ($a, $b) {
                 if ($a->total_point !== $b->total_point) {
                     return $b->total_point <=> $a->total_point;
+                }
+                $aHas = $a->last_point_at !== null;
+                $bHas = $b->last_point_at !== null;
+                if ($aHas !== $bHas) {
+                    return $aHas ? -1 : 1;
+                }
+                if ($aHas && $a->last_point_at !== $b->last_point_at) {
+                    return strcmp($a->last_point_at, $b->last_point_at);
+                }
+                if ($aHas && $a->last_point_id !== $b->last_point_id) {
+                    return $a->last_point_id <=> $b->last_point_id;
                 }
                 if ($a->jumlah_anggota !== $b->jumlah_anggota) {
                     return $b->jumlah_anggota <=> $a->jumlah_anggota;
