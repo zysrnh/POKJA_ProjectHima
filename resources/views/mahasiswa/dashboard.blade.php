@@ -1648,31 +1648,35 @@
         let lastGrpPodiumSig = '';
         let latestMyRank = @json($myRank ?? '-');
         const myKelompokId = {{ $myKelompok ? (int) $myKelompok->id : 'null' }};
-        let latestIndLeaderboard = @json($leaderboardList->values()->map(function ($m, $idx) use ($mahasiswa) {
-            return [
-                'id' => (int) $m->id,
-                'rank' => $idx + 1,
-                'nama' => $m->nama,
-                'kelas' => $m->kelas,
-                'total_point' => (int) $m->total_point,
-                'initials' => $m->initials(),
-                'avatar_url' => $m->avatarUrl(),
-                'is_me' => (int) $m->id === (int) $mahasiswa->id,
-            ];
-        }));
-        let latestGrpLeaderboard = @json($kelompokLeaderboardList->values()->map(function ($g, $idx) use ($myKelompok) {
-            return [
-                'id' => (int) $g->id,
-                'rank' => $idx + 1,
-                'nama_kelompok' => $g->nama_kelompok,
-                'ketua_nama' => $g->ketua_nama,
-                'jumlah_anggota' => (int) $g->jumlah_anggota,
-                'total_point' => (int) $g->total_point,
-                'initials' => $g->initials,
-                'foto_url' => $g->foto_url,
-                'is_my_group' => $myKelompok && (int) $g->id === (int) $myKelompok->id,
-            ];
-        }));
+        @php
+            $initialIndLeaderboardJson = $leaderboardList->values()->map(function ($m, $idx) use ($mahasiswa) {
+                return [
+                    'id' => (int) $m->id,
+                    'rank' => $idx + 1,
+                    'nama' => $m->nama,
+                    'kelas' => $m->kelas,
+                    'total_point' => (int) $m->total_point,
+                    'initials' => $m->initials(),
+                    'avatar_url' => $m->avatarUrl(),
+                    'is_me' => (int) $m->id === (int) $mahasiswa->id,
+                ];
+            })->all();
+            $initialGrpLeaderboardJson = $kelompokLeaderboardList->values()->map(function ($g, $idx) use ($myKelompok) {
+                return [
+                    'id' => (int) $g->id,
+                    'rank' => $idx + 1,
+                    'nama_kelompok' => $g->nama_kelompok,
+                    'ketua_nama' => $g->ketua_nama,
+                    'jumlah_anggota' => (int) $g->jumlah_anggota,
+                    'total_point' => (int) $g->total_point,
+                    'initials' => $g->initials,
+                    'foto_url' => $g->foto_url,
+                    'is_my_group' => $myKelompok && (int) $g->id === (int) $myKelompok->id,
+                ];
+            })->all();
+        @endphp
+        let latestIndLeaderboard = @json($initialIndLeaderboardJson);
+        let latestGrpLeaderboard = @json($initialGrpLeaderboardJson);
 
         function openMahasiswaLeaderboardCapture() {
             if (!window.PokjaLeaderboardCapture) return;

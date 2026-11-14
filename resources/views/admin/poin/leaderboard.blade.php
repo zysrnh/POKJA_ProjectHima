@@ -521,28 +521,32 @@
     let lastAdminIndPodiumSig = '';
     let lastAdminGrpPodiumSig = '';
 
-    let latestAdminIndList = @json($rankedMahasiswa->values()->map(function ($m, $idx) {
-        return [
-            'rank' => $idx + 1,
-            'nama' => $m->nama,
-            'kelas' => $m->kelas,
-            'nim' => $m->nim,
-            'total_point' => (int) $m->total_point,
-            'initials' => $m->initials(),
-            'avatar_url' => $m->avatarUrl(),
-        ];
-    }));
-    let latestAdminGrpList = @json($kelompokLeaderboardList->values()->map(function ($g, $idx) {
-        return [
-            'rank' => $idx + 1,
-            'nama_kelompok' => $g->nama_kelompok,
-            'ketua_nama' => $g->ketua_nama,
-            'jumlah_anggota' => (int) $g->jumlah_anggota,
-            'total_point' => (int) $g->total_point,
-            'initials' => $g->initials,
-            'foto_url' => $g->foto_url,
-        ];
-    }));
+    @php
+        $initialAdminIndJson = $rankedMahasiswa->values()->map(function ($m, $idx) {
+            return [
+                'rank' => $idx + 1,
+                'nama' => $m->nama,
+                'kelas' => $m->kelas,
+                'nim' => $m->nim,
+                'total_point' => (int) $m->total_point,
+                'initials' => $m->initials(),
+                'avatar_url' => $m->avatarUrl(),
+            ];
+        })->all();
+        $initialAdminGrpJson = $kelompokLeaderboardList->values()->map(function ($g, $idx) {
+            return [
+                'rank' => $idx + 1,
+                'nama_kelompok' => $g->nama_kelompok,
+                'ketua_nama' => $g->ketua_nama,
+                'jumlah_anggota' => (int) $g->jumlah_anggota,
+                'total_point' => (int) $g->total_point,
+                'initials' => $g->initials,
+                'foto_url' => $g->foto_url,
+            ];
+        })->all();
+    @endphp
+    let latestAdminIndList = @json($initialAdminIndJson);
+    let latestAdminGrpList = @json($initialAdminGrpJson);
 
     function openAdminLeaderboardCapture() {
         if (!window.PokjaLeaderboardCapture) return;
