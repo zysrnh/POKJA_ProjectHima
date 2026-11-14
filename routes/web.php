@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Admin\KelasAdminController;
+use App\Http\Controllers\Admin\KuesionerAdminController;
 use App\Http\Controllers\Admin\PendaftaranAdminController;
 use App\Http\Controllers\Admin\PengaturanAcaraController;
 use App\Http\Controllers\Admin\PointAdminController;
@@ -106,6 +107,9 @@ Route::middleware('throttle:120,1')->group(function () {
         Route::post('/profile', [MahasiswaController::class, 'updateProfile'])
             ->middleware('throttle:15,1')
             ->name('profile.update');
+        Route::post('/kuesioner', [MahasiswaController::class, 'submitKuesioner'])
+            ->middleware('throttle:20,1')
+            ->name('kuesioner.submit');
         Route::post('/logout', [MahasiswaController::class, 'logout'])->name('logout');
 
         // Kelompok & Inbox Undangan Mahasiswa
@@ -176,6 +180,13 @@ Route::middleware('throttle:120,1')->group(function () {
             Route::post('/poin', [PointAdminController::class, 'store'])->name('poin.store');
             Route::get('/poin/{id}/riwayat', [PointAdminController::class, 'history'])->whereNumber('id')->name('poin.history');
             Route::delete('/poin/riwayat/{historyId}', [PointAdminController::class, 'destroyHistory'])->whereNumber('historyId')->name('poin.destroyHistory');
+
+            // Kuesioner Dinamis & Rekap Jawaban Anggota
+            Route::get('/kuesioner', [KuesionerAdminController::class, 'index'])->name('kuesioner.index');
+            Route::get('/kuesioner/export', [KuesionerAdminController::class, 'exportCsv'])->name('kuesioner.export');
+            Route::post('/kuesioner/pertanyaan', [KuesionerAdminController::class, 'storePertanyaan'])->name('kuesioner.pertanyaan.store');
+            Route::put('/kuesioner/pertanyaan/{id}', [KuesionerAdminController::class, 'updatePertanyaan'])->whereNumber('id')->name('kuesioner.pertanyaan.update');
+            Route::delete('/kuesioner/pertanyaan/{id}', [KuesionerAdminController::class, 'destroyPertanyaan'])->whereNumber('id')->name('kuesioner.pertanyaan.destroy');
 
             // Kelola Kelas
             Route::resource('kelas', KelasAdminController::class)->except(['show']);

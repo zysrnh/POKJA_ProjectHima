@@ -347,7 +347,18 @@
                             <span>Kelola Admin</span>
                         </a>
 
-                        <!-- Menu 5: Pengaturan Acara -->
+                        <!-- Menu 5: Kuesioner -->
+                        <a 
+                            href="{{ route('admin.kuesioner.index') }}" 
+                            class="flex items-center gap-3 px-3.5 py-3 border-2 transition {{ request()->routeIs('admin.kuesioner.*') ? 'bg-[#2A82C6] border-white text-white shadow-[3px_3px_0px_0px_#000000]' : 'border-transparent text-gray-200 hover:bg-[#0F2A4A] hover:text-white' }}"
+                        >
+                            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="square" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                            </svg>
+                            <span>Kuesioner</span>
+                        </a>
+
+                        <!-- Menu 6: Pengaturan Acara -->
                         <a 
                             href="{{ route('admin.pengaturan.index') }}" 
                             class="flex items-center gap-3 px-3.5 py-3 border-2 transition {{ request()->routeIs('admin.pengaturan.*') ? 'bg-[#2A82C6] border-white text-white shadow-[3px_3px_0px_0px_#000000]' : 'border-transparent text-gray-200 hover:bg-[#0F2A4A] hover:text-white' }}"
@@ -639,7 +650,20 @@
                 </span>
             </a>
 
-            <!-- Tab 6: Pengaturan Acara -->
+            <!-- Tab 6: Kuesioner -->
+            <a 
+                href="{{ route('admin.kuesioner.index') }}" 
+                class="flex-1 flex flex-col items-center justify-center py-1 transition-all active:scale-95 {{ request()->routeIs('admin.kuesioner.*') ? 'text-[#1A467C]' : 'text-gray-500 hover:text-[#1A467C]' }}"
+            >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="square" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                </svg>
+                <span class="text-[9px] uppercase tracking-tight mt-0.5 font-bold {{ request()->routeIs('admin.kuesioner.*') ? 'font-black text-[#1A467C]' : '' }}">
+                    Kuesioner
+                </span>
+            </a>
+
+            <!-- Tab 7: Pengaturan Acara -->
             <a 
                 href="{{ route('admin.pengaturan.index') }}" 
                 class="flex-1 flex flex-col items-center justify-center py-1 transition-all active:scale-95 {{ request()->routeIs('admin.pengaturan.*') ? 'text-[#1A467C]' : 'text-gray-500 hover:text-[#1A467C]' }}"

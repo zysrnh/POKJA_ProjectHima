@@ -81,4 +81,12 @@ class Pendaftaran extends Model
     {
         return strtoupper(substr(trim((string) $this->nama), 0, 2)) ?: 'MH';
     }
+
+    /**
+     * Daftar jawaban kuesioner yang diisi mahasiswa ini.
+     */
+    public function kuesionerJawabans()
+    {
+        return $this->hasMany(KuesionerJawaban::class, 'pendaftaran_id');
+    }
 }

@@ -6,6 +6,8 @@ use App\Mail\ResetPasswordMahasiswaMail;
 use App\Models\Kelompok;
 use App\Models\KelompokInvitation;
 use App\Models\KelompokMember;
+use App\Models\KuesionerJawaban;
+use App\Models\KuesionerPertanyaan;
 use App\Models\Pendaftaran;
 use App\Models\Pengaturan;
 use Illuminate\Http\Request;
@@ -617,6 +619,17 @@ class MahasiswaController extends Controller
                 ->get();
         }
 
+        $kuesionerPertanyaans = KuesionerPertanyaan::where('aktif', true)
+            ->orderBy('urutan')
+            ->orderBy('id')
+            ->get();
+
+        $kuesionerJawabanMap = KuesionerJawaban::where('pendaftaran_id', $mahasiswa->id)
+            ->get()
+            ->keyBy('pertanyaan_id');
+
+        $sudahIsiKuesioner = $kuesionerJawabanMap->isNotEmpty();
+
         return compact(
             'mahasiswa',
             'pengaturan',
@@ -634,7 +647,10 @@ class MahasiswaController extends Controller
             'isKetua',
             'kelompokStats',
             'kelompokInbox',
-            'kandidatAnggotaList'
+            'kandidatAnggotaList',
+            'kuesionerPertanyaans',
+            'kuesionerJawabanMap',
+            'sudahIsiKuesioner'
         );
     }
 
@@ -858,6 +874,83 @@ class MahasiswaController extends Controller
         $mahasiswa->save();
 
         return redirect()->route('mahasiswa.dashboard')->with('success', 'Profil Anda berhasil diperbarui!');
+    }
+
+    /**
+     * Simpan atau perbarui jawaban kuesioner mahasiswa (1x isi per mahasiswa, dapat diedit kapan saja).
+     */
+    public function submitKuesioner(Request $request)
+    {
+        if (!self::validateActiveDeviceSession($request)) {
+            return redirect()->route('mahasiswa.login')->with('error', 'Silakan login terlebih dahulu.');
+        }
+
+        $mahasiswa = Pendaftaran::find(session('mahasiswa_id'));
+        if (!$mahasiswa) {
+            return redirect()->route('mahasiswa.login')->with('error', 'Data mahasiswa tidak ditemukan.');
+        }
+
+        $pertanyaans = KuesionerPertanyaan::where('aktif', true)
+            ->orderBy('urutan')
+            ->orderBy('id')
+            ->get();
+
+        if ($pertanyaans->isEmpty()) {
+            return redirect()->to(route('mahasiswa.dashboard') . '#kuesioner')
+                ->with('error', 'Belum ada pertanyaan kuesioner yang aktif saat ini.');
+        }
+
+        $rules = [];
+        $messages = [];
+
+        foreach ($pertanyaans as $q) {
+            $field = 'jawaban.' . $q->id;
+            $qRules = [$q->wajib ? 'required' : 'nullable', 'string'];
+
+            if ($q->tipe === 'teks') {
+                $qRules[] = 'max:500';
+            } elseif ($q->tipe === 'paragraf') {
+                $qRules[] = 'max:3000';
+            } elseif ($q->tipe === 'pilihan') {
+                $opsi = is_array($q->opsi) ? $q->opsi : [];
+                $qRules[] = function ($attribute, $value, $fail) use ($opsi) {
+                    if ($value !== null && $value !== '' && !in_array($value, $opsi, true)) {
+                        $fail('Pilihan jawaban tidak valid.');
+                    }
+                };
+            }
+
+            $rules[$field] = $qRules;
+            $messages[$field . '.required'] = 'Pertanyaan "' . Str::limit($q->pertanyaan, 60) . '" wajib diisi.';
+        }
+
+        $validated = $request->validate($rules, $messages);
+        $inputJawaban = $validated['jawaban'] ?? [];
+
+        $sudahPernahIsi = KuesionerJawaban::where('pendaftaran_id', $mahasiswa->id)->exists();
+
+        DB::transaction(function () use ($pertanyaans, $mahasiswa, $inputJawaban) {
+            foreach ($pertanyaans as $q) {
+                $val = isset($inputJawaban[$q->id]) ? trim((string) $inputJawaban[$q->id]) : null;
+                $val = $val === '' ? null : $val;
+
+                KuesionerJawaban::updateOrCreate(
+                    [
+                        'pendaftaran_id' => $mahasiswa->id,
+                        'pertanyaan_id'  => $q->id,
+                    ],
+                    [
+                        'jawaban' => $val,
+                    ]
+                );
+            }
+        });
+
+        $msg = $sudahPernahIsi
+            ? 'Jawaban kuesioner Anda berhasil diperbarui!'
+            : 'Terima kasih! Jawaban kuesioner Anda berhasil disimpan.';
+
+        return redirect()->to(route('mahasiswa.dashboard') . '#kuesioner')->with('success', $msg);
     }
 
     /**
