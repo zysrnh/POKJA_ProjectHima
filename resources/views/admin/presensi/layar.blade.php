@@ -51,28 +51,30 @@
             box-shadow: 1px 1px 0px 0px #000000 !important;
         }
 
-        /* Tactile Drop Slam Notification Animation */
+        /* Tactile Pop-Up Notification Animation */
         @keyframes notifSlamIn {
             0% {
-                transform: translateY(-140%) scale(0.92);
+                opacity: 0;
+                transform: scale(0.65) rotate(var(--notif-rot, 0deg));
             }
             65% {
-                transform: translateY(12px) scale(1.02);
-            }
-            85% {
-                transform: translateY(-4px) scale(0.99);
+                opacity: 1;
+                transform: scale(1.05) rotate(var(--notif-rot, 0deg));
             }
             100% {
-                transform: translateY(0) scale(1);
+                opacity: 1;
+                transform: scale(1) rotate(var(--notif-rot, 0deg));
             }
         }
 
         @keyframes notifSlamOut {
             0% {
-                transform: translateY(0) scale(1);
+                opacity: 1;
+                transform: scale(1) rotate(var(--notif-rot, 0deg));
             }
             100% {
-                transform: translateY(-160%) scale(0.85);
+                opacity: 0;
+                transform: scale(0.82) rotate(var(--notif-rot, 0deg));
             }
         }
 
@@ -100,8 +102,8 @@
     <!-- ============================================================== -->
     <!-- FLOATING SLAM NOTIFICATIONS CONTAINER (Pop-Up Saat Ada Scan)   -->
     <!-- ============================================================== -->
-    <div id="notif-container" class="fixed top-24 left-1/2 -translate-x-1/2 z-50 w-full max-w-lg px-4 space-y-3 pointer-events-none">
-        <!-- Notifikasi pop-up mahasiswa yang baru scan muncul di sini -->
+    <div id="notif-container" class="fixed inset-0 z-40 pointer-events-none overflow-hidden">
+        <!-- Notifikasi pop-up mahasiswa yang baru scan muncul acak di sekitar QR -->
     </div>
 
     <!-- ============================================================== -->
@@ -156,7 +158,7 @@
     <!-- ============================================================== -->
     <main class="my-auto py-6 sm:py-10 flex flex-col items-center justify-center">
 
-        <div id="qr-outer-card" class="w-full max-w-md bg-white border-[3px] border-[#000000] p-6 sm:p-8 shadow-[10px_10px_0px_0px_#000000] flex flex-col items-center text-center relative">
+        <div id="qr-outer-card" class="z-50 w-full max-w-md bg-white border-[3px] border-[#000000] p-6 sm:p-8 shadow-[10px_10px_0px_0px_#000000] flex flex-col items-center text-center relative">
             
             <!-- QR Code Canvas Container -->
             <div class="relative bg-white border-4 border-black p-4 sm:p-5 shadow-[6px_6px_0px_0px_#000000]">
@@ -298,49 +300,123 @@
             card.classList.add('qr-scan-flash');
         }
 
-        // Tampilkan Pop-Up Mahasiswa yang Baru Saja Scan di Layar Proyektor
+        function pickRandomSafePosition(cardWidth, cardHeight) {
+            const vw = window.innerWidth;
+            const vh = window.innerHeight;
+            const pad = 16;
+            const topMin = 104; // di bawah header top bar
+            const bottomMax = Math.max(topMin + cardHeight, vh - cardHeight - 76); // di atas footer counter
+
+            const qrEl = document.getElementById('qr-outer-card');
+            const qrRect = qrEl ? qrEl.getBoundingClientRect() : null;
+            const qrGap = 20;
+
+            const zones = [];
+            if (qrRect) {
+                // Zona kiri QR
+                if (qrRect.left - qrGap - cardWidth >= pad) {
+                    zones.push({
+                        xMin: pad,
+                        xMax: qrRect.left - qrGap - cardWidth,
+                        yMin: topMin,
+                        yMax: bottomMax,
+                    });
+                }
+                // Zona kanan QR
+                if (vw - (qrRect.right + qrGap + cardWidth) >= pad) {
+                    zones.push({
+                        xMin: qrRect.right + qrGap,
+                        xMax: vw - cardWidth - pad,
+                        yMin: topMin,
+                        yMax: bottomMax,
+                    });
+                }
+                // Zona atas QR (bila ruang cukup)
+                if (qrRect.top - qrGap - cardHeight >= topMin) {
+                    zones.push({
+                        xMin: pad,
+                        xMax: Math.max(pad, vw - cardWidth - pad),
+                        yMin: topMin,
+                        yMax: qrRect.top - qrGap - cardHeight,
+                    });
+                }
+                // Zona bawah QR (bila ruang cukup)
+                if (bottomMax >= qrRect.bottom + qrGap) {
+                    zones.push({
+                        xMin: pad,
+                        xMax: Math.max(pad, vw - cardWidth - pad),
+                        yMin: qrRect.bottom + qrGap,
+                        yMax: bottomMax,
+                    });
+                }
+            }
+
+            if (zones.length === 0) {
+                return {
+                    left: pad,
+                    top: topMin,
+                };
+            }
+
+            const zone = zones[Math.floor(Math.random() * zones.length)];
+            const left = Math.round(zone.xMin + Math.random() * Math.max(0, zone.xMax - zone.xMin));
+            const top = Math.round(zone.yMin + Math.random() * Math.max(0, zone.yMax - zone.yMin));
+
+            return { left, top };
+        }
+
+        // Tampilkan Pop-Up Mahasiswa yang Baru Saja Scan Secara Acak (Tanpa Menutupi QR)
         function showDropNotification(scan) {
             playSuccessChime();
             flashQrCard();
 
             const container = document.getElementById('notif-container');
             const notif = document.createElement('div');
-            notif.className = "notif-card-in bg-white border-[3px] border-[#000000] p-4 sm:p-5 shadow-[8px_8px_0px_0px_#000000] flex items-center justify-between gap-4 text-black";
+            const cardWidth = window.innerWidth >= 640 ? 320 : 272;
+            const cardHeight = 104;
+            const pos = pickRandomSafePosition(cardWidth, cardHeight);
+            const rot = (Math.random() * 5 - 2.5).toFixed(2);
+
+            notif.style.position = 'fixed';
+            notif.style.left = `${pos.left}px`;
+            notif.style.top = `${pos.top}px`;
+            notif.style.width = `${cardWidth}px`;
+            notif.style.setProperty('--notif-rot', `${rot}deg`);
+
+            notif.className = "notif-card-in bg-white border-[3px] border-[#000000] p-3.5 sm:p-4 shadow-[6px_6px_0px_0px_#000000] flex items-center justify-between gap-3 text-black";
 
             const badgeColor = scan.already ? 'bg-amber-400 text-black' : 'bg-[#15803d] text-white';
-            const badgeText = scan.already ? 'SUDAH TERCATAT HADIR' : 'PRESENSI BERHASIL';
+            const badgeText = scan.already ? 'SUDAH HADIR' : 'HADIR ✓';
 
             notif.innerHTML = `
-                <div class="flex items-center gap-3.5 min-w-0 flex-1">
-                    <div class="w-12 h-12 sm:w-14 sm:h-14 bg-[#15803d] border-2 border-black flex items-center justify-center text-white font-black text-2xl shadow-[3px_3px_0px_0px_#000000] shrink-0">
+                <div class="flex items-center gap-3 min-w-0 flex-1">
+                    <div class="w-10 h-10 bg-[#15803d] border-2 border-black flex items-center justify-center text-white font-black text-lg shadow-[2px_2px_0px_0px_#000000] shrink-0">
                         ✓
                     </div>
                     <div class="min-w-0 flex-1">
-                        <div class="flex flex-wrap items-center gap-1.5 mb-1">
-                            <span class="${badgeColor} text-[10px] font-black uppercase px-2 py-0.5 tracking-wider border border-black shadow-[1px_1px_0px_0px_#000000]">
+                        <div class="flex flex-wrap items-center gap-1 mb-0.5">
+                            <span class="${badgeColor} text-[9px] font-black uppercase px-1.5 py-0.5 tracking-wider border border-black">
                                 ${badgeText}
                             </span>
-                            <span class="bg-blue-50 text-[#1A467C] border border-black text-[10px] font-black uppercase px-2 py-0.5 font-mono">
+                            <span class="bg-blue-50 text-[#1A467C] border border-black text-[9px] font-black uppercase px-1.5 py-0.5 font-mono">
                                 ${scan.kelas}
                             </span>
-                            <span class="text-[11px] font-bold text-gray-600 font-mono">${scan.waktu} WIB</span>
                         </div>
-                        <h4 class="text-base sm:text-lg font-black uppercase text-gray-950 truncate leading-tight">
+                        <h4 class="text-sm font-black uppercase text-gray-950 truncate leading-tight">
                             ${scan.nama}
                         </h4>
-                        <p class="text-xs sm:text-sm font-black text-[#1A467C] font-mono mt-0.5">
-                            NIM: ${scan.nim}
+                        <p class="text-[11px] font-black text-[#1A467C] font-mono">
+                            ${scan.nim} • ${scan.waktu}
                         </p>
                     </div>
                 </div>
-                <div class="w-3.5 h-3.5 bg-green-500 border-2 border-black shrink-0 animate-ping"></div>
             `;
 
-            container.prepend(notif);
+            container.appendChild(notif);
 
-            // Batasi maksimal 3 pop-up bertumpuk di layar
-            while (container.children.length > 3) {
-                container.lastElementChild.remove();
+            // Batasi maksimal 8 pop-up sekaligus di layar agar tetap rapi
+            while (container.children.length > 8) {
+                container.firstElementChild?.remove();
             }
 
             // Auto dismiss setelah 4.2 detik
