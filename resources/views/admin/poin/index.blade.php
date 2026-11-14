@@ -438,6 +438,35 @@
                             </span>
                         </button>
                     @endforeach
+                    <button
+                        type="button"
+                        data-kategori="Custom Point"
+                        data-point="0"
+                        onclick="selectCategoryCard('add', 'Custom Point', 0, this)"
+                        class="add-cat-btn col-span-2 text-left p-2.5 border-2 border-black bg-[#F8FBFE] hover:bg-green-50 transition flex items-center justify-between gap-2 cursor-pointer shadow-[2px_2px_0px_0px_#000000]"
+                    >
+                        <span class="font-black text-xs uppercase leading-tight">Custom Point (Isi Manual)</span>
+                        <span class="cat-pill inline-block px-2 py-0.5 text-[11px] font-mono font-black border border-black bg-green-100 text-[#15803d]">
+                            +CUSTOM
+                        </span>
+                    </button>
+                </div>
+
+                <!-- Input Angka Custom Point -->
+                <div id="add-custom-point-wrapper" class="hidden mt-2.5">
+                    <label class="block text-[11px] font-black uppercase tracking-wider text-[#15803d] mb-1">
+                        Jumlah Point Custom (1 - 100) <span class="text-[#CA2C2A]">*</span>
+                    </label>
+                    <input
+                        type="number"
+                        id="add-custom-point-input"
+                        name="jumlah_custom"
+                        min="1"
+                        max="100"
+                        value="1"
+                        oninput="onCustomPointInput('add', this.value)"
+                        class="w-full bg-white border-2 border-black px-3 py-2 text-xs sm:text-sm font-mono font-black focus:bg-yellow-50 focus:outline-none"
+                    >
                 </div>
 
                 <!-- Bar Simulasi Hasil Point -->
@@ -580,6 +609,35 @@
                             </span>
                         </button>
                     @endforeach
+                    <button
+                        type="button"
+                        data-kategori="Custom Point"
+                        data-point="0"
+                        onclick="selectCategoryCard('reduce', 'Custom Point', 0, this)"
+                        class="reduce-cat-btn col-span-2 text-left p-2.5 border-2 border-black bg-[#F8FBFE] hover:bg-red-50 transition flex items-center justify-between gap-2 cursor-pointer shadow-[2px_2px_0px_0px_#000000]"
+                    >
+                        <span class="font-black text-xs uppercase leading-tight">Custom Point (Isi Manual)</span>
+                        <span class="cat-pill inline-block px-2 py-0.5 text-[11px] font-mono font-black border border-black bg-red-100 text-[#CA2C2A]">
+                            -CUSTOM
+                        </span>
+                    </button>
+                </div>
+
+                <!-- Input Angka Custom Point -->
+                <div id="reduce-custom-point-wrapper" class="hidden mt-2.5">
+                    <label class="block text-[11px] font-black uppercase tracking-wider text-[#CA2C2A] mb-1">
+                        Jumlah Pengurangan Custom (1 - 100) <span class="text-[#CA2C2A]">*</span>
+                    </label>
+                    <input
+                        type="number"
+                        id="reduce-custom-point-input"
+                        name="jumlah_custom"
+                        min="1"
+                        max="100"
+                        value="1"
+                        oninput="onCustomPointInput('reduce', this.value)"
+                        class="w-full bg-white border-2 border-black px-3 py-2 text-xs sm:text-sm font-mono font-black focus:bg-yellow-50 focus:outline-none"
+                    >
                 </div>
 
                 <!-- Bar Simulasi Hasil Point -->
@@ -810,33 +868,58 @@
     }
 
     function selectCategoryCard(mode, kategori, point, btnEl) {
-        modalState[mode].selectedPoint = parseInt(point || 0, 10);
+        const isCustom = kategori === 'Custom Point';
+        const customWrapper = document.getElementById(`${mode}-custom-point-wrapper`);
+        const customInput = document.getElementById(`${mode}-custom-point-input`);
+
+        if (customWrapper && customInput) {
+            if (isCustom) {
+                customWrapper.classList.remove('hidden');
+                customInput.required = true;
+                modalState[mode].selectedPoint = Math.max(0, Math.min(100, parseInt(customInput.value || '0', 10)));
+            } else {
+                customWrapper.classList.add('hidden');
+                customInput.required = false;
+                modalState[mode].selectedPoint = parseInt(point || 0, 10);
+            }
+        } else {
+            modalState[mode].selectedPoint = parseInt(point || 0, 10);
+        }
+
         const hiddenKat = document.getElementById(`${mode}-kategori-input`);
         if (hiddenKat) hiddenKat.value = kategori;
 
         const buttons = document.querySelectorAll(`.${mode}-cat-btn`);
         buttons.forEach(btn => {
             const pill = btn.querySelector('.cat-pill');
+            const extraSpan = btn.dataset.kategori === 'Custom Point' ? ' col-span-2 flex items-center justify-between gap-2' : ' flex flex-col justify-between gap-1.5';
             if (mode === 'add') {
-                btn.className = 'add-cat-btn text-left p-2.5 border-2 border-black bg-[#F8FBFE] hover:bg-green-50 text-gray-950 transition flex flex-col justify-between gap-1.5 cursor-pointer shadow-[2px_2px_0px_0px_#000000]';
+                btn.className = `add-cat-btn${extraSpan} text-left p-2.5 border-2 border-black bg-[#F8FBFE] hover:bg-green-50 text-gray-950 transition cursor-pointer shadow-[2px_2px_0px_0px_#000000]`;
                 if (pill) pill.className = 'cat-pill inline-block self-start px-2 py-0.5 text-[11px] font-mono font-black border border-black bg-green-100 text-[#15803d]';
             } else {
-                btn.className = 'reduce-cat-btn text-left p-2.5 border-2 border-black bg-[#F8FBFE] hover:bg-red-50 text-gray-950 transition flex flex-col justify-between gap-1.5 cursor-pointer shadow-[2px_2px_0px_0px_#000000]';
+                btn.className = `reduce-cat-btn${extraSpan} text-left p-2.5 border-2 border-black bg-[#F8FBFE] hover:bg-red-50 text-gray-950 transition cursor-pointer shadow-[2px_2px_0px_0px_#000000]`;
                 if (pill) pill.className = 'cat-pill inline-block self-start px-2 py-0.5 text-[11px] font-mono font-black border border-black bg-red-100 text-[#CA2C2A]';
             }
         });
 
         if (btnEl) {
             const activePill = btnEl.querySelector('.cat-pill');
+            const extraSpan = btnEl.dataset.kategori === 'Custom Point' ? ' col-span-2 flex items-center justify-between gap-2' : ' flex flex-col justify-between gap-1.5';
             if (mode === 'add') {
-                btnEl.className = 'add-cat-btn text-left p-2.5 border-2 border-black bg-[#15803d] text-white transition flex flex-col justify-between gap-1.5 cursor-pointer shadow-[3px_3px_0px_0px_#000000] -translate-y-0.5';
+                btnEl.className = `add-cat-btn${extraSpan} text-left p-2.5 border-2 border-black bg-[#15803d] text-white transition cursor-pointer shadow-[3px_3px_0px_0px_#000000] -translate-y-0.5`;
                 if (activePill) activePill.className = 'cat-pill inline-block self-start px-2 py-0.5 text-[11px] font-mono font-black border border-black bg-white text-[#15803d]';
             } else {
-                btnEl.className = 'reduce-cat-btn text-left p-2.5 border-2 border-black bg-[#CA2C2A] text-white transition flex flex-col justify-between gap-1.5 cursor-pointer shadow-[3px_3px_0px_0px_#000000] -translate-y-0.5';
+                btnEl.className = `reduce-cat-btn${extraSpan} text-left p-2.5 border-2 border-black bg-[#CA2C2A] text-white transition cursor-pointer shadow-[3px_3px_0px_0px_#000000] -translate-y-0.5`;
                 if (activePill) activePill.className = 'cat-pill inline-block self-start px-2 py-0.5 text-[11px] font-mono font-black border border-black bg-white text-[#CA2C2A]';
             }
         }
 
+        updateCalcPreview(mode);
+    }
+
+    function onCustomPointInput(mode, val) {
+        const parsed = parseInt(val || '0', 10);
+        modalState[mode].selectedPoint = isNaN(parsed) ? 0 : Math.max(0, Math.min(100, parsed));
         updateCalcPreview(mode);
     }
 

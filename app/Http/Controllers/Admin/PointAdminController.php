@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\DB;
 
 class PointAdminController extends Controller
 {
+    public const KATEGORI_CUSTOM = 'Custom Point';
+
     public const KATEGORI_TAMBAH = [
         'Kehadiran' => [
             'label' => 'Masuk Kelas / Kehadiran (+1 Point)',
@@ -396,6 +398,12 @@ class PointAdminController extends Controller
             'pendaftaran_id' => ['required', 'integer', 'exists:pendaftarans,id'],
             'tipe' => ['required', 'in:tambah,kurang'],
             'kategori' => ['required', 'string', 'max:100'],
+            'jumlah_custom' => [
+                $request->input('kategori') === self::KATEGORI_CUSTOM ? 'required' : 'nullable',
+                'integer',
+                'min:1',
+                'max:100',
+            ],
             'keterangan' => [
                 $request->input('tipe') === 'kurang' ? 'required' : 'nullable',
                 'string',
@@ -405,13 +413,19 @@ class PointAdminController extends Controller
             'pendaftaran_id.required' => 'Silakan pilih mahasiswa terlebih dahulu.',
             'pendaftaran_id.exists' => 'Data mahasiswa tidak ditemukan.',
             'kategori.required' => 'Silakan pilih kategori point.',
+            'jumlah_custom.required' => 'Jumlah point custom wajib diisi.',
+            'jumlah_custom.integer' => 'Jumlah point custom harus berupa angka bulat.',
+            'jumlah_custom.min' => 'Jumlah point custom minimal 1.',
+            'jumlah_custom.max' => 'Jumlah point custom maksimal 100.',
             'keterangan.required' => 'Alasan pengurangan point wajib diisi.',
         ]);
 
         $tipe = $validated['tipe'];
         $kategori = $validated['kategori'];
 
-        if ($tipe === 'tambah') {
+        if ($kategori === self::KATEGORI_CUSTOM) {
+            $jumlah = (int) $validated['jumlah_custom'];
+        } elseif ($tipe === 'tambah') {
             if (!isset(self::KATEGORI_TAMBAH[$kategori])) {
                 return back()->with('error', 'Kategori penambahan point tidak valid.');
             }
