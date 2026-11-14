@@ -17,6 +17,9 @@ use Illuminate\Support\Str;
 
 class MahasiswaKelompokController extends Controller
 {
+    public const MIN_ANGGOTA = 3;
+    public const MAX_ANGGOTA = 4;
+
     /**
      * Ambil data mahasiswa yang sedang login dan validasi single-device session.
      */
@@ -127,16 +130,29 @@ class MahasiswaKelompokController extends Controller
             return ['ok' => false, 'message' => 'Kamu sudah tergabung di kelompok lain. Keluar dulu dari kelompok saat ini jika ingin pindah.'];
         }
 
-        DB::transaction(function () use ($mahasiswa, $kelompok) {
+        $joinResult = DB::transaction(function () use ($mahasiswa, $kelompok) {
+            $lockedKelompok = Kelompok::where('id', $kelompok->id)->lockForUpdate()->first();
+            if (!$lockedKelompok) {
+                return ['ok' => false, 'message' => 'Kelompok tidak ditemukan.'];
+            }
+
+            $currentCount = KelompokMember::where('kelompok_id', $lockedKelompok->id)->count();
+            if ($currentCount >= self::MAX_ANGGOTA) {
+                return [
+                    'ok' => false,
+                    'message' => "Kelompok \"{$lockedKelompok->nama_kelompok}\" sudah penuh (maksimal " . self::MAX_ANGGOTA . " anggota).",
+                ];
+            }
+
             KelompokMember::create([
-                'kelompok_id' => $kelompok->id,
+                'kelompok_id' => $lockedKelompok->id,
                 'pendaftaran_id' => $mahasiswa->id,
                 'role' => 'anggota',
                 'joined_at' => now(),
             ]);
 
             KelompokInvitation::where('pendaftaran_id', $mahasiswa->id)
-                ->where('kelompok_id', $kelompok->id)
+                ->where('kelompok_id', $lockedKelompok->id)
                 ->where('status', 'pending')
                 ->update([
                     'status' => 'accepted',
@@ -144,13 +160,19 @@ class MahasiswaKelompokController extends Controller
                 ]);
 
             KelompokInvitation::where('pendaftaran_id', $mahasiswa->id)
-                ->where('kelompok_id', '!=', $kelompok->id)
+                ->where('kelompok_id', '!=', $lockedKelompok->id)
                 ->where('status', 'pending')
                 ->update([
                     'status' => 'declined',
                     'responded_at' => now(),
                 ]);
+
+            return ['ok' => true];
         });
+
+        if (!($joinResult['ok'] ?? false)) {
+            return $joinResult;
+        }
 
         if ($kelompok->ketua && (int) $kelompok->ketua->id !== (int) $mahasiswa->id) {
             $this->notifyByEmail(
@@ -399,6 +421,11 @@ class MahasiswaKelompokController extends Controller
                 ->with('error', 'Hanya Ketua kelompok yang dapat mengirim undangan anggota.');
         }
 
+        if (KelompokMember::where('kelompok_id', $membership->kelompok->id)->count() >= self::MAX_ANGGOTA) {
+            return redirect()->route('mahasiswa.dashboard', ['tab' => 'kelompok'])
+                ->with('error', 'Kelompok sudah penuh (maksimal ' . self::MAX_ANGGOTA . ' anggota).');
+        }
+
         $request->validate([
             'pendaftaran_id' => ['required', 'integer', 'exists:pendaftarans,id'],
         ], [
@@ -533,9 +560,22 @@ class MahasiswaKelompokController extends Controller
                 ->with('error', 'Kamu sudah tergabung di kelompok lain.');
         }
 
-        DB::transaction(function () use ($invitation, $mahasiswa) {
+        $acceptResult = DB::transaction(function () use ($invitation, $mahasiswa) {
+            $lockedKelompok = Kelompok::where('id', $invitation->kelompok_id)->lockForUpdate()->first();
+            if (!$lockedKelompok) {
+                return ['ok' => false, 'message' => 'Kelompok tidak ditemukan atau sudah dibubarkan.'];
+            }
+
+            $currentCount = KelompokMember::where('kelompok_id', $lockedKelompok->id)->count();
+            if ($currentCount >= self::MAX_ANGGOTA) {
+                return [
+                    'ok' => false,
+                    'message' => "Maaf, kelompok \"{$lockedKelompok->nama_kelompok}\" sudah penuh (maksimal " . self::MAX_ANGGOTA . " anggota).",
+                ];
+            }
+
             KelompokMember::create([
-                'kelompok_id' => $invitation->kelompok_id,
+                'kelompok_id' => $lockedKelompok->id,
                 'pendaftaran_id' => $mahasiswa->id,
                 'role' => 'anggota',
                 'joined_at' => now(),
@@ -552,7 +592,14 @@ class MahasiswaKelompokController extends Controller
                     'status' => 'declined',
                     'responded_at' => now(),
                 ]);
+
+            return ['ok' => true];
         });
+
+        if (!($acceptResult['ok'] ?? false)) {
+            return redirect()->route('mahasiswa.dashboard', ['tab' => 'kelompok'])
+                ->with('error', $acceptResult['message'] ?? 'Gagal bergabung ke kelompok.');
+        }
 
         if ($invitation->kelompok->ketua && (int) $invitation->kelompok->ketua->id !== (int) $mahasiswa->id) {
             $this->notifyByEmail(

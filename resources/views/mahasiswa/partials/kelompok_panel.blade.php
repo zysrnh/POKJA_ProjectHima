@@ -228,6 +228,9 @@
                         $kelompokFotoUrl = $myKelompok->fotoUrl();
                         $kelompokInitials = $myKelompok->initials();
                         $showEditFormOnLoad = isset($errors) && ($errors->has('nama_kelompok') || $errors->has('judul_proposal') || $errors->has('foto'));
+                        $jumlahAnggotaTim = $myKelompok->members->count();
+                        $minAnggotaTim = \App\Http\Controllers\MahasiswaKelompokController::MIN_ANGGOTA;
+                        $maxAnggotaTim = \App\Http\Controllers\MahasiswaKelompokController::MAX_ANGGOTA;
                     @endphp
 
                     <!-- Header Ringkasan Kelompok Saya -->
@@ -253,6 +256,19 @@
                                         <span class="bg-gray-100 text-gray-900 border border-black px-2 py-0.5 text-[10px] font-mono font-black">
                                             {{ $myKelompok->kode_invite }}
                                         </span>
+                                        @if ($jumlahAnggotaTim >= $maxAnggotaTim)
+                                            <span class="bg-blue-100 text-[#1A467C] border border-black px-2 py-0.5 text-[10px] font-black uppercase">
+                                                Penuh ({{ $jumlahAnggotaTim }}/{{ $maxAnggotaTim }} Anggota)
+                                            </span>
+                                        @elseif ($jumlahAnggotaTim >= $minAnggotaTim)
+                                            <span class="bg-green-100 text-green-900 border border-black px-2 py-0.5 text-[10px] font-black uppercase">
+                                                Memenuhi Syarat ({{ $jumlahAnggotaTim }}/{{ $maxAnggotaTim }} Anggota)
+                                            </span>
+                                        @else
+                                            <span class="bg-amber-100 text-amber-950 border border-black px-2 py-0.5 text-[10px] font-black uppercase">
+                                                Minimal {{ $minAnggotaTim }} Anggota ({{ $jumlahAnggotaTim }}/{{ $maxAnggotaTim }})
+                                            </span>
+                                        @endif
                                     </div>
 
                                     <h3 class="text-base sm:text-xl font-black uppercase text-gray-950 tracking-tight break-words">
@@ -453,17 +469,23 @@
                                 </div>
 
                                 <div class="p-4 sm:p-5 space-y-4 flex-1">
-                                    <div>
-                                        <input
-                                            type="text"
-                                            id="invite-search-input"
-                                            oninput="filterKelompokKandidat()"
-                                            placeholder="Cari nama, NIM, atau kelas teman..."
-                                            class="w-full px-3 py-2 bg-white border-2 border-black text-xs font-bold text-gray-950 focus:outline-none focus:bg-amber-50/40"
-                                        >
-                                    </div>
+                                    @if ($jumlahAnggotaTim >= $maxAnggotaTim)
+                                        <div class="p-3 bg-blue-50 border-2 border-black text-xs font-bold text-[#1A467C]">
+                                            Kelompok sudah mencapai batas maksimal {{ $maxAnggotaTim }} anggota.
+                                        </div>
+                                    @else
+                                        <div>
+                                            <input
+                                                type="text"
+                                                id="invite-search-input"
+                                                oninput="filterKelompokKandidat()"
+                                                placeholder="Cari nama, NIM, atau kelas teman..."
+                                                class="w-full px-3 py-2 bg-white border-2 border-black text-xs font-bold text-gray-950 focus:outline-none focus:bg-amber-50/40"
+                                            >
+                                        </div>
 
-                                    <div id="invite-candidate-list" class="max-h-56 overflow-y-auto divide-y divide-gray-200 border-2 border-black bg-white"></div>
+                                        <div id="invite-candidate-list" class="max-h-56 overflow-y-auto divide-y divide-gray-200 border-2 border-black bg-white"></div>
+                                    @endif
 
                                     @if ($myKelompok->invitations->isNotEmpty())
                                         <div class="border-t-2 border-black pt-3.5 space-y-2">
