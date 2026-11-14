@@ -940,7 +940,7 @@
                             </div>
 
                             <div id="lb-kelompok-list" class="divide-y divide-gray-200">
-                                @foreach ($kelompokLeaderboardList as $idx => $grp)
+                                @foreach ($kelompokLeaderboardList->slice(3) as $idx => $grp)
                                     @php
                                         $rankNum = $idx + 1;
                                         $pts = (int) $grp->total_point;
@@ -2713,6 +2713,7 @@
             if (!container) return;
 
             const list = Array.isArray(items) ? items : [];
+            const belowPodium = list.slice(3);
             const isVisible = container.offsetParent !== null;
             const firstPositions = new Map();
             const existingMap = new Map();
@@ -2725,7 +2726,7 @@
                 }
             });
 
-            if (list.length === 0) {
+            if (belowPodium.length === 0) {
                 container.innerHTML = '';
                 return;
             }
@@ -2734,7 +2735,7 @@
             const nextKeys = new Set();
             const movedOrChanged = [];
 
-            list.forEach(item => {
+            belowPodium.forEach(item => {
                 const key = type === 'individu' ? `mhs-${item.id}` : `grp-${item.id}`;
                 nextKeys.add(key);
 
@@ -2964,8 +2965,8 @@
         }
 
         function startRealtimePolling() {
-            lastIndPodiumSig = getDomTopThreeSig('lb-individu-list');
-            lastGrpPodiumSig = getDomTopThreeSig('lb-kelompok-list');
+            lastIndPodiumSig = '';
+            lastGrpPodiumSig = '';
 
             if (realtimePollTimer) {
                 clearInterval(realtimePollTimer);

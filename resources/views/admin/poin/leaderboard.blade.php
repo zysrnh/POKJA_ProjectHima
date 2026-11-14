@@ -288,8 +288,8 @@
             </div>
         </div>
 
-        <!-- Daftar Peringkat Lengkap Peserta -->
-        <div class="snap-in-4 bg-white border-2 border-black shadow-[5px_5px_0px_0px_#000000] overflow-hidden">
+        <!-- Daftar Peringkat Lengkap Peserta (Mulai #4, #1-#3 di Podium) -->
+        <div id="adm-lb-ind-list-card" class="snap-in-4 {{ $rankedMahasiswa->count() <= 3 ? 'hidden ' : '' }}bg-white border-2 border-black shadow-[5px_5px_0px_0px_#000000] overflow-hidden">
             <div class="px-5 py-3.5 border-b-2 border-black bg-blue-50/70 flex items-center justify-between gap-3">
                 <h3 class="text-xs sm:text-sm font-black uppercase tracking-wider text-[#1A467C]">
                     Peringkat Lengkap Mahasiswa
@@ -300,7 +300,7 @@
             </div>
 
             <div id="adm-lb-ind-list" class="divide-y-2 divide-gray-200">
-                @foreach ($rankedMahasiswa as $idx => $mhs)
+                @foreach ($rankedMahasiswa->slice(3) as $idx => $mhs)
                     @php
                         $rank = $idx + 1;
                         $pct = round(((int) $mhs->total_point / $maxPointIndividu) * 100);
@@ -435,8 +435,8 @@
                 </div>
             </div>
 
-            <!-- Daftar Peringkat Lengkap Kelompok -->
-            <div class="snap-in-4 bg-white border-2 border-black shadow-[5px_5px_0px_0px_#000000] overflow-hidden">
+            <!-- Daftar Peringkat Lengkap Kelompok (Mulai #4, #1-#3 di Podium) -->
+            <div id="adm-lb-grp-list-card" class="snap-in-4 {{ $kelompokLeaderboardList->count() <= 3 ? 'hidden ' : '' }}bg-white border-2 border-black shadow-[5px_5px_0px_0px_#000000] overflow-hidden">
                 <div class="px-5 py-3.5 border-b-2 border-black bg-blue-50/70 flex items-center justify-between gap-3">
                     <h3 class="text-xs sm:text-sm font-black uppercase tracking-wider text-[#1A467C]">
                         Peringkat Lengkap Kelompok
@@ -447,7 +447,7 @@
                 </div>
 
                 <div id="adm-lb-grp-list" class="divide-y-2 divide-gray-200">
-                    @foreach ($kelompokLeaderboardList as $idx => $grp)
+                    @foreach ($kelompokLeaderboardList->slice(3) as $idx => $grp)
                         @php
                             $rank = $idx + 1;
                             $pct = round(($grp->total_point / $maxPointKelompok) * 100);
@@ -748,11 +748,17 @@
         if (!container) return;
 
         const list = Array.isArray(items) ? items : [];
+        const listCard = document.getElementById(`${containerId}-card`);
         if (emptyEl) {
             emptyEl.classList.toggle('hidden', list.length > 0);
         }
 
-        if (list.length === 0) {
+        const belowPodium = list.slice(3);
+        if (listCard) {
+            listCard.classList.toggle('hidden', belowPodium.length === 0);
+        }
+
+        if (belowPodium.length === 0) {
             container.innerHTML = '';
             return;
         }
@@ -770,7 +776,7 @@
         });
 
         const maxPoint = Math.max(1, ...list.map(i => Number(i.total_point || 0)));
-        container.innerHTML = list.map(item => buildAdminLbRowHtml(item, maxPoint, mode)).join('');
+        container.innerHTML = belowPodium.map(item => buildAdminLbRowHtml(item, maxPoint, mode)).join('');
 
         const newRows = Array.from(container.querySelectorAll('.lb-row'));
         const flipMoves = [];
