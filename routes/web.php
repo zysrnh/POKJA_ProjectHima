@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\Route;
 | Global Anti-DDoS Rate Limiter Group (Max 120 Req / Menit per IP)
 |--------------------------------------------------------------------------
 */
-Route::middleware('throttle:120,1')->group(function () {
+Route::middleware('throttle:600,1')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
@@ -65,10 +65,10 @@ Route::middleware('throttle:120,1')->group(function () {
     // Scanner Absensi Mahasiswa di HP
     Route::get('/absen', [PresensiMahasiswaController::class, 'showAbsen'])->name('presensi.absen');
     Route::post('/absen/scan', [PresensiMahasiswaController::class, 'submitScan'])
-        ->middleware('throttle:45,1')
+        ->middleware('throttle:120,1')
         ->name('presensi.scan');
     Route::post('/absen/cek-nim', [PresensiMahasiswaController::class, 'cekNim'])
-        ->middleware('throttle:30,1')
+        ->middleware('throttle:120,1')
         ->name('presensi.cekNim');
 
     /*
@@ -79,7 +79,7 @@ Route::middleware('throttle:120,1')->group(function () {
     Route::prefix('mahasiswa')->name('mahasiswa.')->group(function () {
         Route::get('/login', [MahasiswaController::class, 'showLogin'])->name('login');
         Route::post('/login', [MahasiswaController::class, 'login'])
-            ->middleware('throttle:10,1')
+            ->middleware('throttle:60,1')
             ->name('login.post');
 
         Route::post('/lupa-password', [MahasiswaController::class, 'sendResetLink'])
@@ -95,20 +95,20 @@ Route::middleware('throttle:120,1')->group(function () {
 
         Route::get('/aktivasi', [MahasiswaController::class, 'aktivasiDirect'])->name('aktivasi');
         Route::post('/verifikasi-qr', [MahasiswaController::class, 'verifikasiQr'])
-            ->middleware('throttle:10,1')
+            ->middleware('throttle:60,1')
             ->name('verifikasiQr');
         Route::get('/set-password', [MahasiswaController::class, 'showSetPassword'])->name('setPassword');
         Route::post('/set-password', [MahasiswaController::class, 'savePassword'])
-            ->middleware('throttle:10,1')
+            ->middleware('throttle:60,1')
             ->name('savePassword');
 
         Route::get('/dashboard', [MahasiswaController::class, 'dashboard'])->name('dashboard');
         Route::get('/dashboard/sync', [MahasiswaController::class, 'sync'])->name('dashboard.sync');
         Route::post('/profile', [MahasiswaController::class, 'updateProfile'])
-            ->middleware('throttle:15,1')
+            ->middleware('throttle:60,1')
             ->name('profile.update');
         Route::post('/kuesioner', [MahasiswaController::class, 'submitKuesioner'])
-            ->middleware('throttle:20,1')
+            ->middleware('throttle:60,1')
             ->name('kuesioner.submit');
         Route::post('/logout', [MahasiswaController::class, 'logout'])->name('logout');
 

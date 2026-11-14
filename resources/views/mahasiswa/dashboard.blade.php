@@ -2970,11 +2970,12 @@
             if (realtimePollTimer) {
                 clearInterval(realtimePollTimer);
             }
+            const pollIntervalMs = 10000 + Math.floor(Math.random() * 2000);
             realtimePollTimer = setInterval(() => {
                 if (!document.hidden) {
                     syncDashboardNow();
                 }
-            }, 3000);
+            }, pollIntervalMs);
 
             document.addEventListener('visibilitychange', () => {
                 if (!document.hidden) {
