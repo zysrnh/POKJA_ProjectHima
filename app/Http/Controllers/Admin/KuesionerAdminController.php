@@ -7,12 +7,13 @@ use App\Models\Kelas;
 use App\Models\KuesionerJawaban;
 use App\Models\KuesionerPertanyaan;
 use App\Models\Pendaftaran;
+use App\Models\Pengaturan;
 use Illuminate\Http\Request;
 
 class KuesionerAdminController extends Controller
 {
     /**
-     * Halaman utama Admin Kuesioner: Kelola Pertanyaan Dinamis & Rekap Jawaban Anggota.
+     * Halaman utama Admin Kuesioner: Kelola Pertanyaan Dinamis & Rekap Jawaban Anggota per Pertemuan.
      */
     public function index(Request $request)
     {
@@ -20,21 +21,42 @@ class KuesionerAdminController extends Controller
         $kelasFilter = trim((string) $request->input('kelas', ''));
         $statusFilter = trim((string) $request->input('status', ''));
 
-        $pertanyaans = KuesionerPertanyaan::withCount('jawabans')
+        $pertemuanAktif = max(1, (int) (Pengaturan::value('pertemuan_aktif') ?? 1));
+        $maxPertemuan = max(
+            4,
+            $pertemuanAktif,
+            (int) KuesionerPertanyaan::max('pertemuan'),
+            (int) KuesionerJawaban::max('pertemuan')
+        );
+        $pertemuanList = range(1, $maxPertemuan);
+
+        $pertemuanFilter = max(1, (int) $request->input('pertemuan', $pertemuanAktif));
+        if (!in_array($pertemuanFilter, $pertemuanList, true)) {
+            $pertemuanList[] = $pertemuanFilter;
+            sort($pertemuanList);
+        }
+
+        $pertanyaans = KuesionerPertanyaan::forPertemuan($pertemuanFilter)
+            ->withCount([
+                'jawabans' => fn ($q) => $q->where('pertemuan', $pertemuanFilter),
+            ])
             ->orderBy('urutan')
             ->orderBy('id')
             ->get();
 
         $kelasList = Kelas::orderBy('nama_kelas')->get();
         $totalPeserta = Pendaftaran::count();
-        $totalResponden = KuesionerJawaban::distinct('pendaftaran_id')->count('pendaftaran_id');
+        $totalResponden = KuesionerJawaban::where('pertemuan', $pertemuanFilter)
+            ->distinct('pendaftaran_id')
+            ->count('pendaftaran_id');
         $persenResponden = $totalPeserta > 0 ? round(($totalResponden / $totalPeserta) * 100) : 0;
 
-        // Hitung statistik opsi untuk pertanyaan bertipe Pilihan Ganda
+        // Hitung statistik opsi untuk pertanyaan bertipe Pilihan Ganda pada pertemuan terpilih
         $pilihanStats = [];
         $pilihanPertanyaans = $pertanyaans->where('tipe', 'pilihan');
         if ($pilihanPertanyaans->isNotEmpty()) {
-            $groupedAnswers = KuesionerJawaban::whereIn('pertanyaan_id', $pilihanPertanyaans->pluck('id'))
+            $groupedAnswers = KuesionerJawaban::where('pertemuan', $pertemuanFilter)
+                ->whereIn('pertanyaan_id', $pilihanPertanyaans->pluck('id'))
                 ->get()
                 ->groupBy('pertanyaan_id');
 
@@ -57,9 +79,16 @@ class KuesionerAdminController extends Controller
             }
         }
 
-        $query = Pendaftaran::with(['kuesionerJawabans'])
-            ->withCount('kuesionerJawabans')
-            ->withMax('kuesionerJawabans', 'updated_at');
+        $query = Pendaftaran::with([
+                'kuesionerJawabans' => fn ($q) => $q->where('pertemuan', $pertemuanFilter),
+            ])
+            ->withCount([
+                'kuesionerJawabans' => fn ($q) => $q->where('pertemuan', $pertemuanFilter),
+            ])
+            ->withMax(
+                ['kuesionerJawabans' => fn ($q) => $q->where('pertemuan', $pertemuanFilter)],
+                'updated_at'
+            );
 
         if ($search !== '') {
             $query->where(function ($q) use ($search) {
@@ -74,9 +103,9 @@ class KuesionerAdminController extends Controller
         }
 
         if ($statusFilter === 'sudah') {
-            $query->has('kuesionerJawabans');
+            $query->whereHas('kuesionerJawabans', fn ($q) => $q->where('pertemuan', $pertemuanFilter));
         } elseif ($statusFilter === 'belum') {
-            $query->doesntHave('kuesionerJawabans');
+            $query->whereDoesntHave('kuesionerJawabans', fn ($q) => $q->where('pertemuan', $pertemuanFilter));
         }
 
         $respondenList = $query
@@ -95,7 +124,10 @@ class KuesionerAdminController extends Controller
             'respondenList',
             'search',
             'kelasFilter',
-            'statusFilter'
+            'statusFilter',
+            'pertemuanFilter',
+            'pertemuanList',
+            'pertemuanAktif'
         ));
     }
 
@@ -112,8 +144,10 @@ class KuesionerAdminController extends Controller
 
         KuesionerPertanyaan::create($data);
 
+        $redirectPertemuan = $data['pertemuan'] ?? max(1, (int) $request->input('current_pertemuan', 1));
+
         return redirect()
-            ->route('admin.kuesioner.index')
+            ->route('admin.kuesioner.index', ['pertemuan' => $redirectPertemuan])
             ->with('success', 'Pertanyaan kuesioner berhasil ditambahkan!');
     }
 
@@ -131,38 +165,54 @@ class KuesionerAdminController extends Controller
 
         $pertanyaan->update($data);
 
+        $redirectPertemuan = $data['pertemuan'] ?? max(1, (int) $request->input('current_pertemuan', 1));
+
         return redirect()
-            ->route('admin.kuesioner.index')
+            ->route('admin.kuesioner.index', ['pertemuan' => $redirectPertemuan])
             ->with('success', 'Pertanyaan kuesioner berhasil diperbarui!');
     }
 
     /**
      * Hapus pertanyaan kuesioner (beserta jawabannya).
      */
-    public function destroyPertanyaan(int $id)
+    public function destroyPertanyaan(Request $request, int $id)
     {
         $pertanyaan = KuesionerPertanyaan::findOrFail($id);
         $pertanyaan->delete();
 
+        $redirectPertemuan = max(1, (int) $request->input('current_pertemuan', 1));
+
         return redirect()
-            ->route('admin.kuesioner.index')
+            ->route('admin.kuesioner.index', ['pertemuan' => $redirectPertemuan])
             ->with('success', 'Pertanyaan kuesioner berhasil dihapus.');
     }
 
     /**
-     * Export rekap jawaban kuesioner anggota ke format CSV.
+     * Export rekap jawaban kuesioner anggota per pertemuan ke format CSV.
      */
     public function exportCsv(Request $request)
     {
         $search = trim((string) $request->input('search', ''));
         $kelasFilter = trim((string) $request->input('kelas', ''));
         $statusFilter = trim((string) $request->input('status', ''));
+        $pertemuanAktif = max(1, (int) (Pengaturan::value('pertemuan_aktif') ?? 1));
+        $pertemuanFilter = max(1, (int) $request->input('pertemuan', $pertemuanAktif));
 
-        $pertanyaans = KuesionerPertanyaan::orderBy('urutan')->orderBy('id')->get();
+        $pertanyaans = KuesionerPertanyaan::forPertemuan($pertemuanFilter)
+            ->orderBy('urutan')
+            ->orderBy('id')
+            ->get();
 
-        $query = Pendaftaran::with(['kuesionerJawabans'])
-            ->withCount('kuesionerJawabans')
-            ->withMax('kuesionerJawabans', 'updated_at');
+        $query = Pendaftaran::with([
+                'kuesionerJawabans' => fn ($q) => $q->where('pertemuan', $pertemuanFilter),
+            ])
+            ->withCount([
+                'kuesionerJawabans' => fn ($q) => $q->where('pertemuan', $pertemuanFilter),
+            ])
+            ->withMax(
+                ['kuesionerJawabans' => fn ($q) => $q->where('pertemuan', $pertemuanFilter)],
+                'updated_at'
+            );
 
         if ($search !== '') {
             $query->where(function ($q) use ($search) {
@@ -175,9 +225,9 @@ class KuesionerAdminController extends Controller
             $query->where('kelas', $kelasFilter);
         }
         if ($statusFilter === 'sudah') {
-            $query->has('kuesionerJawabans');
+            $query->whereHas('kuesionerJawabans', fn ($q) => $q->where('pertemuan', $pertemuanFilter));
         } elseif ($statusFilter === 'belum') {
-            $query->doesntHave('kuesionerJawabans');
+            $query->whereDoesntHave('kuesionerJawabans', fn ($q) => $q->where('pertemuan', $pertemuanFilter));
         }
 
         $rows = $query
@@ -185,47 +235,55 @@ class KuesionerAdminController extends Controller
             ->orderBy('nama', 'asc')
             ->get();
 
-        $filename = 'rekap-kuesioner-pokja-' . now()->timezone('Asia/Jakarta')->format('Ymd-His') . '.csv';
+        $filename = 'rekap-kuesioner-pertemuan-' . $pertemuanFilter . '-' . now()->timezone('Asia/Jakarta')->format('Ymd-His') . '.csv';
 
-        return response()->streamDownload(function () use ($rows, $pertanyaans) {
-            $handle = fopen('php://output', 'w');
-            // UTF-8 BOM agar Excel langsung membaca karakter dengan benar
-            fwrite($handle, "\xEF\xBB\xBF");
+        return response()->streamDownload(function () use ($rows, $pertanyaans, $pertemuanFilter) {
+            $out = fopen('php://output', 'w');
+            // UTF-8 BOM agar Excel langsung membaca karakter UTF-8 dengan benar
+            fwrite($out, "\xEF\xBB\xBF");
 
-            $headers = ['No', 'NIM', 'Nama', 'Kelas', 'Status', 'Terakhir Diisi'];
+            $headers = ['Pertemuan', 'NIM', 'Nama', 'Kelas', 'Status Pengisian', 'Terakhir Diperbarui'];
             foreach ($pertanyaans as $q) {
                 $headers[] = $q->pertanyaan;
             }
-            fputcsv($handle, $headers);
+            fputcsv($out, $headers);
 
-            foreach ($rows as $idx => $mhs) {
-                $ansMap = $mhs->kuesionerJawabans->keyBy('pertanyaan_id');
+            foreach ($rows as $row) {
+                $jawabanByQ = $row->kuesionerJawabans->keyBy('pertanyaan_id');
+                $sudahIsi = $row->kuesioner_jawabans_count > 0;
+                $updated = $row->kuesioner_jawabans_max_updated_at
+                    ? \Carbon\Carbon::parse($row->kuesioner_jawabans_max_updated_at)->timezone('Asia/Jakarta')->format('Y-m-d H:i:s')
+                    : '-';
+
                 $line = [
-                    $idx + 1,
-                    $mhs->nim,
-                    $mhs->nama,
-                    $mhs->kelas,
-                    $mhs->kuesioner_jawabans_count > 0 ? 'Sudah Mengisi' : 'Belum Mengisi',
-                    $mhs->kuesioner_jawabans_max_updated_at
-                        ? \Carbon\Carbon::parse($mhs->kuesioner_jawabans_max_updated_at)->timezone('Asia/Jakarta')->format('d/m/Y H:i')
-                        : '-',
+                    'Pertemuan ' . $pertemuanFilter,
+                    $row->nim,
+                    $row->nama,
+                    $row->kelas,
+                    $sudahIsi ? 'Sudah Mengisi' : 'Belum Mengisi',
+                    $updated,
                 ];
 
                 foreach ($pertanyaans as $q) {
-                    $ans = $ansMap->get($q->id);
-                    $line[] = $ans ? ($ans->jawaban ?? '-') : '-';
+                    $ans = $jawabanByQ->get($q->id)?->jawaban ?? '';
+                    // Lindungi dari CSV formula injection
+                    if ($ans !== '' && preg_match('/^[=+\-@]/', $ans)) {
+                        $ans = "'" . $ans;
+                    }
+                    $line[] = $ans;
                 }
-                fputcsv($handle, $line);
+
+                fputcsv($out, $line);
             }
 
-            fclose($handle);
+            fclose($out);
         }, $filename, [
             'Content-Type' => 'text/csv; charset=UTF-8',
         ]);
     }
 
     /**
-     * Validasi & normalisasi payload tambah/edit pertanyaan kuesioner (tanpa rating).
+     * Validasi input pertanyaan kuesioner (tanpa tipe rating).
      */
     private function validatePertanyaan(Request $request): array
     {
@@ -234,6 +292,7 @@ class KuesionerAdminController extends Controller
             'tipe' => ['required', 'in:teks,paragraf,pilihan'],
             'opsi_text' => ['nullable', 'string', 'max:2000'],
             'urutan' => ['nullable', 'integer', 'min:0', 'max:9999'],
+            'pertemuan' => ['nullable', 'integer', 'min:1', 'max:50'],
             'wajib' => ['nullable', 'boolean'],
             'aktif' => ['nullable', 'boolean'],
         ], [
@@ -265,7 +324,7 @@ class KuesionerAdminController extends Controller
             'wajib' => $request->boolean('wajib'),
             'urutan' => isset($validated['urutan']) ? (int) $validated['urutan'] : null,
             'aktif' => $request->boolean('aktif'),
+            'pertemuan' => isset($validated['pertemuan']) && $validated['pertemuan'] !== '' ? (int) $validated['pertemuan'] : null,
         ];
     }
 }
-

@@ -1149,175 +1149,215 @@
             @endphp
             <section id="tab-panel-kuesioner" class="tab-snap-in hidden space-y-4 sm:space-y-6">
                 <div class="bg-white border-2 sm:border-[3px] border-black shadow-[4px_4px_0px_0px_#000000] sm:shadow-[6px_6px_0px_0px_#000000] p-4 sm:p-6">
-                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-4 border-b-2 border-black">
-                        <div>
-                            <div class="flex items-center gap-2">
-                                <span class="w-2.5 h-2.5 bg-[#1A467C] border border-black inline-block"></span>
-                                <span class="text-[10px] font-black uppercase tracking-widest text-[#1A467C]">Evaluasi &amp; Masukan Anggota</span>
-                            </div>
-                            <h2 class="text-lg sm:text-xl font-black text-black uppercase tracking-tight mt-1">
-                                Kuesioner POKJA HIMA IF
-                            </h2>
-                            <p class="text-xs font-medium text-gray-600 mt-1">
-                                Setiap anggota mengisi kuesioner 1 kali dan dapat memperbarui jawabannya kapan saja.
-                            </p>
+                    <div class="pb-4 border-b-2 border-black">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 bg-[#1A467C] border border-black inline-block"></span>
+                            <span class="text-[10px] font-black uppercase tracking-widest text-[#1A467C]">Evaluasi &amp; Masukan Anggota</span>
                         </div>
+                        <h2 class="text-lg sm:text-xl font-black text-black uppercase tracking-tight mt-1">
+                            Kuesioner POKJA HIMA IF
+                        </h2>
+                        <p class="text-xs font-medium text-gray-600 mt-1">
+                            Setiap anggota mengisi kuesioner 1 kali di tiap pertemuan dan dapat memperbarui jawabannya kapan saja.
+                        </p>
 
-                        @if($kuesionerPertanyaans->isNotEmpty())
-                            @if($sudahIsiKuesioner)
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-100 text-green-900 border-2 border-black text-[11px] font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] self-start sm:self-center">
-                                    ✓ Sudah Mengisi
-                                </span>
-                            @else
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-100 text-amber-900 border-2 border-black text-[11px] font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] self-start sm:self-center">
-                                    ● Belum Mengisi
-                                </span>
-                            @endif
-                        @endif
+                        <!-- Sub-Tab Pertemuan -->
+                        <div class="flex flex-wrap items-center gap-2 mt-4">
+                            @foreach($kuesionerPertemuanList as $pNum)
+                                @php
+                                    $isSelectedP = (int) $kuesionerPertemuanDipilih === (int) $pNum;
+                                    $isFilledP = $sudahIsiKuesionerByPertemuan[$pNum] ?? false;
+                                @endphp
+                                <button
+                                    type="button"
+                                    id="kuesioner-ptab-{{ $pNum }}"
+                                    onclick="switchKuesionerPertemuan({{ $pNum }})"
+                                    class="btn-tactile px-3 py-1.5 border-2 border-black text-xs font-black uppercase tracking-wider inline-flex items-center gap-1.5 cursor-pointer {{ $isSelectedP ? 'bg-[#1A467C] text-white shadow-[2px_2px_0px_0px_#000000]' : 'bg-white hover:bg-gray-100 text-black' }}"
+                                >
+                                    <span>Pertemuan {{ $pNum }}</span>
+                                    @if((int) $pNum === (int) $pertemuanAktifKuesioner)
+                                        <span class="px-1 py-0.5 bg-amber-300 text-black border border-black text-[9px] leading-none">Aktif</span>
+                                    @endif
+                                    @if($isFilledP)
+                                        <span class="px-1 py-0.5 bg-green-500 text-white border border-black text-[9px] leading-none">✓</span>
+                                    @endif
+                                </button>
+                            @endforeach
+                        </div>
                     </div>
 
-                    @if($kuesionerPertanyaans->isEmpty())
-                        <div class="mt-5 p-6 bg-gray-50 border-2 border-dashed border-gray-400 text-center">
-                            <p class="text-xs sm:text-sm font-black uppercase tracking-wider text-gray-700">
-                                Belum Ada Pertanyaan Kuesioner Aktif
-                            </p>
-                            <p class="text-xs font-medium text-gray-500 mt-1">
-                                Panitia belum menambahkan atau mengaktifkan pertanyaan kuesioner.
-                            </p>
-                        </div>
-                    @else
-                        @if($sudahIsiKuesioner && !$hasKuesionerValidationError)
-                            <!-- Ringkasan Jawaban Saat Ini -->
-                            <div id="kuesioner-summary-box" class="mt-5 space-y-4">
-                                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3.5 bg-green-50 border-2 border-black shadow-[3px_3px_0px_0px_#000000]">
-                                    <div>
-                                        <p class="text-xs font-black uppercase tracking-wider text-green-900">
-                                            Jawaban Anda Sudah Tercatat
-                                        </p>
-                                        <p class="text-[11px] font-semibold text-green-800 mt-0.5">
-                                            Masih ada yang ingin diubah? Klik tombol Edit Jawaban di sebelah kanan.
-                                        </p>
-                                    </div>
-                                    <button
-                                        type="button"
-                                        onclick="toggleEditKuesioner(true)"
-                                        class="btn-tactile px-4 py-2 bg-[#1A467C] hover:bg-[#12335C] text-white border-2 border-black font-black text-xs uppercase tracking-wider shadow-[3px_3px_0px_0px_#000000] cursor-pointer shrink-0"
-                                    >
-                                        Edit Jawaban
-                                    </button>
-                                </div>
+                    @foreach($kuesionerPertemuanList as $pNum)
+                        @php
+                            $pQuestions = $kuesionerPertanyaanByPertemuan[$pNum] ?? collect();
+                            $pJawabanMap = $kuesionerJawabanByPertemuan->get($pNum, collect());
+                            $pSudahIsi = $sudahIsiKuesionerByPertemuan[$pNum] ?? false;
+                            $isSelectedPanel = (int) $kuesionerPertemuanDipilih === (int) $pNum;
+                            $pHasValidationError = $hasKuesionerValidationError && (int) old('pertemuan', $kuesionerPertemuanDipilih) === (int) $pNum;
+                        @endphp
+                        <div id="kuesioner-pertemuan-panel-{{ $pNum }}" class="kuesioner-pertemuan-panel mt-5 {{ $isSelectedPanel ? '' : 'hidden' }}">
+                            <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+                                <span class="text-xs font-black uppercase tracking-wider text-gray-800">
+                                    Kuesioner Pertemuan {{ $pNum }}
+                                </span>
 
-                                <div class="space-y-3">
-                                    @foreach($kuesionerPertanyaans as $idx => $q)
-                                        @php
-                                            $savedAnswer = $kuesionerJawabanMap->get($q->id)?->jawaban;
-                                        @endphp
-                                        <div class="p-3.5 bg-gray-50 border-2 border-black">
-                                            <p class="text-[11px] font-black uppercase tracking-wider text-gray-500">
-                                                Pertanyaan {{ $idx + 1 }}
-                                            </p>
-                                            <p class="text-xs sm:text-sm font-black text-black mt-0.5">
-                                                {{ $q->pertanyaan }}
-                                            </p>
-                                            <div class="mt-2 pt-2 border-t border-gray-300 text-xs sm:text-sm font-semibold text-gray-800 whitespace-pre-line">
-                                                {{ $savedAnswer !== null && $savedAnswer !== '' ? $savedAnswer : '-' }}
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            </div>
-                        @endif
-
-                        <!-- Form Pengisian / Edit Kuesioner -->
-                        <div id="kuesioner-form-box" class="mt-5 {{ ($sudahIsiKuesioner && !$hasKuesionerValidationError) ? 'hidden' : '' }}">
-                            <form action="{{ route('mahasiswa.kuesioner.submit') }}" method="POST" class="space-y-4">
-                                @csrf
-                                @foreach($kuesionerPertanyaans as $idx => $q)
-                                    @php
-                                        $savedValue = $kuesionerJawabanMap->get($q->id)?->jawaban ?? '';
-                                        $fieldValue = old('jawaban.' . $q->id, $savedValue);
-                                        $fieldError = $errors->first('jawaban.' . $q->id);
-                                    @endphp
-                                    <div class="p-4 bg-[#F8FAFC] border-2 border-black shadow-[3px_3px_0px_0px_#000000]">
-                                        <div class="flex items-start justify-between gap-2 mb-2">
-                                            <label class="block text-xs sm:text-sm font-black text-black leading-snug">
-                                                <span class="inline-block px-1.5 py-0.5 bg-[#1A467C] text-white border border-black text-[10px] mr-1.5">#{{ $idx + 1 }}</span>
-                                                {{ $q->pertanyaan }}
-                                                @if($q->wajib)
-                                                    <span class="text-red-600 ml-0.5">*</span>
-                                                @endif
-                                            </label>
-                                            <span class="px-2 py-0.5 bg-white border border-black text-[9px] font-black uppercase tracking-wider text-gray-700 shrink-0">
-                                                {{ \App\Models\KuesionerPertanyaan::TIPE_LABELS[$q->tipe] ?? $q->tipe }}
-                                            </span>
-                                        </div>
-
-                                        @if($q->tipe === 'teks')
-                                            <input
-                                                type="text"
-                                                name="jawaban[{{ $q->id }}]"
-                                                value="{{ $fieldValue }}"
-                                                maxlength="500"
-                                                {{ $q->wajib ? 'required' : '' }}
-                                                placeholder="Tulis jawaban singkat Anda..."
-                                                class="w-full px-3 py-2.5 bg-white border-2 border-black text-xs sm:text-sm font-bold text-black focus:outline-none focus:bg-yellow-50"
-                                            >
-                                        @elseif($q->tipe === 'paragraf')
-                                            <textarea
-                                                name="jawaban[{{ $q->id }}]"
-                                                rows="3"
-                                                maxlength="3000"
-                                                {{ $q->wajib ? 'required' : '' }}
-                                                placeholder="Tulis jawaban lengkap Anda..."
-                                                class="w-full px-3 py-2.5 bg-white border-2 border-black text-xs sm:text-sm font-bold text-black focus:outline-none focus:bg-yellow-50"
-                                            >{{ $fieldValue }}</textarea>
-                                        @elseif($q->tipe === 'pilihan')
-                                            @php
-                                                $opsiList = is_array($q->opsi) ? $q->opsi : [];
-                                            @endphp
-                                            <div class="space-y-2 mt-2">
-                                                @foreach($opsiList as $optIdx => $optText)
-                                                    <label class="flex items-center gap-2.5 p-2.5 bg-white border-2 border-black cursor-pointer hover:bg-blue-50 transition">
-                                                        <input
-                                                            type="radio"
-                                                            name="jawaban[{{ $q->id }}]"
-                                                            value="{{ $optText }}"
-                                                            {{ (string) $fieldValue === (string) $optText ? 'checked' : '' }}
-                                                            {{ ($q->wajib && $optIdx === 0) ? 'required' : '' }}
-                                                            class="w-4 h-4 accent-[#1A467C] shrink-0"
-                                                        >
-                                                        <span class="text-xs sm:text-sm font-bold text-gray-900">{{ $optText }}</span>
-                                                    </label>
-                                                @endforeach
-                                            </div>
-                                        @endif
-
-                                        @if($fieldError)
-                                            <p class="text-[11px] font-black text-red-600 mt-1.5">{{ $fieldError }}</p>
-                                        @endif
-                                    </div>
-                                @endforeach
-
-                                <div class="flex flex-wrap items-center justify-end gap-2.5 pt-2">
-                                    @if($sudahIsiKuesioner && !$hasKuesionerValidationError)
-                                        <button
-                                            type="button"
-                                            onclick="toggleEditKuesioner(false)"
-                                            class="btn-tactile px-4 py-2.5 bg-white hover:bg-gray-100 text-black border-2 border-black font-black text-xs uppercase tracking-wider shadow-[3px_3px_0px_0px_#000000] cursor-pointer"
-                                        >
-                                            Batal
-                                        </button>
+                                @if($pQuestions->isNotEmpty())
+                                    @if($pSudahIsi)
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-green-100 text-green-900 border-2 border-black text-[11px] font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000]">
+                                            ✓ Sudah Mengisi
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-100 text-amber-900 border-2 border-black text-[11px] font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000]">
+                                            ● Belum Mengisi
+                                        </span>
                                     @endif
-                                    <button
-                                        type="submit"
-                                        class="btn-tactile px-5 py-2.5 bg-[#1A467C] hover:bg-[#12335C] text-white border-2 border-black font-black text-xs uppercase tracking-wider shadow-[4px_4px_0px_0px_#000000] cursor-pointer"
-                                    >
-                                        {{ $sudahIsiKuesioner ? 'Perbarui Jawaban Kuesioner' : 'Simpan Jawaban Kuesioner' }}
-                                    </button>
+                                @endif
+                            </div>
+
+                            @if($pQuestions->isEmpty())
+                                <div class="p-6 bg-gray-50 border-2 border-dashed border-gray-400 text-center">
+                                    <p class="text-xs sm:text-sm font-black uppercase tracking-wider text-gray-700">
+                                        Belum Ada Pertanyaan untuk Pertemuan {{ $pNum }}
+                                    </p>
+                                    <p class="text-xs font-medium text-gray-500 mt-1">
+                                        Panitia belum menambahkan atau mengaktifkan pertanyaan kuesioner untuk pertemuan ini.
+                                    </p>
                                 </div>
-                            </form>
+                            @else
+                                @if($pSudahIsi && !$pHasValidationError)
+                                    <!-- Ringkasan Jawaban Pertemuan {{ $pNum }} -->
+                                    <div id="kuesioner-summary-box-{{ $pNum }}" class="space-y-4">
+                                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3.5 bg-green-50 border-2 border-black shadow-[3px_3px_0px_0px_#000000]">
+                                            <div>
+                                                <p class="text-xs font-black uppercase tracking-wider text-green-900">
+                                                    Jawaban Pertemuan {{ $pNum }} Sudah Tercatat
+                                                </p>
+                                                <p class="text-[11px] font-semibold text-green-800 mt-0.5">
+                                                    Masih ada yang ingin diubah? Klik tombol Edit Jawaban di sebelah kanan.
+                                                </p>
+                                            </div>
+                                            <button
+                                                type="button"
+                                                onclick="toggleEditKuesioner({{ $pNum }}, true)"
+                                                class="btn-tactile px-4 py-2 bg-[#1A467C] hover:bg-[#12335C] text-white border-2 border-black font-black text-xs uppercase tracking-wider shadow-[3px_3px_0px_0px_#000000] cursor-pointer shrink-0"
+                                            >
+                                                Edit Jawaban
+                                            </button>
+                                        </div>
+
+                                        <div class="space-y-3">
+                                            @foreach($pQuestions as $idx => $q)
+                                                @php
+                                                    $savedAnswer = $pJawabanMap->get($q->id)?->jawaban;
+                                                @endphp
+                                                <div class="p-3.5 bg-gray-50 border-2 border-black">
+                                                    <p class="text-[11px] font-black uppercase tracking-wider text-gray-500">
+                                                        Pertanyaan {{ $idx + 1 }}
+                                                    </p>
+                                                    <p class="text-xs sm:text-sm font-black text-black mt-0.5">
+                                                        {{ $q->pertanyaan }}
+                                                    </p>
+                                                    <div class="mt-2 pt-2 border-t border-gray-300 text-xs sm:text-sm font-semibold text-gray-800 whitespace-pre-line">
+                                                        {{ $savedAnswer !== null && $savedAnswer !== '' ? $savedAnswer : '-' }}
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @endif
+
+                                <!-- Form Pengisian / Edit Kuesioner Pertemuan {{ $pNum }} -->
+                                <div id="kuesioner-form-box-{{ $pNum }}" class="{{ ($pSudahIsi && !$pHasValidationError) ? 'hidden' : '' }}">
+                                    <form action="{{ route('mahasiswa.kuesioner.submit') }}" method="POST" class="space-y-4">
+                                        @csrf
+                                        <input type="hidden" name="pertemuan" value="{{ $pNum }}">
+                                        @foreach($pQuestions as $idx => $q)
+                                            @php
+                                                $savedValue = $pJawabanMap->get($q->id)?->jawaban ?? '';
+                                                $fieldValue = $pHasValidationError ? old('jawaban.' . $q->id, $savedValue) : $savedValue;
+                                                $fieldError = $pHasValidationError ? $errors->first('jawaban.' . $q->id) : null;
+                                            @endphp
+                                            <div class="p-4 bg-[#F8FAFC] border-2 border-black shadow-[3px_3px_0px_0px_#000000]">
+                                                <div class="flex items-start justify-between gap-2 mb-2">
+                                                    <label class="block text-xs sm:text-sm font-black text-black leading-snug">
+                                                        <span class="inline-block px-1.5 py-0.5 bg-[#1A467C] text-white border border-black text-[10px] mr-1.5">#{{ $idx + 1 }}</span>
+                                                        {{ $q->pertanyaan }}
+                                                        @if($q->wajib)
+                                                            <span class="text-red-600 ml-0.5">*</span>
+                                                        @endif
+                                                    </label>
+                                                    <span class="px-2 py-0.5 bg-white border border-black text-[9px] font-black uppercase tracking-wider text-gray-700 shrink-0">
+                                                        {{ \App\Models\KuesionerPertanyaan::TIPE_LABELS[$q->tipe] ?? $q->tipe }}
+                                                    </span>
+                                                </div>
+
+                                                @if($q->tipe === 'teks')
+                                                    <input
+                                                        type="text"
+                                                        name="jawaban[{{ $q->id }}]"
+                                                        value="{{ $fieldValue }}"
+                                                        maxlength="500"
+                                                        {{ $q->wajib ? 'required' : '' }}
+                                                        placeholder="Tulis jawaban singkat Anda..."
+                                                        class="w-full px-3 py-2.5 bg-white border-2 border-black text-xs sm:text-sm font-bold text-black focus:outline-none focus:bg-yellow-50"
+                                                    >
+                                                @elseif($q->tipe === 'paragraf')
+                                                    <textarea
+                                                        name="jawaban[{{ $q->id }}]"
+                                                        rows="3"
+                                                        maxlength="3000"
+                                                        {{ $q->wajib ? 'required' : '' }}
+                                                        placeholder="Tulis jawaban lengkap Anda..."
+                                                        class="w-full px-3 py-2.5 bg-white border-2 border-black text-xs sm:text-sm font-bold text-black focus:outline-none focus:bg-yellow-50"
+                                                    >{{ $fieldValue }}</textarea>
+                                                @elseif($q->tipe === 'pilihan')
+                                                    @php
+                                                        $opsiList = is_array($q->opsi) ? $q->opsi : [];
+                                                    @endphp
+                                                    <div class="space-y-2 mt-2">
+                                                        @foreach($opsiList as $optIdx => $optText)
+                                                            <label class="flex items-center gap-2.5 p-2.5 bg-white border-2 border-black cursor-pointer hover:bg-blue-50 transition">
+                                                                <input
+                                                                    type="radio"
+                                                                    name="jawaban[{{ $q->id }}]"
+                                                                    value="{{ $optText }}"
+                                                                    {{ (string) $fieldValue === (string) $optText ? 'checked' : '' }}
+                                                                    {{ ($q->wajib && $optIdx === 0) ? 'required' : '' }}
+                                                                    class="w-4 h-4 accent-[#1A467C] shrink-0"
+                                                                >
+                                                                <span class="text-xs sm:text-sm font-bold text-gray-900">{{ $optText }}</span>
+                                                            </label>
+                                                        @endforeach
+                                                    </div>
+                                                @endif
+
+                                                @if($fieldError)
+                                                    <p class="text-[11px] font-black text-red-600 mt-1.5">{{ $fieldError }}</p>
+                                                @endif
+                                            </div>
+                                        @endforeach
+
+                                        <div class="flex flex-wrap items-center justify-end gap-2.5 pt-2">
+                                            @if($pSudahIsi && !$pHasValidationError)
+                                                <button
+                                                    type="button"
+                                                    onclick="toggleEditKuesioner({{ $pNum }}, false)"
+                                                    class="btn-tactile px-4 py-2.5 bg-white hover:bg-gray-100 text-black border-2 border-black font-black text-xs uppercase tracking-wider shadow-[3px_3px_0px_0px_#000000] cursor-pointer"
+                                                >
+                                                    Batal
+                                                </button>
+                                            @endif
+                                            <button
+                                                type="submit"
+                                                class="btn-tactile px-5 py-2.5 bg-[#1A467C] hover:bg-[#12335C] text-white border-2 border-black font-black text-xs uppercase tracking-wider shadow-[4px_4px_0px_0px_#000000] cursor-pointer"
+                                            >
+                                                {{ $pSudahIsi ? "Perbarui Jawaban Pertemuan {$pNum}" : "Simpan Jawaban Pertemuan {$pNum}" }}
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            @endif
                         </div>
-                    @endif
+                    @endforeach
                 </div>
             </section>
 
@@ -2056,9 +2096,26 @@
             startRealtimePolling();
         });
 
-        function toggleEditKuesioner(isEditing) {
-            const summaryBox = document.getElementById('kuesioner-summary-box');
-            const formBox = document.getElementById('kuesioner-form-box');
+        function switchKuesionerPertemuan(pNum) {
+            document.querySelectorAll('.kuesioner-pertemuan-panel').forEach(el => {
+                el.classList.add('hidden');
+            });
+            document.getElementById('kuesioner-pertemuan-panel-' + pNum)?.classList.remove('hidden');
+
+            document.querySelectorAll('[id^="kuesioner-ptab-"]').forEach(btn => {
+                btn.classList.remove('bg-[#1A467C]', 'text-white', 'shadow-[2px_2px_0px_0px_#000000]');
+                btn.classList.add('bg-white', 'hover:bg-gray-100', 'text-black');
+            });
+            const activeBtn = document.getElementById('kuesioner-ptab-' + pNum);
+            if (activeBtn) {
+                activeBtn.classList.remove('bg-white', 'hover:bg-gray-100', 'text-black');
+                activeBtn.classList.add('bg-[#1A467C]', 'text-white', 'shadow-[2px_2px_0px_0px_#000000]');
+            }
+        }
+
+        function toggleEditKuesioner(pNum, isEditing) {
+            const summaryBox = document.getElementById('kuesioner-summary-box-' + pNum);
+            const formBox = document.getElementById('kuesioner-form-box-' + pNum);
             if (!formBox) return;
 
             if (isEditing) {

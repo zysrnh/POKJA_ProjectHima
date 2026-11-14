@@ -14,7 +14,12 @@ class KuesionerJawaban extends Model
     protected $fillable = [
         'pendaftaran_id',
         'pertanyaan_id',
+        'pertemuan',
         'jawaban',
+    ];
+
+    protected $casts = [
+        'pertemuan' => 'integer',
     ];
 
     /**

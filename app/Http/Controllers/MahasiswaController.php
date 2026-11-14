@@ -619,16 +619,41 @@ class MahasiswaController extends Controller
                 ->get();
         }
 
-        $kuesionerPertanyaans = KuesionerPertanyaan::where('aktif', true)
+        $pertemuanAktifKuesioner = max(1, (int) ($pengaturan->pertemuan_aktif ?? 1));
+        $maxKuesionerPertemuan = max(
+            $pertemuanAktifKuesioner,
+            (int) KuesionerPertanyaan::where('aktif', true)->max('pertemuan'),
+            (int) KuesionerJawaban::where('pendaftaran_id', $mahasiswa->id)->max('pertemuan')
+        );
+        $kuesionerPertemuanList = range(1, $maxKuesionerPertemuan);
+
+        $kuesionerPertanyaanAll = KuesionerPertanyaan::where('aktif', true)
             ->orderBy('urutan')
             ->orderBy('id')
             ->get();
 
-        $kuesionerJawabanMap = KuesionerJawaban::where('pendaftaran_id', $mahasiswa->id)
+        $kuesionerJawabanByPertemuan = KuesionerJawaban::where('pendaftaran_id', $mahasiswa->id)
             ->get()
-            ->keyBy('pertanyaan_id');
+            ->groupBy('pertemuan')
+            ->map(fn ($items) => $items->keyBy('pertanyaan_id'));
 
-        $sudahIsiKuesioner = $kuesionerJawabanMap->isNotEmpty();
+        $kuesionerPertanyaanByPertemuan = [];
+        $sudahIsiKuesionerByPertemuan = [];
+        foreach ($kuesionerPertemuanList as $pNum) {
+            $kuesionerPertanyaanByPertemuan[$pNum] = $kuesionerPertanyaanAll
+                ->filter(fn ($q) => $q->pertemuan === null || (int) $q->pertemuan === $pNum)
+                ->values();
+            $sudahIsiKuesionerByPertemuan[$pNum] = ($kuesionerJawabanByPertemuan->get($pNum)?->isNotEmpty()) ?? false;
+        }
+
+        $requestedPertemuan = (int) request()->query('pertemuan', session('kuesioner_pertemuan', old('pertemuan', $pertemuanAktifKuesioner)));
+        $kuesionerPertemuanDipilih = in_array($requestedPertemuan, $kuesionerPertemuanList, true)
+            ? $requestedPertemuan
+            : $pertemuanAktifKuesioner;
+
+        $kuesionerPertanyaans = $kuesionerPertanyaanByPertemuan[$kuesionerPertemuanDipilih] ?? collect();
+        $kuesionerJawabanMap = $kuesionerJawabanByPertemuan->get($kuesionerPertemuanDipilih, collect());
+        $sudahIsiKuesioner = $sudahIsiKuesionerByPertemuan[$pertemuanAktifKuesioner] ?? false;
 
         return compact(
             'mahasiswa',
@@ -650,7 +675,13 @@ class MahasiswaController extends Controller
             'kandidatAnggotaList',
             'kuesionerPertanyaans',
             'kuesionerJawabanMap',
-            'sudahIsiKuesioner'
+            'sudahIsiKuesioner',
+            'kuesionerPertemuanList',
+            'kuesionerPertanyaanByPertemuan',
+            'kuesionerJawabanByPertemuan',
+            'sudahIsiKuesionerByPertemuan',
+            'kuesionerPertemuanDipilih',
+            'pertemuanAktifKuesioner'
         );
     }
 
@@ -890,14 +921,21 @@ class MahasiswaController extends Controller
             return redirect()->route('mahasiswa.login')->with('error', 'Data mahasiswa tidak ditemukan.');
         }
 
+        $request->validate([
+            'pertemuan' => ['required', 'integer', 'min:1', 'max:50'],
+        ]);
+        $pertemuan = (int) $request->input('pertemuan');
+
         $pertanyaans = KuesionerPertanyaan::where('aktif', true)
+            ->forPertemuan($pertemuan)
             ->orderBy('urutan')
             ->orderBy('id')
             ->get();
 
         if ($pertanyaans->isEmpty()) {
-            return redirect()->to(route('mahasiswa.dashboard') . '#kuesioner')
-                ->with('error', 'Belum ada pertanyaan kuesioner yang aktif saat ini.');
+            return redirect()->route('mahasiswa.dashboard', ['tab' => 'kuesioner', 'pertemuan' => $pertemuan])
+                ->with('kuesioner_pertemuan', $pertemuan)
+                ->with('error', "Belum ada pertanyaan kuesioner yang aktif untuk Pertemuan {$pertemuan}.");
         }
 
         $rules = [];
@@ -927,9 +965,11 @@ class MahasiswaController extends Controller
         $validated = $request->validate($rules, $messages);
         $inputJawaban = $validated['jawaban'] ?? [];
 
-        $sudahPernahIsi = KuesionerJawaban::where('pendaftaran_id', $mahasiswa->id)->exists();
+        $sudahPernahIsi = KuesionerJawaban::where('pendaftaran_id', $mahasiswa->id)
+            ->where('pertemuan', $pertemuan)
+            ->exists();
 
-        DB::transaction(function () use ($pertanyaans, $mahasiswa, $inputJawaban) {
+        DB::transaction(function () use ($pertanyaans, $mahasiswa, $pertemuan, $inputJawaban) {
             foreach ($pertanyaans as $q) {
                 $val = isset($inputJawaban[$q->id]) ? trim((string) $inputJawaban[$q->id]) : null;
                 $val = $val === '' ? null : $val;
@@ -938,6 +978,7 @@ class MahasiswaController extends Controller
                     [
                         'pendaftaran_id' => $mahasiswa->id,
                         'pertanyaan_id'  => $q->id,
+                        'pertemuan'      => $pertemuan,
                     ],
                     [
                         'jawaban' => $val,
@@ -947,10 +988,12 @@ class MahasiswaController extends Controller
         });
 
         $msg = $sudahPernahIsi
-            ? 'Jawaban kuesioner Anda berhasil diperbarui!'
-            : 'Terima kasih! Jawaban kuesioner Anda berhasil disimpan.';
+            ? "Jawaban kuesioner Pertemuan {$pertemuan} berhasil diperbarui!"
+            : "Terima kasih! Jawaban kuesioner Pertemuan {$pertemuan} berhasil disimpan.";
 
-        return redirect()->to(route('mahasiswa.dashboard') . '#kuesioner')->with('success', $msg);
+        return redirect()->route('mahasiswa.dashboard', ['tab' => 'kuesioner', 'pertemuan' => $pertemuan])
+            ->with('kuesioner_pertemuan', $pertemuan)
+            ->with('success', $msg);
     }
 
     /**

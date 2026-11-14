@@ -18,6 +18,7 @@ class KuesionerPertanyaan extends Model
         'wajib',
         'urutan',
         'aktif',
+        'pertemuan',
     ];
 
     protected $casts = [
@@ -25,6 +26,7 @@ class KuesionerPertanyaan extends Model
         'wajib' => 'boolean',
         'urutan' => 'integer',
         'aktif' => 'boolean',
+        'pertemuan' => 'integer',
     ];
 
     public const TIPE_LABELS = [
@@ -39,6 +41,16 @@ class KuesionerPertanyaan extends Model
     public function jawabans()
     {
         return $this->hasMany(KuesionerJawaban::class, 'pertanyaan_id');
+    }
+
+    /**
+     * Scope pertanyaan yang berlaku untuk pertemuan tertentu (atau semua pertemuan bila null).
+     */
+    public function scopeForPertemuan($query, int $pertemuan)
+    {
+        return $query->where(function ($q) use ($pertemuan) {
+            $q->whereNull('pertemuan')->orWhere('pertemuan', $pertemuan);
+        });
     }
 
     /**

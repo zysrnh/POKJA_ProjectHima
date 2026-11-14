@@ -21,7 +21,7 @@
 
         <div class="flex flex-wrap items-center gap-2.5">
             <a
-                href="{{ route('admin.kuesioner.export', ['search' => $search, 'kelas' => $kelasFilter, 'status' => $statusFilter]) }}"
+                href="{{ route('admin.kuesioner.export', ['pertemuan' => $pertemuanFilter, 'search' => $search, 'kelas' => $kelasFilter, 'status' => $statusFilter]) }}"
                 class="btn-smooth px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white border-2 border-black font-black text-xs uppercase tracking-wider shadow-[3px_3px_0px_0px_#000000] inline-flex items-center gap-2"
             >
                 <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -41,6 +41,28 @@
                 <span>Tambah Pertanyaan</span>
             </button>
         </div>
+    </div>
+
+    <!-- Selector Pertemuan -->
+    <div class="snap-in-1 bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] p-3.5 sm:p-4 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex flex-wrap items-center gap-2">
+            <span class="text-xs font-black uppercase tracking-wider text-gray-700 mr-1">Pilih Pertemuan:</span>
+            @foreach($pertemuanList as $pNum)
+                <a
+                    href="{{ route('admin.kuesioner.index', ['pertemuan' => $pNum, 'search' => $search, 'kelas' => $kelasFilter, 'status' => $statusFilter]) }}"
+                    class="btn-smooth px-3 py-1.5 border-2 border-black text-xs font-black uppercase tracking-wider inline-flex items-center gap-1.5 {{ (int) $pertemuanFilter === (int) $pNum ? 'bg-[#1A467C] text-white shadow-[2px_2px_0px_0px_#000000]' : 'bg-white hover:bg-gray-100 text-black' }}"
+                >
+                    <span>Pertemuan {{ $pNum }}</span>
+                    @if((int) $pNum === (int) $pertemuanAktif)
+                        <span class="px-1.5 py-0.5 bg-amber-300 text-black border border-black text-[9px] leading-none">Aktif</span>
+                    @endif
+                </a>
+            @endforeach
+        </div>
+
+        <span class="text-[11px] font-black uppercase tracking-wider text-[#1A467C] bg-blue-50 border border-black px-2.5 py-1">
+            Menampilkan Data Pertemuan {{ $pertemuanFilter }}
+        </span>
     </div>
 
     <!-- Alert Validation Errors -->
@@ -114,6 +136,9 @@
                                 <span class="px-2 py-0.5 bg-white text-black border border-black text-[10px] font-black uppercase">
                                     {{ \App\Models\KuesionerPertanyaan::TIPE_LABELS[$q->tipe] ?? $q->tipe }}
                                 </span>
+                                <span class="px-2 py-0.5 bg-purple-100 text-purple-900 border border-black text-[10px] font-black uppercase">
+                                    {{ $q->pertemuan ? 'Pertemuan ' . $q->pertemuan : 'Semua Pertemuan' }}
+                                </span>
                                 @if($q->wajib)
                                     <span class="px-2 py-0.5 bg-amber-100 text-amber-900 border border-black text-[10px] font-black uppercase">
                                         Wajib
@@ -164,6 +189,7 @@
                             >
                                 @csrf
                                 @method('DELETE')
+                                <input type="hidden" name="current_pertemuan" value="{{ $pertemuanFilter }}">
                                 <button
                                     type="submit"
                                     class="btn-smooth px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white border-2 border-black font-black text-[11px] uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
@@ -229,6 +255,7 @@
 
         <!-- Filter Form -->
         <form method="GET" action="{{ route('admin.kuesioner.index') }}" class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+            <input type="hidden" name="pertemuan" value="{{ $pertemuanFilter }}">
             <input
                 type="text"
                 name="search"
@@ -261,7 +288,7 @@
                 </button>
                 @if($search !== '' || $kelasFilter !== '' || $statusFilter !== '')
                     <a
-                        href="{{ route('admin.kuesioner.index') }}"
+                        href="{{ route('admin.kuesioner.index', ['pertemuan' => $pertemuanFilter]) }}"
                         class="btn-smooth px-3 py-2 bg-white hover:bg-gray-100 text-black border-2 border-black font-black text-xs uppercase shadow-[2px_2px_0px_0px_#000000]"
                     >
                         Reset
@@ -375,6 +402,7 @@
         <form id="pertanyaanForm" method="POST" action="{{ route('admin.kuesioner.pertanyaan.store') }}" class="mt-4 space-y-4">
             @csrf
             <input type="hidden" name="_method" id="pertanyaanFormMethod" value="POST">
+            <input type="hidden" name="current_pertemuan" value="{{ $pertemuanFilter }}">
 
             <div>
                 <label class="block text-xs font-black uppercase tracking-wider text-black mb-1">
@@ -422,6 +450,22 @@
                         class="w-full px-3 py-2 bg-white border-2 border-black text-xs sm:text-sm font-bold text-black focus:outline-none focus:bg-yellow-50"
                     >
                 </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-black uppercase tracking-wider text-black mb-1">
+                    Berlaku Untuk Pertemuan
+                </label>
+                <select
+                    id="inputPertemuan"
+                    name="pertemuan"
+                    class="w-full px-3 py-2 bg-white border-2 border-black text-xs sm:text-sm font-bold text-black focus:outline-none"
+                >
+                    <option value="">Semua Pertemuan (Otomatis Muncul Tiap Pertemuan)</option>
+                    @foreach($pertemuanList as $pNum)
+                        <option value="{{ $pNum }}">Pertemuan {{ $pNum }}</option>
+                    @endforeach
+                </select>
             </div>
 
             <div id="opsiFieldWrapper" class="hidden">
@@ -502,6 +546,7 @@
 <script>
     const storePertanyaanUrl = @json(route('admin.kuesioner.pertanyaan.store'));
     const updatePertanyaanUrlTpl = @json(route('admin.kuesioner.pertanyaan.update', ['id' => '__ID__']));
+    const defaultAdminPertemuan = @json((string) $pertemuanFilter);
 
     function toggleOpsiField() {
         const tipe = document.getElementById('inputTipe').value;
@@ -527,6 +572,7 @@
             document.getElementById('inputPertanyaan').value = data.pertanyaan || '';
             document.getElementById('inputTipe').value = data.tipe || 'teks';
             document.getElementById('inputUrutan').value = data.urutan ?? '';
+            document.getElementById('inputPertemuan').value = data.pertemuan ? String(data.pertemuan) : '';
             document.getElementById('inputOpsiText').value = Array.isArray(data.opsi) ? data.opsi.join('\n') : '';
             document.getElementById('inputWajib').checked = Boolean(data.wajib);
             document.getElementById('inputAktif').checked = Boolean(data.aktif);
@@ -538,6 +584,7 @@
             document.getElementById('inputPertanyaan').value = '';
             document.getElementById('inputTipe').value = 'teks';
             document.getElementById('inputUrutan').value = '';
+            document.getElementById('inputPertemuan').value = defaultAdminPertemuan;
             document.getElementById('inputOpsiText').value = '';
             document.getElementById('inputWajib').checked = true;
             document.getElementById('inputAktif').checked = true;
