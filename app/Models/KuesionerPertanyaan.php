@@ -49,3 +49,4 @@ class KuesionerPertanyaan extends Model
         return self::TIPE_LABELS[$this->tipe] ?? ucfirst((string) $this->tipe);
     }
 }
+

@@ -33,3 +33,4 @@ class KuesionerJawaban extends Model
         return $this->belongsTo(KuesionerPertanyaan::class, 'pertanyaan_id');
     }
 }
+
