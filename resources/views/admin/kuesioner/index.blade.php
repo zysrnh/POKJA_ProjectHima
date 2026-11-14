@@ -1,73 +1,52 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Kelola & Rekap Kuesioner')
+@section('title', 'Kuesioner 6 Pertemuan')
+@section('header_title', 'Kuesioner 6 Pertemuan POKJA')
 
 @section('content')
-<div class="space-y-6">
-    <!-- Header Banner -->
-    <div class="snap-in-1 bg-white border-2 sm:border-[3px] border-black shadow-[4px_4px_0px_0px_#000000] p-4 sm:p-6 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-        <div>
-            <div class="flex items-center gap-2">
-                <span class="w-2.5 h-2.5 bg-[#1A467C] border border-black inline-block"></span>
-                <span class="text-[10px] font-black uppercase tracking-widest text-[#1A467C]">Evaluasi &amp; Masukan Anggota</span>
+<div class="space-y-4 sm:space-y-6">
+
+    <!-- CARD 1: BANNER UTAMA (Clean Style Konsisten dengan Halaman Admin Lainnya) -->
+    <div class="snap-in-1 bg-white border-2 border-[#000000] p-4 sm:p-5 shadow-[5px_5px_0px_0px_#000000]">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+                <h3 class="text-base sm:text-xl font-black uppercase tracking-tight text-[#1A467C]">
+                    Kuesioner 6 Pertemuan &amp; Rekap Jawaban
+                </h3>
+                <p class="text-xs font-semibold text-gray-600 mt-0.5">
+                    Kelola pertanyaan dinamis (Isian Singkat, Paragraf, Pilihan Ganda) serta pantau &amp; ekspor jawaban anggota.
+                </p>
             </div>
-            <h1 class="text-xl sm:text-2xl font-black text-black uppercase tracking-tight mt-1">
-                Kuesioner Dinamis POKJA
-            </h1>
-            <p class="text-xs sm:text-sm font-medium text-gray-600 mt-1">
-                Kelola daftar pertanyaan dinamis (Teks, Paragraf, Pilihan Ganda) serta pantau &amp; ekspor jawaban anggota.
-            </p>
-        </div>
 
-        <div class="flex flex-wrap items-center gap-2.5">
-            <a
-                href="{{ route('admin.kuesioner.export', ['pertemuan' => $pertemuanFilter, 'search' => $search, 'kelas' => $kelasFilter, 'status' => $statusFilter]) }}"
-                class="btn-smooth px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white border-2 border-black font-black text-xs uppercase tracking-wider shadow-[3px_3px_0px_0px_#000000] inline-flex items-center gap-2"
-            >
-                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="square" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
-                <span>Export CSV</span>
-            </a>
-
-            <button
-                type="button"
-                onclick="openPertanyaanModal('create')"
-                class="btn-smooth px-4 py-2.5 bg-[#1A467C] hover:bg-[#12335C] text-white border-2 border-black font-black text-xs uppercase tracking-wider shadow-[3px_3px_0px_0px_#000000] inline-flex items-center gap-2 cursor-pointer"
-            >
-                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="square" stroke-width="2.5" d="M12 4v16m8-8H4" />
-                </svg>
-                <span>Tambah Pertanyaan</span>
-            </button>
-        </div>
-    </div>
-
-    <!-- Selector Pertemuan -->
-    <div class="snap-in-1 bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] p-3.5 sm:p-4 flex flex-wrap items-center justify-between gap-3">
-        <div class="flex flex-wrap items-center gap-2">
-            <span class="text-xs font-black uppercase tracking-wider text-gray-700 mr-1">Pilih Pertemuan:</span>
-            @foreach($pertemuanList as $pNum)
+            <div class="flex items-center gap-2 shrink-0">
                 <a
-                    href="{{ route('admin.kuesioner.index', ['pertemuan' => $pNum, 'search' => $search, 'kelas' => $kelasFilter, 'status' => $statusFilter]) }}"
-                    class="btn-smooth px-3 py-1.5 border-2 border-black text-xs font-black uppercase tracking-wider inline-flex items-center gap-1.5 {{ (int) $pertemuanFilter === (int) $pNum ? 'bg-[#1A467C] text-white shadow-[2px_2px_0px_0px_#000000]' : 'bg-white hover:bg-gray-100 text-black' }}"
+                    href="{{ route('admin.kuesioner.export', ['pertemuan' => $pertemuanFilter, 'search' => $search, 'kelas' => $kelasFilter, 'status' => $statusFilter]) }}"
+                    class="btn-smooth px-3.5 py-2 bg-green-700 hover:bg-green-800 text-white border-2 border-black font-black text-xs uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] inline-flex items-center gap-1.5"
+                    title="Download Rekap CSV Pertemuan {{ $pertemuanFilter }}"
                 >
-                    <span>Pertemuan {{ $pNum }}</span>
-                    @if((int) $pNum === (int) $pertemuanAktif)
-                        <span class="px-1.5 py-0.5 bg-amber-300 text-black border border-black text-[9px] leading-none">Aktif</span>
-                    @endif
+                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="square" stroke-width="2.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <span>Export CSV</span>
                 </a>
-            @endforeach
-        </div>
 
-        <span class="text-[11px] font-black uppercase tracking-wider text-[#1A467C] bg-blue-50 border border-black px-2.5 py-1">
-            Menampilkan Data Pertemuan {{ $pertemuanFilter }}
-        </span>
+                <button
+                    type="button"
+                    onclick="openPertanyaanModal('create')"
+                    class="btn-smooth px-3.5 py-2 bg-[#1A467C] hover:bg-[#12335C] text-white border-2 border-black font-black text-xs uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] inline-flex items-center gap-1.5 cursor-pointer"
+                >
+                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="square" stroke-width="2.5" d="M12 4v16m8-8H4" />
+                    </svg>
+                    <span>Tambah Pertanyaan</span>
+                </button>
+            </div>
+        </div>
     </div>
 
     <!-- Alert Validation Errors -->
     @if($errors->any())
-        <div class="bg-red-100 border-2 border-black shadow-[4px_4px_0px_0px_#000000] p-4">
+        <div class="bg-red-50 border-2 border-[#000000] shadow-[4px_4px_0px_0px_#CA2C2A] p-3.5">
             <p class="text-xs font-black uppercase tracking-wider text-red-900 mb-1">Periksa Input Anda:</p>
             <ul class="list-disc list-inside text-xs font-bold text-red-800 space-y-0.5">
                 @foreach($errors->all() as $err)
@@ -77,84 +56,101 @@
         </div>
     @endif
 
-    <!-- Ringkasan Statistik -->
+    <!-- CARD 2: TAB PILIHAN P1 - P6 -->
+    <div class="snap-in-2 bg-white border-2 border-[#000000] p-3 sm:p-4 shadow-[4px_4px_0px_0px_#000000]">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+            <div class="flex flex-wrap items-center gap-1.5">
+                @foreach($pertemuanList as $pNum)
+                    <a
+                        href="{{ route('admin.kuesioner.index', ['pertemuan' => $pNum, 'search' => $search, 'kelas' => $kelasFilter, 'status' => $statusFilter]) }}"
+                        class="btn-smooth px-3 py-1.5 border-2 border-black text-xs font-black uppercase tracking-wider inline-flex items-center gap-1.5 {{ (int) $pertemuanFilter === (int) $pNum ? 'bg-[#1A467C] text-white shadow-[2px_2px_0px_0px_#000000]' : 'bg-white hover:bg-gray-100 text-black' }}"
+                    >
+                        <span>P{{ $pNum }}</span>
+                        @if((int) $pNum === (int) $pertemuanAktif)
+                            <span class="w-2 h-2 bg-amber-300 border border-black inline-block" title="Pertemuan Aktif"></span>
+                        @endif
+                    </a>
+                @endforeach
+            </div>
+
+            <span class="text-[11px] font-black uppercase tracking-wider text-[#1A467C] bg-blue-50 border border-black px-2.5 py-1">
+                Pertemuan {{ $pertemuanFilter }}
+            </span>
+        </div>
+    </div>
+
+    <!-- RINGKASAN STATISTIK -->
     <div class="snap-in-2 grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div class="bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] p-4">
-            <p class="text-[10px] font-black uppercase tracking-widest text-gray-500">Total Responden</p>
+        <div class="bg-white border-2 border-[#000000] shadow-[4px_4px_0px_0px_#000000] p-4">
+            <p class="text-[10px] font-black uppercase tracking-widest text-gray-500">Responden P{{ $pertemuanFilter }}</p>
             <div class="flex items-baseline gap-2 mt-1">
-                <span class="text-2xl sm:text-3xl font-black text-[#1A467C]">{{ $totalResponden }}</span>
+                <span class="text-2xl font-black text-[#1A467C]">{{ $totalResponden }}</span>
                 <span class="text-xs font-bold text-gray-600">/ {{ $totalPeserta }} Anggota</span>
             </div>
         </div>
 
-        <div class="bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] p-4">
+        <div class="bg-white border-2 border-[#000000] shadow-[4px_4px_0px_0px_#000000] p-4">
             <p class="text-[10px] font-black uppercase tracking-widest text-gray-500">Partisipasi Pengisian</p>
             <div class="flex items-center gap-3 mt-1.5">
-                <span class="text-2xl sm:text-3xl font-black text-green-700">{{ $persenResponden }}%</span>
-                <div class="flex-1 h-3 bg-gray-200 border-2 border-black overflow-hidden">
+                <span class="text-2xl font-black text-green-700">{{ $persenResponden }}%</span>
+                <div class="flex-1 h-2.5 bg-gray-200 border border-black overflow-hidden">
                     <div class="h-full bg-green-600" style="width: {{ min(100, (int) $persenResponden) }}%;"></div>
                 </div>
             </div>
         </div>
 
-        <div class="bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] p-4">
-            <p class="text-[10px] font-black uppercase tracking-widest text-gray-500">Pertanyaan Aktif</p>
+        <div class="bg-white border-2 border-[#000000] shadow-[4px_4px_0px_0px_#000000] p-4">
+            <p class="text-[10px] font-black uppercase tracking-widest text-gray-500">Pertanyaan Aktif (P{{ $pertemuanFilter }})</p>
             <div class="flex items-baseline gap-2 mt-1">
-                <span class="text-2xl sm:text-3xl font-black text-black">{{ $pertanyaans->where('aktif', true)->count() }}</span>
-                <span class="text-xs font-bold text-gray-600">dari {{ $pertanyaans->count() }} total pertanyaan</span>
+                <span class="text-2xl font-black text-black">{{ $pertanyaans->where('aktif', true)->count() }}</span>
+                <span class="text-xs font-bold text-gray-600">dari {{ $pertanyaans->count() }} pertanyaan</span>
             </div>
         </div>
     </div>
 
-    <!-- Daftar Pertanyaan Dinamis -->
-    <div class="snap-in-3 bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] p-4 sm:p-5">
+    <!-- DAFTAR PERTANYAAN DINAMIS -->
+    <div class="snap-in-3 bg-white border-2 border-[#000000] shadow-[4px_4px_0px_0px_#000000] p-4 sm:p-5">
         <div class="flex items-center justify-between gap-2 pb-3 border-b-2 border-black">
-            <div>
-                <h2 class="text-sm sm:text-base font-black uppercase tracking-wider text-black">
-                    Daftar Pertanyaan Dinamis
-                </h2>
-                <p class="text-xs font-medium text-gray-600">
-                    Pertanyaan aktif akan langsung tampil di dashboard mahasiswa.
-                </p>
-            </div>
+            <h4 class="text-sm font-black uppercase tracking-wider text-[#1A467C]">
+                Daftar Pertanyaan (Pertemuan {{ $pertemuanFilter }})
+            </h4>
+            <span class="text-[11px] font-bold text-gray-500">
+                {{ $pertanyaans->count() }} item
+            </span>
         </div>
 
         @if($pertanyaans->isEmpty())
-            <div class="mt-4 p-6 bg-gray-50 border-2 border-dashed border-gray-400 text-center">
-                <p class="text-xs sm:text-sm font-black uppercase text-gray-700">Belum Ada Pertanyaan Kuesioner</p>
-                <p class="text-xs text-gray-500 mt-1">Klik tombol "Tambah Pertanyaan" di atas untuk membuat pertanyaan pertama.</p>
+            <div class="mt-4 p-5 bg-gray-50 border-2 border-dashed border-gray-300 text-center">
+                <p class="text-xs font-black uppercase text-gray-700">Belum Ada Pertanyaan untuk Pertemuan {{ $pertemuanFilter }}</p>
+                <p class="text-xs text-gray-500 mt-1">Klik tombol "Tambah Pertanyaan" di atas untuk menambahkan.</p>
             </div>
         @else
-            <div class="mt-4 space-y-3">
+            <div class="mt-3.5 space-y-2.5">
                 @foreach($pertanyaans as $q)
-                    <div class="p-3.5 sm:p-4 bg-[#F8FAFC] border-2 border-black flex flex-col md:flex-row md:items-start md:justify-between gap-3">
+                    <div class="p-3.5 bg-gray-50 border-2 border-black flex flex-col md:flex-row md:items-start md:justify-between gap-3">
                         <div class="space-y-1.5 min-w-0 flex-1">
                             <div class="flex flex-wrap items-center gap-1.5">
-                                <span class="px-2 py-0.5 bg-[#1A467C] text-white border border-black text-[10px] font-black">
+                                <span class="px-1.5 py-0.5 bg-[#1A467C] text-white border border-black text-[10px] font-black">
                                     #{{ $q->urutan }}
                                 </span>
                                 <span class="px-2 py-0.5 bg-white text-black border border-black text-[10px] font-black uppercase">
                                     {{ \App\Models\KuesionerPertanyaan::TIPE_LABELS[$q->tipe] ?? $q->tipe }}
                                 </span>
-                                <span class="px-2 py-0.5 bg-purple-100 text-purple-900 border border-black text-[10px] font-black uppercase">
-                                    {{ $q->pertemuan ? 'Pertemuan ' . $q->pertemuan : 'Semua Pertemuan' }}
+                                <span class="px-2 py-0.5 bg-blue-50 text-[#1A467C] border border-black text-[10px] font-black uppercase">
+                                    {{ $q->pertemuan ? 'P' . $q->pertemuan : 'Semua (P1-P6)' }}
                                 </span>
                                 @if($q->wajib)
                                     <span class="px-2 py-0.5 bg-amber-100 text-amber-900 border border-black text-[10px] font-black uppercase">
                                         Wajib
                                     </span>
                                 @endif
-                                @if($q->aktif)
-                                    <span class="px-2 py-0.5 bg-green-100 text-green-900 border border-black text-[10px] font-black uppercase">
-                                        Aktif
-                                    </span>
-                                @else
+                                @if(!$q->aktif)
                                     <span class="px-2 py-0.5 bg-gray-200 text-gray-700 border border-black text-[10px] font-black uppercase">
                                         Nonaktif
                                     </span>
                                 @endif
-                                <span class="px-2 py-0.5 bg-blue-50 text-[#1A467C] border border-black text-[10px] font-black">
-                                    {{ $q->jawabans_count }} Jawaban
+                                <span class="text-[11px] font-bold text-gray-600 ml-1">
+                                    • {{ $q->jawabans_count }} jawaban
                                 </span>
                             </div>
 
@@ -163,10 +159,10 @@
                             </p>
 
                             @if($q->tipe === 'pilihan' && is_array($q->opsi) && count($q->opsi) > 0)
-                                <div class="flex flex-wrap gap-1.5 pt-1">
+                                <div class="flex flex-wrap gap-1.5 pt-0.5">
                                     @foreach($q->opsi as $opt)
                                         <span class="px-2 py-0.5 bg-white border border-gray-400 text-[11px] font-bold text-gray-700">
-                                            • {{ $opt }}
+                                            {{ $opt }}
                                         </span>
                                     @endforeach
                                 </div>
@@ -177,7 +173,7 @@
                             <button
                                 type="button"
                                 onclick='openPertanyaanModal("edit", @json($q))'
-                                class="btn-smooth px-3 py-1.5 bg-white hover:bg-yellow-100 text-black border-2 border-black font-black text-[11px] uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
+                                class="btn-smooth px-3 py-1.5 bg-white hover:bg-yellow-100 text-black border-2 border-black font-black text-[11px] uppercase shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
                             >
                                 Edit
                             </button>
@@ -192,7 +188,7 @@
                                 <input type="hidden" name="current_pertemuan" value="{{ $pertemuanFilter }}">
                                 <button
                                     type="submit"
-                                    class="btn-smooth px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white border-2 border-black font-black text-[11px] uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
+                                    class="btn-smooth px-3 py-1.5 bg-[#CA2C2A] hover:bg-[#901C1A] text-white border-2 border-black font-black text-[11px] uppercase shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
                                 >
                                     Hapus
                                 </button>
@@ -204,31 +200,31 @@
         @endif
     </div>
 
-    <!-- Statistik Pilihan Ganda (Jika Ada) -->
+    <!-- STATISTIK PILIHAN GANDA (JIKA ADA) -->
     @if(!empty($pilihanStats))
-        <div class="snap-in-3 bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] p-4 sm:p-5">
+        <div class="snap-in-3 bg-white border-2 border-[#000000] shadow-[4px_4px_0px_0px_#000000] p-4 sm:p-5">
             <div class="pb-3 border-b-2 border-black">
-                <h2 class="text-sm sm:text-base font-black uppercase tracking-wider text-black">
-                    Rekap Statistik Pilihan Ganda
-                </h2>
+                <h4 class="text-sm font-black uppercase tracking-wider text-[#1A467C]">
+                    Rekap Pilihan Ganda (Pertemuan {{ $pertemuanFilter }})
+                </h4>
             </div>
 
-            <div class="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div class="mt-3.5 grid grid-cols-1 lg:grid-cols-2 gap-3.5">
                 @foreach($pertanyaans->where('tipe', 'pilihan') as $q)
                     @php
                         $stat = $pilihanStats[$q->id] ?? ['total' => 0, 'options' => []];
                     @endphp
-                    <div class="p-4 bg-[#F8FAFC] border-2 border-black">
+                    <div class="p-3.5 bg-gray-50 border-2 border-black">
                         <p class="text-xs sm:text-sm font-black text-black mb-1">{{ $q->pertanyaan }}</p>
-                        <p class="text-[11px] font-bold text-gray-500 mb-3">Total jawaban: {{ $stat['total'] }}</p>
-                        <div class="space-y-2.5">
+                        <p class="text-[11px] font-bold text-gray-500 mb-2.5">Total jawaban: {{ $stat['total'] }}</p>
+                        <div class="space-y-2">
                             @foreach($stat['options'] as $opt)
                                 <div>
                                     <div class="flex items-center justify-between text-xs font-bold text-gray-800 mb-1">
                                         <span>{{ $opt['label'] }}</span>
                                         <span>{{ $opt['count'] }} ({{ $opt['pct'] }}%)</span>
                                     </div>
-                                    <div class="w-full h-3 bg-white border border-black overflow-hidden">
+                                    <div class="w-full h-2.5 bg-white border border-black overflow-hidden">
                                         <div class="h-full bg-[#1A467C]" style="width: {{ min(100, (int) $opt['pct']) }}%;"></div>
                                     </div>
                                 </div>
@@ -240,21 +236,16 @@
         </div>
     @endif
 
-    <!-- Rekap Jawaban Per Anggota -->
-    <div class="snap-in-4 bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000000] p-4 sm:p-5 space-y-4">
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 pb-3 border-b-2 border-black">
-            <div>
-                <h2 class="text-sm sm:text-base font-black uppercase tracking-wider text-black">
-                    Rekap Jawaban Anggota
-                </h2>
-                <p class="text-xs font-medium text-gray-600">
-                    Klik "Lihat Jawaban" untuk membaca seluruh jawaban tiap anggota.
-                </p>
-            </div>
+    <!-- REKAP JAWABAN PER ANGGOTA -->
+    <div class="snap-in-4 bg-white border-2 border-[#000000] shadow-[4px_4px_0px_0px_#000000] p-4 sm:p-5 space-y-4">
+        <div class="pb-3 border-b-2 border-black flex items-center justify-between">
+            <h4 class="text-sm font-black uppercase tracking-wider text-[#1A467C]">
+                Rekap Jawaban Anggota (Pertemuan {{ $pertemuanFilter }})
+            </h4>
         </div>
 
         <!-- Filter Form -->
-        <form method="GET" action="{{ route('admin.kuesioner.index') }}" class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+        <form method="GET" action="{{ route('admin.kuesioner.index') }}" class="grid grid-cols-1 sm:grid-cols-4 gap-2.5">
             <input type="hidden" name="pertemuan" value="{{ $pertemuanFilter }}">
             <input
                 type="text"
@@ -329,7 +320,7 @@
                         <tr class="hover:bg-blue-50/60">
                             <td class="px-3 py-2.5 border-r border-black">
                                 <div class="font-black text-black">{{ $mhs->nama }}</div>
-                                <div class="text-[11px] text-gray-600">{{ $mhs->nim }}</div>
+                                <div class="text-[11px] text-gray-600 font-mono">{{ $mhs->nim }}</div>
                             </td>
                             <td class="px-3 py-2.5 border-r border-black">{{ $mhs->kelas }}</td>
                             <td class="px-3 py-2.5 border-r border-black">
@@ -343,7 +334,7 @@
                                     </span>
                                 @endif
                             </td>
-                            <td class="px-3 py-2.5 border-r border-black text-[11px] text-gray-700">
+                            <td class="px-3 py-2.5 border-r border-black text-[11px] text-gray-700 font-mono">
                                 @if($mhs->kuesioner_jawabans_max_updated_at)
                                     {{ \Carbon\Carbon::parse($mhs->kuesioner_jawabans_max_updated_at)->timezone('Asia/Jakarta')->format('d/m/Y H:i') }} WIB
                                 @else
@@ -430,7 +421,7 @@
                         onchange="toggleOpsiField()"
                         class="w-full px-3 py-2 bg-white border-2 border-black text-xs sm:text-sm font-bold text-black focus:outline-none"
                     >
-                        <option value="teks">Teks Singkat</option>
+                        <option value="teks">Isian Singkat</option>
                         <option value="paragraf">Paragraf / Uraian</option>
                         <option value="pilihan">Pilihan Ganda</option>
                     </select>
@@ -461,7 +452,7 @@
                     name="pertemuan"
                     class="w-full px-3 py-2 bg-white border-2 border-black text-xs sm:text-sm font-bold text-black focus:outline-none"
                 >
-                    <option value="">Semua Pertemuan (Otomatis Muncul Tiap Pertemuan)</option>
+                    <option value="">Semua Pertemuan (P1 - P6)</option>
                     @foreach($pertemuanList as $pNum)
                         <option value="{{ $pNum }}">Pertemuan {{ $pNum }}</option>
                     @endforeach
@@ -611,7 +602,7 @@
         const items = Array.isArray(payload.items) ? payload.items : [];
         items.forEach((item, index) => {
             const card = document.createElement('div');
-            card.className = 'p-3.5 bg-[#F8FAFC] border-2 border-black';
+            card.className = 'p-3.5 bg-gray-50 border-2 border-black';
 
             const qTitle = document.createElement('p');
             qTitle.className = 'text-xs font-black text-[#1A467C] uppercase';
@@ -643,4 +634,3 @@
     }
 </script>
 @endsection
-

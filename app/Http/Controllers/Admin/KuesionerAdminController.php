@@ -23,7 +23,7 @@ class KuesionerAdminController extends Controller
 
         $pertemuanAktif = max(1, (int) (Pengaturan::value('pertemuan_aktif') ?? 1));
         $maxPertemuan = max(
-            4,
+            6,
             $pertemuanAktif,
             (int) KuesionerPertanyaan::max('pertemuan'),
             (int) KuesionerJawaban::max('pertemuan')

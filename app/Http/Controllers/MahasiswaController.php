@@ -621,6 +621,7 @@ class MahasiswaController extends Controller
 
         $pertemuanAktifKuesioner = max(1, (int) ($pengaturan->pertemuan_aktif ?? 1));
         $maxKuesionerPertemuan = max(
+            6,
             $pertemuanAktifKuesioner,
             (int) KuesionerPertanyaan::where('aktif', true)->max('pertemuan'),
             (int) KuesionerJawaban::where('pendaftaran_id', $mahasiswa->id)->max('pertemuan')
