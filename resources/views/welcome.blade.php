@@ -76,15 +76,15 @@
 
     <div></div>
 
-    <!-- Main 1-Container 2-Column Landing Page Login -->
+    <!-- Main 2-Card Separated Layout (Info Kegiatan + Login Mahasiswa) -->
     <main class="my-auto py-4 flex flex-col items-center justify-center">
-        <div class="snap-card w-full max-w-4xl bg-white border-[3px] border-[#000000] shadow-[8px_8px_0px_0px_#000000] grid grid-cols-1 lg:grid-cols-12 overflow-hidden">
+        <div class="snap-card w-full max-w-4xl grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-stretch">
 
             <!-- ============================================================== -->
-            <!-- KOLOM KIRI: INFO KEGIATAN, STATUS PENDAFTARAN & AKSES CEPAT    -->
+            <!-- KARTU KIRI: INFO KEGIATAN, STATUS PENDAFTARAN & AKSES CEPAT    -->
             <!-- ============================================================== -->
-            <div class="lg:col-span-5 bg-[#F8FBFE] border-b-[3px] lg:border-b-0 lg:border-r-[3px] border-black p-6 sm:p-8 flex flex-col justify-between gap-6">
-                <div class="space-y-5">
+            <div class="lg:col-span-5 bg-white border-[3px] border-[#000000] shadow-[6px_6px_0px_0px_#000000] p-6 sm:p-7 flex flex-col justify-between gap-5">
+                <div class="space-y-4">
                     <!-- Badge Status Pendaftaran Ditutup + Logo -->
                     <div class="flex items-center justify-between gap-3">
                         <div class="flex items-center gap-3">
@@ -157,11 +157,11 @@
                     </div>
                 </div>
 
-                <!-- Shortcut Scan Absensi & Info CP / WA -->
-                <div class="space-y-2.5 pt-2 border-t-2 border-dashed border-gray-300">
+                <!-- Shortcut Scan Absensi -->
+                <div class="pt-3 border-t-2 border-dashed border-gray-300">
                     <a
                         href="{{ route('presensi.absen') }}"
-                        class="btn-tactile w-full py-2.5 px-3 bg-white hover:bg-amber-100 text-black border-2 border-black shadow-[3px_3px_0px_0px_#000000] text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2"
+                        class="btn-tactile w-full py-2.5 px-3 bg-[#F8FBFE] hover:bg-amber-100 text-black border-2 border-black shadow-[3px_3px_0px_0px_#000000] text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2"
                     >
                         <svg class="w-4 h-4 text-[#1A467C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="square" stroke-width="2.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
@@ -169,26 +169,13 @@
                         </svg>
                         <span>Buka Scanner Absensi</span>
                     </a>
-
-                    @if (!empty($pengaturan->link_grup_wa) || !empty($pengaturan->cp_nama))
-                        <div class="flex flex-wrap items-center justify-between gap-2 text-[11px] font-bold text-gray-700 pt-1">
-                            @if (!empty($pengaturan->cp_nama))
-                                <span>CP: <strong class="text-gray-950">{{ $pengaturan->cp_nama }}</strong>{{ !empty($pengaturan->cp_wa) ? ' (' . $pengaturan->cp_wa . ')' : '' }}</span>
-                            @endif
-                            @if (!empty($pengaturan->link_grup_wa))
-                                <a href="{{ $pengaturan->link_grup_wa }}" target="_blank" rel="noopener noreferrer" class="text-[#15803d] underline font-black">
-                                    Grup WA →
-                                </a>
-                            @endif
-                        </div>
-                    @endif
                 </div>
             </div>
 
             <!-- ============================================================== -->
-            <!-- KOLOM KANAN: FORM LOGIN, AKTIVASI AKUN QR & LUPA PASSWORD       -->
+            <!-- KARTU KANAN: FORM LOGIN, AKTIVASI AKUN QR & LUPA PASSWORD      -->
             <!-- ============================================================== -->
-            <div class="lg:col-span-7 p-6 sm:p-8 flex flex-col justify-center space-y-5">
+            <div class="lg:col-span-7 bg-white border-[3px] border-[#000000] shadow-[6px_6px_0px_0px_#000000] p-6 sm:p-8 flex flex-col justify-center space-y-5">
                 <div class="border-b-2 border-black pb-4">
                     <span class="inline-block bg-amber-300 border border-black px-2 py-0.5 text-[10px] font-black uppercase tracking-wider mb-1.5">
                         PORTAL PESERTA
