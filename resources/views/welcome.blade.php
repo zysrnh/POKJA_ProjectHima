@@ -163,9 +163,6 @@
             <!-- ============================================================== -->
             <div class="lg:col-span-7 bg-white border-[3px] border-[#000000] shadow-[6px_6px_0px_0px_#000000] p-6 sm:p-8 flex flex-col justify-center space-y-5">
                 <div class="border-b-2 border-black pb-4">
-                    <span class="inline-block bg-amber-300 border border-black px-2 py-0.5 text-[10px] font-black uppercase tracking-wider mb-1.5">
-                        PORTAL PESERTA
-                    </span>
                     <h2 class="text-lg sm:text-xl font-black uppercase tracking-tight text-[#1A467C]">
                         Masuk Akun Mahasiswa
                     </h2>
