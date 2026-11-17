@@ -2,9 +2,10 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <title>Pendaftaran {{ $pengaturan->nama_acara ?? 'POKJA' }} - HIMA IF</title>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Portal Mahasiswa - {{ $pengaturan->nama_acara ?? 'POKJA HIMA IF' }}</title>
+
     <!-- Favicon & Web Icons -->
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}">
@@ -12,10 +13,9 @@
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
     <link rel="manifest" href="{{ asset('site.webmanifest') }}">
 
-    <!-- Google Font: Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600;1,700;1,800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,600;1,700;1,800&display=swap" rel="stylesheet">
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -25,19 +25,16 @@
                 extend: {
                     fontFamily: {
                         sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-                    },
-                    colors: {
-                        hima: {
-                            'blue-light': '#2A82C6',
-                            'blue-dark': '#1A467C',
-                            'red-light': '#CA2C2A',
-                            'red-dark': '#901C1A',
-                        }
                     }
                 }
             }
         }
     </script>
+
+    <!-- QR Code Scanning Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
     <style>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
@@ -46,681 +43,623 @@
             background-size: 24px 24px;
         }
 
-        .dot-card {
-            background-color: #F8FBFE;
-            background-image: radial-gradient(#1A467C 1px, transparent 1px);
-            background-size: 16px 16px;
-        }
-
-        /* Tape effect on polaroid badge */
-        .tape-badge {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(2px);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
-        }
-
-        /* Smooth Floating Ambient Accents */
-        @keyframes gentleFloat1 {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-8px) rotate(2deg); }
-        }
-        @keyframes gentleFloat2 {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(6px) rotate(-3deg); }
-        }
-
-        .anim-float-1 {
-            animation: gentleFloat1 6s ease-in-out infinite;
-        }
-        .anim-float-2 {
-            animation: gentleFloat2 7s ease-in-out infinite;
-        }
-
-        /* Polaroid Playful Wobble on Click */
-        @keyframes polaroidWobble {
-            0% { transform: rotate(-2deg) scale(1); }
-            20% { transform: rotate(12deg) scale(1.12); }
-            40% { transform: rotate(-10deg) scale(1.08); }
-            60% { transform: rotate(6deg) scale(1.04); }
-            80% { transform: rotate(-4deg) scale(1.01); }
-            100% { transform: rotate(-2deg) scale(1); }
-        }
-        .wobble-active {
-            animation: polaroidWobble 0.65s cubic-bezier(0.36, 0.07, 0.19, 0.97) both !important;
-        }
-
-        /* Interactive Shape Bounce & Spin */
-        @keyframes shapePopSpin {
-            0% { transform: scale(1) rotate(0deg); }
-            50% { transform: scale(1.35) rotate(180deg); }
-            100% { transform: scale(1) rotate(360deg); }
-        }
-        .shape-popping {
-            animation: shapePopSpin 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both !important;
-        }
-
-        /* Live Validation Bouncy Pop-in Checkmark (No Opacity) */
-        @keyframes fieldCheckPop {
-            0% { transform: translateY(-50%) scale(0.5); }
-            65% { transform: translateY(-50%) scale(1.25); }
-            100% { transform: translateY(-50%) scale(1); }
-        }
-        .field-valid-badge {
-            animation: fieldCheckPop 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
-        }
-
-        /* Modal Tactile Snap (Zero Opacity / Zero Fade) */
-        @keyframes modalSnapIn {
-            0% {
-                transform: translateY(-24px) scale(0.92);
-            }
-            70% {
-                transform: translateY(3px) scale(1.02);
-            }
-            100% {
-                transform: translateY(0) scale(1);
-            }
-        }
-
-        @keyframes modalSnapOut {
-            0% {
-                transform: translateY(0) scale(1);
-            }
-            100% {
-                transform: translateY(20px) scale(0.9);
-            }
-        }
-
-        .modal-spring-in {
-            animation: modalSnapIn 0.28s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
-        }
-
-        .modal-spring-out {
-            animation: modalSnapOut 0.18s cubic-bezier(0.2, 0.8, 0.2, 1) forwards !important;
-        }
-
-        @keyframes checkmarkPop {
-            0% { transform: scale(0.6); }
-            65% { transform: scale(1.2); }
-            100% { transform: scale(1); }
-        }
-        .checkmark-pop {
-            animation: checkmarkPop 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28) 0.1s both;
-        }
-
-        /* Tactile Interactive Controls (Neubrutalism Click & Hover) */
-        .btn-smooth {
+        .btn-tactile {
             transition: transform 0.12s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.12s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.12s ease;
         }
-        .btn-smooth:hover {
+        .btn-tactile:hover {
             transform: translate(-2px, -2px);
         }
-        .btn-smooth:active {
+        .btn-tactile:active {
             transform: translate(2px, 2px) !important;
             box-shadow: 1px 1px 0px 0px #000000 !important;
         }
 
-        .card-tilt {
-            transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.15s cubic-bezier(0.2, 0.8, 0.2, 1);
+        @keyframes cardSnapIn {
+            0% { transform: translateY(-16px) scale(0.97); }
+            70% { transform: translateY(2px) scale(1.005); }
+            100% { transform: translateY(0) scale(1); }
         }
-        .card-tilt:hover {
-            transform: translate(-2px, -2px);
-            box-shadow: 7px 7px 0px 0px #1A467C !important;
+        .snap-card {
+            animation: cardSnapIn 0.28s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+        }
+
+        @keyframes tabSnap {
+            0% { transform: translateY(4px) scale(0.99); }
+            100% { transform: translateY(0) scale(1); }
+        }
+        .tab-snap {
+            animation: tabSnap 0.18s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
         }
     </style>
 </head>
-<body class="text-[#000000] min-h-screen flex flex-col items-center justify-start p-3 sm:p-6 lg:p-10 antialiased selection:bg-[#2A82C6] selection:text-white relative">
+<body class="min-h-screen text-[#000000] flex flex-col justify-between p-4 sm:p-6 lg:p-8 antialiased selection:bg-[#2A82C6] selection:text-white">
 
-    <!-- Floating Interactive Geometric Accents (Click/Tap for fun tactile pop) -->
-    <div onclick="popShape(this)" title="Klik aku!" class="cursor-pointer select-none absolute top-6 sm:top-8 left-4 sm:left-8 w-10 h-10 sm:w-14 sm:h-14 bg-[#2A82C6]/30 border-2 border-[#1A467C] shadow-[3px_3px_0px_0px_#1A467C] sm:shadow-[4px_4px_0px_0px_#1A467C] hover:scale-110 active:scale-90 transition-transform anim-float-1 z-0"></div>
-    <div onclick="popShape(this)" title="Klik aku!" class="cursor-pointer select-none absolute bottom-8 sm:bottom-12 left-4 sm:left-12 w-8 h-8 sm:w-10 sm:h-10 bg-[#CA2C2A]/25 border-2 border-[#901C1A] shadow-[2px_2px_0px_0px_#901C1A] sm:shadow-[3px_3px_0px_0px_#901C1A] hover:scale-110 active:scale-90 transition-transform anim-float-2 z-0"></div>
-    <div onclick="popShape(this)" title="Klik aku!" class="hidden sm:block cursor-pointer select-none absolute top-28 right-12 w-10 h-10 bg-white/90 border-2 border-[#1A467C] shadow-[3px_3px_0px_0px_#1A467C] hover:scale-110 active:scale-90 transition-transform anim-float-2 z-0"></div>
-    <div onclick="popShape(this)" title="Klik aku!" class="cursor-pointer select-none absolute bottom-6 sm:bottom-8 right-4 sm:right-16 w-11 h-11 sm:w-16 sm:h-16 bg-[#1A467C]/20 border-2 border-[#000000] shadow-[3px_3px_0px_0px_#000000] sm:shadow-[4px_4px_0px_0px_#000000] hover:scale-110 active:scale-90 transition-transform anim-float-1 z-0"></div>
+    <div></div>
 
-    <!-- Floating Action Button: Login Portal Mahasiswa (Top-Right Neubrutalism) -->
-    <a 
-        href="{{ session('mahasiswa_id') ? route('mahasiswa.dashboard') : route('mahasiswa.login') }}" 
-        title="{{ session('mahasiswa_id') ? 'Buka Dashboard Mahasiswa' : 'Masuk Portal Mahasiswa' }}"
-        aria-label="{{ session('mahasiswa_id') ? 'Buka Dashboard Mahasiswa' : 'Masuk Portal Mahasiswa' }}"
-        class="btn-smooth fixed top-3.5 right-3.5 sm:top-6 sm:right-8 z-40 px-4 py-2 sm:px-5 sm:py-2.5 bg-[#1A467C] hover:bg-[#2A82C6] text-white text-xs sm:text-sm font-black uppercase tracking-wider border-2 border-[#000000] shadow-[4px_4px_0px_0px_#000000] flex items-center justify-center gap-2 cursor-pointer"
-    >
-        <svg class="w-4 h-4 sm:w-5 sm:h-5 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="square" stroke-width="2.5" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-        </svg>
-        <span>LOGIN</span>
-    </a>
+    <!-- Main 1-Container 2-Column Landing Page Login -->
+    <main class="my-auto py-4 flex flex-col items-center justify-center">
+        <div class="snap-card w-full max-w-4xl bg-white border-[3px] border-[#000000] shadow-[8px_8px_0px_0px_#000000] grid grid-cols-1 lg:grid-cols-12 overflow-hidden">
 
-    <!-- Main Wrapper: Separated Sequential Cards (Judul -> Waktu & Tempat -> Form) -->
-    <div class="w-full max-w-4xl z-10 my-2 sm:my-8 space-y-3.5 sm:space-y-6">
+            <!-- ============================================================== -->
+            <!-- KOLOM KIRI: INFO KEGIATAN, STATUS PENDAFTARAN & AKSES CEPAT    -->
+            <!-- ============================================================== -->
+            <div class="lg:col-span-5 bg-[#F8FBFE] border-b-[3px] lg:border-b-0 lg:border-r-[3px] border-black p-6 sm:p-8 flex flex-col justify-between gap-6">
+                <div class="space-y-5">
+                    <!-- Badge Status Pendaftaran Ditutup + Logo -->
+                    <div class="flex items-center justify-between gap-3">
+                        <div class="flex items-center gap-3">
+                            <img
+                                src="{{ asset('logo/logo.png') }}"
+                                alt="Logo HIMA IF"
+                                class="w-12 h-12 object-contain bg-white p-1.5 border-2 border-black shadow-[3px_3px_0px_0px_#000000] shrink-0"
+                            >
+                            <div>
+                                <span class="text-[10px] font-black uppercase tracking-widest text-[#2A82C6] block">
+                                    HIMA INFORMATIKA
+                                </span>
+                                <h1 class="text-base sm:text-lg font-black uppercase tracking-tight text-[#1A467C] leading-tight">
+                                    {{ $pengaturan->nama_acara ?? 'POKJA HIMA IF' }}
+                                </h1>
+                            </div>
+                        </div>
+                    </div>
 
-        <!-- 1. BAGIAN ATAS: CARD JUDUL & LOGO POLAROID -->
-        <div class="card-tilt bg-white border-2 border-[#1A467C] p-4 sm:p-8 shadow-[5px_5px_0px_0px_#1A467C] sm:shadow-[8px_8px_0px_0px_#1A467C]">
-            <div class="flex flex-col md:flex-row items-center md:items-start gap-4 sm:gap-6 text-center md:text-left">
-                
-                <!-- Polaroid Logo Badge with Tape Header (Click to Wobble) -->
-                <div class="relative group shrink-0">
-                    <div class="absolute -top-2.5 left-1/2 -translate-x-1/2 w-12 sm:w-14 h-4 sm:h-5 tape-badge border border-gray-400 z-10"></div>
-                    
-                    <div 
-                        id="polaroid-badge"
-                        onclick="wobblePolaroid(this)"
-                        title="Klik untuk efek goyang!"
-                        class="bg-white border-2 border-[#1A467C] p-2 sm:p-2.5 shadow-[3px_3px_0px_0px_#1A467C] sm:shadow-[4px_4px_0px_0px_#1A467C] rotate-[-2deg] hover:rotate-0 transition-transform duration-300 ease-out cursor-pointer active:scale-95 select-none"
-                    >
-                        <img 
-                            src="{{ asset('logo/logo.png') }}" 
-                            alt="Logo HIMA IF" 
-                            class="w-14 h-14 sm:w-24 sm:h-24 object-contain mx-auto bg-gray-50 border border-gray-200 p-0.5 sm:p-1 pointer-events-none"
-                        >
-                        <p class="text-[9px] sm:text-[10px] font-black font-mono text-center text-[#1A467C] mt-1 sm:mt-2 uppercase tracking-wider">
-                            #HIMA_IF
+                    <!-- Status Banner -->
+                    <div class="bg-red-50 border-2 border-black p-3 shadow-[3px_3px_0px_0px_#CA2C2A]">
+                        <div class="flex items-center gap-2">
+                            <span class="inline-block px-2 py-0.5 bg-[#CA2C2A] text-white border border-black text-[10px] font-black uppercase tracking-wider">
+                                PENDAFTARAN DITUTUP
+                            </span>
+                        </div>
+                        <p class="text-xs font-bold text-gray-800 mt-1.5 leading-relaxed">
+                            {{ $pengaturan->deskripsi_acara ?? 'Portal resmi peserta POKJA HIMA IF untuk presensi, point keaktifan, kelompok, dan kuesioner.' }}
                         </p>
                     </div>
-                </div>
 
-                <!-- Big Headline Section -->
-                <div class="flex-1">
-                    <span class="inline-block bg-[#1A467C] text-white text-[10px] sm:text-xs font-black uppercase px-2.5 py-0.5 tracking-widest mb-1.5 sm:mb-2 shadow-[2px_2px_0px_0px_#2A82C6]">
-                        POKJA HIMA IF 2026
-                    </span>
-                    <h1 class="text-xl sm:text-4xl lg:text-5xl font-black text-[#1A467C] tracking-tight uppercase leading-snug sm:leading-tight">
-                        {{ $pengaturan->deskripsi_acara ?? 'INNOVATIVE IDEA TO GREAT PROPOSAL' }}
-                    </h1>
-                    <div class="w-16 sm:w-24 h-1.5 sm:h-2 bg-[#CA2C2A] shadow-[2px_2px_0px_0px_#901C1A] mt-2 sm:mt-3 mx-auto md:mx-0"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 2. BAGIAN TENGAH: CARD INFO ACARA (3 SEKAT ELEGAN) -->
-        <div class="card-tilt bg-white border-2 border-[#1A467C] shadow-[5px_5px_0px_0px_#1A467C] sm:shadow-[6px_6px_0px_0px_#1A467C] grid grid-cols-3 divide-x-2 divide-[#1A467C]/20 p-2 sm:p-3">
-            
-            <!-- Sekat 1: Tanggal Pelaksanaan -->
-            <div class="px-1.5 sm:px-4 py-1 flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-1 sm:gap-3">
-                <div class="p-1 sm:p-2 bg-blue-50 border sm:border-2 border-[#2A82C6] text-[#2A82C6] shadow-[1px_1px_0px_0px_#1A467C] sm:shadow-[2px_2px_0px_0px_#1A467C] shrink-0">
-                    <svg class="w-3.5 h-3.5 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                </div>
-                <div class="min-w-0 w-full">
-                    <span class="text-[8px] sm:text-[10px] font-black uppercase tracking-wider text-[#2A82C6] block leading-tight">
-                        TANGGAL
-                    </span>
-                    <span class="font-extrabold text-[11px] sm:text-sm text-gray-900 block leading-tight truncate mt-0.5" title="{{ $pengaturan->tanggal_acara ?? '13 Oktober 2026' }}">
-                        {{ $pengaturan->tanggal_acara ?? '13 Oktober 2026' }}
-                    </span>
-                </div>
-            </div>
-
-            <!-- Sekat 2: Waktu Pelaksanaan -->
-            <div class="px-1.5 sm:px-4 py-1 flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-1 sm:gap-3">
-                <div class="p-1 sm:p-2 bg-blue-50 border sm:border-2 border-[#1A467C] text-[#1A467C] shadow-[1px_1px_0px_0px_#1A467C] sm:shadow-[2px_2px_0px_0px_#1A467C] shrink-0">
-                    <svg class="w-3.5 h-3.5 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                </div>
-                <div class="min-w-0 w-full">
-                    <span class="text-[8px] sm:text-[10px] font-black uppercase tracking-wider text-[#1A467C] block leading-tight">
-                        WAKTU
-                    </span>
-                    <span class="font-extrabold text-[11px] sm:text-sm text-gray-900 block leading-tight truncate mt-0.5" title="{{ $pengaturan->jam_acara ?? '08:00 WIB - Selesai' }}">
-                        {{ $pengaturan->jam_acara ?? '08:00 WIB - Selesai' }}
-                    </span>
-                </div>
-            </div>
-
-            <!-- Sekat 3: Tempat / Ruangan -->
-            <div class="px-1.5 sm:px-4 py-1 flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-1 sm:gap-3">
-                <div class="p-1 sm:p-2 bg-red-50 border sm:border-2 border-[#CA2C2A] text-[#CA2C2A] shadow-[1px_1px_0px_0px_#901C1A] sm:shadow-[2px_2px_0px_0px_#901C1A] shrink-0">
-                    <svg class="w-3.5 h-3.5 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path stroke-linecap="square" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                </div>
-                <div class="min-w-0 w-full">
-                    <span class="text-[8px] sm:text-[10px] font-black uppercase tracking-wider text-[#CA2C2A] block leading-tight">
-                        LOKASI
-                    </span>
-                    <span class="font-extrabold text-[11px] sm:text-sm text-gray-900 block leading-tight truncate mt-0.5" title="{{ $pengaturan->lokasi_acara ?? 'Ruangan 105' }}">
-                        {{ $pengaturan->lokasi_acara ?? 'Ruangan 105' }}
-                    </span>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- 3. BAGIAN BAWAH: CARD FORMULIR PENDAFTARAN -->
-        <div class="card-tilt bg-white border-2 border-[#1A467C] p-4 sm:p-8 shadow-[5px_5px_0px_0px_#1A467C] sm:shadow-[8px_8px_0px_0px_#1A467C]">
-
-            <!-- Alert Error Global jika ada validasi gagal -->
-            @if ($errors->any())
-                <div id="alert-box" class="mb-3 sm:mb-6 p-2.5 sm:p-4 bg-[#FEE2E2] border-2 border-[#901C1A] text-red-950 text-xs sm:text-sm shadow-[3px_3px_0px_0px_#901C1A] sm:shadow-[4px_4px_0px_0px_#901C1A] animate-pulse">
-                    <div class="flex items-center gap-2 mb-1">
-                        <span class="bg-[#CA2C2A] text-white font-black text-xs px-2 py-0.5 border border-[#901C1A] shrink-0">PERIKSA</span>
-                        <span class="font-bold">Terdapat kesalahan input:</span>
-                    </div>
-                    <ul class="list-disc list-inside space-y-0.5 text-xs font-semibold text-red-900">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
-
-            <!-- Form Pendaftaran (2-Column Fields Grid on Desktop, 1-Column on Mobile) -->
-            <form 
-                id="form-pendaftaran"
-                action="{{ route('pendaftaran.store') }}" 
-                method="POST" 
-                class="space-y-3 sm:space-y-5"
-                onsubmit="handleSubmit(event)"
-            >
-                @csrf
-
-                <!-- Anti-bot Honeypot Field -->
-                <div class="hidden" aria-hidden="true">
-                    <input type="text" name="website_url" tabindex="-1" autocomplete="off">
-                </div>
-
-                <!-- Fields Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-5">
-                    
-                    <!-- Field: Nama Lengkap (Full Width) -->
-                    <div class="md:col-span-2">
-                        <label for="nama" class="block text-xs font-black uppercase tracking-wider text-[#1A467C] mb-1 sm:mb-1.5 flex items-center justify-between">
-                            <span>Nama Lengkap <span class="text-[#CA2C2A]">*</span></span>
-                            <span id="hint-nama" class="text-[10px] font-mono text-gray-400">min. 3 huruf</span>
-                        </label>
-                        <div class="relative">
-                            <input 
-                                type="text" 
-                                id="nama" 
-                                name="nama" 
-                                value="{{ session('success') ? '' : old('nama') }}"
-                                placeholder="Masukkan nama lengkap Anda..."
-                                maxlength="100"
-                                required
-                                oninput="validateLive('nama')"
-                                class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] pl-3.5 pr-8 py-2 sm:pl-4 sm:pr-9 sm:py-3 text-xs sm:text-sm font-semibold text-[#000000] focus:bg-white focus:outline-none focus:shadow-[4px_4px_0px_0px_#1A467C] transition-all duration-200 @error('nama') border-[#CA2C2A] bg-red-50 @enderror"
-                            >
-                            <!-- Live Checkmark Badge -->
-                            <div id="check-nama" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 bg-green-600 text-white border border-[#1A467C] text-[9px] sm:text-[11px] font-black flex items-center justify-center shadow-[1px_1px_0px_0px_#1A467C] field-valid-badge">
-                                ✓
+                    <!-- Info Jadwal & Lokasi -->
+                    <div class="space-y-2.5">
+                        <div class="flex items-center gap-3 bg-white border-2 border-black p-2.5 shadow-[2px_2px_0px_0px_#000000]">
+                            <div class="w-8 h-8 bg-blue-50 border border-black text-[#2A82C6] flex items-center justify-center shrink-0">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="square" stroke-width="2.2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                            <div class="min-w-0">
+                                <span class="text-[9px] font-black uppercase tracking-wider text-[#2A82C6] block">Tanggal</span>
+                                <span class="text-xs font-extrabold text-gray-950 block truncate">{{ $pengaturan->tanggal_acara ?? '13 Oktober 2026' }}</span>
                             </div>
                         </div>
-                        @error('nama')
-                            <p class="mt-1 text-xs font-bold text-[#CA2C2A]">{{ $message }}</p>
-                        @enderror
-                    </div>
 
-                    <!-- Field: NIM (Tepat 9 Digit) -->
-                    <div>
-                        <label for="nim" class="block text-xs font-black uppercase tracking-wider text-[#1A467C] mb-1 sm:mb-1.5 flex items-center justify-between">
-                            <span>NIM <span class="text-[#CA2C2A]">*</span></span>
-                            <span id="hint-nim" class="text-[10px] font-mono text-gray-400">tepat 9 digit</span>
-                        </label>
-                        <div class="relative">
-                            <input 
-                                type="text" 
-                                id="nim" 
-                                name="nim" 
-                                inputmode="numeric"
-                                maxlength="9"
-                                oninput="this.value = this.value.replace(/\D/g, ''); validateLive('nim')"
-                                value="{{ session('success') ? '' : old('nim') }}"
-                                placeholder="Contoh: 250414000"
-                                required
-                                class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] pl-3.5 pr-8 py-2 sm:pl-4 sm:pr-9 sm:py-3 text-xs sm:text-sm font-semibold font-mono text-[#000000] focus:bg-white focus:outline-none focus:shadow-[4px_4px_0px_0px_#1A467C] transition-all duration-200 @error('nim') border-[#CA2C2A] bg-red-50 @enderror"
-                            >
-                            <!-- Live Checkmark Badge -->
-                            <div id="check-nim" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 bg-green-600 text-white border border-[#1A467C] text-[9px] sm:text-[11px] font-black flex items-center justify-center shadow-[1px_1px_0px_0px_#1A467C] field-valid-badge">
-                                ✓
+                        <div class="flex items-center gap-3 bg-white border-2 border-black p-2.5 shadow-[2px_2px_0px_0px_#000000]">
+                            <div class="w-8 h-8 bg-blue-50 border border-black text-[#1A467C] flex items-center justify-center shrink-0">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="square" stroke-width="2.2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <div class="min-w-0">
+                                <span class="text-[9px] font-black uppercase tracking-wider text-[#1A467C] block">Waktu</span>
+                                <span class="text-xs font-extrabold text-gray-950 block truncate">{{ $pengaturan->jam_acara ?? '08:00 WIB - Selesai' }}</span>
                             </div>
                         </div>
-                        @error('nim')
-                            <p class="mt-1 text-xs font-bold text-[#CA2C2A]">{{ $message }}</p>
-                        @enderror
-                    </div>
 
-                    <!-- Field: Email -->
-                    <div>
-                        <label for="email" class="block text-xs font-black uppercase tracking-wider text-[#1A467C] mb-1 sm:mb-1.5 flex items-center justify-between">
-                            <span>Email <span class="text-[#CA2C2A]">*</span></span>
-                            <span id="hint-email" class="text-[10px] font-mono text-gray-400">email aktif</span>
-                        </label>
-                        <div class="relative">
-                            <input 
-                                type="email" 
-                                id="email" 
-                                name="email" 
-                                maxlength="150"
-                                oninput="validateLive('email')"
-                                value="{{ session('success') ? '' : old('email') }}"
-                                placeholder="Contoh: nama@gmail.com atau @fellow.lpkia.ac.id"
-                                required
-                                class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] pl-3.5 pr-8 py-2 sm:pl-4 sm:pr-9 sm:py-3 text-xs sm:text-sm font-semibold text-[#000000] focus:bg-white focus:outline-none focus:shadow-[4px_4px_0px_0px_#1A467C] transition-all duration-200 @error('email') border-[#CA2C2A] bg-red-50 @enderror"
-                            >
-                            <!-- Live Checkmark Badge -->
-                            <div id="check-email" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 bg-green-600 text-white border border-[#1A467C] text-[9px] sm:text-[11px] font-black flex items-center justify-center shadow-[1px_1px_0px_0px_#1A467C] field-valid-badge">
-                                ✓
+                        <div class="flex items-center gap-3 bg-white border-2 border-black p-2.5 shadow-[2px_2px_0px_0px_#000000]">
+                            <div class="w-8 h-8 bg-red-50 border border-black text-[#CA2C2A] flex items-center justify-center shrink-0">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="square" stroke-width="2.2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                    <path stroke-linecap="square" stroke-width="2.2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                            </div>
+                            <div class="min-w-0">
+                                <span class="text-[9px] font-black uppercase tracking-wider text-[#CA2C2A] block">Lokasi</span>
+                                <span class="text-xs font-extrabold text-gray-950 block truncate">{{ $pengaturan->lokasi_acara ?? 'Ruangan 105' }}</span>
                             </div>
                         </div>
-                        @error('email')
-                            <p class="mt-1 text-xs font-bold text-[#CA2C2A]">{{ $message }}</p>
-                        @enderror
                     </div>
+                </div>
 
-                    <!-- Field: Kelas (Custom Neubrutalism Dropdown Pop-over) -->
-                    <div class="relative" id="custom-select-container">
-                        <label for="input-kelas-value" class="block text-xs font-black uppercase tracking-wider text-[#1A467C] mb-1 sm:mb-1.5 flex items-center justify-between">
-                            <span>Kelas <span class="text-[#CA2C2A]">*</span></span>
-                            <span id="check-kelas" class="hidden text-green-700 font-bold text-xs">✓ Terpilih</span>
-                        </label>
-                        
-                        @php
-                            $selectedKelas = session('success') ? '' : old('kelas');
-                        @endphp
-                        <!-- Hidden input to submit form data -->
-                        <input 
-                            type="hidden" 
-                            id="input-kelas-value" 
-                            name="kelas" 
-                            value="{{ $selectedKelas }}"
-                            required
+                <!-- Shortcut Scan Absensi & Info CP / WA -->
+                <div class="space-y-2.5 pt-2 border-t-2 border-dashed border-gray-300">
+                    <a
+                        href="{{ route('presensi.absen') }}"
+                        class="btn-tactile w-full py-2.5 px-3 bg-white hover:bg-amber-100 text-black border-2 border-black shadow-[3px_3px_0px_0px_#000000] text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2"
+                    >
+                        <svg class="w-4 h-4 text-[#1A467C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="square" stroke-width="2.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                            <path stroke-linecap="square" stroke-width="2.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        <span>Buka Scanner Absensi</span>
+                    </a>
+
+                    @if (!empty($pengaturan->link_grup_wa) || !empty($pengaturan->cp_nama))
+                        <div class="flex flex-wrap items-center justify-between gap-2 text-[11px] font-bold text-gray-700 pt-1">
+                            @if (!empty($pengaturan->cp_nama))
+                                <span>CP: <strong class="text-gray-950">{{ $pengaturan->cp_nama }}</strong>{{ !empty($pengaturan->cp_wa) ? ' (' . $pengaturan->cp_wa . ')' : '' }}</span>
+                            @endif
+                            @if (!empty($pengaturan->link_grup_wa))
+                                <a href="{{ $pengaturan->link_grup_wa }}" target="_blank" rel="noopener noreferrer" class="text-[#15803d] underline font-black">
+                                    Grup WA →
+                                </a>
+                            @endif
+                        </div>
+                    @endif
+                </div>
+            </div>
+
+            <!-- ============================================================== -->
+            <!-- KOLOM KANAN: FORM LOGIN, AKTIVASI AKUN QR & LUPA PASSWORD       -->
+            <!-- ============================================================== -->
+            <div class="lg:col-span-7 p-6 sm:p-8 flex flex-col justify-center space-y-5">
+                <div class="border-b-2 border-black pb-4">
+                    <span class="inline-block bg-amber-300 border border-black px-2 py-0.5 text-[10px] font-black uppercase tracking-wider mb-1.5">
+                        PORTAL PESERTA
+                    </span>
+                    <h2 class="text-lg sm:text-xl font-black uppercase tracking-tight text-[#1A467C]">
+                        Masuk Akun Mahasiswa
+                    </h2>
+                    <p class="text-xs font-semibold text-gray-600 mt-0.5">
+                        Login dengan NIM/Email &amp; password, atau aktivasi akun via QR tiket.
+                    </p>
+                </div>
+
+                <!-- Flash Alert Error -->
+                @if (session('error') || $errors->any())
+                    <div class="p-3.5 bg-red-50 border-2 border-black text-xs font-bold text-red-900 shadow-[3px_3px_0px_0px_#CA2C2A]">
+                        {{ session('error') ?? $errors->first() }}
+                    </div>
+                @endif
+
+                <!-- Flash Alert Success -->
+                @if (session('success'))
+                    <div class="p-3.5 bg-green-50 border-2 border-black text-xs font-bold text-green-900 shadow-[3px_3px_0px_0px_#15803d]">
+                        {{ session('success') }}
+                    </div>
+                @endif
+
+                <!-- 2 TABS SELECTION: LOGIN & AKTIVASI AKUN -->
+                <div class="grid grid-cols-2 gap-2 border-2 border-black p-1 bg-gray-100 shadow-[2px_2px_0px_0px_#000000]">
+                    <button
+                        type="button"
+                        id="tab-btn-biasa"
+                        onclick="switchTab('biasa')"
+                        class="btn-tactile py-2 text-xs font-black uppercase tracking-wider border-2 border-black bg-white text-[#1A467C] shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
+                    >
+                        Login
+                    </button>
+                    <button
+                        type="button"
+                        id="tab-btn-qr"
+                        onclick="switchTab('qr')"
+                        class="btn-tactile py-2 text-xs font-black uppercase tracking-wider border-2 border-transparent text-gray-600 hover:text-black cursor-pointer"
+                    >
+                        Aktivasi Akun
+                    </button>
+                </div>
+
+                <!-- TAB 1: FORM LOGIN BIASA -->
+                <div id="panel-biasa" class="tab-snap space-y-4">
+                    <form action="{{ route('mahasiswa.login.post') }}" method="POST" class="space-y-4">
+                        @csrf
+
+                        <div>
+                            <label for="identifier" class="block text-xs font-black uppercase tracking-wider text-[#1A467C] mb-1.5">
+                                Email Kampus / NIM <span class="text-[#CA2C2A]">*</span>
+                            </label>
+                            <div class="relative">
+                                <input
+                                    type="text"
+                                    id="identifier"
+                                    name="identifier"
+                                    value="{{ old('identifier') }}"
+                                    required
+                                    autofocus
+                                    placeholder="Contoh: 250414010 atau email kamu"
+                                    class="w-full bg-[#F8FBFE] border-2 border-black text-gray-950 font-bold text-xs sm:text-sm px-3.5 py-2.5 pl-10 focus:bg-white focus:outline-none focus:translate-x-[-1px] focus:translate-y-[-1px] focus:shadow-[4px_4px_0px_0px_#000000] transition"
+                                >
+                                <svg class="w-4 h-4 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="square" stroke-width="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex items-center justify-between mb-1.5">
+                                <label for="password" class="block text-xs font-black uppercase tracking-wider text-[#1A467C]">
+                                    Password <span class="text-[#CA2C2A]">*</span>
+                                </label>
+                                <button
+                                    type="button"
+                                    onclick="switchTab('lupa')"
+                                    class="text-[10px] font-bold text-[#CA2C2A] hover:underline cursor-pointer"
+                                >
+                                    Lupa password?
+                                </button>
+                            </div>
+                            <div class="relative">
+                                <input
+                                    type="password"
+                                    id="password"
+                                    name="password"
+                                    required
+                                    placeholder="Masukkan password akun Anda..."
+                                    class="w-full bg-[#F8FBFE] border-2 border-black text-gray-950 font-bold text-xs sm:text-sm px-3.5 py-2.5 pl-10 pr-10 focus:bg-white focus:outline-none focus:translate-x-[-1px] focus:translate-y-[-1px] focus:shadow-[4px_4px_0px_0px_#000000] transition"
+                                >
+                                <svg class="w-4 h-4 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="square" stroke-width="2.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                </svg>
+                                <button
+                                    type="button"
+                                    onclick="togglePasswordVisibility('password', 'eye-login')"
+                                    class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-black cursor-pointer"
+                                >
+                                    <svg id="eye-login" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="square" stroke-width="2.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="square" stroke-width="2.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <button
+                            type="submit"
+                            class="btn-tactile w-full py-3 bg-[#2A82C6] hover:bg-[#1A467C] text-white text-xs sm:text-sm font-black uppercase tracking-wider border-2 border-black shadow-[4px_4px_0px_0px_#000000] flex items-center justify-center gap-2 cursor-pointer mt-2"
                         >
+                            <span>Masuk</span>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="square" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
+                        </button>
+                    </form>
+                </div>
 
-                        <!-- Custom Trigger Button (Works identically across desktop and mobile) -->
-                        <button 
-                            type="button" 
-                            id="dropdown-kelas-trigger"
-                            onclick="toggleKelasDropdown()"
-                            class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] px-3.5 py-2 sm:px-4 sm:py-3 text-left flex items-center justify-between text-xs sm:text-sm font-bold font-mono focus:bg-white focus:outline-none focus:shadow-[4px_4px_0px_0px_#1A467C] transition-all duration-150 cursor-pointer @error('kelas') border-[#CA2C2A] bg-red-50 @enderror"
+                <!-- TAB 2: AKTIVASI AKUN DENGAN QR TIKET -->
+                <div id="panel-qr" class="hidden tab-snap space-y-4">
+                    <div class="bg-blue-50 border-2 border-black p-3 text-xs text-blue-950 font-medium shadow-[2px_2px_0px_0px_#1A467C]">
+                        <p class="font-black text-[#1A467C] uppercase mb-0.5">Aktivasi Akun Mahasiswa</p>
+                        <p>Upload file gambar QR tiket dari email Anda atau scan menggunakan kamera untuk membuat password baru.</p>
+                    </div>
+
+                    <div class="space-y-2">
+                        <input
+                            type="file"
+                            id="qr-file-input"
+                            accept="image/*"
+                            onchange="scanQrFromFile(this)"
+                            class="hidden"
                         >
-                            <span id="dropdown-kelas-label" class="{{ empty($selectedKelas) ? 'text-gray-400 font-normal' : 'text-gray-900 font-bold' }}">
-                                {{ !empty($selectedKelas) ? $selectedKelas : '-- PILIH KELAS ANDA --' }}
-                            </span>
-                            <svg id="dropdown-chevron-icon" class="w-5 h-5 text-[#1A467C] border-l-2 border-[#1A467C] pl-1 transform transition-transform duration-200 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="square" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+                        <button
+                            type="button"
+                            onclick="document.getElementById('qr-file-input').click()"
+                            class="btn-tactile w-full py-3 bg-[#1A467C] hover:bg-[#153660] text-white border-2 border-black font-black text-xs sm:text-sm uppercase tracking-wider shadow-[3px_3px_0px_0px_#000000] flex items-center justify-center gap-2 cursor-pointer"
+                        >
+                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="square" stroke-width="2.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            <span>Pilih Gambar QR Tiket</span>
+                        </button>
+                    </div>
+
+                    <div class="space-y-2">
+                        <button
+                            type="button"
+                            id="btn-scan-camera"
+                            onclick="toggleCameraScanner()"
+                            class="btn-tactile w-full py-2.5 bg-white hover:bg-gray-100 text-gray-900 border-2 border-black font-black text-xs uppercase tracking-wider shadow-[3px_3px_0px_0px_#000000] flex items-center justify-center gap-2 cursor-pointer"
+                        >
+                            <svg class="w-4 h-4 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="square" stroke-width="2.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                <path stroke-width="2.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            <span>Scan Menggunakan Kamera</span>
+                        </button>
+
+                        <div id="camera-reader-box" class="hidden border-2 border-black overflow-hidden shadow-[3px_3px_0px_0px_#000000]">
+                            <div id="qr-camera-reader" class="w-full"></div>
+                        </div>
+                    </div>
+
+                    <div id="qr-status-msg" class="hidden p-3 text-xs font-bold border-2 border-black shadow-[2px_2px_0px_0px_#000000]"></div>
+                </div>
+
+                <!-- TAB 3: LUPA PASSWORD -->
+                <div id="panel-lupa" class="hidden tab-snap space-y-4">
+                    <div class="bg-amber-50 border-2 border-black p-3 text-xs text-amber-950 font-medium shadow-[2px_2px_0px_0px_#d97706]">
+                        <p class="font-black text-amber-900 uppercase mb-0.5">Lupa Password Akun</p>
+                        <p>Masukkan Email kampus atau NIM yang terdaftar. Kami akan mengirimkan tautan untuk mengatur ulang kata sandi Anda.</p>
+                    </div>
+
+                    @if (session('error_reset'))
+                        <div class="p-3 bg-red-50 border-2 border-black text-xs font-bold text-red-900 shadow-[2px_2px_0px_0px_#CA2C2A]">
+                            {{ session('error_reset') }}
+                        </div>
+                    @endif
+
+                    @if (session('success_reset'))
+                        <div class="p-3.5 bg-green-50 border-2 border-black text-xs font-bold text-green-900 shadow-[3px_3px_0px_0px_#15803d]">
+                            {{ session('success_reset') }}
+                        </div>
+                    @endif
+
+                    <form action="{{ route('mahasiswa.lupaPassword.post') }}" method="POST" class="space-y-4">
+                        @csrf
+
+                        <div>
+                            <label for="reset_identifier" class="block text-xs font-black uppercase tracking-wider text-[#1A467C] mb-1.5">
+                                Email Kampus / NIM <span class="text-[#CA2C2A]">*</span>
+                            </label>
+                            <div class="relative">
+                                <input
+                                    type="text"
+                                    id="reset_identifier"
+                                    name="reset_identifier"
+                                    value="{{ old('reset_identifier') }}"
+                                    required
+                                    placeholder="Contoh: 250414010 atau email kamu"
+                                    class="w-full bg-[#F8FBFE] border-2 border-black text-gray-950 font-bold text-xs sm:text-sm px-3.5 py-2.5 pl-10 focus:bg-white focus:outline-none focus:translate-x-[-1px] focus:translate-y-[-1px] focus:shadow-[4px_4px_0px_0px_#000000] transition"
+                                >
+                                <svg class="w-4 h-4 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="square" stroke-width="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                            </div>
+                        </div>
+
+                        <button
+                            type="submit"
+                            class="btn-tactile w-full py-3 bg-[#1A467C] hover:bg-[#153660] text-white text-xs sm:text-sm font-black uppercase tracking-wider border-2 border-black shadow-[4px_4px_0px_0px_#000000] flex items-center justify-center gap-2 cursor-pointer mt-2"
+                        >
+                            <span>Kirim Tautan Reset Password</span>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="square" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                             </svg>
                         </button>
 
-                        <!-- Dropdown Menu List (Neubrutalism Popover) -->
-                        <div 
-                            id="dropdown-kelas-menu" 
-                            class="hidden absolute z-50 left-0 right-0 bg-white border-2 border-[#1A467C] shadow-[5px_5px_0px_0px_#1A467C] sm:shadow-[6px_6px_0px_0px_#1A467C] max-h-48 sm:max-h-56 overflow-y-auto divide-y divide-gray-100"
-                        >
-                            @foreach ($kelasList as $k)
-                                <div 
-                                    onclick="pilihKelas('{{ $k->nama_kelas }}')"
-                                    class="dropdown-kelas-item px-4 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-bold font-mono text-gray-900 hover:bg-[#2A82C6] hover:text-white cursor-pointer transition-colors flex items-center justify-between {{ $selectedKelas === $k->nama_kelas ? 'bg-blue-50 text-[#1A467C]' : '' }}"
-                                    data-value="{{ $k->nama_kelas }}"
-                                >
-                                    <span>{{ $k->nama_kelas }}</span>
-                                    <span class="item-check {{ $selectedKelas === $k->nama_kelas ? '' : 'hidden' }} text-xs font-black">✓</span>
-                                </div>
-                            @endforeach
-                        </div>
-
-                        @error('kelas')
-                            <p class="mt-1 text-xs font-bold text-[#CA2C2A]">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <!-- Field: No Telp / WhatsApp -->
-                    <div>
-                        <label for="no_telp" class="block text-xs font-black uppercase tracking-wider text-[#1A467C] mb-1 sm:mb-1.5 flex items-center justify-between">
-                            <span>No. WhatsApp <span class="text-[#CA2C2A]">*</span></span>
-                            <span id="hint-wa" class="text-[10px] font-mono text-gray-400">08xx / 62xx</span>
-                        </label>
-                        <div class="relative">
-                            <input 
-                                type="tel" 
-                                id="no_telp" 
-                                name="no_telp" 
-                                inputmode="tel"
-                                maxlength="15"
-                                oninput="this.value = this.value.replace(/\s+/g, ''); validateLive('no_telp')"
-                                value="{{ session('success') ? '' : old('no_telp') }}"
-                                placeholder="Contoh: 081234567890"
-                                required
-                                class="w-full bg-[#F8FBFE] border-2 border-[#1A467C] pl-3.5 pr-8 py-2 sm:pl-4 sm:pr-9 sm:py-3 text-xs sm:text-sm font-semibold font-mono text-[#000000] focus:bg-white focus:outline-none focus:shadow-[4px_4px_0px_0px_#1A467C] transition-all duration-200 @error('no_telp') border-[#CA2C2A] bg-red-50 @enderror"
+                        <div class="text-center pt-1">
+                            <button
+                                type="button"
+                                onclick="switchTab('biasa')"
+                                class="text-xs font-bold text-gray-600 hover:text-black hover:underline cursor-pointer"
                             >
-                            <!-- Live Checkmark Badge -->
-                            <div id="check-no_telp" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 bg-green-600 text-white border border-[#1A467C] text-[9px] sm:text-[11px] font-black flex items-center justify-center shadow-[1px_1px_0px_0px_#1A467C] field-valid-badge">
-                                ✓
-                            </div>
+                                ← Kembali ke Form Login
+                            </button>
                         </div>
-                        @error('no_telp')
-                            <p class="mt-1 text-xs font-bold text-[#CA2C2A]">{{ $message }}</p>
-                        @enderror
-                    </div>
-
+                    </form>
                 </div>
-
-                <!-- Submit Button -->
-                <div class="pt-2 sm:pt-3">
-                    <button 
-                        type="submit" 
-                        id="btn-submit"
-                        class="btn-smooth w-full bg-[#2A82C6] hover:bg-[#1A467C] active:bg-[#1A467C] text-white text-xs sm:text-sm font-black uppercase tracking-widest py-3 sm:py-4 px-6 border-2 border-[#1A467C] shadow-[5px_5px_0px_0px_#1A467C] hover:shadow-[7px_7px_0px_0px_#1A467C] cursor-pointer flex items-center justify-center gap-2.5"
-                    >
-                        <span id="btn-text">KIRIM PENDAFTARAN SEKARANG</span>
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="square" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                        </svg>
-                    </button>
-                </div>
-            </form>
+            </div>
 
         </div>
+    </main>
 
-    </div>
-    
+    <!-- Offscreen Scanner Container untuk Html5Qrcode scanFile -->
+    <div id="qr-file-scan-worker" style="position: fixed; left: -9999px; top: 0; width: 320px; height: 320px; pointer-events: none; z-index: -999;"></div>
+
+    <!-- Footer -->
+    <footer class="w-full text-center py-2 text-xs font-bold text-gray-500">
+        &copy; {{ date('Y') }} POKJA HIMA IF • Sistem Terpadu Presensi &amp; Keaktifan
+    </footer>
+
     <script>
-        // Custom Dropdown Kelas Functions (Smart Auto Drop-up / Drop-down)
-        function toggleKelasDropdown() {
-            const menu = document.getElementById('dropdown-kelas-menu');
-            const trigger = document.getElementById('dropdown-kelas-trigger');
-            const chevron = document.getElementById('dropdown-chevron-icon');
-            if (menu && trigger) {
-                const isHidden = menu.classList.contains('hidden');
-                if (isHidden) {
-                    // Cek sisa ruang layar di bawah tombol trigger
-                    const rect = trigger.getBoundingClientRect();
-                    const spaceBelow = window.innerHeight - rect.bottom;
-                    const spaceAbove = rect.top;
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        let html5QrScanner = null;
+        let isCameraActive = false;
 
-                    // Jika ruang di bawah kurang dari 230px, buka ke ATAS (drop-up) agar tidak terpotong layar
-                    if (spaceBelow < 230 && spaceAbove > spaceBelow) {
-                        menu.classList.remove('top-full', 'mt-1.5');
-                        menu.classList.add('bottom-full', 'mb-1.5');
-                    } else {
-                        menu.classList.remove('bottom-full', 'mb-1.5');
-                        menu.classList.add('top-full', 'mt-1.5');
-                    }
+        function switchTab(mode) {
+            const btnBiasa = document.getElementById('tab-btn-biasa');
+            const btnQr = document.getElementById('tab-btn-qr');
+            const panelBiasa = document.getElementById('panel-biasa');
+            const panelQr = document.getElementById('panel-qr');
+            const panelLupa = document.getElementById('panel-lupa');
 
-                    menu.classList.remove('hidden');
-                    if (chevron) chevron.classList.add('rotate-180');
+            if (mode === 'biasa') {
+                btnBiasa.className = "btn-tactile py-2 text-xs font-black uppercase tracking-wider border-2 border-black bg-white text-[#1A467C] shadow-[2px_2px_0px_0px_#000000] cursor-pointer";
+                btnQr.className = "btn-tactile py-2 text-xs font-black uppercase tracking-wider border-2 border-transparent text-gray-600 hover:text-black cursor-pointer";
+                panelBiasa.classList.remove('hidden');
+                panelQr.classList.add('hidden');
+                panelLupa.classList.add('hidden');
+                stopCameraScanner();
+            } else if (mode === 'qr') {
+                btnQr.className = "btn-tactile py-2 text-xs font-black uppercase tracking-wider border-2 border-black bg-white text-[#1A467C] shadow-[2px_2px_0px_0px_#000000] cursor-pointer";
+                btnBiasa.className = "btn-tactile py-2 text-xs font-black uppercase tracking-wider border-2 border-transparent text-gray-600 hover:text-black cursor-pointer";
+                panelQr.classList.remove('hidden');
+                panelBiasa.classList.add('hidden');
+                panelLupa.classList.add('hidden');
+            } else if (mode === 'lupa') {
+                btnBiasa.className = "btn-tactile py-2 text-xs font-black uppercase tracking-wider border-2 border-transparent text-gray-600 hover:text-black cursor-pointer";
+                btnQr.className = "btn-tactile py-2 text-xs font-black uppercase tracking-wider border-2 border-transparent text-gray-600 hover:text-black cursor-pointer";
+                panelLupa.classList.remove('hidden');
+                panelBiasa.classList.add('hidden');
+                panelQr.classList.add('hidden');
+                stopCameraScanner();
+            }
+        }
+
+        function togglePasswordVisibility(inputId) {
+            const input = document.getElementById(inputId);
+            if (!input) return;
+            input.type = (input.type === 'password') ? 'text' : 'password';
+        }
+
+        async function verifyQrToken(scannedText) {
+            showStatus('Memverifikasi QR tiket...', 'info');
+            try {
+                const response = await fetch("{{ route('mahasiswa.verifikasiQr') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ token: scannedText })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    showStatus(`Tiket ${data.nama} (${data.nim}) valid! Mengarahkan ke form password...`, 'success');
+                    setTimeout(() => {
+                        window.location.href = data.redirect;
+                    }, 800);
                 } else {
-                    menu.classList.add('hidden');
-                    if (chevron) chevron.classList.remove('rotate-180');
+                    showStatus(data.message || 'QR Tiket tidak valid atau tidak terdaftar.', 'error');
                 }
+            } catch (err) {
+                showStatus('Terjadi kesalahan jaringan saat verifikasi QR.', 'error');
             }
         }
 
-        function pilihKelas(val) {
-            const input = document.getElementById('input-kelas-value');
-            const label = document.getElementById('dropdown-kelas-label');
-            const menu = document.getElementById('dropdown-kelas-menu');
-            const chevron = document.getElementById('dropdown-chevron-icon');
-            const trigger = document.getElementById('dropdown-kelas-trigger');
+        async function scanQrFromFile(input) {
+            if (!input.files || input.files.length === 0) return;
+            const file = input.files[0];
+            showStatus('Membaca QR tiket dari file...', 'info');
 
-            if (input) input.value = val;
-            if (label) {
-                label.textContent = val;
-                label.classList.remove('text-gray-400', 'font-normal');
-                label.classList.add('text-gray-900', 'font-bold');
-            }
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = async function() {
+                    let decodedText = null;
 
-            // Update item highlight & check icon
-            document.querySelectorAll('.dropdown-kelas-item').forEach(el => {
-                const check = el.querySelector('.item-check');
-                if (el.getAttribute('data-value') === val) {
-                    el.classList.add('bg-blue-50', 'text-[#1A467C]');
-                    if (check) check.classList.remove('hidden');
-                } else {
-                    el.classList.remove('bg-blue-50', 'text-[#1A467C]');
-                    if (check) check.classList.add('hidden');
-                }
-            });
+                    if (window.jsQR) {
+                        try {
+                            const canvas = document.createElement('canvas');
+                            canvas.width = img.naturalWidth || img.width;
+                            canvas.height = img.naturalHeight || img.height;
+                            const ctx = canvas.getContext('2d', { willReadFrequently: true });
+                            ctx.drawImage(img, 0, 0);
+                            const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                            const code = jsQR(imgData.data, imgData.width, imgData.height, {
+                                inversionAttempts: "attemptBoth",
+                            });
+                            if (code && code.data) {
+                                decodedText = code.data;
+                            }
+                        } catch (err) {
+                            console.warn('jsQR original resolution pass error:', err);
+                        }
 
-            if (menu) menu.classList.add('hidden');
-            if (chevron) chevron.classList.remove('rotate-180');
-            if (trigger) trigger.classList.remove('border-[#CA2C2A]', 'bg-red-50');
-
-            const checkKelas = document.getElementById('check-kelas');
-            if (checkKelas) checkKelas.classList.remove('hidden');
-        }
-
-        // Close dropdown when clicking outside
-        document.addEventListener('click', (e) => {
-            const container = document.getElementById('custom-select-container');
-            const menu = document.getElementById('dropdown-kelas-menu');
-            const chevron = document.getElementById('dropdown-chevron-icon');
-            if (container && menu && !container.contains(e.target)) {
-                menu.classList.add('hidden');
-                if (chevron) chevron.classList.remove('rotate-180');
-            }
-        });
-
-        // Anti-Double Submit & Client Validation Handler
-        let isSubmitting = false;
-
-        function handleSubmit(e) {
-            if (isSubmitting) {
-                e.preventDefault();
-                return false;
-            }
-
-            // Validate custom dropdown
-            const inputKelas = document.getElementById('input-kelas-value');
-            const triggerKelas = document.getElementById('dropdown-kelas-trigger');
-            if (!inputKelas || !inputKelas.value.trim()) {
-                e.preventDefault();
-                if (triggerKelas) {
-                    triggerKelas.classList.add('border-[#CA2C2A]', 'bg-red-50');
-                    toggleKelasDropdown();
-                    triggerKelas.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }
-                return false;
-            }
-
-            const btn = document.getElementById('btn-submit');
-            const btnText = document.getElementById('btn-text');
-
-            isSubmitting = true;
-            btn.disabled = true;
-            btn.classList.add('opacity-75', 'cursor-not-allowed');
-
-            btnText.innerHTML = `
-                <svg class="animate-spin h-4 w-4 text-white inline-block mr-1" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                <span>SEDANG MENGIRIM...</span>
-            `;
-
-            return true;
-        }
-
-        // Close on Escape Key
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                const menu = document.getElementById('dropdown-kelas-menu');
-                const chevron = document.getElementById('dropdown-chevron-icon');
-                if (menu) menu.classList.add('hidden');
-                if (chevron) chevron.classList.remove('rotate-180');
-            }
-        });
-
-        // 1. Polaroid Wobble Click Animation
-        function wobblePolaroid(el) {
-            if (!el) return;
-            el.classList.remove('wobble-active');
-            void el.offsetWidth;
-            el.classList.add('wobble-active');
-            el.addEventListener('animationend', () => {
-                el.classList.remove('wobble-active');
-            }, { once: true });
-        }
-
-        // 2. Interactive Floating Background Shapes (Pop & Spin)
-        function popShape(el) {
-            if (!el) return;
-            el.classList.remove('shape-popping');
-            void el.offsetWidth;
-            el.classList.add('shape-popping');
-            el.addEventListener('animationend', () => {
-                el.classList.remove('shape-popping');
-            }, { once: true });
-        }
-
-        // Live Form Input Validation Indicators
-        function validateLive(type) {
-            if (type === 'nama') {
-                const val = document.getElementById('nama')?.value.trim() || '';
-                const check = document.getElementById('check-nama');
-                if (check) {
-                    if (val.length >= 3) {
-                        check.classList.remove('hidden');
-                    } else {
-                        check.classList.add('hidden');
+                        if (!decodedText && (img.naturalWidth > 600 || img.naturalHeight > 600)) {
+                            try {
+                                const targetW = 500;
+                                const scale = targetW / img.naturalWidth;
+                                const targetH = Math.round(img.naturalHeight * scale);
+                                const canvas = document.createElement('canvas');
+                                canvas.width = targetW;
+                                canvas.height = targetH;
+                                const ctx = canvas.getContext('2d', { willReadFrequently: true });
+                                ctx.drawImage(img, 0, 0, targetW, targetH);
+                                const imgData = ctx.getImageData(0, 0, targetW, targetH);
+                                const code = jsQR(imgData.data, targetW, targetH, {
+                                    inversionAttempts: "attemptBoth",
+                                });
+                                if (code && code.data) {
+                                    decodedText = code.data;
+                                }
+                            } catch (err) {
+                                console.warn('jsQR resize pass error:', err);
+                            }
+                        }
                     }
-                }
-            } else if (type === 'nim') {
-                const val = document.getElementById('nim')?.value.trim() || '';
-                const check = document.getElementById('check-nim');
-                if (check) {
-                    if (/^\d{9}$/.test(val)) {
-                        check.classList.remove('hidden');
-                    } else {
-                        check.classList.add('hidden');
+
+                    if (decodedText) {
+                        verifyQrToken(decodedText);
+                        return;
                     }
-                }
-            } else if (type === 'email') {
-                const val = document.getElementById('email')?.value.trim().toLowerCase() || '';
-                const check = document.getElementById('check-email');
-                if (check) {
-                    if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) {
-                        check.classList.remove('hidden');
-                    } else {
-                        check.classList.add('hidden');
+
+                    try {
+                        const html5Qr = new Html5Qrcode("qr-file-scan-worker");
+                        const fallbackText = await html5Qr.scanFile(file, false);
+                        await html5Qr.clear();
+                        if (fallbackText) {
+                            verifyQrToken(fallbackText);
+                            return;
+                        }
+                    } catch (err) {
+                        console.warn('Html5Qrcode scanFile fallback error:', err);
                     }
-                }
-            } else if (type === 'no_telp') {
-                const val = document.getElementById('no_telp')?.value.trim() || '';
-                const check = document.getElementById('check-no_telp');
-                if (check) {
-                    if (/^(08|62|\+62)\d{8,13}$/.test(val)) {
-                        check.classList.remove('hidden');
-                    } else {
-                        check.classList.add('hidden');
+
+                    showStatus('Tidak ditemukan QR code valid pada gambar tersebut. Pastikan Anda mengupload file gambar QR tiket dari email.', 'error');
+                };
+
+                img.onerror = function() {
+                    showStatus('Gagal membaca gambar. Pastikan format file PNG atau JPG.', 'error');
+                };
+
+                img.src = e.target.result;
+            };
+
+            reader.readAsDataURL(file);
+        }
+
+        async function toggleCameraScanner() {
+            const box = document.getElementById('camera-reader-box');
+            const btn = document.getElementById('btn-scan-camera');
+
+            if (isCameraActive) {
+                stopCameraScanner();
+            } else {
+                box.classList.remove('hidden');
+                btn.innerHTML = '<span>Tutup Kamera</span>';
+                isCameraActive = true;
+
+                html5QrScanner = new Html5Qrcode("qr-camera-reader");
+                try {
+                    await html5QrScanner.start(
+                        { facingMode: "environment" },
+                        { fps: 10, qrbox: { width: 220, height: 220 } },
+                        (decodedText) => {
+                            stopCameraScanner();
+                            verifyQrToken(decodedText);
+                        },
+                        () => {}
+                    );
+                } catch (err) {
+                    try {
+                        await html5QrScanner.start(
+                            { facingMode: "user" },
+                            { fps: 10, qrbox: { width: 220, height: 220 } },
+                            (decodedText) => {
+                                stopCameraScanner();
+                                verifyQrToken(decodedText);
+                            },
+                            () => {}
+                        );
+                    } catch (err2) {
+                        showStatus('Gagal mengakses kamera. Izinkan akses kamera atau gunakan opsi upload file gambar.', 'error');
+                        stopCameraScanner();
                     }
                 }
             }
         }
 
-        // Initialize On Load
+        function stopCameraScanner() {
+            if (html5QrScanner && isCameraActive) {
+                html5QrScanner.stop().then(() => {
+                    html5QrScanner.clear();
+                    const box = document.getElementById('camera-reader-box');
+                    if (box) box.classList.add('hidden');
+                    const btn = document.getElementById('btn-scan-camera');
+                    if (btn) btn.innerHTML = '<span>Scan Menggunakan Kamera</span>';
+                    isCameraActive = false;
+                }).catch(() => {
+                    isCameraActive = false;
+                });
+            }
+        }
+
+        function showStatus(msg, type) {
+            const box = document.getElementById('qr-status-msg');
+            box.classList.remove('hidden', 'bg-red-50', 'text-red-900', 'bg-green-50', 'text-green-900', 'bg-blue-50', 'text-blue-900');
+            if (type === 'error') {
+                box.classList.add('bg-red-50', 'text-red-900');
+            } else if (type === 'success') {
+                box.classList.add('bg-green-50', 'text-green-900');
+            } else {
+                box.classList.add('bg-blue-50', 'text-blue-900');
+            }
+            box.innerText = msg;
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
-            validateLive('nama');
-            validateLive('nim');
-            validateLive('email');
-            validateLive('no_telp');
-
-            const kelasVal = document.getElementById('input-kelas-value')?.value.trim();
-            if (kelasVal) {
-                const checkKelas = document.getElementById('check-kelas');
-                if (checkKelas) checkKelas.classList.remove('hidden');
-            }
+            @if (session('error_reset') || session('success_reset'))
+                switchTab('lupa');
+            @endif
         });
     </script>
 

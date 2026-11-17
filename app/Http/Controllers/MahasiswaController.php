@@ -118,7 +118,7 @@ class MahasiswaController extends Controller
 
         $pengaturan = Pengaturan::first();
 
-        return view('mahasiswa.login', compact('pengaturan'));
+        return view('welcome', compact('pengaturan'));
     }
 
     /**
