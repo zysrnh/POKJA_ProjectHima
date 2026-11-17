@@ -70,55 +70,59 @@
         .tab-snap {
             animation: tabSnap 0.18s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
         }
+
+        .grid-paper {
+            background-color: #FFFFFF;
+            background-image:
+                linear-gradient(to right, rgba(26, 70, 124, 0.08) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(26, 70, 124, 0.08) 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
     </style>
 </head>
 <body class="min-h-screen text-[#000000] flex flex-col justify-between p-4 sm:p-6 lg:p-8 antialiased selection:bg-[#2A82C6] selection:text-white">
 
     <div></div>
 
-    <!-- Main 2-Card Separated Layout (Info Kegiatan + Login Mahasiswa) -->
+    <!-- Main Bento Split Container (Grid Paper Left + Colored Panel with Floating Login Card Right) -->
     <main class="my-auto py-4 flex flex-col items-center justify-center">
-        <div class="snap-card w-full max-w-4xl grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-stretch">
+        <div class="snap-card w-full max-w-5xl bg-white border-[3px] border-[#000000] shadow-[8px_8px_0px_0px_#000000] grid grid-cols-1 lg:grid-cols-12 overflow-hidden">
 
             <!-- ============================================================== -->
-            <!-- KARTU KIRI: INFO KEGIATAN & STATUS PENDAFTARAN                 -->
+            <!-- PANEL KIRI: GRID PAPER + INFO KEGIATAN & STATUS PENDAFTARAN    -->
             <!-- ============================================================== -->
-            <div class="lg:col-span-5 bg-white border-[3px] border-[#000000] shadow-[6px_6px_0px_0px_#000000] p-6 sm:p-7 flex flex-col justify-center gap-5">
+            <div class="lg:col-span-6 grid-paper p-6 sm:p-10 flex flex-col justify-center gap-6">
                 <div class="space-y-4">
-                    <!-- Badge Status Pendaftaran Ditutup + Logo -->
-                    <div class="flex items-center justify-between gap-3">
-                        <div class="flex items-center gap-3">
-                            <img
-                                src="{{ asset('logo/logo.png') }}"
-                                alt="Logo HIMA IF"
-                                class="w-12 h-12 object-contain bg-white p-1.5 border-2 border-black shadow-[3px_3px_0px_0px_#000000] shrink-0"
-                            >
-                            <div>
-                                <span class="text-[10px] font-black uppercase tracking-widest text-[#2A82C6] block">
-                                    HIMA INFORMATIKA
-                                </span>
-                                <h1 class="text-base sm:text-lg font-black uppercase tracking-tight text-[#1A467C] leading-tight">
-                                    {{ $pengaturan->nama_acara ?? 'POKJA HIMA IF' }}
-                                </h1>
-                            </div>
+                    <!-- Logo & Sub-title -->
+                    <div class="flex items-center gap-3.5">
+                        <img
+                            src="{{ asset('logo/logo.png') }}"
+                            alt="Logo HIMA IF"
+                            class="w-12 h-12 object-contain bg-white p-1.5 border-2 border-black shadow-[3px_3px_0px_0px_#000000] shrink-0"
+                        >
+                        <div>
+                            <span class="text-[10px] font-black uppercase tracking-widest text-[#2A82C6] block">
+                                HIMA INFORMATIKA
+                            </span>
+                            <h1 class="text-xl sm:text-2xl font-black uppercase tracking-tight text-[#1A467C] leading-none mt-0.5">
+                                {{ $pengaturan->nama_acara ?? 'POKJA HIMA IF' }}
+                            </h1>
                         </div>
                     </div>
 
                     <!-- Status Banner -->
-                    <div class="bg-red-50 border-2 border-black p-3 shadow-[3px_3px_0px_0px_#CA2C2A]">
-                        <div class="flex items-center gap-2">
-                            <span class="inline-block px-2 py-0.5 bg-[#CA2C2A] text-white border border-black text-[10px] font-black uppercase tracking-wider">
-                                PENDAFTARAN DITUTUP
-                            </span>
-                        </div>
-                        <p class="text-xs font-bold text-gray-800 mt-1.5 leading-relaxed">
+                    <div class="bg-white border-2 border-black p-3.5 shadow-[4px_4px_0px_0px_#CA2C2A]">
+                        <span class="inline-block px-2 py-0.5 bg-[#CA2C2A] text-white border border-black text-[10px] font-black uppercase tracking-wider">
+                            PENDAFTARAN DITUTUP
+                        </span>
+                        <p class="text-xs sm:text-sm font-bold text-gray-800 mt-2 leading-relaxed">
                             {{ $pengaturan->deskripsi_acara ?? 'Portal resmi peserta POKJA HIMA IF untuk presensi, point keaktifan, kelompok, dan kuesioner.' }}
                         </p>
                     </div>
 
                     <!-- Info Jadwal & Lokasi -->
                     <div class="space-y-2.5">
-                        <div class="flex items-center gap-3 bg-white border-2 border-black p-2.5 shadow-[2px_2px_0px_0px_#000000]">
+                        <div class="flex items-center gap-3 bg-white border-2 border-black p-2.5 shadow-[3px_3px_0px_0px_#000000]">
                             <div class="w-8 h-8 bg-blue-50 border border-black text-[#2A82C6] flex items-center justify-center shrink-0">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="square" stroke-width="2.2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -130,7 +134,7 @@
                             </div>
                         </div>
 
-                        <div class="flex items-center gap-3 bg-white border-2 border-black p-2.5 shadow-[2px_2px_0px_0px_#000000]">
+                        <div class="flex items-center gap-3 bg-white border-2 border-black p-2.5 shadow-[3px_3px_0px_0px_#000000]">
                             <div class="w-8 h-8 bg-blue-50 border border-black text-[#1A467C] flex items-center justify-center shrink-0">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="square" stroke-width="2.2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -142,7 +146,7 @@
                             </div>
                         </div>
 
-                        <div class="flex items-center gap-3 bg-white border-2 border-black p-2.5 shadow-[2px_2px_0px_0px_#000000]">
+                        <div class="flex items-center gap-3 bg-white border-2 border-black p-2.5 shadow-[3px_3px_0px_0px_#000000]">
                             <div class="w-8 h-8 bg-red-50 border border-black text-[#CA2C2A] flex items-center justify-center shrink-0">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="square" stroke-width="2.2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -159,9 +163,15 @@
             </div>
 
             <!-- ============================================================== -->
-            <!-- KARTU KANAN: FORM LOGIN, AKTIVASI AKUN QR & LUPA PASSWORD      -->
+            <!-- PANEL KANAN: SOLID BLUE + FLOATING LOGIN CARD                  -->
             <!-- ============================================================== -->
-            <div class="lg:col-span-7 bg-white border-[3px] border-[#000000] shadow-[6px_6px_0px_0px_#000000] p-6 sm:p-8 flex flex-col justify-center space-y-5">
+            <div class="lg:col-span-6 bg-[#2A82C6] border-t-[3px] lg:border-t-0 lg:border-l-[3px] border-black p-6 sm:p-10 flex items-center justify-center">
+                <div class="relative w-full">
+                    <!-- Offset Accent Layer -->
+                    <div class="hidden sm:block absolute inset-0 translate-x-2.5 translate-y-2.5 bg-amber-300 border-[3px] border-black pointer-events-none"></div>
+
+                    <!-- Floating White Login Card -->
+                    <div class="relative bg-white border-[3px] border-black p-5 sm:p-7 shadow-[5px_5px_0px_0px_#000000] sm:shadow-none space-y-5">
                 <div class="border-b-2 border-black pb-4">
                     <h2 class="text-lg sm:text-xl font-black uppercase tracking-tight text-[#1A467C]">
                         Masuk Akun Mahasiswa
@@ -392,6 +402,8 @@
                             </button>
                         </div>
                     </form>
+                </div>
+                    </div>
                 </div>
             </div>
 
