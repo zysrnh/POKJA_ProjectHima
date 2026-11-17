@@ -81,9 +81,9 @@
         <div class="snap-card w-full max-w-4xl grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-stretch">
 
             <!-- ============================================================== -->
-            <!-- KARTU KIRI: INFO KEGIATAN, STATUS PENDAFTARAN & AKSES CEPAT    -->
+            <!-- KARTU KIRI: INFO KEGIATAN & STATUS PENDAFTARAN                 -->
             <!-- ============================================================== -->
-            <div class="lg:col-span-5 bg-white border-[3px] border-[#000000] shadow-[6px_6px_0px_0px_#000000] p-6 sm:p-7 flex flex-col justify-between gap-5">
+            <div class="lg:col-span-5 bg-white border-[3px] border-[#000000] shadow-[6px_6px_0px_0px_#000000] p-6 sm:p-7 flex flex-col justify-center gap-5">
                 <div class="space-y-4">
                     <!-- Badge Status Pendaftaran Ditutup + Logo -->
                     <div class="flex items-center justify-between gap-3">
@@ -155,20 +155,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <!-- Shortcut Scan Absensi -->
-                <div class="pt-3 border-t-2 border-dashed border-gray-300">
-                    <a
-                        href="{{ route('presensi.absen') }}"
-                        class="btn-tactile w-full py-2.5 px-3 bg-[#F8FBFE] hover:bg-amber-100 text-black border-2 border-black shadow-[3px_3px_0px_0px_#000000] text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2"
-                    >
-                        <svg class="w-4 h-4 text-[#1A467C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="square" stroke-width="2.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                            <path stroke-linecap="square" stroke-width="2.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                        <span>Buka Scanner Absensi</span>
-                    </a>
                 </div>
             </div>
 
