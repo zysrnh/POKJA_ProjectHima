@@ -18,7 +18,20 @@
                 </p>
             </div>
 
-            <div class="flex items-center gap-2 shrink-0">
+            <div class="flex flex-wrap items-center gap-2 shrink-0">
+                <button
+                    type="button"
+                    id="btnCopyKuesionerLink"
+                    onclick="copyKuesionerLink()"
+                    class="btn-smooth px-3.5 py-2 bg-amber-300 hover:bg-amber-400 text-black border-2 border-black font-black text-xs uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] inline-flex items-center gap-1.5 cursor-pointer"
+                    title="Salin link langsung kuesioner Pertemuan {{ $pertemuanFilter }} untuk peserta"
+                >
+                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="square" stroke-width="2.5" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                    <span id="copyKuesionerLinkText">Salin Link</span>
+                </button>
+
                 <a
                     href="{{ route('admin.kuesioner.export', ['pertemuan' => $pertemuanFilter, 'search' => $search, 'kelas' => $kelasFilter, 'status' => $statusFilter]) }}"
                     class="btn-smooth px-3.5 py-2 bg-green-700 hover:bg-green-800 text-white border-2 border-black font-black text-xs uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] inline-flex items-center gap-1.5"
@@ -632,6 +645,33 @@
         const modal = document.getElementById('detailJawabanModal');
         modal.classList.add('hidden');
         modal.classList.remove('flex');
+    }
+
+    async function copyKuesionerLink() {
+        const url = @json(route('mahasiswa.dashboard', ['tab' => 'kuesioner', 'pertemuan' => $pertemuanFilter]));
+        const label = document.getElementById('copyKuesionerLinkText');
+        try {
+            if (navigator.clipboard && window.isSecureContext) {
+                await navigator.clipboard.writeText(url);
+            } else {
+                const tmp = document.createElement('textarea');
+                tmp.value = url;
+                tmp.style.position = 'fixed';
+                tmp.style.left = '-9999px';
+                document.body.appendChild(tmp);
+                tmp.select();
+                document.execCommand('copy');
+                tmp.remove();
+            }
+            if (label) {
+                label.textContent = 'Link Tersalin!';
+                setTimeout(() => {
+                    label.textContent = 'Salin Link';
+                }, 2000);
+            }
+        } catch (e) {
+            window.prompt('Salin link kuesioner berikut:', url);
+        }
     }
 </script>
 @endsection

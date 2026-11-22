@@ -103,13 +103,35 @@ class MahasiswaController extends Controller
     }
 
     /**
+     * Simpan query tujuan tab/pertemuan dashboard sebelum redirect ke login.
+     */
+    public static function rememberDashboardIntendedQuery(Request $request): void
+    {
+        $validTabs = ['beranda', 'scan', 'poin', 'leaderboard', 'kelompok', 'kuesioner', 'profil'];
+        $tab = trim((string) $request->query('tab', ''));
+        if ($tab === '' || !in_array($tab, $validTabs, true)) {
+            return;
+        }
+
+        $query = ['tab' => $tab];
+        $pertemuan = (int) $request->query('pertemuan', 0);
+        if ($pertemuan >= 1 && $pertemuan <= 50) {
+            $query['pertemuan'] = $pertemuan;
+        }
+
+        session(['mahasiswa_intended_query' => $query]);
+    }
+
+    /**
      * Menampilkan halaman login untuk mahasiswa.
      */
     public function showLogin(Request $request)
     {
+        self::rememberDashboardIntendedQuery($request);
+
         if (session()->has('mahasiswa_id')) {
             if (self::validateActiveDeviceSession($request)) {
-                return redirect()->route('mahasiswa.dashboard');
+                return redirect()->route('mahasiswa.dashboard', session()->pull('mahasiswa_intended_query', []));
             }
 
             return redirect()->route('mahasiswa.login')
@@ -186,7 +208,8 @@ class MahasiswaController extends Controller
             ]);
         }
 
-        return redirect()->route('mahasiswa.dashboard')->with('success', 'Selamat datang kembali, ' . $mahasiswa->nama . '!');
+        return redirect()->route('mahasiswa.dashboard', session()->pull('mahasiswa_intended_query', []))
+            ->with('success', 'Selamat datang kembali, ' . $mahasiswa->nama . '!');
     }
 
     /**
@@ -300,7 +323,8 @@ class MahasiswaController extends Controller
         // Kunci 1 Akun = 1 Perangkat Aktif & hapus sesi perangkat lama
         self::bindSingleDeviceSession($request, $mahasiswa);
 
-        return redirect()->route('mahasiswa.dashboard')->with('success', 'Password Anda berhasil diperbarui! Selamat datang kembali.');
+        return redirect()->route('mahasiswa.dashboard', session()->pull('mahasiswa_intended_query', []))
+            ->with('success', 'Password Anda berhasil diperbarui! Selamat datang kembali.');
     }
 
     /**
@@ -423,7 +447,8 @@ class MahasiswaController extends Controller
             ]);
         }
 
-        return redirect()->route('mahasiswa.dashboard')->with('success', 'Password berhasil dibuat! Akun Anda kini telah aktif.');
+        return redirect()->route('mahasiswa.dashboard', session()->pull('mahasiswa_intended_query', []))
+            ->with('success', 'Password berhasil dibuat! Akun Anda kini telah aktif.');
     }
 
     /**
@@ -740,10 +765,12 @@ class MahasiswaController extends Controller
     public function dashboard(Request $request)
     {
         if (!session()->has('mahasiswa_id')) {
+            self::rememberDashboardIntendedQuery($request);
             return redirect()->route('mahasiswa.login')->with('error', 'Silakan masuk ke akun Anda terlebih dahulu.');
         }
 
         if (!self::validateActiveDeviceSession($request)) {
+            self::rememberDashboardIntendedQuery($request);
             return redirect()->route('mahasiswa.login')->with('error', 'Sesi Anda telah berakhir karena akun ini baru saja login di perangkat lain.');
         }
 

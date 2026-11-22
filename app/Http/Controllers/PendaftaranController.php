@@ -14,6 +14,8 @@ class PendaftaranController extends Controller
      */
     public function index(Request $request)
     {
+        MahasiswaController::rememberDashboardIntendedQuery($request);
+
         if (session()->has('mahasiswa_id')) {
             if (MahasiswaController::validateActiveDeviceSession($request)) {
                 return redirect()->route('mahasiswa.dashboard');
