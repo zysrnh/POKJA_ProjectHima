@@ -13,9 +13,56 @@ use Illuminate\Http\Request;
 class KuesionerAdminController extends Controller
 {
     /**
-     * Halaman utama Admin Kuesioner: Kelola Pertanyaan Dinamis & Rekap Jawaban Anggota per Pertemuan.
+     * Halaman Overview Kuesioner: Ringkasan Statistik, Rekap Pilihan Ganda & Preview.
      */
     public function index(Request $request)
+    {
+        $data = $this->buildKuesionerContext($request, paginateResponden: false);
+
+        $recentResponden = Pendaftaran::with([
+                'kuesionerJawabans' => fn ($q) => $q->where('pertemuan', $data['pertemuanFilter']),
+            ])
+            ->withCount([
+                'kuesionerJawabans' => fn ($q) => $q->where('pertemuan', $data['pertemuanFilter']),
+            ])
+            ->withMax(
+                ['kuesionerJawabans' => fn ($q) => $q->where('pertemuan', $data['pertemuanFilter'])],
+                'updated_at'
+            )
+            ->whereHas('kuesionerJawabans', fn ($q) => $q->where('pertemuan', $data['pertemuanFilter']))
+            ->orderByDesc('kuesioner_jawabans_max_updated_at')
+            ->take(5)
+            ->get();
+
+        return view('admin.kuesioner.overview', array_merge($data, [
+            'recentResponden' => $recentResponden,
+        ]));
+    }
+
+    /**
+     * Halaman Kelola Pertanyaan Dinamis per Pertemuan.
+     */
+    public function pertanyaan(Request $request)
+    {
+        $data = $this->buildKuesionerContext($request, paginateResponden: false);
+
+        return view('admin.kuesioner.pertanyaan', $data);
+    }
+
+    /**
+     * Halaman Rekap Jawaban Anggota per Pertemuan.
+     */
+    public function rekap(Request $request)
+    {
+        $data = $this->buildKuesionerContext($request, paginateResponden: true);
+
+        return view('admin.kuesioner.rekap', $data);
+    }
+
+    /**
+     * Bangun data konteks bersama untuk Overview, Kelola Pertanyaan, dan Rekap Kuesioner.
+     */
+    private function buildKuesionerContext(Request $request, bool $paginateResponden = true): array
     {
         $search = trim((string) $request->input('search', ''));
         $kelasFilter = trim((string) $request->input('kelas', ''));
@@ -51,7 +98,6 @@ class KuesionerAdminController extends Controller
             ->count('pendaftaran_id');
         $persenResponden = $totalPeserta > 0 ? round(($totalResponden / $totalPeserta) * 100) : 0;
 
-        // Hitung statistik opsi untuk pertanyaan bertipe Pilihan Ganda pada pertemuan terpilih
         $pilihanStats = [];
         $pilihanPertanyaans = $pertanyaans->where('tipe', 'pilihan');
         if ($pilihanPertanyaans->isNotEmpty()) {
@@ -79,42 +125,45 @@ class KuesionerAdminController extends Controller
             }
         }
 
-        $query = Pendaftaran::with([
-                'kuesionerJawabans' => fn ($q) => $q->where('pertemuan', $pertemuanFilter),
-            ])
-            ->withCount([
-                'kuesionerJawabans' => fn ($q) => $q->where('pertemuan', $pertemuanFilter),
-            ])
-            ->withMax(
-                ['kuesionerJawabans' => fn ($q) => $q->where('pertemuan', $pertemuanFilter)],
-                'updated_at'
-            );
+        $respondenList = null;
+        if ($paginateResponden) {
+            $query = Pendaftaran::with([
+                    'kuesionerJawabans' => fn ($q) => $q->where('pertemuan', $pertemuanFilter),
+                ])
+                ->withCount([
+                    'kuesionerJawabans' => fn ($q) => $q->where('pertemuan', $pertemuanFilter),
+                ])
+                ->withMax(
+                    ['kuesionerJawabans' => fn ($q) => $q->where('pertemuan', $pertemuanFilter)],
+                    'updated_at'
+                );
 
-        if ($search !== '') {
-            $query->where(function ($q) use ($search) {
-                $q->where('nama', 'like', "%{$search}%")
-                    ->orWhere('nim', 'like', "%{$search}%")
-                    ->orWhere('kelas', 'like', "%{$search}%");
-            });
+            if ($search !== '') {
+                $query->where(function ($q) use ($search) {
+                    $q->where('nama', 'like', "%{$search}%")
+                        ->orWhere('nim', 'like', "%{$search}%")
+                        ->orWhere('kelas', 'like', "%{$search}%");
+                });
+            }
+
+            if ($kelasFilter !== '') {
+                $query->where('kelas', $kelasFilter);
+            }
+
+            if ($statusFilter === 'sudah') {
+                $query->whereHas('kuesionerJawabans', fn ($q) => $q->where('pertemuan', $pertemuanFilter));
+            } elseif ($statusFilter === 'belum') {
+                $query->whereDoesntHave('kuesionerJawabans', fn ($q) => $q->where('pertemuan', $pertemuanFilter));
+            }
+
+            $respondenList = $query
+                ->orderByDesc('kuesioner_jawabans_count')
+                ->orderBy('nama', 'asc')
+                ->paginate(20)
+                ->withQueryString();
         }
 
-        if ($kelasFilter !== '') {
-            $query->where('kelas', $kelasFilter);
-        }
-
-        if ($statusFilter === 'sudah') {
-            $query->whereHas('kuesionerJawabans', fn ($q) => $q->where('pertemuan', $pertemuanFilter));
-        } elseif ($statusFilter === 'belum') {
-            $query->whereDoesntHave('kuesionerJawabans', fn ($q) => $q->where('pertemuan', $pertemuanFilter));
-        }
-
-        $respondenList = $query
-            ->orderByDesc('kuesioner_jawabans_count')
-            ->orderBy('nama', 'asc')
-            ->paginate(20)
-            ->withQueryString();
-
-        return view('admin.kuesioner.index', compact(
+        return compact(
             'pertanyaans',
             'kelasList',
             'totalPeserta',
@@ -128,7 +177,7 @@ class KuesionerAdminController extends Controller
             'pertemuanFilter',
             'pertemuanList',
             'pertemuanAktif'
-        ));
+        );
     }
 
     /**

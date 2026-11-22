@@ -196,6 +196,7 @@
 
     @php
         $isPointKuMode = request()->routeIs('admin.poin.*');
+        $isKuesionerMode = request()->routeIs('admin.kuesioner.*');
     @endphp
 
     <div class="flex flex-1 h-screen overflow-hidden relative">
@@ -216,8 +217,8 @@
                         >
                         <div>
                             <span class="font-black text-xs uppercase tracking-wider text-white block">POKJA HIMA IF</span>
-                            <span class="text-[10px] {{ $isPointKuMode ? 'text-amber-400' : 'text-[#2A82C6]' }} font-bold uppercase tracking-wider block">
-                                {{ $isPointKuMode ? 'PointKu Panel' : 'Admin Panel' }}
+                            <span class="text-[10px] {{ ($isPointKuMode || $isKuesionerMode) ? 'text-amber-400' : 'text-[#2A82C6]' }} font-bold uppercase tracking-wider block">
+                                {{ $isPointKuMode ? 'PointKu Panel' : ($isKuesionerMode ? 'Kuesioner Panel' : 'Admin Panel') }}
                             </span>
                         </div>
                     </div>
@@ -225,7 +226,7 @@
 
                 <!-- Workspace Switcher Button (Tepat di bawah Brand Header Sidebar) -->
                 <div class="px-3.5 pt-3.5 pb-2 border-b-2 border-[#000000] bg-[#0F2A4A]/60">
-                    @if ($isPointKuMode)
+                    @if ($isPointKuMode || $isKuesionerMode)
                         <a 
                             href="{{ route('admin.dashboard') }}" 
                             class="btn-smooth w-full flex items-center justify-center gap-2 px-3 py-2.5 bg-white hover:bg-gray-100 text-[#1A467C] text-[11px] font-black uppercase tracking-wider border-2 border-black shadow-[3px_3px_0px_0px_#000000]"
@@ -300,6 +301,41 @@
                                 <path stroke-linecap="square" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                             <span>Log Aktivitas</span>
+                        </a>
+                    @elseif ($isKuesionerMode)
+                        <!-- MENU KHUSUS KUESIONER PANEL -->
+                        <div class="px-1 pb-1 text-[10px] font-black uppercase tracking-widest text-amber-300">
+                            Menu Kuesioner
+                        </div>
+
+                        <a 
+                            href="{{ route('admin.kuesioner.index') }}" 
+                            class="flex items-center gap-3 px-3.5 py-3 border-2 transition {{ request()->routeIs('admin.kuesioner.index') ? 'bg-[#2A82C6] border-white text-white shadow-[3px_3px_0px_0px_#000000]' : 'border-transparent text-gray-200 hover:bg-[#0F2A4A] hover:text-white' }}"
+                        >
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="square" stroke-width="2.5" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                            </svg>
+                            <span>Overview Kuesioner</span>
+                        </a>
+
+                        <a 
+                            href="{{ route('admin.kuesioner.pertanyaan') }}" 
+                            class="flex items-center gap-3 px-3.5 py-3 border-2 transition {{ request()->routeIs('admin.kuesioner.pertanyaan') ? 'bg-[#2A82C6] border-white text-white shadow-[3px_3px_0px_0px_#000000]' : 'border-transparent text-gray-200 hover:bg-[#0F2A4A] hover:text-white' }}"
+                        >
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="square" stroke-width="2.5" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span>Kelola Pertanyaan</span>
+                        </a>
+
+                        <a 
+                            href="{{ route('admin.kuesioner.rekap') }}" 
+                            class="flex items-center gap-3 px-3.5 py-3 border-2 transition {{ request()->routeIs('admin.kuesioner.rekap') ? 'bg-[#2A82C6] border-white text-white shadow-[3px_3px_0px_0px_#000000]' : 'border-transparent text-gray-200 hover:bg-[#0F2A4A] hover:text-white' }}"
+                        >
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="square" stroke-width="2.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                            </svg>
+                            <span>Rekap Jawaban</span>
                         </a>
                     @else
                         <!-- MENU PANEL UTAMA POKJA -->
@@ -561,6 +597,66 @@
             </a>
 
             <!-- Mobile PointKu Tab 4: Kembali ke Panel Pendaftaran -->
+            <a 
+                href="{{ route('admin.dashboard') }}" 
+                class="flex-1 flex flex-col items-center justify-center py-1 transition-all active:scale-95 text-[#1A467C]"
+            >
+                <div class="p-1 border-2 bg-amber-400 text-black border-black shadow-[2px_2px_0px_0px_#000000]">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="square" stroke-width="2.2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                </div>
+                <span class="text-[9px] uppercase tracking-tight mt-0.5 font-black text-[#1A467C]">
+                    Panel Utama
+                </span>
+            </a>
+        @elseif ($isKuesionerMode)
+            <!-- Mobile Kuesioner Tab 1: Overview -->
+            <a 
+                href="{{ route('admin.kuesioner.index') }}" 
+                class="flex-1 flex flex-col items-center justify-center py-1 transition-all active:scale-95 {{ request()->routeIs('admin.kuesioner.index') ? 'text-[#1A467C]' : 'text-gray-500 hover:text-[#1A467C]' }}"
+            >
+                <div class="p-1 border-2 transition-all {{ request()->routeIs('admin.kuesioner.index') ? 'bg-[#2A82C6] text-white border-[#1A467C] shadow-[2px_2px_0px_0px_#1A467C]' : 'border-transparent text-gray-500' }}">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="square" stroke-width="2.2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                    </svg>
+                </div>
+                <span class="text-[9px] uppercase tracking-tight mt-0.5 font-bold {{ request()->routeIs('admin.kuesioner.index') ? 'font-black text-[#1A467C]' : '' }}">
+                    Overview
+                </span>
+            </a>
+
+            <!-- Mobile Kuesioner Tab 2: Pertanyaan -->
+            <a 
+                href="{{ route('admin.kuesioner.pertanyaan') }}" 
+                class="flex-1 flex flex-col items-center justify-center py-1 transition-all active:scale-95 {{ request()->routeIs('admin.kuesioner.pertanyaan') ? 'text-[#1A467C]' : 'text-gray-500 hover:text-[#1A467C]' }}"
+            >
+                <div class="p-1 border-2 transition-all {{ request()->routeIs('admin.kuesioner.pertanyaan') ? 'bg-[#2A82C6] text-white border-[#1A467C] shadow-[2px_2px_0px_0px_#1A467C]' : 'border-transparent text-gray-500' }}">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="square" stroke-width="2.2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <span class="text-[9px] uppercase tracking-tight mt-0.5 font-bold {{ request()->routeIs('admin.kuesioner.pertanyaan') ? 'font-black text-[#1A467C]' : '' }}">
+                    Pertanyaan
+                </span>
+            </a>
+
+            <!-- Mobile Kuesioner Tab 3: Rekap -->
+            <a 
+                href="{{ route('admin.kuesioner.rekap') }}" 
+                class="flex-1 flex flex-col items-center justify-center py-1 transition-all active:scale-95 {{ request()->routeIs('admin.kuesioner.rekap') ? 'text-[#1A467C]' : 'text-gray-500 hover:text-[#1A467C]' }}"
+            >
+                <div class="p-1 border-2 transition-all {{ request()->routeIs('admin.kuesioner.rekap') ? 'bg-[#2A82C6] text-white border-[#1A467C] shadow-[2px_2px_0px_0px_#1A467C]' : 'border-transparent text-gray-500' }}">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="square" stroke-width="2.2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                    </svg>
+                </div>
+                <span class="text-[9px] uppercase tracking-tight mt-0.5 font-bold {{ request()->routeIs('admin.kuesioner.rekap') ? 'font-black text-[#1A467C]' : '' }}">
+                    Rekap
+                </span>
+            </a>
+
+            <!-- Mobile Kuesioner Tab 4: Panel Utama -->
             <a 
                 href="{{ route('admin.dashboard') }}" 
                 class="flex-1 flex flex-col items-center justify-center py-1 transition-all active:scale-95 text-[#1A467C]"

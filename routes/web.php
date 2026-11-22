@@ -183,6 +183,8 @@ Route::middleware('throttle:600,1')->group(function () {
 
             // Kuesioner Dinamis & Rekap Jawaban Anggota
             Route::get('/kuesioner', [KuesionerAdminController::class, 'index'])->name('kuesioner.index');
+            Route::get('/kuesioner/pertanyaan', [KuesionerAdminController::class, 'pertanyaan'])->name('kuesioner.pertanyaan');
+            Route::get('/kuesioner/rekap', [KuesionerAdminController::class, 'rekap'])->name('kuesioner.rekap');
             Route::get('/kuesioner/export', [KuesionerAdminController::class, 'exportCsv'])->name('kuesioner.export');
             Route::post('/kuesioner/pertanyaan', [KuesionerAdminController::class, 'storePertanyaan'])->name('kuesioner.pertanyaan.store');
             Route::put('/kuesioner/pertanyaan/{id}', [KuesionerAdminController::class, 'updatePertanyaan'])->whereNumber('id')->name('kuesioner.pertanyaan.update');
