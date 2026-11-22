@@ -158,12 +158,12 @@
     <!-- ============================================================== -->
     <main class="my-auto py-6 sm:py-10 flex flex-col items-center justify-center">
 
-        <div id="qr-outer-card" class="z-50 w-full max-w-md bg-white border-[3px] border-[#000000] p-6 sm:p-8 shadow-[10px_10px_0px_0px_#000000] flex flex-col items-center text-center relative">
+        <div id="qr-outer-card" class="z-50 w-full max-w-xl bg-white border-[3px] border-[#000000] p-5 sm:p-7 shadow-[10px_10px_0px_0px_#000000] flex flex-col items-center text-center relative">
             
             <!-- QR Code Canvas Container -->
-            <div class="relative bg-white border-4 border-black p-4 sm:p-5 shadow-[6px_6px_0px_0px_#000000]">
+            <div class="relative bg-white border-4 border-black p-5 sm:p-6 shadow-[6px_6px_0px_0px_#000000]">
                 <!-- QR Box Render Target -->
-                <div id="qrcode-box" class="flex items-center justify-center min-w-[240px] min-h-[240px] sm:min-w-[280px] sm:min-h-[280px]">
+                <div id="qrcode-box" class="flex items-center justify-center min-w-[260px] min-h-[260px] sm:min-w-[380px] sm:min-h-[380px]">
                     <!-- Canvas QR dimasukkan oleh QRCode.js -->
                 </div>
 
@@ -202,17 +202,20 @@
         let scanIntervalId = null;
         let activeAbortController = null;
 
-        // Inisialisasi QRCode.js pada #qrcode-box
+        // Inisialisasi QRCode.js pada #qrcode-box (ukuran besar & koreksi L agar mudah discan dari jauh)
         function initQR() {
             const qrBox = document.getElementById('qrcode-box');
             qrBox.innerHTML = '';
+            const qrSize = window.innerWidth >= 640
+                ? Math.min(440, Math.max(320, Math.floor(window.innerHeight * 0.56)))
+                : 280;
             qrcode = new QRCode(qrBox, {
                 text: "POKJA:INIT",
-                width: 280,
-                height: 280,
+                width: qrSize,
+                height: qrSize,
                 colorDark: "#000000",
                 colorLight: "#FFFFFF",
-                correctLevel: QRCode.CorrectLevel.M
+                correctLevel: QRCode.CorrectLevel.L
             });
         }
 

@@ -32,6 +32,7 @@
     </script>
     <!-- HTML5-QRCode Library for Fast In-Browser Mobile Camera Scanning -->
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <script src="{{ asset('js/pokja-qr-scanner.js') }}"></script>
 
     <style>
         body {
@@ -188,6 +189,8 @@
                 <div class="relative bg-black border-2 border-black overflow-hidden shadow-[3px_3px_0px_0px_#000000]">
                     <div id="qr-reader" class="w-full"></div>
                 </div>
+
+                <div id="absen-zoom-bar" class="hidden flex flex-wrap items-center justify-center gap-1.5 py-1"></div>
 
                 <button 
                     type="button" 
@@ -367,37 +370,16 @@
             document.getElementById('btn-camera-wrapper').classList.add('hidden');
             document.getElementById('camera-container').classList.remove('hidden');
 
-            if (!html5QrCode) {
-                html5QrCode = new Html5Qrcode("qr-reader");
-            }
-
-            const config = {
-                fps: 10,
-                qrbox: { width: 220, height: 220 },
-                aspectRatio: 1.0
-            };
-
-            // 1. Coba kamera belakang (environment)
             try {
-                await html5QrCode.start(
-                    { facingMode: "environment" },
-                    config,
-                    onScanSuccess,
-                    (err) => { /* abaikan error frame scanner */ }
+                html5QrCode = await window.PokjaQrScanner.start(
+                    html5QrCode,
+                    'qr-reader',
+                    'absen-zoom-bar',
+                    onScanSuccess
                 );
-            } catch (envErr) {
-                // 2. Fallback jika device tidak mendukung facingMode environment (misal laptop webcam)
-                try {
-                    await html5QrCode.start(
-                        { facingMode: "user" },
-                        config,
-                        onScanSuccess,
-                        (err) => { /* abaikan */ }
-                    );
-                } catch (userErr) {
-                    alert("Tidak dapat mengakses kamera. Pastikan Anda telah memberikan izin akses kamera di browser.");
-                    stopCameraScanner();
-                }
+            } catch (userErr) {
+                alert("Tidak dapat mengakses kamera. Pastikan Anda telah memberikan izin akses kamera di browser.");
+                stopCameraScanner();
             }
         }
 
@@ -409,6 +391,9 @@
                 } catch (e) {
                     // Ignore
                 }
+            }
+            if (window.PokjaQrScanner) {
+                window.PokjaQrScanner.hideZoomBar('absen-zoom-bar');
             }
             document.getElementById('camera-container').classList.add('hidden');
             document.getElementById('btn-camera-wrapper').classList.remove('hidden');

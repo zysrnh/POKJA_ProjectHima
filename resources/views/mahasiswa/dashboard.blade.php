@@ -33,6 +33,7 @@
 
     <!-- HTML5-QRCode Library for In-Browser Camera Scanner -->
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <script src="{{ asset('js/pokja-qr-scanner.js') }}"></script>
     <!-- QRCode.js Library for Generating Group Join QR -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
@@ -537,6 +538,8 @@
                         <div class="relative bg-black border-2 border-black overflow-hidden shadow-[4px_4px_0px_0px_#000000]">
                             <div id="dash-qr-reader" class="w-full"></div>
                         </div>
+
+                        <div id="dash-zoom-bar" class="hidden flex flex-wrap items-center justify-center gap-1.5 py-1"></div>
 
                         <button 
                             type="button" 
@@ -2212,37 +2215,17 @@
             dashCamBox.classList.remove('hidden');
             replayBoxSnap(dashCamBox);
 
-            if (!dashQrScanner) {
-                dashQrScanner = new Html5Qrcode("dash-qr-reader");
-            }
-
-            const config = {
-                fps: 10,
-                qrbox: { width: 220, height: 220 },
-                aspectRatio: 1.0
-            };
-
             try {
-                await dashQrScanner.start(
-                    { facingMode: "environment" },
-                    config,
-                    onDashScanSuccess,
-                    (err) => {}
+                dashQrScanner = await window.PokjaQrScanner.start(
+                    dashQrScanner,
+                    'dash-qr-reader',
+                    'dash-zoom-bar',
+                    onDashScanSuccess
                 );
                 isDashScanning = true;
-            } catch (envErr) {
-                try {
-                    await dashQrScanner.start(
-                        { facingMode: "user" },
-                        config,
-                        onDashScanSuccess,
-                        (err) => {}
-                    );
-                    isDashScanning = true;
-                } catch (userErr) {
-                    alert("Tidak dapat mengakses kamera. Pastikan izin kamera telah diberikan di browser.");
-                    stopDashScanner();
-                }
+            } catch (userErr) {
+                alert("Tidak dapat mengakses kamera. Pastikan izin kamera telah diberikan di browser.");
+                stopDashScanner();
             }
         }
 
@@ -2252,6 +2235,9 @@
                 try {
                     await dashQrScanner.stop();
                 } catch (e) {}
+            }
+            if (window.PokjaQrScanner) {
+                window.PokjaQrScanner.hideZoomBar('dash-zoom-bar');
             }
             isDashScanning = false;
             document.getElementById('dash-camera-box')?.classList.add('hidden');
