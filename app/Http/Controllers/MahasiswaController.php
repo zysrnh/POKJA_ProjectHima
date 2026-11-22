@@ -998,6 +998,8 @@ class MahasiswaController extends Controller
                 $qRules[] = 'max:500';
             } elseif ($q->tipe === 'paragraf') {
                 $qRules[] = 'max:3000';
+            } elseif ($q->tipe === 'tanggal') {
+                $qRules[] = 'date';
             } elseif ($q->tipe === 'pilihan') {
                 $opsi = is_array($q->opsi) ? $q->opsi : [];
                 $qRules[] = function ($attribute, $value, $fail) use ($opsi) {

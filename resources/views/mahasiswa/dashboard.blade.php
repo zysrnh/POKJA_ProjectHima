@@ -1304,6 +1304,14 @@
                                                         placeholder="Tulis jawaban lengkap Anda..."
                                                         class="w-full px-3 py-2.5 bg-white border-2 border-black text-xs sm:text-sm font-bold text-black focus:outline-none focus:bg-yellow-50"
                                                     >{{ $fieldValue }}</textarea>
+                                                @elseif($q->tipe === 'tanggal')
+                                                    <input
+                                                        type="date"
+                                                        name="jawaban[{{ $q->id }}]"
+                                                        value="{{ $fieldValue }}"
+                                                        {{ $q->wajib ? 'required' : '' }}
+                                                        class="w-full sm:w-64 px-3 py-2.5 bg-white border-2 border-black text-xs sm:text-sm font-bold text-black focus:outline-none focus:bg-yellow-50"
+                                                    >
                                                 @elseif($q->tipe === 'pilihan')
                                                     @php
                                                         $opsiList = is_array($q->opsi) ? $q->opsi : [];

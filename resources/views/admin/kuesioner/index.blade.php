@@ -424,6 +424,7 @@
                         <option value="teks">Isian Singkat</option>
                         <option value="paragraf">Paragraf / Uraian</option>
                         <option value="pilihan">Pilihan Ganda</option>
+                        <option value="tanggal">Pilihan Tanggal</option>
                     </select>
                 </div>
 

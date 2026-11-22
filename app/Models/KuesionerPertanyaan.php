@@ -33,6 +33,7 @@ class KuesionerPertanyaan extends Model
         'teks' => 'Isian Singkat',
         'paragraf' => 'Paragraf / Uraian',
         'pilihan' => 'Pilihan Ganda',
+        'tanggal' => 'Pilihan Tanggal',
     ];
 
     /**

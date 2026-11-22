@@ -289,7 +289,7 @@ class KuesionerAdminController extends Controller
     {
         $validated = $request->validate([
             'pertanyaan' => ['required', 'string', 'max:1000'],
-            'tipe' => ['required', 'in:teks,paragraf,pilihan'],
+            'tipe' => ['required', 'in:teks,paragraf,pilihan,tanggal'],
             'opsi_text' => ['nullable', 'string', 'max:2000'],
             'urutan' => ['nullable', 'integer', 'min:0', 'max:9999'],
             'pertemuan' => ['nullable', 'integer', 'min:1', 'max:50'],
@@ -297,7 +297,7 @@ class KuesionerAdminController extends Controller
             'aktif' => ['nullable', 'boolean'],
         ], [
             'pertanyaan.required' => 'Teks pertanyaan wajib diisi.',
-            'tipe.in' => 'Tipe pertanyaan hanya boleh Teks, Paragraf, atau Pilihan Ganda.',
+            'tipe.in' => 'Tipe pertanyaan hanya boleh Teks, Paragraf, Pilihan Ganda, atau Pilihan Tanggal.',
         ]);
 
         $opsiList = null;
