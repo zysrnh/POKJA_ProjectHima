@@ -93,7 +93,7 @@ class KelompokAdminController extends Controller
             $query->has('members', '>=', $maxAnggota);
         }
 
-        $kelompoks = $query->latest()->paginate(12)->withQueryString();
+        $kelompoks = $query->orderBy('id', 'asc')->paginate(12)->withQueryString();
 
         $totalKelompok = Kelompok::count();
         $totalMahasiswaBerkelompok = KelompokMember::count();

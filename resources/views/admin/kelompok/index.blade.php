@@ -7,6 +7,7 @@
 @php
     $minAnggota = \App\Http\Controllers\MahasiswaKelompokController::MIN_ANGGOTA;
     $maxAnggota = \App\Http\Controllers\MahasiswaKelompokController::MAX_ANGGOTA;
+    $formatNama = fn ($nama) => \Illuminate\Support\Str::title(\Illuminate\Support\Str::lower(trim((string) $nama)));
 @endphp
 <div class="space-y-5 sm:space-y-6">
 
@@ -121,6 +122,8 @@
                 $fotoUrl = $kelompok->fotoUrl();
                 $memberCount = $kelompok->members->count();
                 $totalTeamPoint = $kelompok->members->sum(fn ($m) => (int) ($m->pendaftaran->total_point ?? 0));
+                $ketuaMember = $kelompok->members->first(fn ($m) => (int) $m->pendaftaran_id === (int) $kelompok->ketua_id);
+                $anggotaMembers = $kelompok->members->filter(fn ($m) => (int) $m->pendaftaran_id !== (int) $kelompok->ketua_id)->values();
             @endphp
             <div class="bg-white border-2 border-black p-4 shadow-[4px_4px_0px_0px_#000000] space-y-3">
                 <div class="flex items-start justify-between gap-2.5">
@@ -135,23 +138,23 @@
 
                         <div class="min-w-0">
                             <div class="flex flex-wrap items-center gap-1.5">
-                                <span class="bg-gray-100 border border-black px-1.5 py-0.2 font-mono font-black text-[10px] text-gray-800">
+                                <span class="bg-gray-100 border border-black px-1.5 py-0.2 font-mono font-black text-[10px] text-gray-800 whitespace-nowrap">
                                     {{ $kelompok->kode_invite }}
                                 </span>
                                 @if ($memberCount > $maxAnggota)
-                                    <span class="bg-blue-100 border border-black text-[#1A467C] px-1.5 py-0.2 text-[10px] font-black uppercase">
+                                    <span class="bg-blue-100 border border-black text-[#1A467C] px-1.5 py-0.2 text-[10px] font-black uppercase whitespace-nowrap">
                                         {{ $memberCount }} Anggota
                                     </span>
                                 @elseif ($memberCount === $maxAnggota)
-                                    <span class="bg-blue-100 border border-black text-[#1A467C] px-1.5 py-0.2 text-[10px] font-black uppercase">
+                                    <span class="bg-blue-100 border border-black text-[#1A467C] px-1.5 py-0.2 text-[10px] font-black uppercase whitespace-nowrap">
                                         Lengkap ({{ $memberCount }}/{{ $maxAnggota }})
                                     </span>
                                 @elseif ($memberCount >= $minAnggota)
-                                    <span class="bg-green-100 border border-black text-green-900 px-1.5 py-0.2 text-[10px] font-black uppercase">
+                                    <span class="bg-green-100 border border-black text-green-900 px-1.5 py-0.2 text-[10px] font-black uppercase whitespace-nowrap">
                                         Siap ({{ $memberCount }}/{{ $maxAnggota }})
                                     </span>
                                 @else
-                                    <span class="bg-amber-100 border border-black text-amber-950 px-1.5 py-0.2 text-[10px] font-black uppercase">
+                                    <span class="bg-amber-100 border border-black text-amber-950 px-1.5 py-0.2 text-[10px] font-black uppercase whitespace-nowrap">
                                         Kurang ({{ $memberCount }}/{{ $maxAnggota }})
                                     </span>
                                 @endif
@@ -169,26 +172,40 @@
                         </div>
                     </div>
 
-                    <span class="bg-green-100 border border-black px-2 py-0.5 font-mono font-black text-[10px] text-[#15803d] shrink-0">
+                    <span class="bg-green-100 border border-black px-2 py-0.5 font-mono font-black text-[10px] text-[#15803d] shrink-0 whitespace-nowrap">
                         ★ {{ $totalTeamPoint }} PTS
                     </span>
                 </div>
 
                 <div class="border-t border-gray-200 pt-2.5 space-y-1.5">
                     <span class="block text-[10px] font-black uppercase text-gray-600">Daftar Anggota ({{ $memberCount }})</span>
-                    <div class="flex flex-wrap gap-1.5">
-                        @foreach ($kelompok->members as $member)
-                            @if ($member->pendaftaran)
-                                <span class="inline-flex items-center gap-1 px-2 py-0.5 border border-black text-[10px] font-bold {{ (int) $member->pendaftaran_id === (int) $kelompok->ketua_id ? 'bg-amber-200 text-black' : 'bg-gray-50 text-gray-800' }}">
-                                    @if ((int) $member->pendaftaran_id === (int) $kelompok->ketua_id)
-                                        <span class="font-black">[KETUA]</span>
-                                    @endif
-                                    <span>{{ $member->pendaftaran->nama }}</span>
-                                    <span class="font-mono text-gray-600">({{ $member->pendaftaran->kelas }})</span>
-                                </span>
-                            @endif
-                        @endforeach
-                    </div>
+
+                    @if ($ketuaMember && $ketuaMember->pendaftaran)
+                        <div class="bg-amber-200 border border-black px-2.5 py-1.5 flex items-center justify-between gap-2 text-[11px]">
+                            <div class="flex items-center gap-1.5 min-w-0">
+                                <span class="bg-black text-amber-300 px-1 text-[9px] font-black uppercase shrink-0">KETUA</span>
+                                <span class="font-black text-gray-950 truncate">{{ $formatNama($ketuaMember->pendaftaran->nama) }}</span>
+                            </div>
+                            <span class="font-mono text-[10px] font-bold text-gray-800 shrink-0">
+                                {{ $ketuaMember->pendaftaran->nim }} • {{ $ketuaMember->pendaftaran->kelas }}
+                            </span>
+                        </div>
+                    @endif
+
+                    @if ($anggotaMembers->isNotEmpty())
+                        <div class="grid grid-cols-1 gap-1.5">
+                            @foreach ($anggotaMembers as $member)
+                                @if ($member->pendaftaran)
+                                    <div class="bg-gray-50 border border-black px-2.5 py-1.5 flex items-center justify-between gap-2 text-[11px]">
+                                        <span class="font-bold text-gray-900 truncate">{{ $formatNama($member->pendaftaran->nama) }}</span>
+                                        <span class="font-mono text-[10px] font-semibold text-gray-600 shrink-0">
+                                            {{ $member->pendaftaran->nim }} • {{ $member->pendaftaran->kelas }}
+                                        </span>
+                                    </div>
+                                @endif
+                            @endforeach
+                        </div>
+                    @endif
                 </div>
 
                 <div class="flex items-center justify-end gap-2 pt-2 border-t border-gray-200">
@@ -236,12 +253,12 @@
             <table class="w-full text-left border-collapse text-xs sm:text-sm">
                 <thead>
                     <tr class="border-b-2 border-[#1A467C] bg-[#1A467C] text-white uppercase font-black text-[11px] tracking-wider">
-                        <th class="py-3.5 px-3.5 w-12 text-center">No</th>
-                        <th class="py-3.5 px-3.5">Kelompok</th>
+                        <th class="py-3.5 px-3.5 w-12 text-center whitespace-nowrap">No</th>
+                        <th class="py-3.5 px-3.5 min-w-[225px] max-w-[260px]">Kelompok</th>
                         <th class="py-3.5 px-3.5">Ketua &amp; Anggota</th>
-                        <th class="py-3.5 px-3.5 text-center w-32">Kuota</th>
-                        <th class="py-3.5 px-3.5 text-center w-28">Point Tim</th>
-                        <th class="py-3.5 px-3.5 text-center w-36">Aksi</th>
+                        <th class="py-3.5 px-3.5 text-center w-36 whitespace-nowrap">Kuota</th>
+                        <th class="py-3.5 px-3.5 text-center w-28 whitespace-nowrap">Point Tim</th>
+                        <th class="py-3.5 px-3.5 text-center w-28 whitespace-nowrap">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200">
@@ -250,15 +267,17 @@
                             $fotoUrl = $kelompok->fotoUrl();
                             $memberCount = $kelompok->members->count();
                             $totalTeamPoint = $kelompok->members->sum(fn ($m) => (int) ($m->pendaftaran->total_point ?? 0));
+                            $ketuaMember = $kelompok->members->first(fn ($m) => (int) $m->pendaftaran_id === (int) $kelompok->ketua_id);
+                            $anggotaMembers = $kelompok->members->filter(fn ($m) => (int) $m->pendaftaran_id !== (int) $kelompok->ketua_id)->values();
                         @endphp
-                        <tr class="hover:bg-blue-50/40 transition align-top">
-                            <td class="py-3.5 px-3.5 text-center text-gray-700 font-mono font-bold">
+                        <tr class="hover:bg-blue-50/40 transition">
+                            <td class="py-4 px-3.5 text-center align-middle text-gray-700 font-mono font-bold">
                                 {{ $kelompoks->firstItem() + $index }}
                             </td>
 
-                            <td class="py-3.5 px-3.5">
-                                <div class="flex items-start gap-2.5">
-                                    <div class="w-10 h-10 bg-[#1A467C] text-white border border-black flex items-center justify-center font-black text-xs shadow-[2px_2px_0px_0px_#000000] shrink-0 overflow-hidden">
+                            <td class="py-4 px-3.5 align-middle min-w-[225px] max-w-[260px]">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 bg-[#1A467C] text-white border-2 border-black flex items-center justify-center font-black text-xs shadow-[2px_2px_0px_0px_#000000] shrink-0 overflow-hidden">
                                         @if ($fotoUrl)
                                             <img src="{{ $fotoUrl }}" alt="Foto {{ $kelompok->nama_kelompok }}" class="w-full h-full object-cover">
                                         @else
@@ -266,63 +285,81 @@
                                         @endif
                                     </div>
                                     <div class="min-w-0">
-                                        <p class="font-black text-sm text-gray-950 uppercase">{{ $kelompok->nama_kelompok }}</p>
-                                        <span class="inline-block mt-0.5 bg-gray-100 border border-black px-1.5 py-0.2 font-mono font-black text-[10px] text-gray-800">
+                                        <p class="font-black text-sm text-gray-950 uppercase leading-snug break-words">{{ $kelompok->nama_kelompok }}</p>
+                                        <span class="inline-block mt-1 bg-gray-100 border border-black px-1.5 py-0.2 font-mono font-black text-[10px] text-gray-800 whitespace-nowrap">
                                             {{ $kelompok->kode_invite }}
                                         </span>
                                         @if (!empty($kelompok->judul_proposal))
-                                            <p class="text-[11px] font-semibold text-gray-600 mt-1 max-w-xs truncate" title="{{ $kelompok->judul_proposal }}">
-                                                Proposal: {{ $kelompok->judul_proposal }}
+                                            <p class="text-[11px] font-semibold text-gray-600 mt-1 max-w-[180px] truncate" title="{{ $kelompok->judul_proposal }}">
+                                                {{ $kelompok->judul_proposal }}
                                             </p>
                                         @endif
                                     </div>
                                 </div>
                             </td>
 
-                            <td class="py-3.5 px-3.5">
-                                <div class="flex flex-wrap gap-1.5">
-                                    @foreach ($kelompok->members as $member)
-                                        @if ($member->pendaftaran)
-                                            @php $isKetuaRow = (int) $member->pendaftaran_id === (int) $kelompok->ketua_id; @endphp
-                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 border border-black text-[11px] font-bold {{ $isKetuaRow ? 'bg-amber-300 text-black' : 'bg-white text-gray-800' }}">
-                                                @if ($isKetuaRow)
-                                                    <span class="text-[9px] font-black uppercase bg-black text-amber-300 px-1">KETUA</span>
-                                                @endif
-                                                <span>{{ $member->pendaftaran->nama }}</span>
-                                                <span class="font-mono text-[10px] text-gray-600">{{ $member->pendaftaran->nim }} • {{ $member->pendaftaran->kelas }}</span>
+                            <td class="py-3.5 px-3.5 align-middle">
+                                <div class="space-y-1.5">
+                                    @if ($ketuaMember && $ketuaMember->pendaftaran)
+                                        <div class="bg-amber-200 border border-black px-2.5 py-1.5 flex items-center justify-between gap-2.5">
+                                            <div class="flex items-center gap-1.5 min-w-0">
+                                                <span class="bg-black text-amber-300 px-1.5 py-0.2 text-[9px] font-black uppercase shrink-0">KETUA</span>
+                                                <span class="font-black text-xs text-gray-950 truncate" title="{{ $ketuaMember->pendaftaran->nama }}">
+                                                    {{ $formatNama($ketuaMember->pendaftaran->nama) }}
+                                                </span>
+                                            </div>
+                                            <span class="font-mono text-[10px] font-bold text-gray-800 shrink-0 whitespace-nowrap">
+                                                {{ $ketuaMember->pendaftaran->nim }} • {{ $ketuaMember->pendaftaran->kelas }}
                                             </span>
-                                        @endif
-                                    @endforeach
+                                        </div>
+                                    @endif
+
+                                    @if ($anggotaMembers->isNotEmpty())
+                                        <div class="grid grid-cols-1 xl:grid-cols-2 gap-1.5">
+                                            @foreach ($anggotaMembers as $member)
+                                                @if ($member->pendaftaran)
+                                                    <div class="bg-white border border-black px-2.5 py-1.5 flex items-center justify-between gap-2 min-w-0">
+                                                        <span class="font-bold text-[11px] text-gray-900 truncate" title="{{ $member->pendaftaran->nama }}">
+                                                            {{ $formatNama($member->pendaftaran->nama) }}
+                                                        </span>
+                                                        <span class="font-mono text-[10px] font-semibold text-gray-600 shrink-0 whitespace-nowrap">
+                                                            {{ $member->pendaftaran->nim }} • {{ $member->pendaftaran->kelas }}
+                                                        </span>
+                                                    </div>
+                                                @endif
+                                            @endforeach
+                                        </div>
+                                    @endif
                                 </div>
                             </td>
 
-                            <td class="py-3.5 px-3.5 text-center">
+                            <td class="py-4 px-3.5 text-center align-middle whitespace-nowrap">
                                 @if ($memberCount > $maxAnggota)
-                                    <span class="inline-block bg-blue-100 border border-black text-[#1A467C] text-[10px] px-2 py-0.5 font-black uppercase">
+                                    <span class="inline-block whitespace-nowrap bg-blue-100 border border-black text-[#1A467C] text-[10px] px-2.5 py-1 font-black uppercase">
                                         {{ $memberCount }} Anggota
                                     </span>
                                 @elseif ($memberCount === $maxAnggota)
-                                    <span class="inline-block bg-blue-100 border border-black text-[#1A467C] text-[10px] px-2 py-0.5 font-black uppercase">
+                                    <span class="inline-block whitespace-nowrap bg-blue-100 border border-black text-[#1A467C] text-[10px] px-2.5 py-1 font-black uppercase">
                                         Lengkap ({{ $memberCount }}/{{ $maxAnggota }})
                                     </span>
                                 @elseif ($memberCount >= $minAnggota)
-                                    <span class="inline-block bg-green-100 border border-black text-green-900 text-[10px] px-2 py-0.5 font-black uppercase">
+                                    <span class="inline-block whitespace-nowrap bg-green-100 border border-black text-green-900 text-[10px] px-2.5 py-1 font-black uppercase">
                                         Memenuhi ({{ $memberCount }}/{{ $maxAnggota }})
                                     </span>
                                 @else
-                                    <span class="inline-block bg-amber-100 border border-black text-amber-950 text-[10px] px-2 py-0.5 font-black uppercase">
+                                    <span class="inline-block whitespace-nowrap bg-amber-100 border border-black text-amber-950 text-[10px] px-2.5 py-1 font-black uppercase">
                                         Kurang ({{ $memberCount }}/{{ $maxAnggota }})
                                     </span>
                                 @endif
                             </td>
 
-                            <td class="py-3.5 px-3.5 text-center">
-                                <span class="inline-block bg-green-50 border border-black px-2 py-0.5 font-mono font-black text-xs text-[#15803d]">
+                            <td class="py-4 px-3.5 text-center align-middle whitespace-nowrap">
+                                <span class="inline-block whitespace-nowrap bg-green-50 border border-black px-2.5 py-1 font-mono font-black text-xs text-[#15803d]">
                                     ★ {{ $totalTeamPoint }}
                                 </span>
                             </td>
 
-                            <td class="py-3.5 px-3.5 text-center">
+                            <td class="py-4 px-3.5 text-center align-middle whitespace-nowrap">
                                 <div class="flex items-center justify-center gap-1.5">
                                     <a
                                         href="{{ route('admin.kelompok.edit', $kelompok->id) }}"
