@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Str;
 
 class Kelompok extends Model
 {
@@ -26,6 +28,63 @@ class Kelompok extends Model
         'nilai_proposal' => 'integer',
         'revisi_terakhir_at' => 'datetime',
     ];
+
+    /**
+     * Generate kode undangan unik dengan prefix PKJ-.
+     */
+    public static function generateUniqueInviteCode(): string
+    {
+        do {
+            $code = 'PKJ-' . strtoupper(Str::random(6));
+        } while (self::where('kode_invite', $code)->exists());
+
+        return $code;
+    }
+
+    /**
+     * Hapus file foto kelompok dari disk secara aman (pencegahan path traversal via basename).
+     */
+    public static function deleteFotoFile(?string $fotoFilename): void
+    {
+        if (empty($fotoFilename)) {
+            return;
+        }
+
+        $oldPath = public_path('uploads/kelompok/' . basename($fotoFilename));
+        if (is_file($oldPath)) {
+            @unlink($oldPath);
+        }
+    }
+
+    /**
+     * Validasi binary gambar asli (Anti-Webshell) & simpan foto profil kelompok.
+     */
+    public static function storeValidatedFoto(UploadedFile $file, self $kelompok): ?string
+    {
+        $imageInfo = @getimagesize($file->getRealPath());
+        $allowedMimeMap = [
+            'image/jpeg' => 'jpg',
+            'image/png' => 'png',
+            'image/webp' => 'webp',
+        ];
+
+        if ($imageInfo === false || !isset($imageInfo['mime']) || !array_key_exists($imageInfo['mime'], $allowedMimeMap)) {
+            return null;
+        }
+
+        $safeExtension = $allowedMimeMap[$imageInfo['mime']];
+        $filename = 'kelompok_' . $kelompok->id . '_' . Str::random(12) . '_' . time() . '.' . $safeExtension;
+        $destinationPath = public_path('uploads/kelompok');
+
+        if (!file_exists($destinationPath)) {
+            mkdir($destinationPath, 0755, true);
+        }
+
+        self::deleteFotoFile($kelompok->foto);
+        $file->move($destinationPath, $filename);
+
+        return $filename;
+    }
 
     /**
      * Ambil URL foto profil kelompok jika tersedia di disk.

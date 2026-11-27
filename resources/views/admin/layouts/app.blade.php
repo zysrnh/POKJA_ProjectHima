@@ -385,6 +385,22 @@
                             <span>Kelola Kelas</span>
                         </a>
 
+                        @if (Auth::user()?->isSuperAdmin())
+                            <!-- Menu 3.5: Kelola Kelompok (Khusus Super Admin) -->
+                            <a 
+                                href="{{ route('admin.kelompok.index') }}" 
+                                class="flex items-center justify-between gap-2 px-3.5 py-3 border-2 transition {{ request()->routeIs('admin.kelompok.*') ? 'bg-[#2A82C6] border-white text-white shadow-[3px_3px_0px_0px_#000000]' : 'border-transparent text-gray-200 hover:bg-[#0F2A4A] hover:text-white' }}"
+                            >
+                                <span class="flex items-center gap-3 min-w-0">
+                                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="square" stroke-width="2.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                    </svg>
+                                    <span class="truncate">Kelola Kelompok</span>
+                                </span>
+                                <span class="bg-amber-400 text-black border border-black px-1 py-0.2 text-[9px] font-black shrink-0">SU</span>
+                            </a>
+                        @endif
+
                         <!-- Menu 4: Kelola Admin -->
                         <a 
                             href="{{ route('admin.users.index') }}" 
@@ -546,7 +562,7 @@
     <!-- ============================================================== -->
     <nav 
         aria-label="Mobile Navigation Toolbar" 
-        class="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t-2 border-[#1A467C] shadow-[0px_-4px_12px_rgba(26,70,124,0.15)] px-1 pt-1.5 pb-2 flex items-center justify-around"
+        class="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t-2 border-[#1A467C] shadow-[0px_-4px_12px_rgba(26,70,124,0.15)] px-1 pt-1.5 pb-2 flex items-center justify-around overflow-x-auto"
     >
         @if ($isPointKuMode)
             <!-- Mobile PointKu Tab 1: Overview -->
@@ -732,7 +748,7 @@
             <!-- Tab 4: Kelola Kelas -->
             <a 
                 href="{{ route('admin.kelas.index') }}" 
-                class="flex-1 flex flex-col items-center justify-center py-1 transition-all active:scale-95 {{ request()->routeIs('admin.kelas.*') ? 'text-[#1A467C]' : 'text-gray-500 hover:text-[#1A467C]' }}"
+                class="flex-1 min-w-[44px] flex flex-col items-center justify-center py-1 transition-all active:scale-95 {{ request()->routeIs('admin.kelas.*') ? 'text-[#1A467C]' : 'text-gray-500 hover:text-[#1A467C]' }}"
             >
                 <div class="p-1 border-2 transition-all {{ request()->routeIs('admin.kelas.*') ? 'bg-[#2A82C6] text-white border-[#1A467C] shadow-[2px_2px_0px_0px_#1A467C]' : 'border-transparent text-gray-500' }}">
                     <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -743,6 +759,23 @@
                     Kelas
                 </span>
             </a>
+
+            @if (Auth::user()?->isSuperAdmin())
+                <!-- Tab 4.5: Kelola Kelompok (Khusus Super Admin) -->
+                <a 
+                    href="{{ route('admin.kelompok.index') }}" 
+                    class="flex-1 min-w-[44px] flex flex-col items-center justify-center py-1 transition-all active:scale-95 {{ request()->routeIs('admin.kelompok.*') ? 'text-[#1A467C]' : 'text-gray-500 hover:text-[#1A467C]' }}"
+                >
+                    <div class="p-1 border-2 transition-all {{ request()->routeIs('admin.kelompok.*') ? 'bg-[#2A82C6] text-white border-[#1A467C] shadow-[2px_2px_0px_0px_#1A467C]' : 'border-transparent text-gray-500' }}">
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="square" stroke-width="2.2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                    </div>
+                    <span class="text-[9px] uppercase tracking-tight mt-0.5 font-bold {{ request()->routeIs('admin.kelompok.*') ? 'font-black text-[#1A467C]' : '' }}">
+                        Tim
+                    </span>
+                </a>
+            @endif
 
             <!-- Tab 5: Kelola Admin -->
             <a 

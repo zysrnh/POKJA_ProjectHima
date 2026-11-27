@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Admin\KelasAdminController;
+use App\Http\Controllers\Admin\KelompokAdminController;
 use App\Http\Controllers\Admin\KuesionerAdminController;
 use App\Http\Controllers\Admin\PendaftaranAdminController;
 use App\Http\Controllers\Admin\PengaturanAcaraController;
@@ -192,6 +193,18 @@ Route::middleware('throttle:600,1')->group(function () {
 
             // Kelola Kelas
             Route::resource('kelas', KelasAdminController::class)->except(['show']);
+
+            // Kelola Kelompok (Khusus Super Admin)
+            Route::resource('kelompok', KelompokAdminController::class)->except(['show']);
+            Route::post('/kelompok/{id}/members', [KelompokAdminController::class, 'addMembers'])
+                ->whereNumber('id')
+                ->name('kelompok.members.add');
+            Route::patch('/kelompok/{id}/ketua/{memberId}', [KelompokAdminController::class, 'setKetua'])
+                ->whereNumber(['id', 'memberId'])
+                ->name('kelompok.ketua.set');
+            Route::delete('/kelompok/{id}/members/{memberId}', [KelompokAdminController::class, 'removeMember'])
+                ->whereNumber(['id', 'memberId'])
+                ->name('kelompok.members.remove');
 
             // Kelola Akun Admin (CRUD Admin)
             Route::resource('users', AdminUserController::class)->except(['show']);

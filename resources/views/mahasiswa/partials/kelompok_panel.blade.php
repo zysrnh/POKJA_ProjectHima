@@ -10,224 +10,36 @@
                             </h3>
                         </div>
 
-                        @if ($kelompokInbox->count() > 0)
-                            <span class="bg-amber-300 text-black border-2 border-black px-2.5 py-1 text-[10px] font-black uppercase shadow-[2px_2px_0px_0px_#000000]">
-                                {{ $kelompokInbox->count() }} Undangan Masuk
-                            </span>
-                        @else
-                            <span class="bg-gray-100 text-gray-800 border-2 border-black px-2.5 py-1 text-[10px] font-black uppercase">
-                                Belum Bergabung
-                            </span>
-                        @endif
+                        <span class="bg-amber-300 text-black border-2 border-black px-2.5 py-1 text-[10px] font-black uppercase shadow-[2px_2px_0px_0px_#000000]">
+                            Menunggu Pembagian
+                        </span>
                     </div>
 
-                    <!-- Inbox Undangan Kelompok -->
-                    <div class="mhs-snap-2 card-tactile bg-white border-2 border-black shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000] overflow-hidden">
-                        <div class="px-4 sm:px-5 py-3 border-b-2 border-black {{ $kelompokInbox->count() > 0 ? 'bg-amber-50' : 'bg-blue-50/70' }} flex items-center justify-between">
-                            <h4 class="text-xs sm:text-sm font-black uppercase tracking-wider text-[#1A467C]">
-                                Inbox Undangan Kelompok
-                            </h4>
-                            <span class="bg-white border border-black px-2 py-0.5 font-mono font-black text-[10px] text-[#1A467C]">
-                                {{ $kelompokInbox->count() }} Masuk
-                            </span>
+                    <!-- Informasi Pembagian Kelompok oleh Super Admin -->
+                    <div class="mhs-snap-2 card-tactile bg-white border-2 border-black p-6 sm:p-8 shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000] text-center space-y-3">
+                        <div class="w-12 h-12 bg-[#1A467C] text-white border-2 border-black flex items-center justify-center mx-auto shadow-[3px_3px_0px_0px_#000000]">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="square" stroke-width="2.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
                         </div>
 
-                        @if ($kelompokInbox->isEmpty())
-                            <div class="p-6 text-center text-xs font-bold text-gray-500">
-                                Belum ada undangan kelompok di inbox kamu. Kamu bisa tunggu undangan dari Ketua tim, buat kelompok baru, atau gabung lewat kode/QR.
-                            </div>
-                        @else
-                            <div class="divide-y-2 divide-black">
-                                @foreach ($kelompokInbox as $inv)
-                                    @if ($inv->kelompok)
-                                        @php $invFotoUrl = $inv->kelompok->fotoUrl(); @endphp
-                                        <div class="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white hover:bg-amber-50/40 transition">
-                                            <div class="flex items-start gap-3 min-w-0 flex-1">
-                                                <div class="w-11 h-11 bg-[#1A467C] text-white border-2 border-black flex items-center justify-center font-black text-xs shrink-0 overflow-hidden shadow-[2px_2px_0px_0px_#000000]">
-                                                    @if ($invFotoUrl)
-                                                        <img src="{{ $invFotoUrl }}" alt="Foto {{ $inv->kelompok->nama_kelompok }}" class="w-full h-full object-cover">
-                                                    @else
-                                                        {{ $inv->kelompok->initials() }}
-                                                    @endif
-                                                </div>
+                        <span class="inline-block bg-amber-300 text-black border border-black px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider">
+                            Dikelola Super Admin
+                        </span>
 
-                                                <div class="min-w-0 flex-1 space-y-1">
-                                                    <div class="flex flex-wrap items-center gap-1.5">
-                                                        <span class="font-black text-sm text-gray-950 uppercase">
-                                                            {{ $inv->kelompok->nama_kelompok }}
-                                                        </span>
-                                                        <span class="bg-blue-50 border border-black text-[#1A467C] px-1.5 py-0.2 text-[10px] font-mono font-black">
-                                                            {{ $inv->kelompok->members->count() }} Anggota
-                                                        </span>
-                                                    </div>
-                                                    <p class="text-xs font-semibold text-gray-700">
-                                                        Ketua: <strong class="text-gray-950">{{ $inv->kelompok->ketua->nama ?? '-' }}</strong>
-                                                        @if (!empty($inv->kelompok->ketua?->kelas))
-                                                            <span class="font-mono text-[11px] text-[#1A467C]">({{ $inv->kelompok->ketua->kelas }})</span>
-                                                        @endif
-                                                    </p>
-                                                    @if (!empty($inv->kelompok->judul_proposal))
-                                                        <p class="text-[11px] font-medium text-gray-600 truncate">
-                                                            Ide Proposal: {{ $inv->kelompok->judul_proposal }}
-                                                        </p>
-                                                    @endif
-                                                </div>
-                                            </div>
+                        <h4 class="text-sm sm:text-base font-black uppercase text-gray-950">
+                            Kamu Belum Dimasukkan ke Kelompok
+                        </h4>
 
-                                            <div class="flex items-center gap-2 shrink-0">
-                                                <form action="{{ route('mahasiswa.kelompok.respondInvite', $inv->id) }}" method="POST">
-                                                    @csrf
-                                                    <input type="hidden" name="action" value="accept">
-                                                    <button
-                                                        type="submit"
-                                                        class="btn-tactile px-3.5 py-2 bg-[#15803d] hover:bg-[#166534] text-white border-2 border-black text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
-                                                    >
-                                                        Terima
-                                                    </button>
-                                                </form>
-                                                <form action="{{ route('mahasiswa.kelompok.respondInvite', $inv->id) }}" method="POST">
-                                                    @csrf
-                                                    <input type="hidden" name="action" value="decline">
-                                                    <button
-                                                        type="submit"
-                                                        class="btn-tactile px-3.5 py-2 bg-white hover:bg-red-50 text-[#CA2C2A] border-2 border-black text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
-                                                    >
-                                                        Tolak
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    @endif
-                                @endforeach
-                            </div>
-                        @endif
-                    </div>
-
-                    <!-- Buat Kelompok Sendiri & Gabung via Kode / Link / QR -->
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-                        <!-- Form Buat Kelompok Sendiri (Auto Ketua) -->
-                        <div class="mhs-snap-3 card-tactile bg-white border-2 border-black shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000] overflow-hidden">
-                            <div class="px-4 sm:px-5 py-3 border-b-2 border-black bg-blue-50/70 flex items-center justify-between">
-                                <h4 class="text-xs sm:text-sm font-black uppercase tracking-wider text-[#1A467C]">
-                                    Buat Kelompok Sendiri
-                                </h4>
-                                <span class="bg-amber-300 border border-black px-2 py-0.5 text-[10px] font-black uppercase">
-                                    Jadi Ketua
-                                </span>
-                            </div>
-
-                            <form action="{{ route('mahasiswa.kelompok.store') }}" method="POST" class="p-4 sm:p-5 space-y-3.5">
-                                @csrf
-                                <div>
-                                    <label for="create-nama-kelompok" class="block text-[11px] font-black uppercase tracking-wider text-gray-800 mb-1">
-                                        Nama Kelompok <span class="text-[#CA2C2A]">*</span>
-                                    </label>
-                                    <input
-                                        type="text"
-                                        id="create-nama-kelompok"
-                                        name="nama_kelompok"
-                                        value="{{ old('nama_kelompok') }}"
-                                        required
-                                        maxlength="80"
-                                        placeholder="Contoh: Tim Garuda IF"
-                                        class="w-full px-3 py-2 bg-white border-2 border-black text-xs sm:text-sm font-bold text-gray-950 focus:outline-none focus:bg-blue-50/40"
-                                    >
-                                </div>
-
-                                <div>
-                                    <label for="create-judul-proposal" class="block text-[11px] font-black uppercase tracking-wider text-gray-800 mb-1">
-                                        Ide Judul Proposal <span class="text-gray-400 font-semibold">(Opsional)</span>
-                                    </label>
-                                    <input
-                                        type="text"
-                                        id="create-judul-proposal"
-                                        name="judul_proposal"
-                                        value="{{ old('judul_proposal') }}"
-                                        maxlength="200"
-                                        placeholder="Bisa diisi atau diubah nanti"
-                                        class="w-full px-3 py-2 bg-white border-2 border-black text-xs sm:text-sm font-semibold text-gray-900 focus:outline-none focus:bg-blue-50/40"
-                                    >
-                                </div>
-
-                                <button
-                                    type="submit"
-                                    class="btn-tactile w-full py-2.5 bg-[#1A467C] hover:bg-[#123259] text-white border-2 border-black text-xs font-black uppercase tracking-wider shadow-[3px_3px_0px_0px_#000000] cursor-pointer"
-                                >
-                                    Buat Kelompok &amp; Jadi Ketua
-                                </button>
-                            </form>
-                        </div>
-
-                        <!-- Form Gabung via Kode, Link, atau Scan QR -->
-                        <div class="mhs-snap-4 card-tactile bg-white border-2 border-black shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000] overflow-hidden">
-                            <div class="px-4 sm:px-5 py-3 border-b-2 border-black bg-green-50/80 flex items-center justify-between">
-                                <h4 class="text-xs sm:text-sm font-black uppercase tracking-wider text-[#15803d]">
-                                    Gabung via Link / Kode QR
-                                </h4>
-                                <span class="bg-white border border-black px-2 py-0.5 text-[10px] font-black uppercase text-[#15803d]">
-                                    Anggota
-                                </span>
-                            </div>
-
-                            <div class="p-4 sm:p-5 space-y-4">
-                                <form id="kelompok-join-form" action="{{ route('mahasiswa.kelompok.joinCode') }}" method="POST" class="space-y-2.5">
-                                    @csrf
-                                    <label for="kelompok-join-input" class="block text-[11px] font-black uppercase tracking-wider text-gray-800">
-                                        Kode atau Link Undangan
-                                    </label>
-                                    <div class="flex gap-2">
-                                        <input
-                                            type="text"
-                                            id="kelompok-join-input"
-                                            name="kode_invite"
-                                            value="{{ old('kode_invite') }}"
-                                            required
-                                            placeholder="PKJ-XXXXXX atau tempel link..."
-                                            class="flex-1 min-w-0 px-3 py-2 bg-white border-2 border-black text-xs sm:text-sm font-mono font-bold text-gray-950 focus:outline-none focus:bg-green-50/40"
-                                        >
-                                        <button
-                                            type="submit"
-                                            class="btn-tactile px-4 py-2 bg-[#15803d] hover:bg-[#166534] text-white border-2 border-black text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] shrink-0 cursor-pointer"
-                                        >
-                                            Gabung
-                                        </button>
-                                    </div>
-                                </form>
-
-                                <div class="border-t-2 border-dashed border-gray-300 pt-3.5 space-y-3">
-                                    <button
-                                        type="button"
-                                        id="kelompok-camera-trigger"
-                                        onclick="startKelompokQrScanner()"
-                                        class="btn-tactile w-full py-2.5 bg-amber-300 hover:bg-amber-400 text-black border-2 border-black text-xs font-black uppercase tracking-wider shadow-[3px_3px_0px_0px_#000000] flex items-center justify-center gap-2 cursor-pointer"
-                                    >
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="square" stroke-width="2.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                                            <path stroke-linecap="square" stroke-width="2.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        </svg>
-                                        <span>Scan Kode QR Ketua</span>
-                                    </button>
-
-                                    <div id="kelompok-camera-box" class="hidden box-snap-in space-y-2.5">
-                                        <div id="kelompok-qr-reader" class="w-full max-w-xs mx-auto border-2 border-black bg-black overflow-hidden"></div>
-                                        <button
-                                            type="button"
-                                            onclick="stopKelompokQrScanner()"
-                                            class="btn-tactile w-full py-2 bg-gray-100 hover:bg-gray-200 text-gray-900 border-2 border-black text-xs font-black uppercase tracking-wider cursor-pointer"
-                                        >
-                                            Tutup Kamera
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <p class="max-w-lg mx-auto text-xs sm:text-sm font-semibold text-gray-600 leading-relaxed">
+                            Pembentukan kelompok, penetapan Ketua, dan pembagian anggota diatur langsung oleh Super Admin / Panitia POKJA. Data tim kamu akan muncul otomatis di halaman ini setelah dibagikan.
+                        </p>
                     </div>
                 @else
                     @php
-                        $joinUrl = route('mahasiswa.kelompok.joinLink', ['kode' => $myKelompok->kode_invite]);
                         $kelompokFotoUrl = $myKelompok->fotoUrl();
                         $kelompokInitials = $myKelompok->initials();
-                        $showEditFormOnLoad = isset($errors) && ($errors->has('nama_kelompok') || $errors->has('judul_proposal') || $errors->has('foto'));
+                        $showEditFormOnLoad = isset($errors) && ($errors->has('judul_proposal') || $errors->has('foto'));
                         $jumlahAnggotaTim = $myKelompok->members->count();
                         $minAnggotaTim = \App\Http\Controllers\MahasiswaKelompokController::MIN_ANGGOTA;
                         $maxAnggotaTim = \App\Http\Controllers\MahasiswaKelompokController::MAX_ANGGOTA;
@@ -281,7 +93,7 @@
                                         </p>
                                     @elseif ($isKetua)
                                         <p class="text-xs font-medium text-gray-500">
-                                            Belum ada judul proposal. Klik Edit Info untuk menambahkan.
+                                            Belum ada judul proposal. Klik Edit Proposal / Foto untuk menambahkan.
                                         </p>
                                     @endif
                                 </div>
@@ -293,7 +105,7 @@
                                     onclick="toggleEditKelompok()"
                                     class="btn-tactile px-3 py-1.5 bg-white hover:bg-gray-100 text-gray-950 border-2 border-black text-xs font-black uppercase shadow-[2px_2px_0px_0px_#000000] shrink-0 cursor-pointer"
                                 >
-                                    Edit Info
+                                    Edit Proposal / Foto
                                 </button>
                             @endif
                         </div>
@@ -346,18 +158,12 @@
 
                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                         <div>
-                                            <label for="edit-nama-kelompok" class="block text-[10px] font-black uppercase tracking-wider text-gray-700 mb-1">
-                                                Nama Kelompok
-                                            </label>
-                                            <input
-                                                type="text"
-                                                id="edit-nama-kelompok"
-                                                name="nama_kelompok"
-                                                value="{{ old('nama_kelompok', $myKelompok->nama_kelompok) }}"
-                                                required
-                                                maxlength="80"
-                                                class="w-full px-3 py-2 bg-white border-2 border-black text-xs font-bold text-gray-950"
-                                            >
+                                            <span class="block text-[10px] font-black uppercase tracking-wider text-gray-700 mb-1">
+                                                Nama Kelompok (Ditetapkan Super Admin)
+                                            </span>
+                                            <div class="w-full px-3 py-2 bg-gray-100 border-2 border-black text-xs font-black text-gray-700 uppercase">
+                                                {{ $myKelompok->nama_kelompok }}
+                                            </div>
                                         </div>
                                         <div>
                                             <label for="edit-judul-proposal" class="block text-[10px] font-black uppercase tracking-wider text-gray-700 mb-1">
@@ -410,119 +216,8 @@
                         </div>
                     </div>
 
-                    @if ($isKetua)
-                        <!-- Panel Khusus Ketua: Share Link/QR & Undang ke Inbox Teman -->
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-                            <!-- Card Link & Kode QR Undangan -->
-                            <div class="mhs-snap-2 card-tactile bg-white border-2 border-black shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000] overflow-hidden">
-                                <div class="px-4 sm:px-5 py-3 border-b-2 border-black bg-green-50/80 flex items-center justify-between">
-                                    <h4 class="text-xs sm:text-sm font-black uppercase tracking-wider text-[#15803d]">
-                                        Undang via Link &amp; Kode QR
-                                    </h4>
-                                    <span class="bg-white border border-black px-2 py-0.5 font-mono font-black text-[10px] text-[#15803d]">
-                                        {{ $myKelompok->kode_invite }}
-                                    </span>
-                                </div>
-
-                                <div class="p-4 sm:p-5 space-y-4">
-                                    <div class="flex flex-col items-center justify-center bg-gray-50 border-2 border-black p-4">
-                                        <div id="kelompok-qr-canvas" class="bg-white p-2.5 border-2 border-black shadow-[3px_3px_0px_0px_#000000]"></div>
-                                        <span class="mt-2 font-mono text-xs font-black tracking-widest text-gray-950">
-                                            {{ $myKelompok->kode_invite }}
-                                        </span>
-                                    </div>
-
-                                    <div class="space-y-2">
-                                        <label class="block text-[10px] font-black uppercase tracking-wider text-gray-700">
-                                            Link Gabung Otomatis
-                                        </label>
-                                        <div class="flex gap-2">
-                                            <input
-                                                type="text"
-                                                id="kelompok-share-link"
-                                                value="{{ $joinUrl }}"
-                                                readonly
-                                                class="flex-1 min-w-0 px-2.5 py-2 bg-gray-50 border-2 border-black text-[11px] font-mono font-bold text-gray-800 select-all"
-                                            >
-                                            <button
-                                                type="button"
-                                                id="btn-copy-kelompok-link"
-                                                onclick="copyKelompokText('kelompok-share-link', 'btn-copy-kelompok-link')"
-                                                class="btn-tactile px-3.5 py-2 bg-[#1A467C] hover:bg-[#123259] text-white border-2 border-black text-xs font-black uppercase shadow-[2px_2px_0px_0px_#000000] shrink-0 cursor-pointer"
-                                            >
-                                                Salin Link
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Card Undang Langsung ke Inbox Teman -->
-                            <div class="mhs-snap-3 card-tactile bg-white border-2 border-black shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000] overflow-hidden flex flex-col">
-                                <div class="px-4 sm:px-5 py-3 border-b-2 border-black bg-amber-50/80 flex items-center justify-between">
-                                    <h4 class="text-xs sm:text-sm font-black uppercase tracking-wider text-[#1A467C]">
-                                        Undang ke Inbox Teman
-                                    </h4>
-                                    <span class="bg-white border border-black px-2 py-0.5 font-mono font-black text-[10px] text-[#1A467C]">
-                                        {{ $kandidatAnggotaList->where('already_invited', false)->count() }} Tersedia
-                                    </span>
-                                </div>
-
-                                <div class="p-4 sm:p-5 space-y-4 flex-1">
-                                    @if ($jumlahAnggotaTim >= $maxAnggotaTim)
-                                        <div class="p-3 bg-blue-50 border-2 border-black text-xs font-bold text-[#1A467C]">
-                                            Kelompok sudah mencapai batas maksimal {{ $maxAnggotaTim }} anggota.
-                                        </div>
-                                    @else
-                                        <div>
-                                            <input
-                                                type="text"
-                                                id="invite-search-input"
-                                                oninput="filterKelompokKandidat()"
-                                                placeholder="Cari nama, NIM, atau kelas teman..."
-                                                class="w-full px-3 py-2 bg-white border-2 border-black text-xs font-bold text-gray-950 focus:outline-none focus:bg-amber-50/40"
-                                            >
-                                        </div>
-
-                                        <div id="invite-candidate-list" class="max-h-56 overflow-y-auto divide-y divide-gray-200 border-2 border-black bg-white"></div>
-                                    @endif
-
-                                    @if ($myKelompok->invitations->isNotEmpty())
-                                        <div class="border-t-2 border-black pt-3.5 space-y-2">
-                                            <span class="block text-[10px] font-black uppercase tracking-wider text-gray-700">
-                                                Menunggu Konfirmasi ({{ $myKelompok->invitations->count() }})
-                                            </span>
-                                            <div class="divide-y divide-gray-200 border-2 border-black bg-gray-50 max-h-36 overflow-y-auto">
-                                                @foreach ($myKelompok->invitations as $sentInv)
-                                                    @if ($sentInv->pendaftaran)
-                                                        <div class="px-3 py-2 flex items-center justify-between gap-2 text-xs">
-                                                            <div class="min-w-0">
-                                                                <p class="font-bold text-gray-950 truncate">{{ $sentInv->pendaftaran->nama }}</p>
-                                                                <p class="font-mono text-[10px] text-gray-600">{{ $sentInv->pendaftaran->nim }} • {{ $sentInv->pendaftaran->kelas }}</p>
-                                                            </div>
-                                                            <form action="{{ route('mahasiswa.kelompok.cancelInvite', $sentInv->id) }}" method="POST" class="shrink-0">
-                                                                @csrf
-                                                                @method('DELETE')
-                                                                <button
-                                                                    type="submit"
-                                                                    class="btn-tactile px-2.5 py-1 bg-white hover:bg-red-50 text-[#CA2C2A] border border-black text-[10px] font-black uppercase cursor-pointer"
-                                                                >
-                                                                    Batalkan
-                                                                </button>
-                                                            </form>
-                                                        </div>
-                                                    @endif
-                                                @endforeach
-                                            </div>
-                                        </div>
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
-                    @endif
-
                     <!-- Card Daftar Anggota Kelompok -->
-                    <div class="mhs-snap-4 card-tactile bg-white border-2 border-black shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000] overflow-hidden">
+                    <div class="mhs-snap-2 card-tactile bg-white border-2 border-black shadow-[3px_3px_0px_0px_#000000] sm:shadow-[5px_5px_0px_0px_#000000] overflow-hidden">
                         <div class="px-4 sm:px-5 py-3 border-b-2 border-black bg-blue-50/70 flex items-center justify-between">
                             <h4 class="text-xs sm:text-sm font-black uppercase tracking-wider text-[#1A467C]">
                                 Daftar Anggota Kelompok
@@ -572,72 +267,16 @@
                                             <span class="bg-green-100 border-2 border-black px-2.5 py-1 font-mono font-black text-xs text-[#15803d]">
                                                 ★ {{ (int) ($mhs->total_point ?? 0) }} PTS
                                             </span>
-
-                                            @if ($isKetua && !$isSelf)
-                                                <form id="transfer-ketua-form-{{ $member->id }}" action="{{ route('mahasiswa.kelompok.transferKetua', $member->id) }}" method="POST" class="inline">
-                                                    @csrf
-                                                    <button
-                                                        type="button"
-                                                        data-form="transfer-ketua-form-{{ $member->id }}"
-                                                        data-title="Serahkan Jabatan Ketua?"
-                                                        data-message="Jabatan Ketua kelompok akan dipindahkan ke {{ $mhs->nama }}."
-                                                        data-confirm="Ya, Serahkan"
-                                                        data-danger="0"
-                                                        onclick="openKelompokConfirmFromEl(this)"
-                                                        class="btn-tactile px-2.5 py-1.5 bg-amber-300 hover:bg-amber-400 text-black border-2 border-black text-[10px] font-black uppercase cursor-pointer"
-                                                    >
-                                                        Jadikan Ketua
-                                                    </button>
-                                                </form>
-
-                                                <form id="remove-member-form-{{ $member->id }}" action="{{ route('mahasiswa.kelompok.removeMember', $member->id) }}" method="POST" class="inline">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button
-                                                        type="button"
-                                                        data-form="remove-member-form-{{ $member->id }}"
-                                                        data-title="Keluarkan Anggota?"
-                                                        data-message="{{ $mhs->nama }} akan dikeluarkan dari kelompok ini."
-                                                        data-confirm="Ya, Keluarkan"
-                                                        data-danger="1"
-                                                        onclick="openKelompokConfirmFromEl(this)"
-                                                        class="btn-tactile px-2.5 py-1.5 bg-white hover:bg-red-50 text-[#CA2C2A] border-2 border-black text-[10px] font-black uppercase cursor-pointer"
-                                                    >
-                                                        Keluarkan
-                                                    </button>
-                                                </form>
-                                            @endif
                                         </div>
                                     </div>
                                 @endif
                             @endforeach
                         </div>
 
-                        <div class="px-4 sm:px-5 py-3.5 bg-gray-50 border-t-2 border-black flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="px-4 sm:px-5 py-3 bg-gray-50 border-t-2 border-black">
                             <p class="text-[11px] font-semibold text-gray-600">
-                                @if ($isKetua)
-                                    Serahkan jabatan ke anggota lain terlebih dahulu jika hanya ingin keluar tanpa membubarkan kelompok.
-                                @else
-                                    Keluar akan melepas keanggotaanmu dari kelompok ini.
-                                @endif
+                                Susunan anggota, nama kelompok, dan penetapan Ketua dikelola oleh Super Admin POKJA. Hubungi panitia jika terdapat kendala tim.
                             </p>
-
-                            <form id="leave-disband-form" action="{{ route('mahasiswa.kelompok.leave') }}" method="POST" class="shrink-0">
-                                @csrf
-                                <button
-                                    type="button"
-                                    data-form="leave-disband-form"
-                                    data-title="{{ $isKetua ? 'Bubarkan Kelompok?' : 'Keluar dari Kelompok?' }}"
-                                    data-message="{{ $isKetua ? 'Seluruh anggota akan otomatis dikeluarkan dan kode undangan kelompok tidak berlaku lagi.' : 'Kamu tidak akan lagi tergabung di kelompok ' . $myKelompok->nama_kelompok . '.' }}"
-                                    data-confirm="{{ $isKetua ? 'Ya, Bubarkan' : 'Ya, Keluar' }}"
-                                    data-danger="1"
-                                    onclick="openKelompokConfirmFromEl(this)"
-                                    class="btn-tactile px-4 py-2 bg-[#CA2C2A] hover:bg-[#901C1A] text-white border-2 border-black text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
-                                >
-                                    {{ $isKetua ? 'Bubarkan Kelompok' : 'Keluar Kelompok' }}
-                                </button>
-                            </form>
                         </div>
                     </div>
                 @endif
-
