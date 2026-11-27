@@ -101,6 +101,7 @@ class KelompokManagementTest extends TestCase
         $m3 = $this->makeMahasiswa(3);
         $m4 = $this->makeMahasiswa(4);
         $m5 = $this->makeMahasiswa(5);
+        $m6 = $this->makeMahasiswa(6);
 
         // Super Admin sees Kelola Kelompok menu on dashboard & can open index/create views
         $this->actingAs($superAdmin)
@@ -145,23 +146,36 @@ class KelompokManagementTest extends TestCase
             ->assertOk()
             ->assertSee('Tim Alpha');
 
-        // Cannot exceed MAX_ANGGOTA = 4
+        // Super Admin can add 2 more members at once (reaching 5 members with no artificial 4-person block)
         $this->actingAs($superAdmin)
             ->post(route('admin.kelompok.members.add', $kelompok->id), [
                 'pendaftaran_ids' => [$m4->id, $m5->id],
             ])
             ->assertRedirect(route('admin.kelompok.edit', $kelompok->id))
-            ->assertSessionHas('error');
-        $this->assertSame(3, $kelompok->members()->count());
+            ->assertSessionHas('success');
+        $this->assertSame(5, $kelompok->members()->count());
 
-        // Add 1 member (reaches 4/4)
+        // Super Admin can still see remaining unassigned candidate on edit page & add a 6th member if needed
+        $this->actingAs($superAdmin)
+            ->get(route('admin.kelompok.edit', $kelompok->id))
+            ->assertOk()
+            ->assertSee($m6->nama)
+            ->assertSee('5 Anggota');
+
         $this->actingAs($superAdmin)
             ->post(route('admin.kelompok.members.add', $kelompok->id), [
-                'pendaftaran_ids' => [$m4->id],
+                'pendaftaran_ids' => [$m6->id],
             ])
             ->assertRedirect(route('admin.kelompok.edit', $kelompok->id))
             ->assertSessionHas('success');
-        $this->assertSame(4, $kelompok->members()->count());
+        $this->assertSame(6, $kelompok->members()->count());
+
+        // Filter 5+ Anggota works cleanly
+        $this->actingAs($superAdmin)
+            ->get(route('admin.kelompok.index', ['status' => 'penuh']))
+            ->assertOk()
+            ->assertSee('Tim Alpha')
+            ->assertSee('6 Anggota');
 
         // Transfer ketua to m2
         $m2Membership = KelompokMember::where('kelompok_id', $kelompok->id)
@@ -191,7 +205,7 @@ class KelompokManagementTest extends TestCase
             ->delete(route('admin.kelompok.members.remove', [$kelompok->id, $m4Membership->id]))
             ->assertRedirect(route('admin.kelompok.edit', $kelompok->id))
             ->assertSessionHas('success');
-        $this->assertSame(3, $kelompok->members()->count());
+        $this->assertSame(5, $kelompok->members()->count());
 
         // Super Admin can rename group & update proposal
         $this->actingAs($superAdmin)
@@ -213,6 +227,28 @@ class KelompokManagementTest extends TestCase
             ->delete(route('admin.kelompok.destroy', $kelompok->id))
             ->assertRedirect(route('admin.kelompok.index'))
             ->assertSessionHas('success');
+
+        // Super Admin can also create a 5-person team directly from store()
+        $s1 = $this->makeMahasiswa(21);
+        $s2 = $this->makeMahasiswa(22);
+        $s3 = $this->makeMahasiswa(23);
+        $s4 = $this->makeMahasiswa(24);
+        $s5 = $this->makeMahasiswa(25);
+
+        $this->actingAs($superAdmin)
+            ->post(route('admin.kelompok.store'), [
+                'nama_kelompok' => 'Tim Lima Orang',
+                'ketua_id' => $s1->id,
+                'anggota_ids' => [$s2->id, $s3->id, $s4->id, $s5->id],
+            ])
+            ->assertRedirect()
+            ->assertSessionHas('success');
+
+        $timLima = Kelompok::where('nama_kelompok', 'Tim Lima Orang')->firstOrFail();
+        $this->assertSame(5, $timLima->members()->count());
+        $this->actingAs($superAdmin)
+            ->delete(route('admin.kelompok.destroy', $timLima->id))
+            ->assertRedirect(route('admin.kelompok.index'));
 
         $this->assertDatabaseCount('kelompoks', 0);
         $this->assertDatabaseCount('kelompok_members', 0);

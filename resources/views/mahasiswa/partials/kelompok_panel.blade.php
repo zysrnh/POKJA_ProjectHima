@@ -68,9 +68,13 @@
                                         <span class="bg-gray-100 text-gray-900 border border-black px-2 py-0.5 text-[10px] font-mono font-black">
                                             {{ $myKelompok->kode_invite }}
                                         </span>
-                                        @if ($jumlahAnggotaTim >= $maxAnggotaTim)
+                                        @if ($jumlahAnggotaTim > $maxAnggotaTim)
                                             <span class="bg-blue-100 text-[#1A467C] border border-black px-2 py-0.5 text-[10px] font-black uppercase">
-                                                Penuh ({{ $jumlahAnggotaTim }}/{{ $maxAnggotaTim }} Anggota)
+                                                {{ $jumlahAnggotaTim }} Anggota
+                                            </span>
+                                        @elseif ($jumlahAnggotaTim === $maxAnggotaTim)
+                                            <span class="bg-blue-100 text-[#1A467C] border border-black px-2 py-0.5 text-[10px] font-black uppercase">
+                                                Lengkap ({{ $jumlahAnggotaTim }}/{{ $maxAnggotaTim }} Anggota)
                                             </span>
                                         @elseif ($jumlahAnggotaTim >= $minAnggotaTim)
                                             <span class="bg-green-100 text-green-900 border border-black px-2 py-0.5 text-[10px] font-black uppercase">

@@ -18,7 +18,7 @@
                     KHUSUS SUPER ADMIN
                 </span>
                 <span class="bg-[#1A467C] text-white border border-black text-[10px] font-mono font-black uppercase px-2 py-0.5">
-                    KUOTA {{ $minAnggota }}-{{ $maxAnggota }} ORANG / TIM
+                    STANDAR {{ $minAnggota }}-{{ $maxAnggota }} ORANG / TIM
                 </span>
             </div>
             <h3 class="text-sm sm:text-base font-black uppercase tracking-tight text-[#1A467C]">
@@ -88,10 +88,10 @@
                     onchange="this.form.submit()"
                     class="w-full px-3 py-2.5 bg-[#F8FBFE] border-2 border-[#1A467C] text-xs sm:text-sm font-bold text-gray-950 focus:bg-white focus:outline-none cursor-pointer"
                 >
-                    <option value="all" {{ $statusFilter === 'all' ? 'selected' : '' }}>Semua Status Kuota</option>
+                    <option value="all" {{ $statusFilter === 'all' ? 'selected' : '' }}>Semua Jumlah Anggota</option>
                     <option value="kurang" {{ $statusFilter === 'kurang' ? 'selected' : '' }}>Kurang (&lt; {{ $minAnggota }} Anggota)</option>
-                    <option value="memenuhi" {{ $statusFilter === 'memenuhi' ? 'selected' : '' }}>Memenuhi ({{ $minAnggota }} Anggota)</option>
-                    <option value="penuh" {{ $statusFilter === 'penuh' ? 'selected' : '' }}>Penuh ({{ $maxAnggota }} Anggota)</option>
+                    <option value="memenuhi" {{ $statusFilter === 'memenuhi' ? 'selected' : '' }}>Standar ({{ $minAnggota }}-{{ $maxAnggota }} Anggota)</option>
+                    <option value="penuh" {{ $statusFilter === 'penuh' ? 'selected' : '' }}>{{ $maxAnggota }}+ Anggota</option>
                 </select>
             </div>
 
@@ -138,9 +138,13 @@
                                 <span class="bg-gray-100 border border-black px-1.5 py-0.2 font-mono font-black text-[10px] text-gray-800">
                                     {{ $kelompok->kode_invite }}
                                 </span>
-                                @if ($memberCount >= $maxAnggota)
+                                @if ($memberCount > $maxAnggota)
                                     <span class="bg-blue-100 border border-black text-[#1A467C] px-1.5 py-0.2 text-[10px] font-black uppercase">
-                                        Penuh ({{ $memberCount }}/{{ $maxAnggota }})
+                                        {{ $memberCount }} Anggota
+                                    </span>
+                                @elseif ($memberCount === $maxAnggota)
+                                    <span class="bg-blue-100 border border-black text-[#1A467C] px-1.5 py-0.2 text-[10px] font-black uppercase">
+                                        Lengkap ({{ $memberCount }}/{{ $maxAnggota }})
                                     </span>
                                 @elseif ($memberCount >= $minAnggota)
                                     <span class="bg-green-100 border border-black text-green-900 px-1.5 py-0.2 text-[10px] font-black uppercase">
@@ -293,9 +297,13 @@
                             </td>
 
                             <td class="py-3.5 px-3.5 text-center">
-                                @if ($memberCount >= $maxAnggota)
+                                @if ($memberCount > $maxAnggota)
                                     <span class="inline-block bg-blue-100 border border-black text-[#1A467C] text-[10px] px-2 py-0.5 font-black uppercase">
-                                        Penuh ({{ $memberCount }}/{{ $maxAnggota }})
+                                        {{ $memberCount }} Anggota
+                                    </span>
+                                @elseif ($memberCount === $maxAnggota)
+                                    <span class="inline-block bg-blue-100 border border-black text-[#1A467C] text-[10px] px-2 py-0.5 font-black uppercase">
+                                        Lengkap ({{ $memberCount }}/{{ $maxAnggota }})
                                     </span>
                                 @elseif ($memberCount >= $minAnggota)
                                     <span class="inline-block bg-green-100 border border-black text-green-900 text-[10px] px-2 py-0.5 font-black uppercase">

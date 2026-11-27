@@ -88,7 +88,7 @@ class KelompokAdminController extends Controller
             $query->has('members', '<', $minAnggota);
         } elseif ($statusFilter === 'memenuhi') {
             $query->has('members', '>=', $minAnggota)
-                ->has('members', '<', $maxAnggota);
+                ->has('members', '<=', $maxAnggota);
         } elseif ($statusFilter === 'penuh') {
             $query->has('members', '>=', $maxAnggota);
         }
@@ -181,13 +181,6 @@ class KelompokAdminController extends Controller
             ->values();
 
         $allMemberIds = collect([$ketuaId])->merge($anggotaIds)->values();
-        $maxAnggota = MahasiswaKelompokController::MAX_ANGGOTA;
-
-        if ($allMemberIds->count() > $maxAnggota) {
-            return back()
-                ->withErrors(['anggota_ids' => "Total anggota termasuk Ketua maksimal {$maxAnggota} orang."])
-                ->withInput();
-        }
 
         if ($request->hasFile('foto')) {
             $imageInfo = @getimagesize($request->file('foto')->getRealPath());
@@ -366,21 +359,8 @@ class KelompokAdminController extends Controller
             ->unique()
             ->values();
 
-        $maxAnggota = MahasiswaKelompokController::MAX_ANGGOTA;
-
-        $result = DB::transaction(function () use ($id, $selectedIds, $maxAnggota) {
+        $result = DB::transaction(function () use ($id, $selectedIds) {
             $kelompok = Kelompok::where('id', $id)->lockForUpdate()->firstOrFail();
-            $currentCount = KelompokMember::where('kelompok_id', $kelompok->id)->count();
-            $remaining = max(0, $maxAnggota - $currentCount);
-
-            if ($selectedIds->count() > $remaining) {
-                return [
-                    'ok' => false,
-                    'error' => $remaining === 0
-                        ? "Kelompok \"{$kelompok->nama_kelompok}\" sudah penuh (maksimal {$maxAnggota} anggota)."
-                        : "Sisa kuota kelompok ini hanya {$remaining} orang lagi (maksimal {$maxAnggota} anggota).",
-                ];
-            }
 
             if ($conflictMsg = $this->findAssignedMemberConflict($selectedIds)) {
                 return ['ok' => false, 'error' => $conflictMsg];

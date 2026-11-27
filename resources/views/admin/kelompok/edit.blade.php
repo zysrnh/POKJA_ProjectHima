@@ -9,7 +9,6 @@
     $maxAnggota = \App\Http\Controllers\MahasiswaKelompokController::MAX_ANGGOTA;
     $fotoUrl = $kelompok->fotoUrl();
     $jumlahAnggota = $kelompok->members->count();
-    $sisaKuota = max(0, $maxAnggota - $jumlahAnggota);
     $totalPointTim = $kelompok->members->sum(fn ($m) => (int) ($m->pendaftaran->total_point ?? 0));
     $kelasOptions = $kandidatMahasiswa->pluck('kelas')->filter()->unique()->sort()->values();
 @endphp
@@ -35,7 +34,7 @@
                         {{ $kelompok->kode_invite }}
                     </span>
                     <span class="{{ $jumlahAnggota >= $maxAnggota ? 'bg-blue-100 text-[#1A467C]' : ($jumlahAnggota >= $minAnggota ? 'bg-green-100 text-green-900' : 'bg-amber-100 text-amber-950') }} border border-black px-2 py-0.5 text-[10px] font-black uppercase">
-                        {{ $jumlahAnggota }}/{{ $maxAnggota }} Anggota
+                        {{ $jumlahAnggota }} Anggota
                     </span>
                     <span class="bg-green-50 border border-black px-2 py-0.5 font-mono font-black text-[10px] text-[#15803d]">
                         ★ {{ $totalPointTim }} PTS Tim
@@ -184,7 +183,7 @@
                         Susunan Anggota Tim
                     </h4>
                     <span class="bg-white border border-black px-2 py-0.5 font-mono font-black text-[10px] text-[#1A467C]">
-                        {{ $jumlahAnggota }}/{{ $maxAnggota }} Orang
+                        {{ $jumlahAnggota }} Orang
                     </span>
                 </div>
 
@@ -265,16 +264,12 @@
                         Tambah Anggota Baru
                     </h4>
                     <span class="bg-white border border-black px-2 py-0.5 font-mono font-black text-[10px] text-[#15803d]">
-                        Sisa Kuota: {{ $sisaKuota }} Slot
+                        Tersedia: {{ $kandidatMahasiswa->count() }} Kandidat
                     </span>
                 </div>
 
                 <div class="p-4 sm:p-5 space-y-3.5">
-                    @if ($sisaKuota <= 0)
-                        <div class="p-4 bg-blue-50 border-2 border-black text-xs font-bold text-[#1A467C]">
-                            Kelompok sudah mencapai batas maksimal {{ $maxAnggota }} anggota. Keluarkan salah satu anggota terlebih dahulu jika ingin mengganti susunan tim.
-                        </div>
-                    @elseif ($kandidatMahasiswa->isEmpty())
+                    @if ($kandidatMahasiswa->isEmpty())
                         <div class="p-4 bg-amber-50 border-2 border-black text-xs font-bold text-amber-950">
                             Semua mahasiswa pendaftar sudah tergabung di kelompok lain.
                         </div>
@@ -314,7 +309,7 @@
                                                 type="checkbox"
                                                 name="pendaftaran_ids[]"
                                                 value="{{ $kandidat->id }}"
-                                                onchange="checkEditSlotLimit(this)"
+                                                onchange="updateEditSelectedCount()"
                                                 class="edit-add-checkbox w-4 h-4 accent-[#15803d] shrink-0 cursor-pointer"
                                             >
                                             <div class="min-w-0">
@@ -338,7 +333,7 @@
 
                             <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
                                 <span id="edit-selected-count" class="text-xs font-mono font-black text-gray-700">
-                                    Dipilih: 0 / {{ $sisaKuota }} Slot
+                                    Dipilih: 0 Mahasiswa
                                 </span>
                                 <button
                                     type="submit"
@@ -358,8 +353,6 @@
 </div>
 
 <script>
-    const EDIT_REMAINING_SLOT = {{ $sisaKuota }};
-
     function previewEditKelompokFoto(input) {
         const preview = document.getElementById('edit-kelompok-foto-preview');
         const placeholder = document.getElementById('edit-kelompok-foto-placeholder');
@@ -403,17 +396,11 @@
         }
     }
 
-    function checkEditSlotLimit(changedCheckbox) {
+    function updateEditSelectedCount() {
         const checked = Array.from(document.querySelectorAll('.edit-add-checkbox:checked'));
-        if (checked.length > EDIT_REMAINING_SLOT && changedCheckbox) {
-            changedCheckbox.checked = false;
-            alert(`Sisa kuota kelompok ini hanya ${EDIT_REMAINING_SLOT} orang lagi.`);
-            return checkEditSlotLimit(null);
-        }
-
         const countEl = document.getElementById('edit-selected-count');
         if (countEl) {
-            countEl.textContent = `Dipilih: ${checked.length} / ${EDIT_REMAINING_SLOT} Slot`;
+            countEl.textContent = `Dipilih: ${checked.length} Mahasiswa`;
         }
     }
 </script>

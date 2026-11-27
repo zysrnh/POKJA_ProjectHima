@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 class MahasiswaKelompokController extends Controller
 {
     public const MIN_ANGGOTA = 3;
-    public const MAX_ANGGOTA = 4;
+    public const MAX_ANGGOTA = 5;
 
     /**
      * Ambil data mahasiswa yang sedang login dan validasi single-device session.

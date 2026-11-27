@@ -5,6 +5,7 @@
 
 @section('content')
 @php
+    $minAnggota = \App\Http\Controllers\MahasiswaKelompokController::MIN_ANGGOTA;
     $maxAnggota = \App\Http\Controllers\MahasiswaKelompokController::MAX_ANGGOTA;
     $oldKetuaId = (int) old('ketua_id', 0);
     $oldAnggotaIds = collect(old('anggota_ids', []))->map(fn ($v) => (int) $v)->all();
@@ -113,12 +114,12 @@
                         2. Pilih Ketua &amp; Anggota Tim
                     </h4>
                     <p class="text-[11px] font-semibold text-gray-600 mt-0.5">
-                        Wajib pilih 1 Ketua, lalu centang maksimal {{ $maxAnggota - 1 }} anggota tambahan (total maks. {{ $maxAnggota }} orang). Hanya menampilkan mahasiswa yang belum punya kelompok.
+                        Wajib pilih 1 Ketua, lalu centang anggota tambahan (standar {{ $minAnggota }}-{{ $maxAnggota }} orang, Super Admin bebas menyesuaikan jumlah anggota tim). Hanya menampilkan mahasiswa yang belum punya kelompok.
                     </p>
                 </div>
 
                 <span id="create-selection-badge" class="bg-amber-300 text-black border-2 border-black px-2.5 py-1 font-mono font-black text-xs shadow-[2px_2px_0px_0px_#000000]">
-                    Terpilih: 0/{{ $maxAnggota }}
+                    Terpilih: 0 Orang
                 </span>
             </div>
 
@@ -221,7 +222,7 @@
 </div>
 
 <script>
-    const CREATE_MAX_ANGGOTA = {{ $maxAnggota }};
+    const CREATE_MIN_ANGGOTA = {{ $minAnggota }};
 
     function previewCreateKelompokFoto(input) {
         const preview = document.getElementById('create-kelompok-foto-preview');
@@ -261,7 +262,7 @@
         }
     }
 
-    function syncCreateMemberSelection(changedCheckbox = null) {
+    function syncCreateMemberSelection() {
         const selectedKetua = document.querySelector('input[name="ketua_id"]:checked');
         const ketuaId = selectedKetua ? selectedKetua.value : null;
 
@@ -283,17 +284,12 @@
         const checkedAnggota = Array.from(document.querySelectorAll('.anggota-checkbox:checked'));
         const totalSelected = (ketuaId ? 1 : 0) + checkedAnggota.length;
 
-        if (totalSelected > CREATE_MAX_ANGGOTA && changedCheckbox) {
-            changedCheckbox.checked = false;
-            alert(`Maksimal total anggota tim adalah ${CREATE_MAX_ANGGOTA} orang (termasuk Ketua).`);
-            return syncCreateMemberSelection();
-        }
-
         const badge = document.getElementById('create-selection-badge');
         if (badge) {
-            badge.textContent = `Terpilih: ${totalSelected}/${CREATE_MAX_ANGGOTA} (${ketuaId ? '1 Ketua + ' : 'Belum pilih Ketua, '}${checkedAnggota.length} Anggota)`;
-            badge.classList.toggle('bg-red-200', totalSelected > CREATE_MAX_ANGGOTA);
-            badge.classList.toggle('bg-amber-300', totalSelected <= CREATE_MAX_ANGGOTA);
+            badge.textContent = `Terpilih: ${totalSelected} Orang (${ketuaId ? '1 Ketua + ' : 'Belum pilih Ketua, '}${checkedAnggota.length} Anggota)`;
+            const isReady = Boolean(ketuaId && totalSelected >= CREATE_MIN_ANGGOTA);
+            badge.classList.toggle('bg-green-200', isReady);
+            badge.classList.toggle('bg-amber-300', !isReady);
         }
     }
 
