@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Pendaftaran;
+use App\Models\PointHistory;
 use App\Models\Presensi;
 use App\Models\Pengaturan;
 use App\Http\Controllers\Admin\PresensiAdminController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class PresensiMahasiswaController extends Controller
@@ -183,50 +185,83 @@ class PresensiMahasiswaController extends Controller
             ], 422);
         }
 
-        // 6. Cek apakah mahasiswa sudah hadir di pertemuan ini
-        $sudahHadir = Presensi::where('pendaftaran_id', $pendaftaran->id)
-            ->where('pertemuan', $pertemuanDariQR)
-            ->where('status', 'hadir')
-            ->first();
+        // 6 & 7. Cek & Simpan Presensi + Tambah +1 Point secara Atomic
+        try {
+            $result = DB::transaction(function () use ($pendaftaran, $pertemuanDariQR) {
+                $lockedPendaftaran = Pendaftaran::where('id', $pendaftaran->id)->lockForUpdate()->first();
 
-        if ($sudahHadir) {
-            $jam = $sudahHadir->waktu_hadir ? $sudahHadir->waktu_hadir->timezone('Asia/Jakarta')->format('H:i:s') : now()->timezone('Asia/Jakarta')->format('H:i:s');
+                $sudahHadir = Presensi::where('pendaftaran_id', $lockedPendaftaran->id)
+                    ->where('pertemuan', $pertemuanDariQR)
+                    ->where('status', 'hadir')
+                    ->first();
 
-            // Tetap kirim pop-up ke layar proyektor agar mahasiswa/panitia melihat konfirmasi visual
-            $this->pushProyektorScanEvent($pendaftaran, $pertemuanDariQR, $jam, true);
+                if ($sudahHadir) {
+                    return [
+                        'already' => true,
+                        'presensi' => $sudahHadir,
+                        'point_awarded' => false,
+                        'total_point' => (int) $lockedPendaftaran->total_point,
+                    ];
+                }
 
-            return response()->json([
-                'success' => true,
-                'already' => true,
-                'nama' => $pendaftaran->nama,
-                'nim' => $pendaftaran->nim,
-                'kelas' => $pendaftaran->kelas,
-                'pertemuan' => $pertemuanDariQR,
-                'waktu' => $jam,
-                'data' => [
+                $presensi = Presensi::updateOrCreate(
+                    [
+                        'pendaftaran_id' => $lockedPendaftaran->id,
+                        'pertemuan' => $pertemuanDariQR,
+                    ],
+                    [
+                        'status' => 'hadir',
+                        'waktu_hadir' => now(),
+                    ]
+                );
+
+                $pointAwarded = PointHistory::awardPresensiPoint(
+                    $lockedPendaftaran->id,
+                    $pertemuanDariQR,
+                    'Sistem Presensi QR'
+                );
+
+                $lockedPendaftaran->refresh();
+
+                return [
+                    'already' => false,
+                    'presensi' => $presensi,
+                    'point_awarded' => $pointAwarded,
+                    'total_point' => (int) $lockedPendaftaran->total_point,
+                ];
+            });
+
+            if ($result['already']) {
+                $sudahHadir = $result['presensi'];
+                $jam = $sudahHadir->waktu_hadir
+                    ? $sudahHadir->waktu_hadir->timezone('Asia/Jakarta')->format('H:i:s')
+                    : now()->timezone('Asia/Jakarta')->format('H:i:s');
+
+                // Tetap kirim pop-up ke layar proyektor agar mahasiswa/panitia melihat konfirmasi visual
+                $this->pushProyektorScanEvent($pendaftaran, $pertemuanDariQR, $jam, true);
+
+                return response()->json([
+                    'success' => true,
+                    'already' => true,
+                    'point_awarded' => false,
+                    'total_point' => $result['total_point'],
                     'nama' => $pendaftaran->nama,
                     'nim' => $pendaftaran->nim,
                     'kelas' => $pendaftaran->kelas,
                     'pertemuan' => $pertemuanDariQR,
-                    'waktu' => $jam . ' WIB',
-                ],
-                'message' => "{$pendaftaran->nama} SUDAH tercatat hadir di Pertemuan {$pertemuanDariQR} pada pukul {$jam} WIB.",
-            ]);
-        }
+                    'waktu' => $jam,
+                    'data' => [
+                        'nama' => $pendaftaran->nama,
+                        'nim' => $pendaftaran->nim,
+                        'kelas' => $pendaftaran->kelas,
+                        'pertemuan' => $pertemuanDariQR,
+                        'waktu' => $jam . ' WIB',
+                    ],
+                    'message' => "{$pendaftaran->nama} SUDAH tercatat hadir di Pertemuan {$pertemuanDariQR} pada pukul {$jam} WIB.",
+                ]);
+            }
 
-        // 7. Simpan Presensi secara Atomic
-        try {
-            $presensi = Presensi::updateOrCreate(
-                [
-                    'pendaftaran_id' => $pendaftaran->id,
-                    'pertemuan' => $pertemuanDariQR,
-                ],
-                [
-                    'status' => 'hadir',
-                    'waktu_hadir' => now(),
-                ]
-            );
-
+            $presensi = $result['presensi'];
             $waktuStr = $presensi->waktu_hadir->timezone('Asia/Jakarta')->format('H:i:s');
 
             // Dorong notifikasi real-time ke Layar Proyektor
@@ -241,9 +276,13 @@ class PresensiMahasiswaController extends Controller
                 }
             });
 
+            $pointSuffix = $result['point_awarded'] ? ' (+1 Point).' : '.';
+
             return response()->json([
                 'success' => true,
                 'already' => false,
+                'point_awarded' => $result['point_awarded'],
+                'total_point' => $result['total_point'],
                 'nama' => $pendaftaran->nama,
                 'nim' => $pendaftaran->nim,
                 'kelas' => $pendaftaran->kelas,
@@ -256,7 +295,7 @@ class PresensiMahasiswaController extends Controller
                     'pertemuan' => $pertemuanDariQR,
                     'waktu' => $waktuStr . ' WIB',
                 ],
-                'message' => "Hadir Berhasil! {$pendaftaran->nama} ({$pendaftaran->kelas}) tercatat pada Pertemuan {$pertemuanDariQR}.",
+                'message' => "Hadir Berhasil! {$pendaftaran->nama} ({$pendaftaran->kelas}) tercatat pada Pertemuan {$pertemuanDariQR}{$pointSuffix}",
             ]);
         } catch (\Throwable $e) {
             Log::error('Error saat submit scan presensi: ' . $e->getMessage());

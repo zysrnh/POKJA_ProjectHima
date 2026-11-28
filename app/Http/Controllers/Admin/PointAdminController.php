@@ -506,6 +506,8 @@ class PointAdminController extends Controller
         $mahasiswa = Pendaftaran::findOrFail($validated['pendaftaran_id']);
 
         DB::transaction(function () use ($mahasiswa, $tipe, $kategori, $jumlah, $validated) {
+            Pendaftaran::where('id', $mahasiswa->id)->lockForUpdate()->first();
+
             PointHistory::create([
                 'pendaftaran_id' => $mahasiswa->id,
                 'tipe' => $tipe,
@@ -515,14 +517,7 @@ class PointAdminController extends Controller
                 'created_by' => Auth::user()?->name ?? 'Admin',
             ]);
 
-            $currentPoint = (int) $mahasiswa->total_point;
-            $newPoint = $tipe === 'tambah'
-                ? ($currentPoint + $jumlah)
-                : max(0, $currentPoint - $jumlah);
-
-            $mahasiswa->update([
-                'total_point' => $newPoint,
-            ]);
+            PointHistory::recalculateTotalPoint($mahasiswa->id);
         });
 
         $simbol = $tipe === 'tambah' ? "+{$jumlah}" : "-{$jumlah}";
@@ -576,26 +571,9 @@ class PointAdminController extends Controller
         $mahasiswa = Pendaftaran::findOrFail($history->pendaftaran_id);
 
         DB::transaction(function () use ($history, $mahasiswa) {
+            Pendaftaran::where('id', $mahasiswa->id)->lockForUpdate()->first();
             $history->delete();
-
-            // Hitung ulang total point secara berurutan dari riwayat yang tersisa
-            $remaining = PointHistory::where('pendaftaran_id', $mahasiswa->id)
-                ->orderBy('created_at', 'asc')
-                ->orderBy('id', 'asc')
-                ->get();
-
-            $recalculated = 0;
-            foreach ($remaining as $item) {
-                if ($item->tipe === 'tambah') {
-                    $recalculated += (int) $item->jumlah;
-                } else {
-                    $recalculated = max(0, $recalculated - (int) $item->jumlah);
-                }
-            }
-
-            $mahasiswa->update([
-                'total_point' => $recalculated,
-            ]);
+            PointHistory::recalculateTotalPoint($mahasiswa->id);
         });
 
         return back()->with('success', "Riwayat point untuk {$mahasiswa->nama} berhasil dihapus & total point telah diperbarui.");

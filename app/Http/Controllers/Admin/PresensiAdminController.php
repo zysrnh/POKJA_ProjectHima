@@ -4,12 +4,15 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Pendaftaran;
+use App\Models\PointHistory;
 use App\Models\Presensi;
 use App\Models\Pengaturan;
 use App\Models\Kelas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -238,36 +241,56 @@ class PresensiAdminController extends Controller
         }
 
         $pendaftaran = Pendaftaran::findOrFail($pendaftaranId);
+        $adminName = Auth::user()?->name ?? 'Admin';
 
-        $presensi = Presensi::where('pendaftaran_id', $pendaftaran->id)
-            ->where('pertemuan', $pertemuan)
-            ->first();
+        $result = DB::transaction(function () use ($pendaftaran, $pertemuan, $adminName) {
+            $lockedPendaftaran = Pendaftaran::where('id', $pendaftaran->id)->lockForUpdate()->firstOrFail();
 
-        if ($presensi && $presensi->status === 'hadir') {
-            // Ubah jadi belum hadir (hapus record presensi pertemuan ini)
-            $presensi->delete();
-            $statusSekarang = 'BELUM HADIR';
-        } else {
-            // Tandai hadir
-            Presensi::updateOrCreate(
-                ['pendaftaran_id' => $pendaftaran->id, 'pertemuan' => $pertemuan],
-                ['status' => 'hadir', 'waktu_hadir' => now()]
-            );
-            $statusSekarang = 'HADIR';
-        }
+            $presensi = Presensi::where('pendaftaran_id', $lockedPendaftaran->id)
+                ->where('pertemuan', $pertemuan)
+                ->first();
+
+            if ($presensi && $presensi->status === 'hadir') {
+                // Ubah jadi belum hadir (hapus record presensi pertemuan ini & cabut poin otomatisnya)
+                $presensi->delete();
+                $revokedCount = PointHistory::revokePresensiPoint($lockedPendaftaran->id, $pertemuan);
+                $statusSekarang = 'BELUM HADIR';
+                $pointSuffix = $revokedCount > 0 ? " (-{$revokedCount} Point)" : '';
+            } else {
+                // Tandai hadir & catat +1 Point Kehadiran otomatis
+                Presensi::updateOrCreate(
+                    ['pendaftaran_id' => $lockedPendaftaran->id, 'pertemuan' => $pertemuan],
+                    ['status' => 'hadir', 'waktu_hadir' => now()]
+                );
+                $awarded = PointHistory::awardPresensiPoint($lockedPendaftaran->id, $pertemuan, $adminName);
+                $statusSekarang = 'HADIR';
+                $pointSuffix = $awarded ? ' (+1 Point)' : '';
+            }
+
+            $lockedPendaftaran->refresh();
+
+            return [
+                'status' => $statusSekarang,
+                'point_suffix' => $pointSuffix,
+                'total_point' => (int) $lockedPendaftaran->total_point,
+            ];
+        });
 
         // Sinkronisasi otomatis ke Google Sheets di background
         self::syncAllWithKehadiranToSheets();
 
-        if ($request->ajax()) {
+        $message = "Presensi Pertemuan {$pertemuan} untuk {$pendaftaran->nama} berhasil diubah jadi {$result['status']}{$result['point_suffix']}.";
+
+        if ($request->ajax() || $request->expectsJson()) {
             return response()->json([
                 'success' => true,
-                'status' => $statusSekarang,
-                'message' => "Presensi Pertemuan {$pertemuan} untuk {$pendaftaran->nama} berhasil diubah jadi {$statusSekarang}."
+                'status' => $result['status'],
+                'total_point' => $result['total_point'],
+                'message' => $message,
             ]);
         }
 
-        return redirect()->back()->with('success', "Presensi Pertemuan {$pertemuan} untuk {$pendaftaran->nama} berhasil diubah jadi {$statusSekarang}.");
+        return redirect()->back()->with('success', $message);
     }
 
     /**
