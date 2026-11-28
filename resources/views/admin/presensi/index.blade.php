@@ -74,50 +74,84 @@
     </div>
 
     <!-- ============================================================== -->
-    <!-- CARD 2: TAB PILIHAN P1 - P7 & 1-KLIK TOGGLE SCAN (Icon Only)   -->
+    <!-- CARD 2: TAB PILIHAN P1 - P7 & KONTROL SESI SCAN PERTEMUAN      -->
     <!-- ============================================================== -->
+    @php
+        $pertemuanAktif = (int) ($pengaturan->pertemuan_aktif ?? 1);
+        $isScanAktif = (bool) ($pengaturan->is_scan_aktif ?? false);
+        $isViewingActiveSession = ($pertemuanAktif === $pertemuanDipilih);
+    @endphp
     <div class="snap-in-2 bg-white border-2 border-[#000000] p-3 sm:p-4 shadow-[4px_4px_0px_0px_#000000]">
-        <div class="flex items-center justify-between gap-3">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             
             <!-- Left: 7 Pertemuan Pill Tabs -->
             <div class="flex items-center gap-1.5 overflow-x-auto pb-0.5">
                 @for ($p = 1; $p <= 7; $p++)
+                    @php $isTabAktifDb = ($pertemuanAktif === $p); @endphp
                     <a 
                         href="{{ route('admin.presensi.index', ['pertemuan' => $p, 'search' => $search, 'kelas' => $kelasFilter]) }}"
-                        class="btn-smooth shrink-0 px-3 sm:px-3.5 py-1.5 border-2 border-black text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] {{ $pertemuanDipilih === $p ? 'bg-[#2A82C6] text-white' : 'bg-white text-gray-800 hover:bg-gray-100' }}"
-                        title="Pilih Pertemuan {{ $p }}"
+                        class="btn-smooth shrink-0 inline-flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 border-2 border-black text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] {{ $pertemuanDipilih === $p ? 'bg-[#2A82C6] text-white' : 'bg-white text-gray-800 hover:bg-gray-100' }}"
+                        title="Pilih Pertemuan {{ $p }}{{ $isTabAktifDb ? ' (Sesi Proyektor & Scan Aktif)' : '' }}"
                     >
-                        P{{ $p }}
+                        <span>P{{ $p }}</span>
+                        @if ($isTabAktifDb)
+                            <span
+                                class="w-2 h-2 border border-black {{ $isScanAktif ? 'bg-green-400 animate-pulse' : 'bg-amber-300' }}"
+                                title="{{ $isScanAktif ? 'Scan P' . $p . ' sedang DIBUKA' : 'Sesi aktif saat ini (scan ditutup)' }}"
+                            ></span>
+                        @endif
                     </a>
                 @endfor
             </div>
 
-            <!-- Right: 1-Click Scan Toggle (Icon Only) -->
-            <form action="{{ route('admin.presensi.sesi') }}" method="POST" class="inline shrink-0">
-                @csrf
-                <input type="hidden" name="toggle_scan" value="1">
-                @if ($pengaturan->is_scan_aktif)
-                    <button 
-                        type="submit" 
-                        class="btn-smooth w-9 h-9 sm:w-10 sm:h-10 bg-[#CA2C2A] hover:bg-[#901C1A] text-white border-2 border-black flex items-center justify-center shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
-                        title="Sesi Scan Sedang DIBUKA — Klik untuk TUTUP sesi scan"
-                    >
-                        <svg class="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="square" stroke-width="2.8" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                @else
-                    <button 
-                        type="submit" 
-                        class="btn-smooth w-9 h-9 sm:w-10 sm:h-10 bg-[#15803d] hover:bg-[#166534] text-white border-2 border-black flex items-center justify-center shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
-                        title="Sesi Scan Sedang DITUTUP — Klik untuk BUKA sesi scan"
-                    >
-                        <svg class="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="square" stroke-width="3" d="M5 13l4 4L19 7" />
-                        </svg>
-                    </button>
-                @endif
-            </form>
+            <!-- Right: Status Sesi Aktif + Tombol Kontrol Scan Pertemuan Dipilih -->
+            <div class="flex flex-wrap items-center justify-between sm:justify-end gap-2 shrink-0">
+                <span class="px-2.5 py-1.5 border-2 border-black text-[10px] sm:text-[11px] font-black uppercase tracking-wider {{ $isScanAktif ? 'bg-green-100 text-green-900' : 'bg-gray-100 text-gray-700' }}">
+                    {{ $isScanAktif ? "Scan Aktif: P{$pertemuanAktif}" : "Scan Ditutup (P{$pertemuanAktif})" }}
+                </span>
+
+                <form action="{{ route('admin.presensi.sesi') }}" method="POST" class="inline shrink-0">
+                    @csrf
+                    <input type="hidden" name="pertemuan_aktif" value="{{ $pertemuanDipilih }}">
+                    @if (!$isViewingActiveSession)
+                        <input type="hidden" name="activate_scan" value="1">
+                        <button 
+                            type="submit" 
+                            class="btn-smooth inline-flex items-center gap-1.5 px-3 py-1.5 sm:py-2 bg-[#15803d] hover:bg-[#166534] text-white border-2 border-black text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
+                            title="Pindahkan sesi aktif ke Pertemuan {{ $pertemuanDipilih }} dan buka sesi scan"
+                        >
+                            <svg class="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="square" stroke-width="3" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span>Buka Sesi P{{ $pertemuanDipilih }}</span>
+                        </button>
+                    @elseif ($isScanAktif)
+                        <input type="hidden" name="toggle_scan" value="1">
+                        <button 
+                            type="submit" 
+                            class="btn-smooth inline-flex items-center gap-1.5 px-3 py-1.5 sm:py-2 bg-[#CA2C2A] hover:bg-[#901C1A] text-white border-2 border-black text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
+                            title="Sesi Scan P{{ $pertemuanDipilih }} sedang DIBUKA — Klik untuk TUTUP sesi scan"
+                        >
+                            <svg class="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="square" stroke-width="2.8" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                            <span>Tutup Scan P{{ $pertemuanDipilih }}</span>
+                        </button>
+                    @else
+                        <input type="hidden" name="toggle_scan" value="1">
+                        <button 
+                            type="submit" 
+                            class="btn-smooth inline-flex items-center gap-1.5 px-3 py-1.5 sm:py-2 bg-[#15803d] hover:bg-[#166534] text-white border-2 border-black text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_#000000] cursor-pointer"
+                            title="Sesi Scan P{{ $pertemuanDipilih }} sedang DITUTUP — Klik untuk BUKA sesi scan"
+                        >
+                            <svg class="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="square" stroke-width="3" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span>Buka Scan P{{ $pertemuanDipilih }}</span>
+                        </button>
+                    @endif
+                </form>
+            </div>
 
         </div>
     </div>

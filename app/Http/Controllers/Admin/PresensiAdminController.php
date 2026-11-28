@@ -200,7 +200,11 @@ class PresensiAdminController extends Controller
      */
     public function updateSesi(Request $request)
     {
-        $pengaturan = Pengaturan::firstOrCreate([]);
+        $pengaturan = Pengaturan::firstOrCreate([], [
+            'nama_acara' => 'POKJA HIMA IF',
+            'pertemuan_aktif' => 1,
+            'is_scan_aktif' => true,
+        ]);
 
         if ($request->has('pertemuan_aktif')) {
             $p = (int) $request->input('pertemuan_aktif');
@@ -209,7 +213,9 @@ class PresensiAdminController extends Controller
             }
         }
 
-        if ($request->has('toggle_scan')) {
+        if ($request->boolean('activate_scan')) {
+            $pengaturan->is_scan_aktif = true;
+        } elseif ($request->has('toggle_scan')) {
             $pengaturan->is_scan_aktif = !$pengaturan->is_scan_aktif;
         } elseif ($request->has('is_scan_aktif')) {
             $pengaturan->is_scan_aktif = $request->boolean('is_scan_aktif');
