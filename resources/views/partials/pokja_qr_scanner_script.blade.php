@@ -100,6 +100,7 @@
         const container = containerId ? document.getElementById(containerId) : null;
         if (container) {
             container.style.touchAction = '';
+            container.style.overflow = '';
             container.innerHTML = '';
         }
     }
@@ -127,16 +128,19 @@
             const videoEl = container ? container.querySelector('video') : null;
             const stream = videoEl && videoEl.srcObject ? videoEl.srcObject : null;
             const track = stream && stream.getVideoTracks ? stream.getVideoTracks()[0] : null;
-            if (!container || !track || typeof track.getCapabilities !== 'function') {
+            if (!container || !videoEl || !track) {
                 return;
             }
 
-            const caps = track.getCapabilities();
+            const caps = typeof track.getCapabilities === 'function' ? track.getCapabilities() : {};
 
-            // Tingkatkan resolusi & autofocus secara halus setelah stream berhasil dibuka
+            // Tingkatkan resolusi Full HD & autofocus kontinu secara halus setelah kamera terbuka
             if (typeof track.applyConstraints === 'function') {
                 const enhanceConstraints = {};
-                if (caps.width && caps.width.max >= 1280 && caps.height && caps.height.max >= 720) {
+                if (caps.width && caps.width.max >= 1920 && caps.height && caps.height.max >= 1080) {
+                    enhanceConstraints.width = { ideal: 1920 };
+                    enhanceConstraints.height = { ideal: 1080 };
+                } else if (caps.width && caps.width.max >= 1280 && caps.height && caps.height.max >= 720) {
                     enhanceConstraints.width = { ideal: 1280 };
                     enhanceConstraints.height = { ideal: 720 };
                 }
@@ -148,28 +152,94 @@
                 }
             }
 
-            if (!caps.zoom || typeof caps.zoom.max !== 'number') {
-                return;
-            }
+            const hasHwZoom = Boolean(caps.zoom && typeof caps.zoom.max === 'number' && caps.zoom.max > (Number(caps.zoom.min) || 1));
+            const minZoom = hasHwZoom ? (Number(caps.zoom.min) || 1) : 1;
+            const hwMax = hasHwZoom ? Number(caps.zoom.max) : 1;
+            const hwStep = hasHwZoom ? (Number(caps.zoom.step) || 0.1) : 0.1;
 
-            const minZoom = Number(caps.zoom.min) || 1;
-            const maxZoom = Number(caps.zoom.max);
-            if (!(maxZoom > minZoom)) {
-                return;
-            }
-
-            const rawStep = Number(caps.zoom.step) || 0.1;
-            const sliderStep = Math.max(0.05, Math.min(0.25, rawStep));
-            const btnDelta = Math.max(0.5, Number(((maxZoom - minZoom) / 8).toFixed(1)));
             const currentSetting = typeof track.getSettings === 'function' ? Number(track.getSettings().zoom) : NaN;
-            let activeZoom = clampAndSnapZoom(
-                Number.isFinite(currentSetting) ? currentSetting : Math.min(maxZoom, Math.max(minZoom, 1)),
-                minZoom,
-                maxZoom,
-                rawStep
-            );
+            let activeZoom = hasHwZoom
+                ? clampAndSnapZoom(Number.isFinite(currentSetting) ? currentSetting : minZoom, minZoom, hwMax, hwStep)
+                : 1;
+            let currentDigitalScale = 1;
 
-            // Overlay badge sementara saat mencubit layar kamera
+            // Pastikan wrapper video menyembunyikan overflow ketika digital zoom aktif
+            container.style.overflow = 'hidden';
+            if (videoEl.parentElement) {
+                videoEl.parentElement.style.overflow = 'hidden';
+            }
+
+            // Hook canvas decoder milik html5-qrcode di container ini agar digital zoom ikut memperbesar frame yang di-decode
+            const scanCanvas = container.querySelector('canvas');
+            const scanCtx = scanCanvas ? scanCanvas.getContext('2d') : null;
+            let wrappedCanvasCtx = null;
+            let origDrawImage = null;
+
+            if (scanCtx && typeof scanCtx.drawImage === 'function') {
+                origDrawImage = scanCtx.__pokjaOrigDrawImage || scanCtx.drawImage.bind(scanCtx);
+                scanCtx.__pokjaOrigDrawImage = origDrawImage;
+                wrappedCanvasCtx = scanCtx;
+
+                scanCtx.drawImage = function (img, ...args) {
+                    const scale = currentDigitalScale;
+                    if (img === videoEl && scale > 1.01 && videoEl.videoWidth > 0 && videoEl.videoHeight > 0) {
+                        const srcW = videoEl.videoWidth;
+                        const srcH = videoEl.videoHeight;
+                        let sx = 0;
+                        let sy = 0;
+                        let sw = srcW;
+                        let sh = srcH;
+                        let dx = 0;
+                        let dy = 0;
+                        let dw = srcW;
+                        let dh = srcH;
+
+                        if (args.length === 2) {
+                            dx = args[0];
+                            dy = args[1];
+                        } else if (args.length === 4) {
+                            dx = args[0];
+                            dy = args[1];
+                            dw = args[2];
+                            dh = args[3];
+                        } else if (args.length >= 8) {
+                            sx = args[0];
+                            sy = args[1];
+                            sw = args[2];
+                            sh = args[3];
+                            dx = args[4];
+                            dy = args[5];
+                            dw = args[6];
+                            dh = args[7];
+                        } else {
+                            return origDrawImage(img, ...args);
+                        }
+
+                        const cx = sx + sw / 2;
+                        const cy = sy + sh / 2;
+                        const croppedSw = Math.max(48, sw / scale);
+                        const croppedSh = Math.max(48, sh / scale);
+                        const nextSx = Math.max(0, Math.min(srcW - croppedSw, cx - croppedSw / 2));
+                        const nextSy = Math.max(0, Math.min(srcH - croppedSh, cy - croppedSh / 2));
+
+                        return origDrawImage(img, nextSx, nextSy, croppedSw, croppedSh, dx, dy, dw, dh);
+                    }
+
+                    return origDrawImage(img, ...args);
+                };
+            }
+
+            const getMaxAllowedZoom = () => {
+                const vw = videoEl.videoWidth || 0;
+                const vh = videoEl.videoHeight || 0;
+                const minSide = Math.min(vw, vh);
+                const maxDigital = minSide > 96 ? Math.max(6, Math.floor(minSide / 48)) : 20;
+                return Math.max(20, Number((hwMax * maxDigital).toFixed(1)));
+            };
+
+            const initialSliderMax = Math.max(20, Math.ceil(hwMax * 3));
+
+            // Overlay badge sementara saat mencubit atau menggeser zoom
             const viewportWrapper = container.parentElement;
             let overlayBadge = null;
             let hideBadgeTimer = null;
@@ -196,9 +266,13 @@
 
             const syncZoomUi = (zoomVal) => {
                 if (readoutEl) {
-                    readoutEl.textContent = `${zoomVal.toFixed(1)}x / ${maxZoom.toFixed(1)}x`;
+                    readoutEl.textContent = `${zoomVal.toFixed(1)}x`;
                 }
                 if (sliderEl) {
+                    const curMax = Number(sliderEl.max) || initialSliderMax;
+                    if (zoomVal > curMax) {
+                        sliderEl.max = String(Math.ceil(zoomVal + 5));
+                    }
                     sliderEl.value = String(zoomVal);
                 }
                 if (resetBtn) {
@@ -209,43 +283,66 @@
                 }
             };
 
-            let pendingZoom = null;
-            let isApplyingZoom = false;
+            let pendingHwZoom = null;
+            let isApplyingHwZoom = false;
             let lastApplyTs = 0;
+            let lastSentHwZoom = null;
 
-            const applyHardwareZoom = (nextZoom, showOverlay = false) => {
-                activeZoom = clampAndSnapZoom(nextZoom, minZoom, maxZoom, rawStep);
+            const pumpHwZoom = async () => {
+                if (!hasHwZoom || pendingHwZoom === null) return;
+                const elapsed = Date.now() - lastApplyTs;
+                if (elapsed < 55) {
+                    await delay(55 - elapsed);
+                }
+                if (pendingHwZoom === null) return;
+                const target = pendingHwZoom;
+                pendingHwZoom = null;
+                if (target === lastSentHwZoom) {
+                    return;
+                }
+                isApplyingHwZoom = true;
+                lastApplyTs = Date.now();
+                try {
+                    await track.applyConstraints({ advanced: [{ zoom: target }] });
+                    lastSentHwZoom = target;
+                } catch (_) {
+                    // Abaikan reject driver sementara saat gesture cepat
+                } finally {
+                    isApplyingHwZoom = false;
+                    if (pendingHwZoom !== null) {
+                        pumpHwZoom();
+                    }
+                }
+            };
+
+            const applyHybridZoom = (nextZoom, showOverlay = false) => {
+                const maxAllowed = getMaxAllowedZoom();
+                activeZoom = Number(Math.min(maxAllowed, Math.max(minZoom, Number(nextZoom) || minZoom)).toFixed(2));
+
+                currentDigitalScale = activeZoom > hwMax ? Number((activeZoom / hwMax).toFixed(3)) : 1;
+
+                if (currentDigitalScale > 1.01) {
+                    videoEl.style.transformOrigin = 'center center';
+                    videoEl.style.transform = `scale(${currentDigitalScale})`;
+                } else {
+                    videoEl.style.transform = '';
+                    videoEl.style.transformOrigin = '';
+                }
+
                 syncZoomUi(activeZoom);
                 if (showOverlay) {
                     flashZoomBadge(activeZoom);
                 }
 
-                pendingZoom = activeZoom;
-                if (isApplyingZoom) return;
-
-                const pump = async () => {
-                    if (pendingZoom === null) return;
-                    const elapsed = Date.now() - lastApplyTs;
-                    if (elapsed < 55) {
-                        await delay(55 - elapsed);
-                    }
-                    if (pendingZoom === null) return;
-                    const target = pendingZoom;
-                    pendingZoom = null;
-                    isApplyingZoom = true;
-                    lastApplyTs = Date.now();
-                    try {
-                        await track.applyConstraints({ advanced: [{ zoom: target }] });
-                    } catch (_) {
-                        // Abaikan reject driver sementara saat gesture cepat
-                    } finally {
-                        isApplyingZoom = false;
-                        if (pendingZoom !== null) {
-                            pump();
+                if (hasHwZoom && typeof track.applyConstraints === 'function') {
+                    const targetHw = clampAndSnapZoom(Math.min(activeZoom, hwMax), minZoom, hwMax, hwStep);
+                    if (targetHw !== lastSentHwZoom) {
+                        pendingHwZoom = targetHw;
+                        if (!isApplyingHwZoom) {
+                            pumpHwZoom();
                         }
                     }
-                };
-                pump();
+                }
             };
 
             if (zoomBar) {
@@ -266,7 +363,7 @@
                 resetBtn.type = 'button';
                 resetBtn.textContent = 'Reset 1x';
                 resetBtn.className = 'px-2 py-0.5 bg-white hover:bg-gray-100 text-black border border-black text-[10px] font-black uppercase cursor-pointer';
-                resetBtn.addEventListener('click', () => applyHardwareZoom(minZoom, true));
+                resetBtn.addEventListener('click', () => applyHybridZoom(minZoom, true));
 
                 rightGroup.appendChild(readoutEl);
                 rightGroup.appendChild(resetBtn);
@@ -276,23 +373,29 @@
                 const controlRow = document.createElement('div');
                 controlRow.className = 'flex items-center gap-2';
 
+                const getAdaptiveStep = (dir) => {
+                    if (activeZoom < 3) return dir * 0.5;
+                    if (activeZoom < 8) return dir * 1.0;
+                    return dir * 2.0;
+                };
+
                 const zoomOutBtn = document.createElement('button');
                 zoomOutBtn.type = 'button';
                 zoomOutBtn.textContent = '-';
                 zoomOutBtn.setAttribute('aria-label', 'Perkecil Zoom');
                 zoomOutBtn.className = 'w-8 h-8 shrink-0 bg-white hover:bg-gray-100 text-black border-2 border-black font-black text-base leading-none shadow-[1px_1px_0px_0px_#000000] cursor-pointer';
-                zoomOutBtn.addEventListener('click', () => applyHardwareZoom(activeZoom - btnDelta, true));
+                zoomOutBtn.addEventListener('click', () => applyHybridZoom(activeZoom + getAdaptiveStep(-1), true));
 
                 sliderEl = document.createElement('input');
                 sliderEl.type = 'range';
                 sliderEl.min = String(minZoom);
-                sliderEl.max = String(maxZoom);
-                sliderEl.step = String(sliderStep);
+                sliderEl.max = String(initialSliderMax);
+                sliderEl.step = '0.1';
                 sliderEl.value = String(activeZoom);
                 sliderEl.setAttribute('aria-label', 'Atur Zoom Kamera');
                 sliderEl.className = 'flex-1 h-2.5 accent-[#1A467C] cursor-pointer';
                 sliderEl.addEventListener('input', () => {
-                    applyHardwareZoom(parseFloat(sliderEl.value), true);
+                    applyHybridZoom(parseFloat(sliderEl.value), true);
                 });
 
                 const zoomInBtn = document.createElement('button');
@@ -300,7 +403,7 @@
                 zoomInBtn.textContent = '+';
                 zoomInBtn.setAttribute('aria-label', 'Perbesar Zoom');
                 zoomInBtn.className = 'w-8 h-8 shrink-0 bg-white hover:bg-gray-100 text-black border-2 border-black font-black text-base leading-none shadow-[1px_1px_0px_0px_#000000] cursor-pointer';
-                zoomInBtn.addEventListener('click', () => applyHardwareZoom(activeZoom + btnDelta, true));
+                zoomInBtn.addEventListener('click', () => applyHybridZoom(activeZoom + getAdaptiveStep(1), true));
 
                 controlRow.appendChild(zoomOutBtn);
                 controlRow.appendChild(sliderEl);
@@ -315,6 +418,7 @@
 
             // Pinch-to-Zoom 2 Jari langsung di layar kamera
             container.style.touchAction = 'pan-y';
+            videoEl.style.touchAction = 'pan-y';
             let pinchStartDist = 0;
             let pinchStartZoom = activeZoom;
 
@@ -337,8 +441,8 @@
                     e.preventDefault();
                     const dist = getTouchDist(e.touches);
                     const ratio = dist / pinchStartDist;
-                    const nextZoom = pinchStartZoom * Math.pow(ratio, 1.2);
-                    applyHardwareZoom(nextZoom, true);
+                    const nextZoom = pinchStartZoom * Math.pow(ratio, 1.25);
+                    applyHybridZoom(nextZoom, true);
                 }
             };
 
@@ -359,6 +463,16 @@
                 container.removeEventListener('touchend', onTouchEnd);
                 container.removeEventListener('touchcancel', onTouchEnd);
                 container.style.touchAction = '';
+                container.style.overflow = '';
+                if (videoEl) {
+                    videoEl.style.touchAction = '';
+                    videoEl.style.transform = '';
+                    videoEl.style.transformOrigin = '';
+                }
+                if (wrappedCanvasCtx && origDrawImage) {
+                    wrappedCanvasCtx.drawImage = origDrawImage;
+                    delete wrappedCanvasCtx.__pokjaOrigDrawImage;
+                }
                 if (hideBadgeTimer) clearTimeout(hideBadgeTimer);
                 if (overlayBadge && overlayBadge.parentNode) {
                     overlayBadge.parentNode.removeChild(overlayBadge);
