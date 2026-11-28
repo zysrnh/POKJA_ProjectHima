@@ -18,16 +18,24 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     /**
-     * Email tunggal yang memiliki hak akses penuh sebagai Super Admin.
+     * Email utama Super Admin bawaan sistem.
      */
     public const SUPER_ADMIN_EMAIL = 'naoo@hmif.my.id';
 
     /**
-     * Mengecek apakah akun ini adalah Super Admin tunggal.
+     * Daftar email yang memiliki hak akses penuh sebagai Super Admin.
+     */
+    public const SUPER_ADMIN_EMAILS = [
+        'naoo@hmif.my.id',
+        'adinda@hmif.my.id',
+    ];
+
+    /**
+     * Mengecek apakah akun ini termasuk Super Admin.
      */
     public function isSuperAdmin(): bool
     {
-        return strtolower(trim((string) $this->email)) === self::SUPER_ADMIN_EMAIL;
+        return in_array(strtolower(trim((string) $this->email)), self::SUPER_ADMIN_EMAILS, true);
     }
 
     /**

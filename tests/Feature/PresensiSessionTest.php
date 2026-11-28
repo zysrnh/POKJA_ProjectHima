@@ -133,9 +133,10 @@ class PresensiSessionTest extends TestCase
         $this->assertSame(3, $pengaturan->pertemuan_aktif);
         $this->assertFalse($pengaturan->is_scan_aktif);
 
-        // Public /absen scanner page renders with cache-busted pokja-qr-scanner.js
+        // Public /absen scanner page renders inline PokjaQrScanner script
         $this->get(route('presensi.absen'))
             ->assertOk()
-            ->assertSee('pokja-qr-scanner.js?v=');
+            ->assertSee('window.PokjaQrScanner')
+            ->assertSee('formatError');
     }
 }

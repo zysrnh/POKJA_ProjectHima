@@ -305,6 +305,8 @@ class KelompokManagementTest extends TestCase
         $this->withSession($sessionData)
             ->get(route('mahasiswa.dashboard', ['tab' => 'kelompok']))
             ->assertOk()
+            ->assertSee('window.PokjaQrScanner')
+            ->assertSee('formatError')
             ->assertSee('Tim Resmi SU')
             ->assertSee('Edit Proposal / Foto')
             ->assertDontSee('Bubarkan Kelompok');
@@ -376,5 +378,36 @@ class KelompokManagementTest extends TestCase
             ->post(route('mahasiswa.kelompok.joinCode'), ['kode_invite' => 'PKJ-RESMI1'])
             ->assertRedirect(route('mahasiswa.dashboard', ['tab' => 'kelompok']))
             ->assertSessionHas('error');
+    }
+
+    public function test_adinda_seeder_grants_super_admin_access_and_preserves_profile_edit(): void
+    {
+        $this->seed(\Database\Seeders\AdindaSuperAdminSeeder::class);
+
+        $adinda = User::where('email', 'adinda@hmif.my.id')->first();
+        $this->assertNotNull($adinda);
+        $this->assertTrue($adinda->isSuperAdmin());
+
+        $this->actingAs($adinda)
+            ->get(route('admin.kelompok.index'))
+            ->assertOk();
+
+        $this->actingAs($adinda)
+            ->get(route('admin.users.index'))
+            ->assertOk()
+            ->assertSee('SUPER ADMIN');
+
+        $this->actingAs($adinda)
+            ->put(route('admin.users.update', $adinda->id), [
+                'name' => 'Adinda S.',
+                'email' => 'adinda@hmif.my.id',
+            ])
+            ->assertRedirect(route('admin.users.index'))
+            ->assertSessionHas('success');
+
+        $this->assertDatabaseHas('users', [
+            'id' => $adinda->id,
+            'name' => 'Adinda S.',
+        ]);
     }
 }

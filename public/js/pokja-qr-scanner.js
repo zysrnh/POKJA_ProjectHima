@@ -1,6 +1,10 @@
 (function () {
     const activeOpsByContainer = new Map();
 
+    function delay(ms) {
+        return new Promise((resolve) => setTimeout(resolve, ms));
+    }
+
     function extractErrorText(err) {
         if (!err) return '';
         if (typeof err === 'string') return err;
@@ -8,47 +12,46 @@
         return parts.length > 0 ? parts.join(': ') : String(err);
     }
 
+    async function ensureHtml5QrcodeLoaded() {
+        if (typeof Html5Qrcode !== 'undefined') {
+            return true;
+        }
+
+        const cdnFallbacks = [
+            'https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js',
+            'https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js',
+        ];
+
+        for (const src of cdnFallbacks) {
+            try {
+                await new Promise((resolve, reject) => {
+                    const s = document.createElement('script');
+                    s.src = src;
+                    s.async = true;
+                    s.onload = () => resolve();
+                    s.onerror = () => reject(new Error('CDN load failed'));
+                    document.head.appendChild(s);
+                });
+                if (typeof Html5Qrcode !== 'undefined') {
+                    return true;
+                }
+            } catch (_) {}
+        }
+
+        return typeof Html5Qrcode !== 'undefined';
+    }
+
     function safeQrBox(viewfinderWidth, viewfinderHeight) {
-        const minDim = Math.min(viewfinderWidth || 0, viewfinderHeight || 0);
-        if (!minDim || minDim < 80) {
+        const w = Number(viewfinderWidth) || 0;
+        const h = Number(viewfinderHeight) || 0;
+        const minDim = Math.min(w, h);
+        if (minDim < 70) {
             return { width: 50, height: 50 };
         }
         const maxAllowed = Math.max(50, minDim - 12);
-        const target = Math.floor(minDim * 0.8);
-        const edge = Math.min(maxAllowed, Math.max(50, Math.min(320, target)));
+        const target = Math.floor(minDim * 0.78);
+        const edge = Math.min(maxAllowed, Math.max(50, Math.min(300, target)));
         return { width: edge, height: edge };
-    }
-
-    function buildHdConfig() {
-        return {
-            fps: 15,
-            qrbox: safeQrBox,
-            videoConstraints: {
-                facingMode: { ideal: 'environment' },
-                width: { ideal: 1280 },
-                height: { ideal: 720 },
-            },
-        };
-    }
-
-    function buildCompatConfig() {
-        return {
-            fps: 12,
-            qrbox: safeQrBox,
-        };
-    }
-
-    function createScanner(containerId, useNativeDetector) {
-        if (useNativeDetector) {
-            return new Html5Qrcode(containerId, {
-                experimentalFeatures: {
-                    useBarCodeDetectorIfSupported: true,
-                },
-                verbose: false,
-            });
-        }
-
-        return new Html5Qrcode(containerId, { verbose: false });
     }
 
     function releaseContainerVideoTracks(containerId) {
@@ -106,8 +109,19 @@
 
             const caps = track.getCapabilities();
 
-            if (Array.isArray(caps.focusMode) && caps.focusMode.includes('continuous')) {
-                track.applyConstraints({ advanced: [{ focusMode: 'continuous' }] }).catch(() => {});
+            // Tingkatkan resolusi & autofocus secara halus setelah stream berhasil dibuka
+            if (typeof track.applyConstraints === 'function') {
+                const enhanceConstraints = {};
+                if (caps.width && caps.width.max >= 1280 && caps.height && caps.height.max >= 720) {
+                    enhanceConstraints.width = { ideal: 1280 };
+                    enhanceConstraints.height = { ideal: 720 };
+                }
+                if (Array.isArray(caps.focusMode) && caps.focusMode.includes('continuous')) {
+                    enhanceConstraints.advanced = [{ focusMode: 'continuous' }];
+                }
+                if (Object.keys(enhanceConstraints).length > 0) {
+                    track.applyConstraints(enhanceConstraints).catch(() => {});
+                }
             }
 
             if (zoomBar && caps.zoom && typeof caps.zoom.max === 'number' && caps.zoom.max > caps.zoom.min) {
@@ -165,8 +179,8 @@
         }
     }
 
-    async function tryStartAttempt(containerId, cameraConfig, scanConfig, useNativeDetector, onSuccess) {
-        const scanner = createScanner(containerId, useNativeDetector);
+    async function tryStartAttempt(containerId, cameraConfig, scanConfig, onSuccess) {
+        const scanner = new Html5Qrcode(containerId, { verbose: false });
         try {
             await scanner.start(cameraConfig, scanConfig, onSuccess, () => {});
             return { ok: true, scanner };
@@ -190,7 +204,8 @@
     }
 
     async function runStart(existingInstance, containerId, zoomBarId, onSuccess) {
-        if (typeof Html5Qrcode === 'undefined') {
+        const loaded = await ensureHtml5QrcodeLoaded();
+        if (!loaded) {
             throw new Error('Library QR scanner gagal dimuat. Periksa koneksi internet lalu muat ulang halaman.');
         }
 
@@ -203,30 +218,26 @@
         }
 
         await resetScannerInstance(existingInstance, containerId);
-
-        // Tunggu 1 frame agar ukuran container (#qr-reader / #dash-qr-reader) sudah terhitung
         await new Promise((resolve) => requestAnimationFrame(() => resolve()));
 
-        const hdConfig = buildHdConfig();
-        const compatConfig = buildCompatConfig();
+        const compatConfig = { fps: 12, qrbox: safeQrBox };
+        const fullFrameConfig = { fps: 10 };
 
         const attempts = [
-            { camera: { facingMode: 'environment' }, config: hdConfig, nativeDetector: true },
-            { camera: { facingMode: 'environment' }, config: compatConfig, nativeDetector: false },
-            { camera: { facingMode: 'user' }, config: compatConfig, nativeDetector: false },
+            { camera: { facingMode: 'environment' }, config: compatConfig },
+            { camera: { facingMode: 'user' }, config: compatConfig },
+            { camera: { facingMode: 'environment' }, config: fullFrameConfig },
         ];
 
         let lastError = null;
 
-        for (const attempt of attempts) {
-            const res = await tryStartAttempt(
-                containerId,
-                attempt.camera,
-                attempt.config,
-                attempt.nativeDetector,
-                onSuccess
-            );
+        for (let i = 0; i < attempts.length; i++) {
+            if (i > 0) {
+                await delay(250);
+            }
 
+            const attempt = attempts[i];
+            const res = await tryStartAttempt(containerId, attempt.camera, attempt.config, onSuccess);
             if (res.ok) {
                 setTimeout(() => setupCameraControls(containerId, zoomBarId), 350);
                 return res.scanner;
@@ -238,19 +249,18 @@
             }
         }
 
-        // Fallback terakhir: enumerasi camera deviceId langsung (mengatasi device yang menolak constraint facingMode)
         try {
+            await delay(250);
             const devices = await Html5Qrcode.getCameras();
             const ordered = sortCamerasPreferBack(devices);
-            for (const cam of ordered) {
+            for (let i = 0; i < ordered.length; i++) {
+                const cam = ordered[i];
                 if (!cam || !cam.id) continue;
-                const res = await tryStartAttempt(
-                    containerId,
-                    cam.id,
-                    compatConfig,
-                    false,
-                    onSuccess
-                );
+                if (i > 0) {
+                    await delay(250);
+                }
+
+                const res = await tryStartAttempt(containerId, cam.id, fullFrameConfig, onSuccess);
                 if (res.ok) {
                     setTimeout(() => setupCameraControls(containerId, zoomBarId), 350);
                     return res.scanner;
@@ -311,21 +321,21 @@
             return raw;
         }
         if (/NotAllowedError|PermissionDeniedError|Permission denied|Permission dismissed/i.test(raw)) {
-            return 'Izin kamera diblokir oleh browser atau perangkat. Buka pengaturan izin situs di address bar (ikon gembok/kamera), setel Kamera ke Izinkan, lalu muat ulang halaman.';
+            return 'Izin kamera diblokir oleh browser atau perangkat. Cek pengaturan izin situs di address bar, setel Kamera ke Izinkan, lalu muat ulang halaman.';
         }
         if (/NotReadableError|TrackStartError|AbortError|Could not start video source/i.test(raw)) {
-            return 'Kamera sudah diizinkan, tetapi sedang dipakai oleh aplikasi/tab lain atau hardware kamera belum siap. Tutup aplikasi kamera lain lalu coba lagi.';
+            return 'Browser menerima izin, tetapi hardware kamera gagal dibuka (kemungkinan tab/aplikasi lain masih menahan kamera atau perlu refresh halaman). Detail: ' + raw;
         }
         if (/NotFoundError|DevicesNotFoundError|Requested device not found|no camera/i.test(raw)) {
             return 'Kamera tidak ditemukan pada perangkat ini.';
         }
         if (/OverconstrainedError|ConstraintNotSatisfiedError/i.test(raw)) {
-            return 'Pengaturan kamera tidak cocok dengan perangkat ini. Silakan muat ulang halaman dan coba lagi.';
+            return 'Resolusi/mode kamera tidak didukung browser ini. Detail: ' + raw;
         }
 
         return raw
-            ? `Tidak dapat membuka kamera (${raw}). Pastikan kamera tidak sedang dipakai aplikasi lain lalu muat ulang halaman.`
-            : 'Tidak dapat membuka kamera. Pastikan kamera tidak sedang dipakai aplikasi lain lalu muat ulang halaman.';
+            ? `Tidak dapat membuka kamera (${raw}). Silakan muat ulang halaman dan coba lagi.`
+            : 'Tidak dapat membuka kamera. Silakan muat ulang halaman dan coba lagi.';
     }
 
     window.PokjaQrScanner = {

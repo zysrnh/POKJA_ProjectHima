@@ -18,7 +18,8 @@ class AdminUserController extends Controller
      */
     public function index()
     {
-        $admins = User::orderByRaw("CASE WHEN LOWER(email) = ? THEN 0 ELSE 1 END", [User::SUPER_ADMIN_EMAIL])
+        $placeholders = implode(', ', array_fill(0, count(User::SUPER_ADMIN_EMAILS), '?'));
+        $admins = User::orderByRaw("CASE WHEN LOWER(email) IN ({$placeholders}) THEN 0 ELSE 1 END", User::SUPER_ADMIN_EMAILS)
             ->latest()
             ->paginate(10);
 
@@ -114,9 +115,10 @@ class AdminUserController extends Controller
         ]);
 
         // Cegah akun Super Admin kehilangan email Super Admin-nya secara tidak sengaja
-        if ($admin->isSuperAdmin() && $request->input('email') !== User::SUPER_ADMIN_EMAIL) {
+        $lockedEmail = strtolower(trim((string) $admin->email));
+        if ($admin->isSuperAdmin() && $request->input('email') !== $lockedEmail) {
             return back()
-                ->withErrors(['email' => 'Email utama Super Admin (' . User::SUPER_ADMIN_EMAIL . ') dikunci dan tidak dapat diubah.'])
+                ->withErrors(['email' => 'Email utama Super Admin (' . $lockedEmail . ') dikunci dan tidak dapat diubah.'])
                 ->withInput();
         }
 

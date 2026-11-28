@@ -33,7 +33,7 @@
 
     <!-- HTML5-QRCode Library for In-Browser Camera Scanner -->
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-    <script src="{{ asset('js/pokja-qr-scanner.js') }}?v={{ @filemtime(public_path('js/pokja-qr-scanner.js')) ?: 1 }}"></script>
+    @include('partials.pokja_qr_scanner_script')
     <!-- QRCode.js Library for Generating Group Join QR -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
@@ -536,7 +536,7 @@
                     <!-- Live Scanner Camera Viewport Container -->
                     <div id="dash-camera-box" class="hidden box-snap-in space-y-3">
                         <div class="relative bg-black border-2 border-black overflow-hidden shadow-[4px_4px_0px_0px_#000000]">
-                            <div id="dash-qr-reader" class="w-full"></div>
+                            <div id="dash-qr-reader" class="w-full min-h-[260px]"></div>
                         </div>
 
                         <div id="dash-zoom-bar" class="hidden flex flex-wrap items-center justify-center gap-1.5 py-1"></div>

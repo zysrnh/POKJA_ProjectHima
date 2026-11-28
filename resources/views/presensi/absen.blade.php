@@ -32,7 +32,7 @@
     </script>
     <!-- HTML5-QRCode Library for Fast In-Browser Mobile Camera Scanning -->
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-    <script src="{{ asset('js/pokja-qr-scanner.js') }}?v={{ @filemtime(public_path('js/pokja-qr-scanner.js')) ?: 1 }}"></script>
+    @include('partials.pokja_qr_scanner_script')
 
     <style>
         body {
@@ -187,7 +187,7 @@
             <!-- Area Video Scanner Kamera -->
             <div id="camera-container" class="hidden space-y-3">
                 <div class="relative bg-black border-2 border-black overflow-hidden shadow-[3px_3px_0px_0px_#000000]">
-                    <div id="qr-reader" class="w-full"></div>
+                    <div id="qr-reader" class="w-full min-h-[260px]"></div>
                 </div>
 
                 <div id="absen-zoom-bar" class="hidden flex flex-wrap items-center justify-center gap-1.5 py-1"></div>
