@@ -32,7 +32,7 @@
     </script>
     <!-- HTML5-QRCode Library for Fast In-Browser Mobile Camera Scanning -->
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-    <script src="{{ asset('js/pokja-qr-scanner.js') }}"></script>
+    <script src="{{ asset('js/pokja-qr-scanner.js') }}?v={{ @filemtime(public_path('js/pokja-qr-scanner.js')) ?: 1 }}"></script>
 
     <style>
         body {
@@ -378,22 +378,30 @@
                     onScanSuccess
                 );
             } catch (userErr) {
-                alert("Tidak dapat mengakses kamera. Pastikan Anda telah memberikan izin akses kamera di browser.");
-                stopCameraScanner();
+                console.error('Gagal membuka kamera scanner:', userErr);
+                const msg = window.PokjaQrScanner && typeof window.PokjaQrScanner.formatError === 'function'
+                    ? window.PokjaQrScanner.formatError(userErr)
+                    : 'Tidak dapat mengakses kamera. Pastikan kamera tidak sedang dipakai aplikasi lain.';
+                alert(msg);
+                await stopCameraScanner();
             }
         }
 
         // Tutup Kamera Scanner
         async function stopCameraScanner() {
-            if (html5QrCode && html5QrCode.isScanning) {
-                try {
-                    await html5QrCode.stop();
-                } catch (e) {
-                    // Ignore
+            const currentInstance = html5QrCode;
+            html5QrCode = null;
+            if (window.PokjaQrScanner && typeof window.PokjaQrScanner.stop === 'function') {
+                await window.PokjaQrScanner.stop(currentInstance, 'qr-reader', 'absen-zoom-bar');
+            } else {
+                if (currentInstance && currentInstance.isScanning) {
+                    try {
+                        await currentInstance.stop();
+                    } catch (e) {}
                 }
-            }
-            if (window.PokjaQrScanner) {
-                window.PokjaQrScanner.hideZoomBar('absen-zoom-bar');
+                if (window.PokjaQrScanner) {
+                    window.PokjaQrScanner.hideZoomBar('absen-zoom-bar');
+                }
             }
             document.getElementById('camera-container').classList.add('hidden');
             document.getElementById('btn-camera-wrapper').classList.remove('hidden');

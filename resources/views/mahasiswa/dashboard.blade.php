@@ -33,7 +33,7 @@
 
     <!-- HTML5-QRCode Library for In-Browser Camera Scanner -->
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-    <script src="{{ asset('js/pokja-qr-scanner.js') }}"></script>
+    <script src="{{ asset('js/pokja-qr-scanner.js') }}?v={{ @filemtime(public_path('js/pokja-qr-scanner.js')) ?: 1 }}"></script>
     <!-- QRCode.js Library for Generating Group Join QR -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
@@ -2224,20 +2224,30 @@
                 );
                 isDashScanning = true;
             } catch (userErr) {
-                alert("Tidak dapat mengakses kamera. Pastikan izin kamera telah diberikan di browser.");
-                stopDashScanner();
+                console.error('Gagal membuka kamera scanner dashboard:', userErr);
+                const msg = window.PokjaQrScanner && typeof window.PokjaQrScanner.formatError === 'function'
+                    ? window.PokjaQrScanner.formatError(userErr)
+                    : 'Tidak dapat mengakses kamera. Pastikan kamera tidak sedang dipakai aplikasi lain.';
+                alert(msg);
+                await stopDashScanner();
             }
         }
 
         // Tutup Kamera Scanner
         async function stopDashScanner() {
-            if (dashQrScanner && dashQrScanner.isScanning) {
-                try {
-                    await dashQrScanner.stop();
-                } catch (e) {}
-            }
-            if (window.PokjaQrScanner) {
-                window.PokjaQrScanner.hideZoomBar('dash-zoom-bar');
+            const currentInstance = dashQrScanner;
+            dashQrScanner = null;
+            if (window.PokjaQrScanner && typeof window.PokjaQrScanner.stop === 'function') {
+                await window.PokjaQrScanner.stop(currentInstance, 'dash-qr-reader', 'dash-zoom-bar');
+            } else {
+                if (currentInstance && currentInstance.isScanning) {
+                    try {
+                        await currentInstance.stop();
+                    } catch (e) {}
+                }
+                if (window.PokjaQrScanner) {
+                    window.PokjaQrScanner.hideZoomBar('dash-zoom-bar');
+                }
             }
             isDashScanning = false;
             document.getElementById('dash-camera-box')?.classList.add('hidden');
