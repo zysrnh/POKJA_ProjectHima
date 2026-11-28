@@ -539,7 +539,7 @@
                             <div id="dash-qr-reader" class="w-full min-h-[260px]"></div>
                         </div>
 
-                        <div id="dash-zoom-bar" class="hidden flex flex-wrap items-center justify-center gap-1.5 py-1"></div>
+                        <div id="dash-zoom-bar" class="hidden bg-[#F8FBFE] border-2 border-black p-2.5 shadow-[2px_2px_0px_0px_#000000] space-y-2"></div>
 
                         <button 
                             type="button" 
